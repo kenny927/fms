@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+
+    <!-- ztree v3.5 -->
+    <link rel="stylesheet" type="text/css" href="/res/public/zTree_v3/css/zTreeStyle/zTreeStyle.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/public/zTree_v3/js/jquery.ztree.core-3.5.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/zTree_v3/js/jquery.ztree.excheck-3.5.min.js<@resVersionDirective>?</@>"></script>
+
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div class="purchaseSearch">
+                <form>
+                    <input type="hidden" id="roleId" value="${roleId}">
+                    <dl class="form-list" style="height: 60px;">
+                        <dt style="width: 150px;">角色名称：</dt>
+                        <dd>
+                            <input type="text" id="roleName" value="${roleName}" style="width: 300px;"/>
+                        </dd>
+                    </dl>
+                    <dl id="classifyDiv" class="form-list" style="height: 60px;">
+                        <dt style="width: 150px;">角色描述：</dt>
+                        <dd>
+                            <input type="text" id="roleDesc" style="width: 300px;" value="${roleDesc}" />
+                        </dd>
+                    </dl>
+                    <dl class="form-list" style="height: 500px;">
+                        <dt style="width: 150px;">资源：</dt>
+                        <dd>
+                            <div id="authorityResourceDiv" style="margin-top: 10px;">
+                                <ul id="tree" class="ztree" style="width:340px; height: 500px;overflow-y: scroll;"></ul>
+                            </div>
+                        </dd>
+                    </dl>
+                    <dl class="form-list" style="height:100px;margin-left: 150px;">
+                        <dd><span class="btn ml10" id="updateAuthorityRoleBtn" style="cursor: pointer;">修改</span></dd>
+                        <dd><span class="btn ml10" id="cancelEditAuthorityRoleBtn" style="cursor: pointer;">取消</span></dd>
+                    </dl>
+                </form>
+            </div>
+        </div>
+    </section>
+</section>
+
+<script>
+
+
+    var zTree;
+    var setting = {
+        check: {
+            enable: true,
+            chkStyle: "checkbox",
+            chkboxType: { "Y": "s", "Y": "p" } //勾选只影响父节点,取消勾选只影响子节点
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        },
+        callback: {
+            onClick: zTreeOnClick
+        }
+
+    };
+
+
+    function zTreeOnClick(event, treeId, treeNode) {
+
+    }
+
+    function returnToAuthorityRoleList(){
+        postUtil.submit("/authorityRole/preList")
+    }
+
+    $(function(){
+
+        var initParam={};
+        postUtil.call("/authorityResource/listALlJsonForZTree",initParam,function(resultData){
+            var t = $("#tree");
+            t = $.fn.zTree.init(t, setting, resultData);
+            zTree = $.fn.zTree.getZTreeObj("tree");
+
+            //根据当前roleId查询出roleResource并初始化
+            var roleId = $('#roleId').val();
+            postUtil.call("/authorityRole/roleResource/"+roleId,null,function(resultData){
+                if(resultData) {
+                    for(var i=0;i<resultData.length;i++) {
+                        var resourceId = resultData[i].resourceId;
+                        var zTreeNode = zTree.getNodesByParam("id",resourceId,null);
+                        zTree.checkNode(zTreeNode[0], true, true);
+                    }
+                }
+            });
+        });
+
+
+
+        $('#cancelEditAuthorityRoleBtn').bind("click",function(){
+            returnToAuthorityRoleList();
+        });
+
+        $('#updateAuthorityRoleBtn').bind("click",function(){
+            var layerContent = '<div id="upload" class="t-c c-2" style="padding-top: 40px;"><p style="margin-top: 25px;">确定修改角色：<span class="fz18 c-f fw-b">['+$('#roleName').val()+']</span>吗？</p></div>';
+            layer.open({
+                title: false,
+                skin: 'myskin3',
+                area: ['450px', '250px'],
+                btnAlign: 'c',
+                content:layerContent,
+                btn: ['确定', '取消'],
+                yes: function(index, layero){
+                    var nodes = zTree.getCheckedNodes(true);
+                    var nodeStr = "";
+                    for(i =0;i<nodes.length;i++) {
+                        if(i == (nodes.length-1)) {
+                            nodeStr = nodeStr + nodes[i].id;
+                        }else {
+                            nodeStr = nodeStr + nodes[i].id + ",";
+                        }
+                    }
+
+                    if(nodeStr == "") {
+                        layer.msg("请勾选当前角色所对应的资源",{icon:5})
+                        return;
+                    }
+                    var roleName = $('#roleName').val();
+                    var roleDesc = $('#roleDesc').val();
+                    if(roleName == null || roleName == "") {
+                        layer.msg("角色名称不允许为空",{icon:5})
+                        return;
+                    }
+                    if(roleDesc == null || roleDesc == "") {
+                        layer.msg("角色描述不允许为空",{icon:5})
+                        return;
+                    }
+                    var updateParam = {};
+                    updateParam.roleId = $('#roleId').val();
+                    updateParam.resourceStr = nodeStr;
+                    updateParam.roleName = roleName;
+                    updateParam.roleDesc = roleDesc;
+                    postUtil.call("/authorityRole/update",updateParam,function(result){
+                        if(result.STATUS == "SUCCESS") {
+                            layer.msg("修改成功!",{icon:6});
+                            setTimeout(function(){
+                                postUtil.submit("/authorityRole/preList");
+                            },2000);
+                        }else {
+                            layer.msg(result.MSG,{icon:5});
+                        }
+                    });
+                },btn2: function(index, layero){
+                    layer.close(index);
+                },
+                cancel: function(){
+
+                }
+            });
+
+        });
+    });
+
+</script>
+</body>
+</html>

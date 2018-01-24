@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+
+    <style>
+        #itocCenter .itocContent .itocMain .purchaseSearch form {width:99%}
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain" style="height:486px">
+            <div class="purchaseSearch" style="padding-top:0px;padding-bottom:10px">
+                <form style="width:100%">
+                    <dl class="form-list flt mt20">
+                        <dt>流程定义名称：</dt>
+                        <dd><input type="text" name="definitionName" placeholder="请输入流程名称"/></dd>
+                        <dd><span class="btn ml20" onclick="searchDefinition()" style="height:35px;cursor: pointer;">查询</span></dd>
+                    </dl>
+                </form>
+            </div>
+            <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px">
+                <table class="layui-table pop" lay-skin="line">
+                    <colgroup>
+                        <col style="width:3%">
+                        <col style="width:23%">
+                        <col style="width:7%">
+                        <col style="width:8%">
+                        <col style="width:10%">
+                        <col style="width:10%">
+                        <col style="width:7%">
+                        <col style="width:8%">
+                        <col style="width:8%">
+                        <col style="width:6%">
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th style="text-align:center;width:23%">流程编号</th>
+                        <th style="text-align:center;width:7%">名称</th>
+                        <th style="text-align:center;width:8%">流程定义主键</th>
+                        <th style="text-align:center;width:10%">流程文件名</th>
+                        <th style="text-align:center;width:10%">流程部署ID</th>
+                        <th style="text-align:center;width:7%">版本</th>
+                        <th style="text-align:center;width:8%">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+        </div>
+    </section>
+</section>
+<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+<script>
+    var html2="";
+    function isExitsVariable(variableName) {
+        try {
+            if (typeof (variableName) == "undefined") {
+                return "";
+            } else {
+                return variableName;
+            }
+        } catch (e) {
+        }
+        return "";
+    }
+
+    $(function(){
+        loadMallCustomerList(1);
+    });
+    function loadMallCustomerList(currentPageIndex, processNameLike) {
+        var param = {};
+        param.currentPage = currentPageIndex;
+        if(processNameLike){
+            param.processNameLike = processNameLike;
+        }
+        //alert(JSON.stringify(param));
+        postUtil.call("/flow/processDefinition/queryList", param, function (result) {
+            //alert(JSON.stringify(result));
+            var pageNumber = result.pageNumber;
+            var pageSize = result.pageSize;
+            var totalPage = result.totalPage;
+            var totalRow = result.totalRow;
+            var dataList = JSON.parse(result.DATA);
+            renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        loadMallCustomerList(obj.curr, status);
+                    }
+                }
+            });
+        });
+    }
+
+    function renderTable(dataList) {
+        var html="";
+        var length = dataList.length;
+        if (length > 0) {
+            for (var i1 = 0; i1 < dataList.length; i1++) {
+                var data = dataList[i1];
+                var operationHtml  = '<a class="c-h fz12"  href="/flow/processDefinition/showView/' + isExitsVariable(data.deploymentId) + '?diagramResourceName=' + data.diagramResourceName + '">查看详情</>';
+                html+='  <tr>'+
+                        '   <td  width="10%">'+isExitsVariable(data.id)+'</td>'+
+                        '   <td  width="22%">'+isExitsVariable(data.name)+'</td>'+
+                        '   <td  width="8%">'+isExitsVariable(data.key)+'</td>'+
+                        '   <td  width="8%">'+isExitsVariable(data.resourceName)+'</td>'+
+                        '   <td  width="15%">'+isExitsVariable(data.deploymentId)+'</td>'+
+                        '   <td  width="8%">'+isExitsVariable(data.version)+'</td>'+
+                        '   <td  width="14%">'+ operationHtml +'</td>'+
+                        '  </tr>'
+            }
+        }
+        $(".layui-table tbody").html(html);
+    }
+    
+    function searchDefinition() {
+        loadMallCustomerList(1, $("input[name=definitionName]").val());
+    }
+</script>
+</body>
+</html>

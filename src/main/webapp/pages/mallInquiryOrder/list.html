@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <link rel="stylesheet" href="/res/public/css/daterangepicker.css<@resVersionDirective>?</@>" />
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/MultiSelectDropList.js"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/jquery.daterangepicker.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/Area1.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+
+    <style>
+        .form-css .dl-form dd input[type="text"]{
+            width: 238px;
+        }
+    </style>
+</head>
+<body>
+<section class="bz-bb pl20 pr20 pt20 pb20">
+    <div class="tab-nav">
+        <ul class="tab-title">
+            <li id="statusCountLi_all_count" class="tab-this" onclick="changeOrderTab('ALL')">全部</li>
+            <li id="statusCountLi_follow_up" onclick="changeOrderTab('NO_FLLOW')">待跟进</li>
+            <li id="statusCountLi_in_process" onclick="changeOrderTab('DEALED')">处理中</li>
+            <li id="statusCountLi_quoted_price" onclick="changeOrderTab('ALREADY_OFFER')">已报价</li>
+            <li id="statusCountLi_order_transferred" onclick="changeOrderTab('REQUIRY_TO_ORDER')">已转订单</li>
+            <li id="statusCountLi_closed" onclick="changeOrderTab('CLOSE')">已关闭</li>
+        </ul>
+    </div>
+    <div class="jun-form-s form-css ">
+        <form action="" class="jun-form-s form-css ">
+        <dl class="dl-form">
+                <dt class="flt fz12">查询：</dt>
+                <dd class="flt"><input type="text" name="searchContidion" lay-filter="searchContidion"
+                                       placeholder="询价单号/账号/联系人/联系电话" autocomplete="off"
+                                       class="layui-input pl10" style="width:238px"></dd>
+                <dt class="flt fz12 ml20"  style="width: 130px;">客户经理：</dt>
+                <!--<dd class="flt layui-form jun-form-l">-->
+                    <!--<select name="accountManagerId" lay-filter="accountManagerId" style="width: 200px;">-->
+                        <!--<option value="ALL" selected="">全部</option>-->
+                        <!--<option value="IN">待跟进</option>-->
+                        <!--<#list accountManagers as item>-->
+                            <!--<option value="${item.userId}">${item.userRealName}</option>-->
+                        <!--</#list>-->
+                    <!--</select>-->
+                <!--</dd>-->
+                <dd class="flt pre w240">
+                    <div class="multi_select" id="statusSelect" style="position:absolute;left:-2px;top:0;z-index:2">
+                        <!--<img class="cs-p" style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" />-->
+                    </div>
+                </dd>
+                <dt class="flt fz12" style="width: 68px;margin-left: 281px;">终端来源：</dt>
+              	<dd class="flt layui-form jun-form-l" style="">
+              		<select name="deviceSource">
+              			<option value=""></option>
+              			<option value="ALL">全部</option>
+              			<option value="PC">PC端</option>
+              			<option value="WAP">移动端</option>
+              		</select>
+              	</dd>
+
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12">报价人公司：</dt>
+            <dd class="flt layui-form">
+                <select name="reportAccount"  lay-filter="reportAccount" id="s_reportAccount" style="width: 268px;" lay-search>
+                    <option value="">请选择报价人公司</option>
+                    <option value="ALL">全部</option>
+                </select>
+            </dd>
+            <dt class="flt fz12 ml20"  style="width: 128px;">报价人／联系方式：</dt>
+            <dd class="flt pre w240" style="height: 32px;">
+                <input type="text" name="reportAccountLinkManCondition" lay-filter="reportAccountLinkManCondition"
+                       placeholder="请输入报价人/联系方式" autocomplete="off"
+                       class="layui-input pl10" style="width:240px">
+            </dd>
+            <dt class="flt fz12 ml20">类型：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="orderSourceType" lay-filter="orderSourceType" style="width: 238px;">
+                    <option value="" selected=""></option>
+                    <option value="ALL">全部</option>
+                    <option value="FROM_PLATFORM">平台</option>
+                    <option value="FROM_SHOP">店铺</option>
+                </select>
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12">创建时间：</dt>
+            <!--<dd class="flt" style="display: flex;">-->
+                <!--<input style="width: 130px;" value="" id="startDate" class="layui-input laydate-icon bor-e6" placeholder="开始日期" onclick="layui.laydate({elem: this, istime: false, format: 'YYYY-MM-DD'})" >-->
+                <!-- - -->
+                <!--<input style="width: 130px;" value="" id="endDate" class="layui-input laydate-icon bor-e6" placeholder="结束日期" onclick="layui.laydate({elem: this, istime: false, format: 'YYYY-MM-DD'})" >-->
+            <!--</dd>-->
+            <dd class="flt pre"  id="picker-css">
+                <input class="picker-css searchFiled" style="width: 224px;" id="date-range0" value="" >
+                <img class="cs-p" style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" />
+            </dd>
+            <dt class="flt fz12 ml20" style="width: 130px;">来源：</dt>
+            <dd class="flt pre w240" style="height: 32px;">
+                <div class="multi_select" id="statusSelect2" style="position:absolute;left:-2px;top:0;z-index:1">
+                    <!--<img class="cs-p" style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" />-->
+                </div>
+            </dd>
+            <dt class="flt fz12" style="margin-left: 18px;">地址：</dt>
+            <dd class="flt layui-form dd-city provinceSel dd-city2" style="margin-left:2px;">
+                <select name="province" lay-filter="province" id="s_province" lay-search>
+                    <option value="">请选择省</option>
+                </select>
+            </dd>
+            <dd class="flt layui-form dd-city citySel ml10 dd-city2">
+                <select name="city" lay-filter="city" lay-search>
+                    <option value="">请选择市</option>
+                </select>
+            </dd>
+        </dl>
+        </form>
+        <dl class="dl-form">
+            <button class="form-btn layui-btn-small2  ml10 " lay-submit="" lay-filter="demo1">搜索</button>
+            <button class="form-btn layui-btn-small2  ml10 goEditForOther" id="createInquiryOrderForCustomerBtn" lay-submit="" lay-filter="demo2">代客下询单
+            </button>
+        </dl>
+    </div>
+    <div class="mark-read mb10 ml10">
+        <span class="cs-p">
+          <input type="checkbox" class="allChoose fz12">
+          <span class="fz12 c-2">全选</span>
+        </span>
+        <span class="c-2 cs-p ml10 fz12" id="markReadBtn">设为已读</span>
+        <span class="c-2 cs-p ml10 fz12" id="markUnReadBtn">设为未读</span>
+    </div>
+    <div class="content">
+        <h3 class="bz-bb bg-f0 h3-tittle pl15 mb10 inquiry-title">
+            <span style="width:52%;">商品信息/客户信息</span>
+            <span style="width:13%;">收货地址</span>
+            <span style="width:8%;">报价/回复交期</span>
+            <span style="width:13%;">状态</span>
+            <span style="width:11%;">操作</span>
+        </h3>
+
+        <div id="inquiry_data_div">
+        </div>
+        <div id="paginationDiv"></div>
+    </div>
+</section>
+<script>
+    var _province="";
+    var _city="";
+    $('#date-range0').dateRangePicker();
+    var accountManagers = ${accountManagersJson};
+    var  _bFromStatics ="${bFromStatics}";
+    var _userName='${userName}';
+    var currentUserId = "";
+    var currentUserName = '';
+    var currentUserMobile = '';
+    var p_currentPageIndex = 1;
+    var layer;
+    var $form;
+    var form;
+    var $;
+    <#if (SYSTEM_USER_SESSION != null)>
+    currentUserId = "${SYSTEM_USER_SESSION.systemUser.userId}";
+    currentUserRealName = "${SYSTEM_USER_SESSION.systemUser.userRealName}";
+    currentUserMobile = "${SYSTEM_USER_SESSION.systemUser.mobile}";
+    </#if>
+    var currentStatuss = '';
+    //分页
+    layui.use(['form','jquery', 'element', 'layer', 'laydate'], function () {
+        form = layui.form();
+        $ = layui.jquery;
+        var element = layui.element();
+        $form = $('form');
+        layer = layui.layer;
+        loadMultiSelect("#s_reportAccount", "/mallOrder/api/reportDistributor/list", {});
+        $('.jun-form-s input[name=searchContidion]').val(_userName);
+
+        loadProvince();
+
+        form.on('select(orderSourceType)', function(data) {
+            $('#statusSelect2').empty();
+            if(data.value=='FROM_PLATFORM'){
+                $('#statusSelect2').MSDL({
+                    'width': '240',
+                    'data': [
+                        {"text":"400转化平台委托单(平台)","value":"SALES_OPPORTUNITIES"},
+                        {"text":"客户经理新增平台询价单(平台)","value":"MANAGER_NEW_INQUIRY"},
+                        {"text":"用户新增平台询价单(平台)","value":"USER_NEW_INQUIRY"},
+                        {"text":"用户新增平台委托单(平台)","value":"USER_NEW_ORDERS"}
+                    ],
+                    'id': "inquiryOrderSource"
+                });
+            }else if(data.value=='FROM_SHOP'){
+                $('#statusSelect2').MSDL({
+                    'width': '240',
+                    'data': [
+                        {"text":"用户新增店铺询价单(店铺)","value":"USER_NEW_STORE_INQUIRY_ORDER"},
+                        {"text":"400转化店铺委托单","value":"FOURZEROZERO_VAGUE_DEMAND"},
+                        {"text":"用户新增店铺委托单(店铺)","value":"USER_NEW_STORE_VAGUE_DEMAND"},
+                        {"text":"分销商新增店铺询价单","value":"DISTRIBUTOR_NEW_STORE_INQUIRY"}
+                    ],
+                    'id': "inquiryOrderSource"
+                });
+            }else{
+                initOrderSourceSel();
+            }
+        });
+
+        form.on('submit(demo1)', function (data) {
+            data.field.currentPage = 1;
+            if (currentStatuss != '') {
+                data.field.inquiryOrderStatus = currentStatuss;
+            }
+            if (_userName != '') {
+                data.field.userName = _userName;
+            }
+            //alert(JSON.stringify(data.field));
+
+            data.field.currentPage = 1;
+            var param = data.field;
+            param.searchContidion = $('input[name=searchContidion]').val();
+            param.accountManagerId = $('#accountManagerId_hidden').val();
+            param.inquiryOrderSource = $('#inquiryOrderSource_hidden').val();
+            var dateStr = $('#date-range0').val();
+            if(dateStr!="") {
+                if(dateStr.indexOf("to") > 0) {
+                    var dateArr = dateStr.split("to");
+                    param.startDate = $.trim(dateArr[0]);
+                    param.endDate = $.trim(dateArr[1]);
+                }
+            } else {
+                param.startDate = "";
+                param.endDate = "";
+            }
+
+            if(param.startDate !='' && param.endDate !='') {
+                if(moment(param.endDate).isBefore(param.startDate)) {
+                    layer.msg('结束日期不能小于开始日期',{icon:5});
+                    return false;
+                }
+            }
+            param.reportAccount = $('#s_reportAccount').val();
+            param.reportAccountLinkManCondition = $('input[name=reportAccountLinkManCondition]').val();
+            var orderSourceType = $('select[name=orderSourceType]').val();
+            var inquiryOrderSource_hidden = $('#inquiryOrderSource_hidden').val();
+            if(orderSourceType == 'FROM_PLATFORM'
+                    && (inquiryOrderSource_hidden == 'ALL' || inquiryOrderSource_hidden == '')){
+                //TODO 缺少会计诶委托单
+                param.inquiryOrderSource = 'SALES_OPPORTUNITIES;MANAGER_NEW_INQUIRY;USER_NEW_INQUIRY;USER_NEW_ORDERS';
+            }else if(orderSourceType == 'FROM_SHOP'
+                    && (inquiryOrderSource_hidden == 'ALL' || inquiryOrderSource_hidden == '')){
+                //TODO 店铺枚举类型定义
+                param.inquiryOrderSource = 'USER_NEW_STORE_INQUIRY_ORDER;USER_NEW_STORE_VAGUE_DEMAND;FOURZEROZERO_VAGUE_DEMAND';
+            }
+            //alert(JSON.stringify(param));
+            var deviceSource = $("select[name=deviceSource]").val();
+			if(deviceSource){
+				param.deviceSource = deviceSource;
+			}
+            param.province = $('select[name=province]').val();
+            param.city = $('select[name=city]').val();
+            loadListDataByParam(param);
+            return false;
+        });
+
+        //代客下旬单按钮事件绑定
+        $('#createInquiryOrderForCustomerBtn').bind("click",function(){
+            cardUtil.openCard("代客下询单","/mallOrder/api/mallInquiry/preCopy");
+            cardUtil.changeCard("代客下询单");
+        });
+        
+        var param = {};
+        param.currentPage = 1;
+        if (currentStatuss != '') {
+            param.inquiryOrderStatus = currentStatuss;
+        }
+        param.searchContidion = $('input[name=searchContidion]').val();
+        loadListDataByParam(param);
+        //loadListData({}); 
+        
+        
+        inquiryStatusCount();
+
+        element.init();
+        //renderData($('#inquiry_data_div'), plat_mallInquiryOrderList_mock2.DATA.list);
+        //inquiryStatusCountTest();
+
+    })
+
+    //省市联动  star
+    var areaData = Area;
+    //省市联动  star
+    function loadProvince() {
+        var proHtml = '';
+        var proHtml1 = '<option class="option1" value="' +"" + '" selected>' +
+            "全部" + '</option>';
+        var proHtml2 = '<option class="option2" value="' +"" + '" selected>' +
+            "全部" + '</option>';
+        for(var i = 0; i < areaData.length; i++) {
+            if(_province != '' && _province == areaData[i].provinceName) {
+                proHtml1 += '<option class="option1" value="' + areaData[i].provinceName + '" selected='+'"selected">' +
+                    areaData[i].provinceName + '</option>';
+            } else {
+                proHtml1 += '<option class="option1" value="' + areaData[i].provinceName + '">' +
+                    areaData[i].provinceName + '</option>';
+            }
+        }
+        if(_province != '') {
+            var cities = getCityByProvince(areaData, _province);
+            loadCity(cities, _city);
+        }
+        $form.find('select[name=province]').append(proHtml1);
+        form.render();
+        form.on('select(province)', function(data) {
+            _province = data.value;
+            if(_province==""){
+            }else{
+                $(".option2").attr("selected",false);
+            }
+            var cities = getCityByProvince(areaData, _province);
+            if(cities.length > 0) {
+                loadCity(cities);
+
+            } else {
+                $form.find('select[name=city]').parent().hide();
+            }
+        });
+    }
+    function getCityByProvince(areaData, provinceName) {
+        var cities = [];
+        $.each(areaData, function (index, item) {
+            if(item.provinceName == provinceName) {
+                cities = item.mallCityList;
+                return false;
+            }
+        });
+        return cities;
+    }
+    function loadCity(citys, selCity) {
+        var cityHtml = '';
+        if(citys.length>=1){
+            _city=citys[0].cityName;
+        }
+        cityHtml = '<option value="' +"" + '" selected>' +
+            "全部" + '</option>';
+        for(var i = 0; i < citys.length; i++) {
+            if(selCity != '' && selCity == citys[i].cityName) {
+                cityHtml += '<option value="' + citys[i].cityName + '">' +
+                    citys[i].cityName + '</option>';
+            } else {
+                cityHtml += '<option value="' + citys[i].cityName + '">' +
+                    citys[i].cityName + '</option>';
+            }
+        }
+        $form.find('select[name=city]').html(cityHtml).parent().show();
+        form.render();
+        form.on('select(city)', function(data) {
+            var value = data.value;
+            _city=value;
+        });
+
+    }
+
+    function inquiryStatusCount() {
+        postUtil.call('/mallOrder/api/mallInquiry/inquiryStatusCount', {}, function (result) {
+            if (result.STATUS == 'SUCCESS') {
+                inquiryStatusCountOne(result, 'all_count');
+                inquiryStatusCountOne(result, 'follow_up');
+                inquiryStatusCountOne(result, 'in_process');
+                inquiryStatusCountOne(result, 'quoted_price');
+                inquiryStatusCountOne(result, 'order_transferred');
+                inquiryStatusCountOne(result, 'closed');
+                inquiryStatusCountInBar(result.DATA.all_count);
+            } else {
+                layer.msg('系统发生未知错误(统计失败)' + result.MSG, {icon: 5});
+            }
+        });
+    }
+    /**
+     * mock codes
+     * */
+    function inquiryStatusCountTest() {
+        var result = {
+            MSG: "success msg.",
+            DATA: {
+                follow_up: 5,
+                in_process: 6,
+                quoted_price: 7,
+                order_transferred: 3,
+                not_quoted: 1,
+                all_count: 2,
+                closed: 2
+            }
+        };
+        inquiryStatusCountOne(result, 'all_count');
+        inquiryStatusCountOne(result, 'follow_up');
+        inquiryStatusCountOne(result, 'in_process');
+        inquiryStatusCountOne(result, 'quoted_price');
+        inquiryStatusCountOne(result, 'order_transferred');
+        inquiryStatusCountOne(result, 'closed');
+        inquiryStatusCountInBar(result.all_count);
+    }
+
+    function inquiryStatusCountOne(data, mark) {
+        var count = data.DATA[mark] || 0;
+        var numCss = 'has-num';
+        if (count == 0) {
+            $('#statusCountLi_' + mark).removeClass("has-num");
+            $('#statusCountLi_' + mark).removeClass("has-num1");
+            $('#statusCountLi_' + mark).removeClass("has-num2");
+            $('#statusCountLi_' + mark + ' i').remove();
+            return;
+        } else if (count <= 9){
+            numCss = 'has-num';
+        } else if (count <= 99){
+            numCss = 'has-num1';
+        } else if (count <= 999){
+            numCss = 'has-num2';
+        }
+        $('#statusCountLi_' + mark).addClass(numCss);
+        $('#statusCountLi_' + mark + ' i').remove();
+        $('#statusCountLi_' + mark).append('<i class="num inquiry_counter1">' + count + '</i>');
+    }
+
+    function inquiryStatusCountInBar(count){
+        count = count || 0;
+        var numCss = 'has-num';
+        if(count < 1){
+            $('span[name="mallInquireListOfPlatForm"]', parent.document).remove();
+            return;
+        } else if (count <= 9){
+            numCss = 'has-num';
+        } else if (count <= 99){
+            numCss = 'has-num1';
+        } else if (count <= 999){
+            numCss = 'has-num2';
+        }
+        if(!$('span', parent.document).hasClass('mallInquireListOfPlatForm')){
+            $('a[href-url="/mallOrder/api/mallInquiry/preMallInquiryOrderList"]', parent.document).append('<span name="mallInquireListOfPlatForm" class="mallInquireListOfPlatForm ' + numCss + '" style="margin-left:14px;"><i class="mallInquireListOfPlatFormCount">'+count+'</i></span>');
+        }else{
+            $('.mallInquireListOfPlatFormCount', parent.document).html(count);
+            var obj = $('a[href-url="/mallOrder/api/mallInquiry/preMallInquiryOrderList"] .mallInquireListOfPlatForm', parent.document);
+            obj.removeClass('has-num');
+            obj.removeClass('has-num1');
+            obj.removeClass('has-num2');
+            obj.addClass(numCss);
+        }
+
+    }
+
+    function changeOrderTab(type) {
+    	_bFromStatics = "";//标志位重置，恢复询价单界面功能
+        if (type == 'ALL') {
+            currentStatuss = '';
+            loadListData(1);
+        } else if (type == "DEALED") {
+            currentStatuss = 'IN_PROCESSING_MANAGER,IN_PROCESSING_MANAGER_SKU,IN_PROCESSING_MANAGER_SKU_SELLER';
+            loadListData(1, currentStatuss);
+        } else {
+            currentStatuss = type;
+            loadListData(1, type);
+        }
+
+        $('.allChoose')[0].checked = false;
+        fromReset();
+    }
+
+    function fromReset(){
+        $('.jun-form-s input[name=searchContidion]').val("");
+        $('select[name=accountManagerId]').val("ALL");
+        $('select[name=inquiryOrderSource]').val("ALL");
+        $('#accountManagerId_hidden').val('');
+        $('#inquiryOrderSource_hidden').val('');
+        $('#accountManagerId').val('');
+        $('#inquiryOrderSource').val('');
+        $('#date-range0').val('');
+
+        $('#s_reportAccount').val('');
+        $('input[name=reportAccountLinkManCondition]').val('');
+        $('select[name=orderSourceType]').val('');
+
+
+        $('select[name=province]').val('');
+        $('select[name=city]').html('<option value="">请选择市</option>');
+
+        initOrderSourceSel();
+        form.render();
+    }
+
+    function loadListDataByFormData(currentPageIndex){
+        var param = {};
+        param.currentPage = currentPageIndex;
+        if (currentStatuss != '') {
+            param.inquiryOrderStatus = currentStatuss;
+        }
+        param.searchContidion = $('input[name=searchContidion]').val();
+        param.accountManagerId = $('#accountManagerId_hidden').val();
+        param.inquiryOrderSource = $('#inquiryOrderSource_hidden').val();
+        var dateStr = $('#date-range0').val();
+        if(dateStr!="") {
+            if(dateStr.indexOf("to") > 0) {
+                var dateArr = dateStr.split("to");
+                param.startDate = $.trim(dateArr[0]);
+                param.endDate = $.trim(dateArr[1]);
+            }
+        } else {
+            param.startDate = "";
+            param.endDate = "";
+        }
+        if(param.startDate !='' && param.endDate !='') {
+            if(moment(param.endDate).isBefore(param.startDate)) {
+                layer.msg('结束日期不能小于开始日期',{icon:5});
+                return;
+            }
+        }
+        var deviceSource = $("select[name=deviceSource]").val();
+		if(deviceSource){
+			param.deviceSource = deviceSource;
+		}
+		param.province = $('select[name=province]').val();
+		param.city = $('select[name=city]').val();
+        loadListDataByParam(param);
+    }
+
+    function loadListData(currentPageIndex, statuss) {
+        statuss = statuss || '';
+        var param = {};
+        param.currentPage = currentPageIndex;
+        if (statuss != '') {
+            param.inquiryOrderStatus = statuss;
+        }
+        loadListDataByParam(param);
+    }
+
+    function loadListDataByParam(param) {
+    	if(_bFromStatics!=null&&_bFromStatics!=""){
+    		param.bFromStatics=_bFromStatics;
+    	}
+        var index = layer.load();
+        postUtil.call("/mallOrder/api/mallInquiry/list", param, function (result) {
+            if (result.STATUS == 'SUCCESS') {
+                var pageNumber = result.DATA.pageNumber;
+                var pageSize = result.DATA.pageSize;
+                var totalPage = result.DATA.totalPage;
+                var totalRow = result.DATA.totalRow;
+                var dataList = result.DATA.list;
+                renderData($('#inquiry_data_div'), dataList);
+                laypage({
+                    cont: 'paginationDiv',
+                    pages: totalPage,
+                    curr: pageNumber,
+                    total: totalRow,
+                    skip: true,
+                    jump: function (obj, first) {
+                        $('.allChoose')[0].checked = false;
+                        if (!first) {
+                            p_currentPageIndex = obj.curr;
+                            param.currentPage = obj.curr;
+                            loadListDataByParam(param);
+                        }
+                    }
+                });
+                layer.closeAll('loading');
+            } else {
+                layer.msg('系统发生未知错误' + result.MSG, {icon: 5});
+            }
+        });
+    }
+
+    //单选checkbox
+    $('.choose').click(function () {
+        var checked = this.checked;
+        var choose = document.getElementsByClassName("choose");
+        var allChoose = document.getElementsByClassName("allChoose");
+        var checked_num = 0;
+        for (var i = 0; i < choose.length; i++) {
+            if (choose[i].checked) {
+                checked_num = checked_num + 1;
+            }
+        }
+        if (checked) {
+
+            $(this).parent().parent().css('background-color', '#FFFDF1');
+
+            if (!allChoose[0].checked & choose.length == checked_num) {
+                allChoose[0].checked = true;
+            }
+        } else {
+
+            $(this).parent().parent().css('background-color', 'transparent');
+
+            if (allChoose[0].checked) {
+                allChoose[0].checked = false;
+            }
+        }
+    })
+    //全选checkbox
+    $('.allChoose').click(function () {
+        var checked = this.checked;
+        var inputs = document.getElementsByClassName("choose");
+
+        if (checked) {
+            $(".choose").parent().parent().css('background-color', '#FFFDF1');
+            for (var input in inputs) {
+                inputs[input].checked = true;
+            }
+        } else {
+            $(".choose").parent().parent().css('background-color', 'transparent');
+            for (var input in inputs) {
+                inputs[input].checked = false;
+            }
+        }
+    })
+    $(document).on('click', '.tab-nav li', function () {
+        $(this).addClass("tab-this").siblings().removeClass("tab-this");
+    })
+
+    /**
+     * 设置已读
+     * /mallOrder/api/mallInquiry/inquiryReadNoRead
+     * */
+    $(document).on('click', '#markReadBtn', function () {
+        readOrUnReadOrder("READ");
+    })
+    /**
+     * 设置未读
+     * /mallOrder/api/mallInquiry/inquiryReadNoRead
+     * */
+    $(document).on('click', '#markUnReadBtn', function () {
+        readOrUnReadOrder("NOREAD");
+    })
+    /**
+     * 修改询单
+     * */
+    function openUpdateOrderMSG(offerId) {
+        var param = {
+            type: "READ"
+        };
+        var offerIds = [];
+        offerIds.push(offerId);
+        param.offerIds = JSON.stringify(offerIds);
+        postUtil.call("/mallOrder/api/mallInquiry/inquiryReadNoRead", param, function (result) {
+            if (result.STATUS == 'SUCCESS') {
+                inquiryStatusCount();
+                loadListDataByFormData(p_currentPageIndex);
+            }
+        });
+
+        cardUtil.openCard("修改询价单-" + offerId,"/mallOrder/api/mallInquiry/preEdit", {offerId:offerId});
+        cardUtil.changeCard("修改询价单-" + offerId);
+
+    }
+    /**
+     * 复制询单
+     * */
+    function openCopyOrderMSG(offerId) {
+        cardUtil.openCard("复制询价单-" + offerId,"/mallOrder/api/mallInquiry/preCopy", {offerId:offerId});
+        cardUtil.changeCard("复制询价单-" + offerId);
+    }
+    /**
+     * 跟进询单
+     * */
+    function openFollowOrderMSG(offerId, mobile, name) {
+    	
+    	layer
+		.open({
+			title : "询价单转交",
+			type : 2,
+			area : [
+					'700px',
+					'500px' ],
+		    fixed: false, //不固定
+		    maxmin: true,
+			skin : 'msgskin',
+			content :'/mallOrder/api/mallInquiry/transferDlg?offerId='+offerId,
+			});
+    	
+//         postUtil.call("/mallOrder/api/mallInquiry/followUp", {offerId:offerId}, function (result) {
+//             if (result.STATUS == 'SUCCESS') {
+//                 inquiryStatusCount();
+//                 loadListDataByFormData();
+//                 layer.msg('您已跟进此询价单，成 为账号：' + mobile + '／' + name +' 的专属客户经理');
+//             } else {
+//                 layer.msg('系统发生未知错误' + result.MSG, {icon: 5});
+//             }
+//         });
+    }
+    /**
+     * 关闭询单
+     * */
+    function openClosedOrderMSG(offerId) {
+        //弹出窗口输入关闭原因
+        layer.open({
+            title: "关闭订单",
+            type: 2,
+            area: ['550px', '460px'],
+            fixed: false, //不固定
+            maxmin: true,
+            content: '/mallOrder/api/mallInquiry/closePage?offerId=' + offerId
+        });
+    }
+
+    /**
+     * 发送邮件
+     * */
+    function openSendEmailMSG(offerId, buyerAccountId){
+        //弹出窗口输入关闭原因
+        layer.open({
+            title: "邮件发送",
+            type: 2,
+            area: ['550px', '460px'],
+            fixed: false, //不固定
+            maxmin: true,
+            content: '/mallOrder/api/mallInquiry/sendEmailPage?offerId=' + offerId + '&buyerAccountId=' + buyerAccountId
+        });
+    }
+
+    /**
+     * 查看详情
+     * */
+    function openViewDetail(offerId) {
+        cardUtil.closeCard("询价单-" + offerId);
+        cardUtil.openCard("询价单-" + offerId,"/mallOrder/api/mallInquiry/preDetail?offerId=" + offerId);
+        cardUtil.changeCard("询价单-" + offerId);
+
+        loadListDataByFormData(p_currentPageIndex);
+        inquiryStatusCount();
+    }
+    /**
+     * /mallOrder/api/mallInquiry/otherList
+     * inquiryOrderStatus
+     * offerId
+     * 查看同一需求下，不同状态的其他询价单
+     * */
+    function queryMoreOtherSub(e, offerId, status) {
+        var param = {
+            offerId: offerId,
+            inquiryOrderStatus: status
+        };
+        if ($(e).parents('div .enquriry-data').next().css("display") == "none") {
+            postUtil.call("/mallOrder/api/mallInquiry/otherList", param, function (result) {
+                 if (result.STATUS == 'SUCCESS') {
+                    renderMoreOffers(e, result.DATA, 'OTHER');
+                 } else {
+                    layer.msg('系统发生未知错误' + result.MSG, {icon: 5});
+                 }
+             });
+            //renderMoreOffers(e, plat_mallInquiryOrderList_mock2.DATA.list, 'OTHER');
+        } else {
+            renderMoreOffers(e);
+        }
+    }
+
+    function renderData(obj, dataList, type) {
+        var htm = '';
+        type = type || "";
+        dataList = dataList || [];
+        if(dataList.length == 0){
+            obj.html('<table class="layui-table pop no-margin" style="border-top:none"><colgroup><col></colgroup><tbody><tr><td style="border-top:none;">暂无信息！</td></tr></tbody></table>');
+            return;
+        }
+        for (var i = 0; i < dataList.length; i++) {
+            var data = dataList[i];
+            var isAddOtherStausLink = data.isAddOtherStausLink || false;
+            var skuCount = typeof(data.skuList) == 'undefined' ? 0 : data.skuList.length;
+            var cs_skuCount = typeof(data.customSkuList) == 'undefined' ? 0 : data.customSkuList.length;
+            var sub_OrderListCount = typeof(data.subOrderList) == 'undefined' ? 0 : data.subOrderList.length;
+            if (skuCount == 0 && cs_skuCount == 0) {
+                htm += '<div class="enquriry-data mb20"  progress="50%">';
+                htm += renderTableHeader(data, type);
+                htm += renderTableWithOutSkus(data);
+                htm += '</div>';
+            } else {
+                htm += '<div class="enquriry-data"  progress="50%">';
+
+                htm += renderTableHeader(data, type);
+                htm += renderTableWithSkus(data, skuCount, cs_skuCount, sub_OrderListCount == 0, isAddOtherStausLink);
+
+                htm += '</div>';
+
+                //同一需求查看更多OFFER 链接
+                if (type != 'OTHER') {
+                    htm += '<div class="show_more_offers_under_smreq" style="display: none"></div>';
+                    htm += '<div class="mb20"></div>';
+                }
+            }
+        }
+
+        obj.html(htm);
+    }
+    /**
+     *  表格每一个询单的 表头部分
+     * */
+    function renderTableHeader(data, type) {
+        var htm = '';
+        //需求：如果已报价展示报价信息；
+        var isOffer = (isExitsVariable(data.offerersAccountId) == '');
+        var offerType = isExitsVariable(data.offerType);
+        var accountManagerName = isExitsVariable(data.accountManagerName);
+        var moreOfferType = type || '';
+        accountManagerName = (accountManagerName == '' ? "--" : accountManagerName)
+        htm += !isOffer ? '<ol>' : '<ol style="height:40px;">';
+
+        var buyerHeader = '<span>买方账号：<span class="c-f">' + isExitsVariable(data.buyUserMobile) + "/" + isExitsVariable(data.buyerUsername) + '</span></span>';
+        if (moreOfferType == '') {
+            if (checkRead(data.readUserIds)) {
+                htm += '<li><input name="readCB" class="choose" type="checkbox" cbOfferId="' + data.offerId + '">' + buyerHeader + '</li> ';
+            } else {
+                htm += '<li class="fw-b"><input name="readCB" class="new choose" type="checkbox" cbOfferId="' + data.offerId + '">' + buyerHeader + '</li> ';
+            }
+        } else {
+            htm += '<li>' + buyerHeader + '</li>';
+        }
+        htm +=  '    <li class="fw-b" style="width: 220px;"><span>创建时间：<span class="fw-b">' + moment(data.createTime).format("YYYY-MM-DD HH:mm:ss") + '</span></span></li> ' ;
+        htm +=  '    <li><span style="color: #999;">询价单编号：' + isExitsVariable(data.offerId) ;
+        htm +=  '</span></li> ' +
+                '    <li><span>来源：' + isExitsVariable(data.inquiryOrderSourceName) + '</span></li> ' +
+                '    <li style="float:right;width:14%;" title="'+accountManagerName+'"><span style="color: #999;">专属客户经理：' + accountManagerName + '</span></li> ';
+        if (data.offerersAccountName) {
+            if (offerType == 'PLATFORM_OFFER') {
+                htm += '    <li class="ml20"><span>报价人：<span class="c-f">' + isExitsVariable(data.offerersAccountName) + '</span></span></li>';
+            } else {
+                htm += '    <li class="ml20" style="width: 50%"><span>报价人：<span class="c-f">' + isExitsVariable(data.offerersAccountCity) + '/' + isExitsVariable(data.offerersAccountName) + '  ' + isExitsVariable(data.offerersUserName) + '  ' + isExitsVariable(data.offerersUserMobile) + '</span></span></li>';
+            }
+        }
+        htm += '</ol>';
+        return htm;
+    }
+    /**
+     * 委托单转询单
+     * */
+    function renderTableWithOutSkus(data) {
+        var htm = '';
+        var att_htm = '';
+        //data.attachList = [{attachmentId:'1',attachmentName:'aa'},{attachmentId:'1',attachmentName:'aa'},{attachmentId:'1',attachmentName:'商品信息商品信息商品信息商品信息商品信息商品商品信息商品信息商品信息商品信息商品信息商品信息商品信息商品信息商品信息商品信息商品信息商品信息商品信息商品信息信息商品信息'},{attachmentId:'1',attachmentName:'aa'},{attachmentId:'1',attachmentName:'aa'}];
+        if (data.attachList) {
+            for (var i = 0; i < data.attachList.length; i++) {
+                att_htm += '<dd class="special-button one-row" style="width: 200px;"  onclick="downLoadMallAttachment(\'' + data.attachList[i].attachmentId + '\')" title="' + isExitsVariable(data.attachList[i].attachmentName) + '">' + isExitsVariable(data.attachList[i].attachmentName)  + '</dd>';
+            }
+        }
+        var option_t1_htm = getOperationHtmlStyle(data);
+        var inquiryOrderStatus = data.inquiryOrderStatus || '';
+        var replyDeliveryDate = data.replyDeliveryDate || '';
+        htm += '<table class="layui-table pop no-margin">                        ' +
+                '    <colgroup>                                                   ' +
+                '        <col  width="800">                                       ' +
+                '        <col  width="300">                                       ' +
+                '        <col  width="240">                                       ' +
+                '        <col  width="160">                                       ' +
+                '        <col  width="250">                                       ' +
+                '        <col  width="200">                                       ' +
+                '    </colgroup>                                                  ' +
+                '    <tbody>                                                      ' +
+                '    <tr>                                                         ' +
+                '        <td>                                                     ' +
+                '            <dl align="left">                                    ' +
+                '                <dt>需求描述：</dt>                              ' +
+                '                <dd class="four-row" style="max-width: 350px;" title="' + isExitsVariable(data.purchasingRequisitionDesc) + '">' + isExitsVariable(data.purchasingRequisitionDesc) + '</dd>    ' +
+                '            </dl>                                                 ' +
+                '        </td>                                                     ' +
+                '        <td >                                                     ' +
+                '            <dl align="left">                                     ' +
+                '                <dt>附件信息：</dt>                               ' +
+                att_htm +
+                '            </dl>                                                 ' +
+                '        </td>                                                     ' +
+                '        <td>' + isExitsVariable(data.inquiryOrderProvince) + '/' + isExitsVariable(data.inquiryOrderCity) + '</td>                                    ' +
+                '        <td>' + (replyDeliveryDate=='' ? '--': moment(data.replyDeliveryDate).format("YYYY-MM-DD")) + '</td>                                        ' +
+                '        <td>                                                      ' +
+                getPercentProcessBar(data.inquiryOrderStatusPercent || '0%', inquiryOrderStatus) +
+                '            <dl>                                                  ' +
+                '                <dt class="status mt10">' + isExitsVariable(data.inquiryOrderStatusName) + '</dt>               ' +
+                '                <dd style="color:#999;">' + moment(data.operationTime).format("YYYY/MM/DD HH:mm:ss") + '</dd>     ' +
+                '            </dl>                                                 ' +
+                '        </td>                                                     ' +
+                '        <td>                                                      ' +
+                option_t1_htm +
+                '        </td>                                                     ' +
+                '    </tr>                                                         ' +
+                '    </tbody>                                                      ' +
+                '</table>                                                          '
+        return htm;
+    }
+    /**
+     * 下询单部分渲染
+     * */
+    function renderTableWithSkus(data, skuCount, cs_skuCount, isSub, isAddOtherStausLink) {
+        var htm = '';
+        if (skuCount > 0 || cs_skuCount > 0) {
+            htm += '<table class="layui-table pop no-margin">                                   ' +
+                    '    <colgroup>               ' +
+                    '        <col  width="140">   ' +
+                    '        <col  width="340">   ' +
+                    '        <col  width="160">   ' +
+                    '        <col  width="100">   ' +
+                    '        <col  width="150">   ' +
+                    '        <col  width="100">   ' +
+                    '        <col  width="240">   ' +
+                    '        <col  width="160">   ' +
+                    '        <col  width="250">   ' +
+                    '        <col  width="200">   ' +
+                    '    </colgroup>              ' +
+                    '    <thead class="bor-no" style="display:none;">                            ' +
+                    '    <tr>                     ' +
+                    '        <th colspan="6" style="text-align:left!important;">商品信息/客户信息</th>                                          ' +
+                    '        <th >收货地址</th>   ' +
+                    '        <th >报价/付款后多少天发货</th>                                             ' +
+                    '        <th >状态</th>       ' +
+                    '        <th >操作</th>       ' +
+                    '    </tr>                    ' +
+                    '    </thead>                 ' +
+                    '    <tbody>                  '
+            ;
+            //渲染平台商品
+            if (skuCount > 0) {
+                htm += renderTableWithSku(data.skuList, data, 'PLAT', true, skuCount + cs_skuCount, isSub, isAddOtherStausLink);
+            }
+            //渲染自定义商品
+            if (cs_skuCount) {
+                htm += renderTableWithSku(data.customSkuList, data, 'CUSTOMER', skuCount == 0, skuCount + cs_skuCount, isSub, isAddOtherStausLink);
+            }
+            htm += '    </tbody>' +
+                    '</table>';
+
+        }
+        return htm;
+    }
+    /**
+     * 渲染一条SKU
+     * */
+    function renderTableWithSku(sku, data, type, rowspanFlag, totalCount, isSub, isAddOtherStausLink) {
+        var htm = '';
+        var option_t1_htm = getOperationHtmlStyle(data);
+        var inquiryOrderStatus = data.inquiryOrderStatus || '';
+        var orderSource = data.inquiryOrderSource;
+        var orderSourceStr;
+        if(orderSource == 'USER_NEW_STORE_VAGUE_DEMAND' || orderSource=='USER_NEW_STORE_INQUIRY_ORDER'||orderSource=='FOURZEROZERO_VAGUE_DEMAND'){
+            orderSourceStr = "店铺商品";
+        }else{
+            orderSourceStr = "平台商品";
+        }
+        for (var i = 0; i < sku.length; i++) {
+            htm += '    <tr>                     ' +
+                    '        <td style="text-align:left!important;">' + (type == 'PLAT' ? orderSourceStr : '自定义商品') + '</td>              ' +
+                    '        <td>' + isExitsVariable(sku[i].skuName) + '</td>                                      ' +
+                    '        <td>' + isExitsVariable(sku[i].skuModel) + '</td>    ' +
+                    '        <td>' + isExitsVariable(sku[i].skuBrandName) + '</td>        ' +
+                    '        <td>' + getSkuQuantity(isExitsVariable(sku[i].skuQuantity), sku[i].skuUnitName, type) + '</td>     ' +
+                    '        <td>' + isExitsVariable(sku[i].skuUnitName) + '</td>          '
+            ;
+            if (i == 0 && rowspanFlag) {
+                var replyDateHtm = '';
+                htm += '        <td rowspan=' + totalCount + '>' + isExitsVariable(data.inquiryOrderProvince) + '/' + isExitsVariable(data.inquiryOrderCity) + '</td>                                    ' +
+                        '        <td rowspan=' + totalCount + '>       ' +
+                        '            <dl>             ' +
+                        getReplyDateHtml(sku[i], data) +
+                        '            </dl>            ' +
+                        '        </td>                ' +
+                        '        <td rowspan=' + totalCount + '>       ' +
+                        getPercentProcessBar(data.inquiryOrderStatusPercent || '0%', inquiryOrderStatus) +
+                        '            <dl>             ' +
+                        '                <dt class="status mt10">' + isExitsVariable(data.inquiryOrderStatusName) + '</dt>                         ' +
+                        '                <dd style="color:#999;">' + moment(data.operationTime).format("YYYY/MM/DD HH:mm:ss") + '</dd>               ' +
+                        '            </dl>            ' +
+                        '        </td>                ' +
+                        '        <td rowspan=' + totalCount + '>       ' +
+
+                        option_t1_htm +
+                        '        </td>'
+                ;
+            }
+            htm += '</tr>';
+
+            //有子询单且 展示更多 按钮显示最后一行
+            if (isAddOtherStausLink ) {
+                if ((i + 1 == totalCount && type == 'PLAT') || (i + 1 == sku.length && type == 'CUSTOMER')) {
+                    htm += '<tr style="mb20"><td colspan=10 align="left"><span class="special-button underline more-offer-cs" style="width:280px" onclick="queryMoreOtherSub(this, \'' + data.offerId + '\',\'' + data.inquiryOrderStatus + '\')">展开：查看同一需求下的其他询价单></span></td></tr>';
+                }
+            }
+        }
+        return htm;
+    }
+
+    function getPercentProcessBar(percent, inquiryOrderStatus) {
+        var htm = '';
+        var processCss = '';
+        var percentCss = '';
+        var percentFloat = parseFloat((percent)) / 100;
+        if( inquiryOrderStatus == 'CLOSE'){
+            processCss = 'layui-bg-red layui-bg-gray';
+        } else if (percentFloat <= 0) {
+            processCss = '';
+            percentCss = 'style="color:#999"';
+        } else if (percentFloat < 0.3) {
+            processCss = 'layui-bg-red';
+        } else if (percentFloat < 0.5) {
+            processCss = 'layui-bg-red';
+        } else if (percentFloat < 0.8) {
+            processCss = 'layui-bg-orange';
+        } else {
+            processCss = 'layui-bg-red layui-bg-green';
+        }
+        htm += '<div class="layui-progress layui-progress-big" lay-showPercent="yes">                   ' +
+                '   <div class="layui-progress-bar ' + processCss + '" lay-percent="' + percent + '" style="width: ' + percent + ';">' +
+                '       <span class="layui-progress-text " ' + percentCss +'>' + percent + '</span>' +
+                '   </div>' +
+                '</div>';
+
+        return htm;
+    }
+
+    function getSkuQuantity(quantity, unitName, type){
+        if(unitName == '米' || unitName == '千米' || type == 'CUSTOMER'){
+            return quantity.toFixed(3);
+        }else{
+            return quantity;
+        }
+    }
+
+    function renderMoreOffers(e, data, type) {
+        var htm = '';
+        var obj = $(e).parents('div .enquriry-data');
+        if (obj.next().hasClass("show_more_offers_under_smreq")) {
+            if (obj.next().css("display") == "none") {
+                obj.next().show();
+                $(e).text("收起：查看同一需求下的其他询价单>");
+                renderData(obj.next(), data, type);
+            } else {
+                $(e).text("展开：查看同一需求下的其他询价单>");
+                obj.next().hide();
+            }
+        }
+        obj.after(htm);
+    }
+
+    /**
+     * 关闭询单成功后回调
+     * */
+    function closeMallOrderCallback(data) {
+        inquiryStatusCount();
+        loadListDataByFormData();;
+        return true;
+    }
+    /**
+     * 根据询价单状态或是否报价 判定渲染回复交期，总金额等
+     * */
+    function getReplyDateHtml(sku, data) {
+        var htm = '';
+        var isOffer = (isExitsVariable(data.offerersAccountId) == '');
+        var replyDeliveryDate = data.replyDeliveryDate || '';
+        var deliverDays =data.deliverDays||'';
+        if(!isOffer){
+        	if(replyDeliveryDate != ''){
+        		 htm += '<dt class="fz14 mb5"><span class="c-f  fw-b">' + (data.offerTotalPrice || 0).toFixed(2) + '</span>元<dt>                 ' +
+                 '<dd class="mb5" style="color:#00a930;">' + moment(data.replyDeliveryDate).format("YYYY-MM-DD") + '</dd>' +
+                 '<dd style="color:#999;">有效期至</dd>                       ' +
+                 '<dd style="color:#999;">' + moment(data.offerValidUntil).format("YYYY/MM/DD") + '</dd>  ';
+        	}else{
+        		if(deliverDays != ''){
+        			 htm += '<dt class="fz14 mb5"><span class="c-f  fw-b">' + (data.offerTotalPrice || 0).toFixed(2) + '</span>元<dt>                 ' +
+        	            '<dd class="mb5" style="color:#00a930;">付款后' +deliverDays  + '天发货</dd>' +
+        	            '<dd style="color:#999;">有效期至</dd>                       ' +
+        	            '<dd style="color:#999;">' + moment(data.offerValidUntil).format("YYYY/MM/DD") + '</dd>  ';
+            	}else{
+            		 htm += '<dt class="fz14 mb5"><span class="c-f  fw-b">' + (data.offerTotalPrice || 0).toFixed(2) + '</span>元<dt>                 ' +
+                     '<dd class="mb5" style="color:#00a930;">付款后--天发货</dd>' +
+                     '<dd style="color:#999;">有效期至</dd>                       ' +
+                     '<dd style="color:#999;">' + moment(data.offerValidUntil).format("YYYY/MM/DD") + '</dd>  ';
+            	}
+        	}
+        }else {
+            htm += '<dd style="color:#999;">付款后--天发货</dd>';
+        }
+        return htm;
+    }
+
+    function getOperationHtmlStyle(data) {
+        var htm = '';
+        var percent = data.inquiryOrderStatusPercent || '0%';
+        var percentFloat = parseFloat(percent) / 100;
+        if(data.offerType=='DISTRIBUTOR_OFFER'){  //分销商报价 
+        	htm += '<dl>';
+        	htm += '<span class="special-button mb10" onclick="openViewDetail(\'' + data.offerId + '\')">查看</span>' ;
+        	htm += '</dl>';
+        }else{ //平台报价
+        	htm += '<dl>';
+            if (percentFloat < 0.1 || percentFloat ==1 || data.inquiryOrderStatus == 'CLOSE'){
+                htm += '<span class="special-button mb10" onclick="openViewDetail(\'' + data.offerId + '\')">查看</span>' ;
+            }
+            if (percentFloat == 0 && data.inquiryOrderStatus != 'CLOSE') {
+                htm += '<dd><button class="form-btn layui-btn-itoc layui-btn-small3 mb5" onclick="openFollowOrderMSG(\'' + data.offerId+ '\', \'' + data.buyUserMobile +'\',\'' + data.buyerUsername + '\')" lay-filter="formDemo">转交</button></dd>';
+            }
+            if (percentFloat >= 0.1 && percentFloat < 1 && data.inquiryOrderStatus != 'CLOSE') {
+                htm += '<dd><button class="form-btn layui-btn-itoc layui-btn-small3 mb5" onclick="openUpdateOrderMSG(\'' + data.offerId+ '\')" lay-filter="formDemo">修改</button></dd>';
+            }
+            if (percentFloat >= 0.3) {
+                htm += '<dd><button class="form-btn layui-btn-itoc layui-btn-small3 mb5" onclick="openCopyOrderMSG(\'' + data.offerId+ '\')" lay-filter="formDemo">复制询价单</button></dd>';
+            }
+            if(percentFloat == 0.8 && data.inquiryOrderStatus != 'CLOSE'){
+                htm += '<dd><button class="form-btn layui-btn-itoc layui-btn-small3 mb5" onclick="openUpdateOrderMSG(\'' + data.offerId+ '\')" lay-filter="formDemo">转订单</button></dd>';
+            }
+            htm += '</dl>';
+            if (percentFloat >= 0.1 && percentFloat < 1 && data.inquiryOrderStatus != 'CLOSE') {
+                htm += '<span class="special-button close mt10" onclick="openClosedOrderMSG(\'' + data.offerId + '\')">关闭</span>';
+            }
+            if(percentFloat == 0.8 && data.inquiryOrderStatus != 'CLOSE'){
+                htm += '<span class="special-button close mt10" onclick="openSendEmailMSG(\'' + data.offerId + '\', \'' + isExitsVariable(data.buyerAccountId) +'\')">邮件发送</span>';
+            }
+        }
+        if(data.inquiryOrderSource=='USER_NEW_STORE_VAGUE_DEMAND' || data.inquiryOrderSource=='USER_NEW_STORE_INQUIRY_ORDER'|| data.inquiryOrderSource=='FOURZEROZERO_VAGUE_DEMAND'){ 
+        	htm='';
+        	htm += '<dl>';
+        	htm += '<span class="special-button mb10" onclick="openViewDetail(\'' + data.offerId + '\')">查看</span>' ;
+        	htm += '</dl>';
+        }
+
+        return htm;
+    }
+
+    function readOrUnReadOrder(type) {
+        var param = {
+            type: type
+        };
+        var cbofferidArray = [];
+        var needChangeFlag = false;
+        $.each($('input[name=readCB]:checked'), function (n, item) {
+            var offerId = $(item).attr("cbofferid");
+            if (type == 'READ') {
+                $(item).removeClass('new');
+                $(item).parent().removeClass("fw-b");
+            } else {
+                $(item).addClass('new');
+                $(item).parent().addClass("fw-b");
+            }
+            cbofferidArray.push(offerId);
+            needChangeFlag = true;
+        });
+        if(!needChangeFlag){
+            layer.msg('请至少勾选一条询单！');
+            return false;
+        }
+        param.offerIds = JSON.stringify(cbofferidArray);
+        //alert(JSON.stringify(param));
+        postUtil.call("/mallOrder/api/mallInquiry/inquiryReadNoRead", param, function (result) {
+            if (result.STATUS == 'SUCCESS') {
+                inquiryStatusCount();
+
+                $(".choose").parent().parent().css('background-color', 'transparent');
+                var inputs = document.getElementsByClassName("choose");
+                for (var input in inputs) {
+                    inputs[input].checked = false;
+                }
+                $('.allChoose')[0].checked = false;
+                layer.msg('设置成功');
+            } else {
+                layer.msg('系统发生未知错误' + result.MSG, {icon: 5});
+            }
+        });
+    }
+
+    function downLoadMallAttachment(mallFileAttachmentId) {
+        var param = {};
+        param.fileAttachmentId = mallFileAttachmentId;
+        postUtil.submit("/file_server/mall/generalFileDownload", param);
+    }
+
+    function isExitsVariable(variableName) {
+        try {
+            if (typeof (variableName) == "undefined") {
+                return "";
+            } else if (variableName == null) {
+                return "";
+            } else {
+                return variableName;
+            }
+        } catch (e) {
+        }
+        return "";
+    }
+
+    function checkRead(readUserIds) {
+        var isRead = false;
+        if (readUserIds) {
+            var userIds = readUserIds.split(',');
+            if (userIds && userIds.length > 0) {
+                $.each(userIds, function (index, item) {
+                    if (item == currentUserId) {
+                        isRead = true;
+                        return false;
+                    }
+                });
+            }
+        }
+        return isRead;
+    }
+
+    Array.prototype.contains = function ( needle ) {
+        for (i in this) {
+            if (this[i] == needle) return true;
+        }
+        return false;
+    }
+
+    $(function (){
+        var accountManagerOption = [];
+        if(accountManagers) {
+            for(var i = accountManagers.length-1;i>-1;i--) {
+                var item = accountManagers[i];
+                var option = {};
+                option.text = item.userRealName;
+                option.value = item.userId;
+                accountManagerOption.push(option);
+            }
+        }
+        accountManagerOption.push({"text":"待跟进","value":"IN"});
+        $('#statusSelect').MSDL({
+            'width': '240',
+            'data': accountManagerOption,
+            'id': "accountManagerId"
+        });
+        /*$('#statusSelect2').MSDL({
+            'width': '240',
+            'data': [{"text":"400销售机会转化","value":"SALES_OPPORTUNITIES"},
+                {"text":"客户经理新增","value":"MANAGER_NEW_INQUIRY"},
+                {"text":"用户新增询价单","value":"USER_NEW_INQUIRY"},
+                {"text":"用户新增委托单","value":"USER_NEW_ORDERS"}],
+            'id': "inquiryOrderSource"
+        });*/
+        initOrderSourceSel();
+    });
+
+    function initOrderSourceSel(){
+        $('#statusSelect2').empty();
+        $('#statusSelect2').MSDL({
+            'width': '240',
+            'data': [
+                {"text":"用户新增店铺询价单(店铺)","value":"USER_NEW_STORE_INQUIRY_ORDER"},
+                {"text":"400转化店铺委托单","value":"FOURZEROZERO_VAGUE_DEMAND"},
+                {"text":"用户新增店铺委托单(店铺)","value":"USER_NEW_STORE_VAGUE_DEMAND"},
+                {"text":"分销商新增店铺询价单","value":"DISTRIBUTOR_NEW_STORE_INQUIRY"},
+                {"text":"400转化平台委托单(平台)","value":"SALES_OPPORTUNITIES"},
+                {"text":"客户经理新增平台询价单(平台)","value":"MANAGER_NEW_INQUIRY"},
+                {"text":"用户新增平台询价单(平台)","value":"USER_NEW_INQUIRY"},
+                {"text":"用户新增平台委托单(平台)","value":"USER_NEW_ORDERS"}
+            ],
+            'id': "inquiryOrderSource"
+        });
+    }
+
+    function loadMultiSelect(el, url, param){
+        postUtil.call(url, param, function (result) {
+            if (result.STATUS == 'SUCCESS') {
+                var ctHtml = '';
+                for(var i = 0; i < result.DATA.length; i++) {
+                    if(result.DATA[i]) {
+                        ctHtml += '<option value="' + result.DATA[i].code + '">' +
+                                result.DATA[i].name + '</option>';
+                    }
+                }
+                $(el).append(ctHtml);
+                form.render();
+            } else {
+                layer.msg('系统发生未知错误(加载数据失败)' + result.MSG, {icon: 5});
+            }
+        });
+    }
+    
+    //新增销售机会回调函数
+    function turnInquireToOut(result) {
+        var isPass = true;
+        if (result.STATUS == "SUCCESS") {
+            layer.msg("询单转交成功", {icon: 6});
+            isPass = true;
+        } else {
+            layer.msg("询单转交失败:" + result.MSG, {icon: 5});
+            isPass = false;
+        }
+         if(isPass){
+             var param = {};
+             param.currentPage = 1;
+             if (currentStatuss != '') {
+                 param.inquiryOrderStatus = currentStatuss;
+             }
+             param.searchContidion = $('input[name=searchContidion]').val();
+             loadListDataByParam(param);
+         }
+        return isPass;
+    }
+</script>
+</body>
+</html>

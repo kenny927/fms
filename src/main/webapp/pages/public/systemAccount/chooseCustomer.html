@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>请选择工程商</title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="/res/css/sku.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+
+    <style>
+        select {
+            margin-left: 10px;
+            height: 36px;
+            line-height: 34px;
+            width: 148px;
+            padding-left: 10px;
+            border: 1px solid #e6e6e6;
+        }
+    </style>
+</head>
+<body>
+
+<section id="itocCenter" style="padding-left: 0px;">
+    <section class="itocContent">
+        <div class="itocMain" style="border: 0px;">
+            <div class="table inquiry" id="addInquiry">
+                <div class="treeSearch mb20">
+                    <input type="text" id="queryString" placeholder="手机号/姓名/邮箱/公司名称" class="mr20"/>
+                    <select id="accountResource">
+                        <option value="ALL">全部来源</option>
+                        <option value="MANUAL">手动新增</option>
+                        <option value="MALL_PERSONAGE_REGIST">商城个人注册</option>
+                        <option value="MALL_ENTERPRISE_REGISTION">商城企业注册</option>
+                        <option value="DISTRIBUTOR_PROJECT_BACKUP">分销商项目报备</option>
+                        <option value="SALES_PROJECT_BACKUP">销售员项目报备</option>
+                    </select>
+                    <button id="searchBtn" class="search-btn" style="cursor: pointer;">搜索</button>
+                    <button id="chooseBtn" class="search-btn" style="cursor: pointer;">确定</button>
+                    <button id="cancelBtn" class="search-btn" style="cursor: pointer;">取消</button>
+                </div>
+                <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px">
+                    <table class="layui-table pop" lay-skin="line">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>账号(手机号)</th>
+                            <th>姓名</th>
+                            <th>公司名称</th>
+                            <th>来源</th>
+                            <th>注册时间</th>
+                            <th>专属客户经理</th>
+                        </tr>
+                        </thead>
+                        <tbody id="authorityCustomerTable">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+            </div>
+        </div>
+    </section>
+</section>
+
+
+<script type="text/javascript">
+
+    $(function () {
+        $('#addInquiry').show();
+    });
+
+    var PAGE_SIZE = 5;
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    var customerDataMap = {};
+
+
+    function doSearch() {
+        var queryString = $('#queryString').val();
+        var accountResource = $('#accountResource').val();
+        var queryParam = {};
+        queryParam.currentPageIndex = 1;
+        queryParam.pageSize = PAGE_SIZE;
+
+        queryParam.queryString = queryString;
+        if (accountResource != "ALL") {
+            queryParam.accountResource = accountResource;
+        }
+
+        loadCustomerData(queryParam);
+    }
+
+    $(function () {
+
+        doSearch();
+
+        $("#searchBtn").bind("click", function () {
+            doSearch();
+        });
+
+        $('#chooseBtn').bind("click", function () {
+            var checkedCustomer = $("input[type='radio'][name='customer_radio']:checked");
+            if (checkedCustomer[0]) {
+                var accountId = checkedCustomer[0].value;
+                var chooseCustomerDataArray = [];
+                chooseCustomerDataArray.push(customerDataMap[accountId]);
+                var success = parent.chooseCustomerCallback(chooseCustomerDataArray);//调用父页面的渲染方法
+                if (success) {
+                    parent.layer.close(index);//关闭当前窗口
+                }
+            } else {
+                layer.msg("请选择工程商后再进行操作");
+            }
+        });
+
+        $('#cancelBtn').bind("click", function () {
+            parent.layer.close(index);//关闭当前窗口
+        });
+
+    });
+
+    function loadCustomerData(queryParam) {
+        layer.load();
+        postUtil.call("/reusable/systemAccount/customerJsonData", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            renderTable(dataList);
+            initCustomerDataMap(dataList);
+            layer.closeAll("loading");
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                skip: true,
+                total: totalRow,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var queryString = $('#queryString').val();
+                        var accountResource = $('#accountResource').val();
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        tempParam.queryString = queryString;
+                        if (accountResource != "ALL") {
+                            tempParam.accountResource = accountResource;
+                        }
+                        loadCustomerData(tempParam);
+                    }
+                }
+            });
+        });
+    }
+
+    function initCustomerDataMap(dataList) {
+        if (dataList && dataList.length > 0) {
+            customerDataMap = {};
+            for (var i = 0; i < dataList.length; i++) {
+                customerDataMap[dataList[i].accountId] = dataList[i];
+            }
+        }
+    }
+
+    function renderTable(dataList) {
+        var length = dataList.length;
+        var table = document.getElementById("authorityCustomerTable");
+        table.innerHTML = "";
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var row = renderRow(data);
+                table.appendChild(row);
+            }
+        } else {
+            var html = '<tr><td colspan="6"><p class="t-c fz16 c-2" style="line-height: 76px;">未查询到工程商信息</p></td></tr>';
+            $(table).html(html);
+        }
+    }
+
+    function renderRow(rowData) {
+
+        var mobile = rowData.mobile;
+        var userRealName = rowData.userRealName;
+        var accountName = rowData.accountName;
+        var accountType = rowData.accountType;
+        var accountTypeName = rowData.accountTypeName;
+        var email = rowData.email;
+        var accountResource = rowData.accountResource;
+        var accountResourceName = rowData.accountResourceName;
+        var createDate = rowData.createDate;
+        var createDateStr = rowData.createDateStr;
+        var accountManagerName = rowData.accountManagerName;
+
+        var tr = document.createElement('tr');
+        tr.appendChild(renderCell("radio", rowData, "width:8%;"));
+        tr.appendChild(renderCell(null, mobile, "width:8%;"));
+        tr.appendChild(renderCell(null, userRealName, "width:4%;"));
+        tr.appendChild(renderCell(null, accountName, "width:10%;"));
+        tr.appendChild(renderCell(null, accountResourceName, "width:10%;"));
+        tr.appendChild(renderCell(null, createDateStr, "width:10%;"));
+        tr.appendChild(renderCell(null, accountManagerName, "width:10%;"));
+        return tr;
+    }
+
+    function renderCell(name, value, style) {
+        var td = document.createElement('td');
+        if (name == "radio") {
+            td.innerHTML = "<input type=\"radio\" name='customer_radio' value=\"" + value.accountId + "\" />";
+        } else {
+            if (value) {
+                td.innerText = value;
+            } else {
+                td.innerText = "--";
+            }
+        }
+
+        return td;
+    }
+</script>
+</body>
+</html>

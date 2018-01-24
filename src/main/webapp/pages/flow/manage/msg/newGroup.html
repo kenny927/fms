@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/public/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_svvppt2njx9u23xr.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <link rel="stylesheet" href="/res/css/project.css<@resVersionDirective>?</@>">
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+</head>
+<body style="background-color: #fff">
+
+    <div class="itocMain main pt20 pl20 pr20">
+        <form id="conflictForm" class="layui-form" action="">
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">群组标识：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="group" lay-verify="group" autocomplete="off" placeholder="请输入群组标识" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">名称：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="groupDesc" lay-verify="groupDesc" autocomplete="off" placeholder="请输入名称" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">类型：</label>
+                <div class="layui-input-block">
+                    <input type="text" name="type" lay-verify="type" autocomplete="off" placeholder="请输入类型" class="layui-input">
+                </div>
+            </div>
+        </form>
+    </div>
+<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+<style type="text/css">
+    .layui-form-item layui-form-text{
+        margin-bottom: 0px;
+    }
+</style>
+<script>
+    var group = '${group.id??}';
+    var name = '${group.name??}';
+    var type = '${group.type??}';
+
+    layui.use([ 'form', 'layer' ], function(){
+        var form = layui.form(), layer = layui.layer;
+
+    });
+
+    $(function () {
+        if(id != '' && id != 'undefined'){
+            $('input[name=group]').val(id);
+            $('input[name=group]').attr("disabled", "disabled");
+        }
+        if(name != '' && id != 'undefined'){
+            $('input[name=groupDesc]').val(name);
+        }
+        if(type != '' && id != 'undefined'){
+            $('input[name=type]').val(type);
+        }
+    })
+</script>
+</body>
+</html>

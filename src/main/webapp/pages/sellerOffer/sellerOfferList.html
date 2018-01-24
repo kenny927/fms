@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+		<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+        <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+	</head>
+	<body>
+		<section id="itocCenter">
+	       <section class="itocContent">
+				<div class="itocMain">
+					<!--<div class="purchaseSearch purchasepading">-->
+		       			<form class="jun-form-s form-css mt20">
+			       		    <dl  class="dl-form">
+				       		    	<dt class="flt">搜报价单：</dt>
+				       		    	<dd class="flt"><input type="text"  id="num" placeholder="请输入报价单编号/询单编号" class="layui-input" /></dd>
+				       		    	<dd class="flt ml10"><span class="form-btn layui-btn-small2" onclick="search()">搜索</span></dd>
+			       		    </dl>
+		       			</form>
+		       		<!--</div>-->
+		       		<div id="offerList">
+		       		
+		       		</div>
+		       		<div id="paginationDiv"></div>
+				</div>
+
+			</section>
+	    </section>
+		<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+		<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+	    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+	    <script src="/res/js/seller_offer_list.js<@resVersionDirective>?</@>"></script>
+	    <script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+	     <style type="text/css">
+		.myskin1 .layui-layer-content{
+	        height: 103px!important;
+	    }
+		</style>
+		
+		
+		<script type="text/javascript">
+		
+
+		var _currentPage='${currentPage}';
+
+		
+		var mallOfferStatus="${mallOfferStatus}"||"";
+		var isSendToBuyerYet="${isSendToBuyerYet}"||"";
+		    //加载数据，设置分页
+		    $(function () {
+				var param ={offerId : $('#num').val()||"","mallOfferStatus":mallOfferStatus,"isSendToBuyerYet":isSendToBuyerYet};
+		        loadOfferListData(param);
+		    });
+		    
+	         //关闭询单弹窗
+	         var layer;
+			 layui.use('layer', function(){
+	          	layer = layui.layer;
+			 });
+		    function search(){
+				var param ={
+					offerId : $('#num').val()||""
+				};
+			    loadOfferListData(param);
+		    }
+		      
+		    function loadOfferListData(param) {
+		    	var offerId =  param.offerId||'';
+		        var currentPageIndex = param.currentPage || _currentPage; //如果currentPage没定义就设置为1
+		        _currentPage = currentPageIndex;
+		        param.currentPage=currentPageIndex;
+		     	postUtil.call("/mallSellerOffer/offerlist", param, function (result) {
+		     		if(result.SUCCESS){
+			            var pages = result.count;
+			            renderSellerOfferList(result.data);
+			            laypage({
+			                cont: 'paginationDiv',
+			                pages: pages,
+			                total:result.total,
+			                curr: currentPageIndex,
+			                skip: true,
+			                jump: function (obj, first) {
+			                    if (!first) {
+			                    	var jumpParam ={
+			                    		offerId :offerId,
+			                    		currentPage:obj.curr
+			                    	};
+			                    	loadOfferListData(jumpParam);
+			                    }
+			                }
+			            });
+		     		}else{
+		     		    //关闭委托单弹出层
+		     			layer.open({
+		     			  title: '操作提示',
+		     			  skin: 'myskin',
+		     			  area: ['350px', '280px'],
+		     			  btnAlign: 'c',
+		     			  content: '<p style="text-align: center;margin-top: 50px;">请求出错，请检查数据正确性！<span style="color:#fd4800"></span></p>',
+		     			  btn: ['确认关闭'],
+		     			  yes: function(index, layero){
+		     			    //关闭委托单的回调
+		     			    layer.close(index);
+		     			  },
+		     			  cancel: function(){ 
+		     			    //右上角关闭回调
+		     			  }
+		     			});
+		     		}
+		     	});
+		    }		
+		</script>
+	</body>
+</html>

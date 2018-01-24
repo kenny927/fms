@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" >
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>" />
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/Area1.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/vue/dist/vue.min.js"></script>
+    <style>
+        .form-css .dl-form dd .layui-layedit{
+            height: 230px!important;
+        }
+        .layui-layedit {
+            width: 568px !important;
+            height: 230px!important;
+        }
+
+        .layui-layedit iframe {
+            height: 187px !important;
+        }
+        .jun-form-s input[type='text'].borff{
+            border: 1px solid #ff4800!important;
+        }
+        .layui-form-select dl{
+            max-height: 280px;
+        }
+    </style>
+</head>
+<body>
+<div class="yofc-body" style="margin-left:10px">
+    <form id ="visitForm" action="" class="jun-form-s form-css">
+        <dl class="dl-form">
+            <dt class="flt chooseDistributor" style="width: 80px;">选择客户：</dt>
+            <dd class="flt chooseDistributor">
+                <input  value="" type="text" name="chooseDistributor" onclick="chooseDistributormethod()" autocomplete="off" readonly="readonly" placeholder="请选择" class="layui-input required">
+            </dd>
+            <dt class="flt" style="width: 90px;">计划拜访时间：</dt>
+            <dd class="flt">
+                <input name="visitTime" value="" id="visitTime"
+                       style="height: 32px; width: 242px;"
+                       class="layui-input laydate-icon" placeholder="自定义日期格式">
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12" style="width: 80px;">拜访方式：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="visitType" style="width: 240px;" lay-filter="visitType">
+                    <option value="">请选择拜访方式</option>
+                    <option value="PHONE" selected>电话联系</option>
+                    <option value="HOUSE">登门拜访</option>
+                    <option value="MEETING_MARKET">会议营销</option>
+                </select>
+            </dd>
+            <dt class="flt fz12" style="width: 90px;">联系人：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select id="linkman" name="linkman" style="width: 234px;">
+                    <option value="">请选择联系人</option>
+                </select>
+            </dd>
+        </dl>
+        <dl class="dl-form" id="addressShow">
+            <dt class="flt"  style="width: 80px;">地址：</dt>
+            <dd class="flt layui-form dd-city">
+                <select name="province" lay-filter="province" lay-search>
+                    <option value="">请选择省</option>
+                </select>
+            </dd>
+            <dd class="flt layui-form dd-city ml10" lay-filter="city">
+                <select name="city" lay-search>
+                    <option value="">请选择市</option>
+                </select>
+            </dd>
+            <dd class="flt ml10"><input style="width: 308px;" lay-verify="address" :value="queryParam.address" type="text" name="address" autocomplete="off"  class="layui-input"></dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12" style="width: 80px;">拜访主题：</dt>
+            <dd class="flt layui-form">
+						<textarea class="layui-textarea layui-hide" name="content"
+                                  lay-verify="content" id="LAY_demo_editor"></textarea>
+            </dd>
+        </dl>
+    </form>
+    <div class="t-c" style="margin-top: 20px;">
+        <button class="form-btn layui-btn-big"  onclick="saveVisitRecord()">保存</button>
+        <button class="form-btn  layui-btn-primary layui-btn-big ml10" onclick="closeLayer()">取消</button>
+    </div>
+</div>
+<script type="text/javascript">
+    var startDate= '${startDate!}';
+    var accountId = '${accountId!}';
+    var accountName = '${accountName!}';
+    var linkMan = '${linkmanName!}';
+    var visitRecordId = '';
+    var form;
+    var layedit;
+    var edit_index;
+    var laydate;
+    var layer;
+    var areaData = Area;
+    var province = '';
+    var city = '';
+    var $form;
+    var OchooseDistributor = $("input[name='chooseDistributor']");
+    var Oaddress = $("input[name='address']");
+    var Oprovince = $("select[name=province]");
+    var parent_index = parent.layer.getFrameIndex(window.name);
+    layui.use(['layer','form','laydate','layedit'], function(){
+        layer = layui.layer;
+        form = layui.form();
+        $form = $('#visitForm');
+        loadProvince();
+        //编辑器
+        layedit = layui.layedit;
+        edit_index = layedit.build('LAY_demo_editor',{
+            tool: [
+                'strong','italic','underline','del','|',
+                'left' ,'center','right','link' ,'unlink',
+                'face'
+            ]
+        });
+        if(accountId){
+            $("input[name='chooseDistributor']").attr('disabled','true');
+            $("input[name='chooseDistributor']").val(accountName);
+         }
+         var visitType = $("select[name='visitType']").val();
+         if(visitType == 'PHONE') {
+            $('#addressShow').hide();    
+         }
+        laydate = layui.laydate;
+        loadVisitTime();
+        loadLinkMan(accountId);
+        parent.layer.iframeAuto(parent_index);
+        form.on('select(visitType)', function(data) {
+            if(data.value == 'PHONE') {
+                $('#addressShow').hide();
+            }else {
+                $('#addressShow').show();
+            }
+            parent.layer.iframeAuto(parent_index);
+        });
+
+    });
+
+    function  getLayedit(){
+        return layedit;
+    }
+    function validateForm(){
+        var flag = true;
+        if(!OchooseDistributor.val()){
+            OchooseDistributor.addClass("borff");
+            return false;
+        }
+        var visitTime = $("input[name=visitTime]");
+        if(!visitTime.val()){
+            visitTime.attr("required","required");
+            return false;
+        }
+        var visitType = $("select[name='visitType']").val();
+        if(visitType!='PHONE') {
+            if(!Oprovince.val()){
+                Oprovince.next().find("input[type='text']").addClass("borff");
+                return false;
+            }
+            if(!Oaddress.val()){
+                Oaddress.addClass("borff");
+                return false;
+            }else {
+                Oaddress.removeClass("borff");
+            }
+        }
+        var content = layedit.getContent(edit_index);
+        if(!content){
+            layer.msg("请填写拜访主题",{icon:5});
+            return false;
+        }
+        return flag;
+    }
+    function closeLayer(){
+        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+        parent.layer.close(index); //再执行关闭
+    }
+    function loadProvince() {
+        var proHtml = '';
+        for (var i = 0; i < areaData.length; i++) {
+            if (province != undefined && province != '' && areaData[i].provinceName == province) {
+                proHtml += '<option value="' + areaData[i].provinceCode + '_' + areaData[i].mallCityList.length + '_' + i + '_' + areaData[i].provinceName + '" selected>' +
+                    areaData[i].provinceName + '</option>';
+                loadCity(areaData[i].mallCityList);
+            }else {
+                proHtml += '<option value="' + areaData[i].provinceCode + '_' + areaData[i].mallCityList.length + '_' + i + '_' + areaData[i].provinceName + '">' +
+                    areaData[i].provinceName + '</option>';
+            }
+        }
+        $form.find('select[name=province]').append(proHtml);
+        form.render();
+        form.on('select(province)', function(data) {
+            city="";
+            var value = data.value;
+            var d = value.split('_');
+            var code = d[0];
+            var count = d[1];
+            var index = d[2];
+            province=d[3];
+            if (count > 0) {
+                loadCity(areaData[index].mallCityList);
+                Oprovince.next().find("input[type='text']").removeClass("borff");
+            } else {
+                province = "";
+                city="";
+            }
+        });
+    }
+    function loadCity(citys) {
+        var cityHtml = '';
+        for (var i = 0; i < citys.length; i++) {
+            if (city != undefined && city != '' && citys[i].cityName == city) {
+               if(citys[i].mallAreaList){
+                  cityHtml += '<option value="' + citys[i].cityCode + '_' + citys[i].mallAreaList.length + '_' + i + '_' + citys[i].cityName + '" selected>' + citys[i].cityName + '</option>';
+               }else{
+                  cityHtml += '<option value="' + citys[i].cityCode + '_0' + '_' + i + '_' + citys[i].cityName + '" selected>' + citys[i].cityName + '</option>';
+               }  
+                 
+            }else {
+
+                 if(citys[i].mallAreaList){  
+                     cityHtml += '<option value="' + citys[i].cityCode + '_' + citys[i].mallAreaList.length + '_' + i + '_' + citys[i].cityName + '">' + citys[i].cityName + '</option>';
+                 }else{
+                     cityHtml += '<option value="' + citys[i].cityCode + '_0' + '_' + i + '_' + citys[i].cityName + '">' + citys[i].cityName + '</option>';
+                }
+            }
+        }
+        if(!city){
+            city=citys[0].cityName;
+        }
+        $form.find('select[name=city]').html(cityHtml)
+        form.render();  
+        form.on('select(city)', function(data) {
+            var value = data.value;
+            var d = value.split('_');
+            var code = d[0];
+            var count = d[1];
+            var index = d[2];
+            city=d[3];
+        });
+    }
+    function saveVisitRecord(){
+        if(!validateForm()){
+            return;
+        }
+        var param={
+            accountId:accountId,
+            province:province,
+            city:city,
+            address:$("input[name=address]").val(),
+            linkmanId:$("select[name=linkman]").val(),
+            visitTime:$("input[name=visitTime]").val(),
+            visitType:$("select[name=visitType]").val(),
+            recordType:"VISITING_PLAN",
+            content:layedit.getContent(edit_index)
+        };
+        postUtil.call("/customer/relation/insertRecordDetail",param,function(response){
+            if(response.STATUS == 'SUCCESS'){
+                layer.msg('新建拜访计划成功!');
+                closeLayer();
+                parent.vm.saveVisitRecordCallback(response);
+            }
+        });
+
+    }
+    function showMsg(msg){
+        var html ='<body>'+
+            '<div class="t-c jun-close fz14 c-2"  style="margin-top: 30px; ">'+
+            '<span class="iconfont icon-jinggao-copy c-f mr5 mt5" style="font-size: 24px">'+
+            '</span>'+
+            '</div>'+
+            '</body>';
+        html = html.replace("",msg);
+        layer.open({
+            title: '提示',
+            skin: 'jun-close',
+            area: ['480px', '250px'],
+            btnAlign: 'c',
+            content: html,
+            btn: ['关闭'],
+            yes: function(index, layero){
+                //关闭委托单的回调
+                layer.close(index);
+            },
+            cancel: function(){
+                //右上角关闭回调
+            }
+        });
+    }
+
+    function loadVisitTime(){
+        var config = {
+            min: startDate,
+            istime:false,
+            format: 'YYYY-MM-DD',
+            istoday: true
+        };
+        document.getElementById('visitTime').onclick = function(){
+            config.elem = this;
+            laydate(config);
+        };
+    }
+    function loadLinkMan(accountId){
+        postUtil.call("/mallCustomer/getLinkmanData",{accountId:accountId},function(response){
+            if(response.success){
+                $.each($('#linkman').children(),function(index,element){
+                    if(index!=0){
+                        $(element).remove();
+                    }
+                });
+                $.each(response.data,function(index,element){
+                    if(linkMan){
+                        var html = '<option value="'+element.linkmanId+'"'+(element.linkmanId==linkMan?'selected':'')+'>'+element.linkmanName+'('+element.linkmanTelephone+')'+(element.linkmanPosition||'')+'</option>'
+                    }else{
+                        var html = '<option value="'+element.linkmanId+'"'+(index==0?'selected':'')+'>'+element.linkmanName+'('+element.linkmanTelephone+')'+(element.linkmanPosition||'')+'</option>'
+                    }
+                    $('#linkman').append(html);
+                });
+                form.render('select');
+            }
+        });
+    }
+    function chooseDistributormethod() {
+        layer.open({
+            title: "选择客户",
+            type: 2,
+            area: ['750px','380px'],
+            content: '/reusable/systemAccount/chooseAllCustomerPage'
+        });
+    }
+    function saveTransmitRecordCallback(obj) {
+        $("input[name='chooseDistributor']").val(obj.linkmanName);
+        accountId = obj.accountId;
+        linkmanId = obj.linkmanId;
+        OchooseDistributor.removeClass("borff");
+        loadLinkMan(accountId);
+    }
+</script>
+</body>
+</html>

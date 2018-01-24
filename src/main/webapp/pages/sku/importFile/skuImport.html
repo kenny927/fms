@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+	<script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+	<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+	<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+	<script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+	<script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+</head>
+<style type="text/css">
+	td {width: 130px}
+</style>
+<body>
+	<div style="margin-left:50px">
+		<div style="margin-top:10px"></div>
+		<p>1.产品sku</p>
+			<table>
+				<tr style="height: 80px;">
+					<td>新增sku:</td>
+					<td><a href="/manage/file/downloadImportResultByName?fileName=SKU_IMPORT_TEMPLATE.xlsx">下载sku模板</a></td>
+					<td id ='td_sku1' style="width :300px"><input id="sku1" type="file" name="file"></td>
+					<td></td>
+					<td><div id ="result_sku1"></div></td>
+				</tr>
+			</table>
+			<table>
+				<tr>
+					<td>修改sku:</td>
+					<td><a href="/manage/commodity/export">导出sku数据</a></td>
+					<td id ='td_sku2' style="width :300px"><input id="sku2" type="file" name="file"></td>
+					<td></td>
+					<td><div id ="result_sku2"></div></td>
+				</tr>
+			</table>
+		<div style="margin-top:10px"></div>
+		<p>2.产品图片</p>
+			<table id="mytb1">
+				<tr>
+					<td>图片列表导入</td>
+					<td><a href="/manage/photo/downloadTemplate">下载图片列表模板</a></td>
+					<td id ="td_image1" style="width :300px"><input id="image1" type="file" name="file"></td>
+					<td id ="td_image2" style="width :300px"><input id="image2" type="file" name="file"></td>
+					<td style="width:60px"></td>
+					<td></td>
+					<td><div id ="result_image1"></div></td>
+				</tr>
+			</table>
+	</div>
+<script>
+    var resultUrl='/manage/file/downloadImportResultByName?fileName=';
+
+    layui.use('upload', function(){
+
+        //新增sku
+        layui.upload({
+            elem: '#sku1',
+            title: '点击选择文件导入',
+            skin:'upload',
+            url: '/manage/commodity/importCommoditySKUForInsert', //上传接口
+            ext: 'xlsx',
+            type: 'file',
+            before: function(input){
+                // //返回的参数item，即为当前的input DOM对象
+                // console.log('文件上传中');
+				layer.load();
+            },
+            success: function(res){ //上传成功后的回调
+				layer.closeAll("loading");
+                if(res.STATUS) {
+                    layer.msg(res.MSG);
+                    if(res.STATUS=='SUCCESS'){
+                        generateResult("sku",1,resultUrl+'SKU_IMPORT_ADD_RESULT.xlsx');
+                    }
+                }
+            }
+        });
+
+        //修改sku
+        layui.upload({
+            elem: '#sku2',
+            title: '点击选择文件导入',
+            skin:'upload',
+            url: '/manage/commodity/importCommoditySKUForUpdate', //上传接口
+            ext: 'xlsx',
+            type: 'file',
+            before: function(input){
+                // //返回的参数item，即为当前的input DOM对象
+                // console.log('文件上传中');
+				layer.load();
+            },
+            success: function(res){ //上传成功后的回调
+				layer.closeAll("loading");
+                if(res.STATUS) {
+                    layer.msg(res.MSG);
+                    if(res.STATUS=='SUCCESS'){
+                        generateResult("sku",2,resultUrl+'SKU_IMPORT_UPDATE_RESULT.xlsx');
+                    }
+                }
+            }
+        });
+
+        //图片对应关系导入
+        layui.upload({
+            elem: '#image1',
+            title: '点击选择文件导入',
+            skin:'upload',
+            url: '/manage/photo/importSkuProductImage', //上传接口
+            ext: 'xlsx',
+            type: 'file',
+            before: function(input){
+                // //返回的参数item，即为当前的input DOM对象
+                // console.log('文件上传中');
+            },
+            success: function(res){ //上传成功后的回调
+                if(res.STATUS) {
+                    layer.msg(res.MSG);
+                    if(res.STATUS=='SUCCESS'){
+                        generateResult("image",1,resultUrl+'SKU_PRODUCT_IMAGE_RESULT.xlsx');
+                    }
+                }
+            }
+        });
+
+        //图片zip包导入
+        layui.upload({
+            elem: '#image2',
+            title: '点击选择zip包导入',
+            skin:'upload',
+            url: '/file_server/images/uploadZIP', //上传接口
+            ext: 'zip',
+            type: 'file',
+            before: function(input){
+                // //返回的参数item，即为当前的input DOM对象
+                // console.log('文件上传中');
+            },
+            success: function(res){ //上传成功后的回调
+                if(res.STATUS == "SUCCESS") {
+                    layer.msg("导入图片文件成功!");
+                }else{
+                    layer.msg(res.MSG);
+                }
+            }
+        });
+    });
+
+	function generateResult(moudule,type,resultUrl){
+		var html = "<td><a href='"+resultUrl+"'>查看结果</a></td>"
+		$('#result_'+moudule+type).html(html);
+	}
+
+</script>
+</body>
+</html>

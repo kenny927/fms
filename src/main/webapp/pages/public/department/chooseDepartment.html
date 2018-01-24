@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>选择部门(岗位)</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_svvppt2njx9u23xr.css<@resVersionDirective>?</@>"/>
+    <style type="text/css">
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd .goodsName {
+            height: 35px;
+            line-height: 35px;
+            overflow: hidden;
+            width: 500px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            color: #222222;
+        }
+
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd p {
+            height: 20px;
+            line-height: 20px;
+            color: #999999;
+            overflow: hidden;
+            width: 500px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        select {
+            margin-left: 10px;
+            height: 34px;
+            line-height: 34px;
+            width: 148px;
+            padding-left: 10px;
+            border: 1px solid #e6e6e6;
+        }
+    </style>
+</head>
+<body>
+
+<section id="itocCenter" style="padding-left: 0px;">
+    <section class="itocContent">
+        <div class="itocMain" style="border: 0px;">
+            <div class="table inquiry" id="addInquiry">
+                <div class="treeSearch mb20">
+                    部门名称：<input type="text" id="departmentName" style="width: 150px;" placeholder="请输入部门名称"/>
+                    <button id="searchBtn" class="search-btn" style="cursor: pointer">查询</button>
+                    <button id="chooseBtn" class="search-btn" style="cursor: pointer">确认</button>
+                </div>
+                <ul class="th th-border">
+                    <li style="width: 5%;"><div class="mida"><div class="midb"><input id="selectAllCheckBox" type="checkbox"/></div></div></li>
+                    <li style="width:10%;"><div class="mida"><div class="midb">部门(岗位)ID</div></div></li>
+                    <li style="width:20%"><div class="mida"><div class="midb">部门(岗位)名称</div></div></li>
+                    <li style="width:45%;"><div class="mida"><div class="midb">部门(岗位)层级</div></div></li>
+                    <li style="width:20%;"><div class="mida"><div class="midb">部门(岗位)类型</div></div></li>
+                </ul>
+                <div class="information-list wait" id="authorityDepartmentTable">
+                </div>
+                <div id="paginationDiv"></div>
+            </div>
+        </div>
+    </section>
+</section>
+
+<script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript">
+
+    $(function () {
+        $('#addInquiry').show();
+    });
+
+    var PAGE_SIZE = 5;
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    var departmentDataMap = {};
+
+
+    function doSearch(){
+        var departmentName = $('#departmentName').val();
+
+        var queryParam = {};
+        queryParam.currentPageIndex = 1;
+        queryParam.pageSize = PAGE_SIZE;
+        queryParam.departmentName = departmentName;
+
+        loadAuthorityDepartmentData(queryParam);
+    }
+
+    $(function () {
+
+        doSearch();
+
+        $("#searchBtn").bind("click", function () {
+            doSearch();
+        });
+
+        $('#chooseBtn').bind("click", function () {
+            var departmentChecks = document.getElementsByName("departmentIdCheckBox");
+            var checkedDepartmentIds = [];
+            if (departmentChecks.length > 0) {
+                for (var i = 0; i < departmentChecks.length; i++) {
+                    if (departmentChecks[i].checked == true) {
+                        checkedDepartmentIds.push(departmentChecks[i].value);
+                    }
+                }
+
+                if (checkedDepartmentIds.length == 0) {
+                    layer.msg("请查询数据勾选后再进行操作",{icon:5});
+                } else {
+                    var choosedDepartmentDataArray = [];
+                    for (var j = 0; j < checkedDepartmentIds.length; j++) {
+                        var tempAccountData = departmentDataMap[checkedDepartmentIds[j]];
+                        choosedDepartmentDataArray.push(tempAccountData);
+                    }
+                    var success = parent.chooseDepartmentCallback(choosedDepartmentDataArray);//调用父页面的渲染方法
+                    if (success) {
+                        parent.layer.close(index);//关闭当前窗口
+                    }
+                }
+            } else {
+                layer.msg("请查询数据勾选后再进行操作",{icon:5});
+            }
+        });
+
+        $('#selectAllCheckBox').bind("click", function () {
+            var selectAllChecked = document.getElementById("selectAllCheckBox").checked;
+            var departmentChecks = document.getElementsByName("departmentIdCheckBox");
+            if (departmentChecks.length > 0) {
+                for (var i = 0; i < departmentChecks.length; i++) {
+                    departmentChecks[i].checked = selectAllChecked;
+                }
+            }
+        });
+    });
+
+    function loadAuthorityDepartmentData(queryParam) {
+        layer.load();
+        postUtil.call("/reusable/department/listJson", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            renderTable(dataList);
+            layer.closeAll("loading");
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var departmentName = $('#departmentName').val();
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        tempParam.departmentName = departmentName;
+                        loadAuthorityDepartmentData(tempParam);
+                    }
+                }
+            });
+        });
+    }
+
+    function renderTable(dataList) {
+        var length = dataList.length;
+        var table = document.getElementById("authorityDepartmentTable");
+        table.innerHTML = "";
+        departmentDataMap = {};
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var departmentId = data.departmentId;
+                departmentDataMap[departmentId] = data;
+                var row = renderRow(data);
+                table.appendChild(row);
+            }
+        }else {
+            var html = '<p class="t-c fz16 c-2" style="line-height: 76px;">暂无部门(岗位)信息！</p>';
+            $(table).html(html);
+        }
+    }
+
+    function renderRow(rowData) {
+
+        var departmentId = rowData.departmentId;
+        var departmentName = rowData.departmentName;
+        var departmentAllName = rowData.departmentAllName;
+        var departmentType = rowData.departmentType;
+
+        var ul = document.createElement('ul');
+        ul.setAttribute("class", "information");
+        ul.setAttribute("style", "height:75px;");
+
+
+        ul.appendChild(renderCell("departmentIdCheckBox", departmentId, "width:5%;height:75px;"));
+        ul.appendChild(renderCell(null, departmentId, "width:10%;height:75px;"));
+        ul.appendChild(renderCell(null, departmentName, "width:20%;height:75px;"));
+        ul.appendChild(renderCell(null, departmentAllName, "width:45%;height:75px;"));
+        ul.appendChild(renderCell(null, departmentType, "width:20%;height:75px;"));
+        return ul;
+    }
+
+    function renderCell(name, value, style) {
+        var li = document.createElement('li');
+        li.setAttribute("style", style)
+        var div_mida = document.createElement('div');
+        div_mida.setAttribute("class", "mida");
+        var div_midb = document.createElement('div');
+        div_midb.setAttribute("class", "midb");
+        if ("departmentIdCheckBox" == name) {
+            div_midb.innerHTML = '<input type="checkbox" name="departmentIdCheckBox" value="' + value + '" />';
+        } else {
+            if(value) {
+                div_midb.innerText = value;
+            }else {
+                div_midb.innerText = "--";
+            }
+        }
+        div_mida.appendChild(div_midb);
+        li.appendChild(div_mida);
+        return li;
+    }
+
+    $(document).on("click", "#departmentTable_tbody ul", function () {
+        var checked = $(this).find('input:checkbox[name="departmentIdCheckBox"]').attr("checked");
+        $(this).find('input:checkbox[name="departmentIdCheckBox"]').attr("checked", !checked);
+        var isAllChecked = true;
+        $.each($('input:checkbox[name="departmentIdCheckBox"]'), function (index, item) {
+            if(!$(item).is(':checked')) {
+                isAllChecked = false;
+                return false;
+            }
+        });
+        $('#selectAllCheckBox').attr("checked", isAllChecked);
+    });
+</script>
+</body>
+</html>

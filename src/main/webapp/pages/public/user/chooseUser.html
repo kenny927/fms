@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>请选择员工</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_svvppt2njx9u23xr.css<@resVersionDirective>?</@>"/>
+    <style type="text/css">
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd .goodsName {
+            height: 35px;
+            line-height: 35px;
+            overflow: hidden;
+            width: 500px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            color: #222222;
+        }
+
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd p {
+            height: 20px;
+            line-height: 20px;
+            color: #999999;
+            overflow: hidden;
+            width: 500px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        select {
+            margin-left: 10px;
+            height: 34px;
+            line-height: 34px;
+            width: 148px;
+            padding-left: 10px;
+            border: 1px solid #e6e6e6;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter" style="padding-left: 0px;">
+    <section class="itocContent">
+        <div class="itocMain" style="border: 0px;">
+            <div class="table inquiry" id="addInquiry">
+                <div class="treeSearch mb20">
+                    员工姓名：<input type="text" name="s_user" id="s_user" placeholder="请输入员工姓名" style="width: 100px;">
+                    公司名称：<input type="text" name="s_accountName" id="s_accountName" placeholder="请输入公司名称">
+                    主体：<select  id="s_mainObject" name="s_mainObject" >
+                            <option value="">---请选择---</option>
+                            <option value="10004">工程商</option>
+                            <option value="10003">分销商</option>
+                            <option value="10001">供应商</option>
+                            <option value="10002">平台</option>
+                </select>
+                    <button id="searchBtn" class="search-btn" style="cursor: pointer;">查询</button>
+                    <button id="chooseBtn" style="width: 84px;cursor: pointer;" class="search-btn">确定</button>
+                </div>
+                <ul class="th th-border">
+                    <li style="width: 3%;"><div class="mida"><div class="midb"><input id="selectAllCheckBox" type="checkbox"/></div></div></li>
+                    <li style="width: 10%"><div class="mida"><div class="midb">员工姓名</div></div></li>
+                    <li style="width: 10%;"><div class="mida"><div class="midb">真实姓名</div></div></li>
+                    <li style="width: 3%;"><div class="mida"><div class="midb">性别</div></div></li>
+                    <li style="width: 8%"><div class="mida"><div class="midb">主体</div></div></li>
+                    <li style="width: 18%"><div class="mida"><div class="midb">公司名称</div></div></li>
+                    <li style="width: 8%"><div class="mida"><div class="midb">上级</div></div></li>
+                    <li style="width: 12%"><div class="mida"><div class="midb">当前岗位</div></div></li>
+                    <li style="width: 12%"><div class="mida"><div class="midb">手机</div></div></li>
+                    <li style="width: 15%"><div class="mida"><div class="midb">邮箱</div></div></li>
+                </ul>
+                <div class="information-list wait" id="userTable_tbody">
+                </div>
+                <div id="paginationDiv"></div>
+            </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#addInquiry').show();
+    });
+
+    var PAGE_SIZE = 5;
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    var userDataMap = {};
+
+
+    function doSearch(){
+        var userName = $('#s_user').val();
+        var accountName = $('#s_accountName').val();
+        var mainObjectId = $('#s_mainObject').val();
+        var queryParam = {};
+        queryParam.currentPageIndex = 1;
+        queryParam.pageSize = PAGE_SIZE;
+        queryParam.userRealName = userName;
+        queryParam.accountName = accountName;
+        queryParam.mainObjectId = mainObjectId;
+
+        loadUserData(queryParam);
+    }
+
+    $(function () {
+
+        doSearch();
+
+        $("#searchBtn").bind("click", function () {
+            doSearch();
+        });
+
+        $('#chooseBtn').bind("click", function () {
+            var userChecks = document.getElementsByName("userIdCheckBox");
+            var checkedUserIds = [];
+            if (userChecks.length > 0) {
+                for (var i = 0; i < userChecks.length; i++) {
+                    if (userChecks[i].checked == true) {
+                        checkedUserIds.push(userChecks[i].value);
+                    }
+                }
+
+                if (checkedUserIds.length == 0) {
+                    alert("请查询数据勾选后再进行操作");
+                } else {
+                    var choosedUserDataArray = [];
+                    for (var j = 0; j < checkedUserIds.length; j++) {
+                        var tempAccountData = userDataMap[checkedUserIds[j]];
+                        choosedUserDataArray.push(tempAccountData);
+                    }
+                    var success = parent.chooseUserCallback(choosedUserDataArray);//调用父页面的渲染方法
+                    if (success) {
+                        parent.layer.close(index);//关闭当前窗口
+                    }
+                }
+            } else {
+                alert("请查询数据勾选后再进行操作");
+            }
+        });
+
+        $('#selectAllCheckBox').bind("click", function () {
+            var selectAllChecked = document.getElementById("selectAllCheckBox").checked;
+            var userChecks = document.getElementsByName("userIdCheckBox");
+            if (userChecks.length > 0) {
+                for (var i = 0; i < userChecks.length; i++) {
+                    userChecks[i].checked = selectAllChecked;
+                }
+            }
+        });
+    });
+
+    function loadUserData(queryParam) {
+        layer.load();
+        postUtil.call("/reusable/user/userJsonData", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            renderTable(dataList);
+            layer.closeAll("loading");
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                skip: true,
+                total:totalRow,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var userName = $('#s_user').val();
+                        var accountName = $('#s_accountName').val();
+                        var mainObjectId = $('#s_mainObject').val();
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        tempParam.userRealName = userName;
+                        tempParam.accountName = accountName;
+                        tempParam.mainObjectId = mainObjectId;
+
+                        loadUserData(tempParam);
+                    }
+                }
+            });
+        });
+    }
+
+    function renderTable(dataList) {
+        var length = dataList.length;
+        var table = document.getElementById("userTable_tbody");
+        table.innerHTML = "";
+        userDataMap = {};
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var userId = data.userId;
+                userDataMap[userId] = data;
+                var row = renderRow(data);
+                table.appendChild(row);
+            }
+        }else {
+            var html = '<p class="t-c fz16 c-2" style="line-height: 76px;">暂无员工信息！</p>';
+            $(table).html(html);
+        }
+    }
+
+    function renderRow(rowData) {
+
+        var userId = rowData.userId;
+        var userName = rowData.userName;
+        var userRealName = rowData.userRealName;
+        var pUserId = rowData.pUserId;
+        var pUserName = rowData.pUserName;
+        var sex = rowData.sex;
+        var mobile = rowData.mobile;
+        var email = rowData.email;
+        var accountId = rowData.accountId;
+        var accountName = rowData.accountName;
+        var mainObjectId = rowData.mainObjectId;
+        var mainObjectName = rowData.mainObjectName;
+        var departmentId = rowData.departmentId;
+        var departmentName = rowData.departmentName;
+
+        var ul = document.createElement('ul');
+        ul.setAttribute("class", "information");
+        ul.setAttribute("style", "height:75px;");
+
+
+        ul.appendChild(renderCell("userIdCheckBox", userId, "width:3%;height:75px;"));
+        ul.appendChild(renderCell(null, userName, "width:10%;height:75px;"));
+        ul.appendChild(renderCell(null, userRealName, "width:10%;height:75px;"));
+        ul.appendChild(renderCell(null, sex, "width:3%;height:75px;"));
+        ul.appendChild(renderCell(null, mainObjectName, "width:8%;height:75px;"));
+        ul.appendChild(renderCell(null, accountName, "width:18%;height:75px;"));
+        ul.appendChild(renderCell(null, pUserName, "width:8%;height:75px;"));
+        ul.appendChild(renderCell(null, departmentName, "width:12%;height:75px;"));
+        ul.appendChild(renderCell(null, mobile, "width:12%;height:75px;"));
+        ul.appendChild(renderCell(null, email, "width:15%;height:75px;"));
+        return ul;
+    }
+
+    function renderCell(name, value, style) {
+        var li = document.createElement('li');
+        li.setAttribute("style", style)
+        var div_mida = document.createElement('div');
+        div_mida.setAttribute("class", "mida");
+        var div_midb = document.createElement('div');
+        div_midb.setAttribute("class", "midb");
+        if ("userIdCheckBox" == name) {
+            div_midb.innerHTML = '<input type="checkbox" name="userIdCheckBox" value="' + value + '" />';
+        } else {
+            if(value) {
+                div_midb.innerText = value;
+            }else {
+                div_midb.innerText = "--";
+            }
+        }
+        div_mida.appendChild(div_midb);
+        li.appendChild(div_mida);
+        return li;
+    }
+
+    $(document).on("click", "#userTable_tbody ul", function () {
+        var checked = $(this).find('input:checkbox[name="userIdCheckBox"]').attr("checked");
+        $(this).find('input:checkbox[name="userIdCheckBox"]').attr("checked", !checked);
+        var isAllChecked = true;
+        $.each($('input:checkbox[name="userIdCheckBox"]'), function (index, item) {
+            if(!$(item).is(':checked')) {
+                isAllChecked = false;
+                return false;
+            }
+        });
+        $('#selectAllCheckBox').attr("checked", isAllChecked);
+    });
+</script>
+</body>
+</html>

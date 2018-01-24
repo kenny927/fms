@@ -1,0 +1,613 @@
+<#import "/res/template/indexBase.html" as base/>
+<@base.htmlBase>
+<script src="/res/common/area.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<link href="/res/bootstrap3.3/dist/css/bootstrap.min.css<@resVersionDirective>?</@>" rel="stylesheet">
+<link href="/res/bootstrap3.3/dist/css/bootstrap-theme.css<@resVersionDirective>?</@>" rel="stylesheet">
+<link href="/res/bootstrap3.3/_style.css<@resVersionDirective>?</@>" rel="stylesheet">
+<script src="/res/bootstrap3.3/dist/js/bootstrap.min.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<script src="/res/bootstrap3.3/jquery.dataTables.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<script src="/res/bootstrap3.3/dist/js/dataTables.bootstrap.min.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<script src="/res/js/ajaxfileupload_final.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+ <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+<script src="/res/js/projectReport/project_backup_detail.js<@resVersionDirective>?</@>"></script>
+<script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+<script src="/res/js/projectReport/projectOperationLog.js<@resVersionDirective>?</@>"></script>
+<script src="/res/common/multiple-select.js<@resVersionDirective>?</@>"></script>
+<link href="/res/css/multiple-select.css<@resVersionDirective>?</@>" rel="stylesheet">
+<style>
+	.nav3{height:55px; margin-left: -20px;
+	    border-top: 1px solid #f0f0f0;bottom:13px;}
+	.nav3  button{height:35px;}
+	.bor-ff {
+    	border: 1px solid #ff4800!important;
+    }	
+    .form-css .layui-form-radio{
+     display:inline!important;
+    }
+    .form-css .layui-form-radio:nth-of-type(3){
+    margin-left:220px;  
+    }
+    .radios .layui-form-radio:nth-of-type(2){
+    margin-left:12px;
+    }
+    .ms-choice{
+    border-radius:2px !important;
+    }
+    .ms-choice > div{
+    top:3px;}
+    .ms-choice > span{
+     font-size:12px;
+     top:4px;
+    }
+    .ms-drop ul > li label{
+    font-size:12px;
+    }
+    .ms-drop input[type="checkbox"]{
+    vertical-align:sub;
+    margin-right:10px;
+    }
+</style>
+<script type="text/javascript">
+	var contextPath ='${request.contextPath}';
+	var backupId = '${backup.backupId}';
+	
+	var action = '${action!}';
+    var $form;
+    var form;
+    $(function(){
+        layui.use(['form','laydate'], function() {
+    		form = layui.form();
+    		$form = $('form');
+    		form.on('select(visitCompanyName)', function(data) {
+    			var visitArray = visit[data.value];
+    			var html='';
+    			for(var i=0;i<visitArray.length;i++){
+    				html+="<option value='"+visitArray[i]+"'>"+visitArray[i]+"</option>"
+    			}
+    			removeOtherVisitLinkMan($form.find('select[name=visitLink]'));
+    			$form.find('select[name=visitLink]').html(html);
+    	      	form.render();
+    		})
+    		
+    		form.on('radio(secrecyOpt)', function(data){
+   	   		   if(data.value=="OPEN_TO_SOMEAREA"){
+   	 			  $('.ms-choice').attr("disabled",false);
+   	 			  $('#isOpenSkuDiv').show();
+   	 			  $("#isOpenSkuDiv").parent().css('height','70px');
+   	 		   }else if(data.value=='SECRETIVE'){
+   	 			  $('.ms-choice').attr("disabled",true);
+   	   	   		  $('#secrecyArea').multipleSelect("uncheckAll");
+   	   	   		  $('#isOpenSkuDiv').hide();
+   	   	          $("#isOpenSkuDiv").parent().css('height','40px');
+   	 		   }else{
+   	 			  $('.ms-choice').attr("disabled",true);
+   	 			  $('#secrecyArea').multipleSelect("uncheckAll");
+   	 			  $('#isOpenSkuDiv').show();
+   	 		      $("#isOpenSkuDiv").parent().css('height','70px');
+   	 		   }
+    		   $('input[name=secrecyOpt]:checked').parent().parent().find(".jun-wrong-msg.c-f").hide();
+    		   $('.ms-choice').removeClass("bor-ff");
+     		});
+    		form.on('radio(projectLevel)', function(data){
+ 	   		   if(data.value=="A" ){
+ 	   			 $('#addProperty').show();
+ 	   			 addPropertyInput();
+ 			   }else{
+ 				   $('#addProperty').hide();
+ 				   deletePropertyInput();
+ 				   $.each($("#proprietorTableBody").children(),function(index,element){
+ 						if($(element).find("input").length==5){ //存在新增的input框
+ 							$(element).remove();
+ 						}
+ 					});
+ 			   }
+ 	 		});
+    		form.on('select(visitLink)', function(data) {
+    			if(data.value=="其他"){
+    				renderOtherVisitLinkMan($form.find('select[name=visitLink]'));
+    			}else{
+    				removeOtherVisitLinkMan($form.find('select[name=visitLink]'));
+    			}
+    		});
+    		setTimeout('form.render()',1000);
+        });
+    });
+    
+    var visit = {};
+    var companyNamesJson = JSON.parse('${companyNamesJson}');
+    
+    for(var companyName in companyNamesJson){
+    	var obj = companyNamesJson[companyName];
+    	for(var i=0;i<obj.length;i++){
+    		var array =  visit[companyName];
+    		if(array){
+    			if(array.indexOf(obj[i].visitLinkMan+'|'+obj[i].visitLinkMobile)<0){
+    				array.push(obj[i].visitLinkMan+'|'+obj[i].visitLinkMobile);
+    			}
+    		}else{
+    			array = [];
+    			array.push(obj[i].visitLinkMan+'|'+obj[i].visitLinkMobile);
+    			visit[companyName] = array;
+    		}
+		}
+    	visit[companyName].push('其他');
+	}
+//     $(document).on("blur change","input", function(){
+//     	var v = $(this).val();
+//     	if(v){
+//     		$(this).removeClass("bor-ff");
+//     	}
+//     });
+    $(document).on("blur change","textarea", function(){
+    	var v = $(this).val();
+    	if(v){
+    		$(this).removeClass("bor-ff");
+    	}
+    });
+    var areaData = Area;
+    $(function(){
+    	if(action){
+    		$('#visitForm').css('display','block');
+    		$('input[name=followDate]').focus();
+    	}
+    	
+    	var proHtml = '';
+    	var secrecyArea = '${backup.secrecyArea!}';
+      	for(var i = 0; i < areaData.length; i++) {
+            proHtml += '<option value="' + areaData[i].provinceName;
+            if(secrecyArea.indexOf(areaData[i].provinceName)>-1){
+            	proHtml+='" selected >';
+            }else{
+            	proHtml+= '">' ;
+            }
+            proHtml+=areaData[i].provinceName + '</option>';
+      	}
+      	$('#secrecyArea').html(proHtml);
+        $('#secrecyArea').change(function() {
+        	if($('input[name=secrecyOpt]:checked').val()=='OPEN_TO_SOMEAREA'){
+	        	if($(this).val().length!=0){
+	    			$('input[name=secrecyOpt]:checked').parent().parent().find(".jun-wrong-msg.c-f").hide();
+	    			$('.ms-choice').removeClass("bor-ff");
+	        	}else{
+	    			$('input[name=secrecyOpt]:checked').parent().parent().find(".jun-wrong-msg.c-f").show();
+	    			$('.ms-choice').addClass("bor-ff");
+	        	}
+        	}
+        }).multipleSelect({
+            width: '200px',
+            selectAllText:'全部',
+            allSelected:'全部',
+            countSelected:''
+        });
+        var secrecyOpt= '${backup.secrecyOpt!}';
+        if(secrecyOpt!='OPEN_TO_SOMEAREA'){
+        	$('.ms-choice').attr("disabled",true);
+        }
+        if(secrecyOpt!='SECRETIVE'){
+        	$('#isOpenSkuDiv').show();
+        	$("#isOpenSkuDiv").parent().css('height','70px');
+        }
+    });
+    
+</script>
+<!-- 附件模块 -->
+<#assign v_m_businessKey  = backup.backupId/>
+<#assign v_m_useremployId  = SYSTEM_USER_SESSION.systemUser.employId/>
+<#include "/res/template/_attachment_manage.html"/>
+<@attachment_manage/>
+
+<!-- 附件模块 -->
+<#assign v_businessKey  = backup.backupId/>
+<#include "/res/template/_attachment_info.html"/>
+<@attachment_info/>
+<div class="main">
+    <div class="jun-base">
+<!--       <div class="t-r pt20"> -->
+<!--       		<button onclick="saveProjectBakupInfo()" class="btn-click">保存</button> -->
+<!-- 			<button onclick="manageAttachment('PROJECT_BACKUP_FILE_TYPE')" data-toggle="modal" data-target="#attachment_modal" class="btn-click">上传附件</button> -->
+<!-- 			<button onClick="listAttachment('${backup.backupId!}','PROJECT_BACKUP_FILE_TYPE')" class="btn-click ml10" data-toggle="modal" data-target="#list_attachment_modal">查看附件</button>   -->
+<!--       </div> -->
+       <div class="base pt20">
+           <article class="bor-e6 pt10" style="height:40px;">
+               <div class="c-2 clr fz12">
+                <p class="fz12 mt5 flt ml20" ><span class='mr20'> 提报人：${mentioner}</span><span class='mr20'> 销售代表：${realName}</span> ${mobile}</p>
+				  <button onClick="listAttachment('${backup.backupId!}','PROJECT_BACKUP_FILE_TYPE')" class="btn-click frt ml10 mr20" data-toggle="modal" data-target="#list_attachment_modal">查看附件</button>  
+                  <button onclick="manageAttachment('PROJECT_BACKUP_FILE_TYPE')" data-toggle="modal" data-target="#attachment_modal" class="btn-click frt ml10">上传附件</button>
+                  <button onclick="saveProjectBakupInfo()" class="btn-click frt ml10">保存修改</button>
+                  <#if backUpFrom=='DISTRIBUTOR'>
+                    <#if (status=='PROTECTED'&&hasSubmittedOrauthorizated=="false" && (backup.changeStatus==null ||backup.changeStatus=='SUCCESS' ||backup.changeStatus=='FAILED'))>
+                    <button id="authorityBtn" onclick="checkAuthorizationApplication('${backup.backupId}')" class="btn-click frt ml10">申请授权</button>
+                    </#if> 
+                  <#else>
+                     <#if status=='PROTECTED'>
+                         <#if (hasSubmittedOrauthorizated=="false" && (backup.changeStatus==null ||backup.changeStatus=='SUCCESS' ||backup.changeStatus=='FAILED'))>
+                         <button id="authorityBtn" onclick="checkAuthorizationApplication('${backup.backupId}')" class="btn-click frt ml10">申请授权</button>
+                         </#if>
+                          <button onclick="followProjectBackup()" class="btn-click frt ml10">跟进</button>
+                     </#if>
+                  </#if>
+                 <#if (hasSubmittedOrauthorizatedEnd=="false") && (backup.status=='PROTECTED' && (backup.changeStatus==null||backup.changeStatus=='SUCCESS' ||backup.changeStatus=='FAILED') ) >
+      				<button id="projectChangeBtn" onclick="projectChange(this)" class="btn-click frt ml10">项目变更</button>
+      			  </#if>
+               </div>
+           </article>
+       </div>
+       <#if backup.distributorCompanyName!=null && backup.distributorCompanyName!=''>
+       <div class="base pt20">
+           <article class="bor-e6 pt10" style="height:30px;">
+               <div class="div">
+               <p>公司名称：<span class="c-2">${backup.distributorCompanyName!}</span></p>
+               <p>分销商本项目负责人：<span class="c-2">${backup.distributorPrincipalName!}</span></p>
+               <p>联系电话：<span class="c-2">${backup.distributorPrincipalMobile!}</span></p>
+               <p>邮箱：<span class="c-2">${backup.distributorPrincipalEmail!}</span></p>
+               </div>
+           </article>
+       </div>
+       </#if>
+       <div class="base pre">
+         <p class="pt10 mb10"><span class="c-2">项目基本信息</span><span class="fz12">（编号：${backup.backupId!}，<#if (backup.commitDate??) >${backup.commitDate?string('yyyy-MM-dd HH:mm:ss')}</#if>）</span></p>
+         <article class="bor-e6 pt10 pb10">
+           <div class="mt10 div">
+<!--                <p>项目名称：<span class="c-2">${backup.projectName!}</span></p> -->
+               <p id="projectName">项目名称：<span class="<#if (projectChangeMap?exists && projectChangeMap.projectName?exists) >bg-fb<#else>c-2</#if>">${backup.projectName!}</span></p>
+           </div>
+           <div class="mt10 div">               
+<!--                <p>项目编号：<span class="c-2">${backup.projectNumber!}</span></p> -->
+               <p style="flex:1.2">项目编号：<input class="no-css" type="text" name="projectNumber" value="${backup.projectNumber!}" /></p>
+               <p>报备状态：<span class="c-f">${backup.statusName!}</span></p>
+               <div style="flex:1" id="projectLevel"><p>项目等级：<span class="<#if (projectChangeMap?exists && projectChangeMap.projectLevel?exists) >bg-fb<#else>c-2</#if>">${backup.projectLevel!}</span></p></div>
+			   <#if backup.changeStatusName?exists >
+			   		<p>项目变更状态：<span class="c-f">${backup.changeStatusName!}</span></p>
+			   </#if>
+           </div>
+           <div class="div">
+           	   <#if backup.projectProvince?exists >
+           	   		<#if backup.projectProvince==backup.projectCity >
+           	   			<p style="line-height:32px;">项目地：<span class="c-2">${backup.projectProvince!}</span></p>
+           	   		<#else>
+           	   			<p style="line-height:32px;">项目地：<span class="c-2">${backup.projectProvince!}${backup.projectCity!}</span></p>
+           	   		</#if>
+           	   </#if>
+<!--                <p>要求保护期：<span class="c-2"><#if (backup.projectProtectDate??) >${backup.projectProtectDate?string('yyyy-MM-dd')}</#if></span></p> -->
+              	<div style="flex:1">要求保护期：
+         			<input type="text" style="width: 240px;height:32px;" value="<#if (backup.projectProtectDate??) >${backup.projectProtectDate?string('yyyy-MM-dd')}</#if>" name="projectProtectDate" class="layui-input laydate-icon bor-e6 inline" placeholder="自定义日期格式" onclick="layui.laydate({elem: this, istime: false, format: 'YYYY-MM-DD'})" />
+         		</div>
+         		<div style="flex:1;line-height:32px;">授权状态：<span class="c-f">${authorizationStatus}</span>
+         		<#if authorizationStatus!="未申请" >
+         		 <span onclick="showAuthorityList('${backup.backupId}')" class="btn-click ml10" style="padding:5px;">授权详情</span>
+         		</#if>
+               </div>
+           </div>
+                <form  class="jun-form-s form-css" style="height:40px;">
+                    <dl class="dl-form" style="margin-bottom:0;">
+			           <dt class="flt fz12" style="font-weight:500;line-height:30px;margin-left:30px;">项目保密选择：</dt>
+			           <dd class="flt layui-form">
+                           <input  lay-filter="secrecyOpt" type="radio" name="secrecyOpt" value="SECRETIVE" title="保密" ${(backup.secrecyOpt==null || backup.secrecyOpt=='SECRETIVE')?string('checked','')} />
+			               <input  lay-filter="secrecyOpt" type="radio" name="secrecyOpt" value="OPEN_TO_SOMEAREA" title="对某些区域公开" ${(backup.secrecyOpt!=null && backup.secrecyOpt=='OPEN_TO_SOMEAREA')?string('checked','')} />
+			               <input  lay-filter="secrecyOpt" type="radio" name="secrecyOpt" value="OPEN_TO_ALL" title="对所有区域公开" ${(backup.secrecyOpt!=null && backup.secrecyOpt=='OPEN_TO_ALL')?string('checked','')} />
+			           </dd>
+			           <dd class="pre"><span class="jun-wrong-msg c-f" style="top:30px;left:270px;display:none;">请选择具体的区域</span></dd>
+                    </dl>
+                    <br /><br />
+                    <dl class="dl-form" style="margin-bottom:0;display:none" id="isOpenSkuDiv">
+			           <dt class="flt fz12" style="font-weight:500;line-height:30px;margin-left:30px;">公开商品：</dt>
+			           <dd class="flt layui-form radios" style="margin-left:23px;">
+	                      <input lay-filter="isOpenSku" type="radio" name="isOpenSku" value="N" title="否" ${(backup.isOpenSku==null || backup.isOpenSku=='N')?string('checked','')} />
+		                   <input lay-filter="isOpenSku" type="radio" name="isOpenSku" value="Y" title="是" ${(backup.isOpenSku!=null && backup.isOpenSku=='Y')?string('checked','')} />
+			           </dd>
+			           <dd class="pre"><span class="jun-wrong-msg c-f" style="top:30px;left:270px;display:none;"></span></dd>
+                    </dl>
+                </form>
+         </article>
+		<div style="position:absolute;left:300px;top:188px;width:200px;height:32px;">
+	        <div style="display:inline;">
+		        <select id="secrecyArea" name="secrecyArea" multiple="multiple">
+		       	</select>
+	        </div>
+	 	</div>
+       </div>
+       <div class="base mt5">
+         <p class="pt20 mb10"><span class="c-2">项目描述</span></p>
+         <article class="bor-e6 pt10 pb10">
+         <div class="c-2 div">${backup.projectDecription!}
+         </div>                
+         </article>
+       </div> 
+       <div class="base mt5">
+          <p class="pt20" style="height: 15px;"><span class="c-2 flt">业主信息</span>
+          <#if ((hasSubmittedOrauthorizatedEnd=="false") && (backup.status=='PROTECTED' && (backup.changeStatus==null|| backup.changeStatus=='SUCCESS' ||backup.changeStatus=='FAILED'))) >
+          <a id="addProperty" href="javascript:addProprietor2();" class="c-h fz12 frt mt5 cs-p" style="display:none">添加业主信息</a>
+          </#if>
+          </p>
+          <table class="layui-table pop">
+            <colgroup>
+              <col width="300">
+              <col width="300">
+              <col width="200">                        
+              <col width="200">
+              <col width="200">
+              <col width="100">
+              <col>
+            </colgroup>
+            <thead>
+              <tr>
+                <th>公司名称</th>
+                <th>统一社会信用代码</th>
+                <th>联系人</th>
+                <th>联系电话</th>                          
+                <th>职位</th>
+                <th <#if backup.changeStatus!=null && backup.changeStatus!='SUCCESS' && backup.changeStatus!='FAILED' >style="display:none" </#if> >操作</th>
+              </tr> 
+            </thead>
+            <tbody id='proprietorTableBody'>
+           	<#if proprietorList?? && (proprietorList?size>0) > 
+				<#list proprietorList as proprietor>
+					<tr id="proprietor${proprietor_index}"  class="<#if (projectChangeMap?exists && projectChangeMap.proprietorChangeIdList?exists) >
+																  	<#list projectChangeMap.proprietorChangeIdList as proprietorId>
+																    	<#if (proprietorId==proprietor.proprietorId) >
+																    		bg-fb
+																    	</#if>
+																    </#list>
+																  </#if>">
+	             		<td>${proprietor.proprietorCompanyName!}</td>
+	             		<td class="pre">${proprietor.proprietorCreditId!}</td>
+	             		<td>${proprietor.proprietorLinkMan!}</td>
+	             		<td>${proprietor.proprietorLinkMobile!}</td>
+	             		<td>${proprietor.proprietorLinkPosition!}</td>
+	             		<td <#if backup.changeStatus!=null && backup.changeStatus!='SUCCESS' && backup.changeStatus!='FAILED' >style="display:none" </#if> ><a href="javascript:addProprietor('${proprietor.proprietorCompanyName!}','${proprietor.proprietorCreditId!}');">增加</a></td>
+	             		<td style="display:none">${proprietor.proprietorId!}</td>
+	             	</tr>
+				</#list>
+			</#if>
+            </tbody>
+          </table>
+       </div> 
+       <div class="base mt5">
+         <p class="pt20 mb10"><span class="c-2">集成商信息</span>
+         <#if ((hasSubmittedOrauthorizatedEnd=="false") && (backup.status=='PROTECTED' && (backup.changeStatus==null|| backup.changeStatus=='SUCCESS' ||backup.changeStatus=='FAILED'))) >
+         <a id="addIntegrator" style="display:none" href="javascript:addIntegrator2();" class="c-h fz12 frt mt5 cs-p">添加集成商信息</a>
+         </#if>
+         </p>
+          <table class="layui-table pop">
+            <colgroup>
+              <col width="300">
+              <col width="300">
+              <col width="200">                        
+              <col width="200">
+              <col width="200">
+              <col width="100">
+              <col>
+            </colgroup>
+            <thead>
+              <tr>
+                <th>公司名称</th>
+                <th>统一社会信用代码</th>
+                <th>联系人</th>
+                <th>联系电话</th>                          
+                <th>职位</th>
+                <th <#if backup.changeStatus!=null && backup.changeStatus!='SUCCESS' && backup.changeStatus!='FAILED' >style="display:none" </#if>>操作</th>
+              </tr> 
+            </thead>
+            <tbody id='integratorTableBody'>
+            <#if integratorList?exists && (integratorList?size>0) > 
+				<#list integratorList as integrator>
+	             	<tr id="integrator${integrator_index}"  class="<#if (projectChangeMap?exists && projectChangeMap.integratorChangeIdList?exists) >
+																  	<#list projectChangeMap.integratorChangeIdList as integratorId>
+																    	<#if (integratorId == integrator.integratorId) >
+																    		bg-fb
+																    	</#if>
+																    </#list>
+																  </#if>">
+	             		<td>${integrator.integratorCompanyName!}</td>
+	             		<td class="pre">${integrator.integratorCreditId!}</td>
+	             		<td>${integrator.integratorLinkMan!}</td>
+	             		<td>${integrator.integratorLinkMobile!}</td>
+	             		<td>${integrator.integratorLinkPosition!}</td>
+	             		<td <#if backup.changeStatus!=null && backup.changeStatus!='SUCCESS' && backup.changeStatus!='FAILED' >style="display:none" </#if> ><a href="javascript:addIntegrator('${integrator.integratorCompanyName!}','${integrator.integratorCreditId!}');">增加</a></td>
+	             	</tr>
+				</#list>
+			</#if>
+            </tbody>
+          </table>
+       </div>
+       <div class="base mt5">
+         <p class="pt20" style="height: 15px;"><span class="c-2 flt">产品信息</span></p>
+             <table class="layui-table pop">
+               <colgroup>
+                 <col width="200">
+                 <col width="100">
+                 <col width="350">
+                 <col width="100">                        
+                 <col width="100">
+                 <col width="200">
+                 <col>
+               </colgroup>
+               <thead>
+                 <tr>
+                   <th>商品型号</th>
+                   <th>品牌</th>
+                   <th>商品名称</th>
+                   <th><span class="c-f">*</span>数量</th>                          
+                   <th>计量单位</th>
+                   <th>希望厂家配合报出的价格</th>
+                 </tr> 
+               </thead>
+               <tbody>
+	            <#if skuList?exists && (skuList?size !=0) > 
+					<#list skuList as sku>
+                        <tr id="customProduct${sku_index}">
+	                       <td>${sku.skuModel!}</td>
+	                       <td>${sku.skuBrandName!}</td>
+	                       <td>${sku.skuName!}</td>
+	                       <td class="unitDisplay" unitName="${sku.skuUnitName}"><#if (sku.skuQuantity?exists) > ${(sku.skuQuantity?number)?string('0.000')} </#if> </td>
+	                       <td>${sku.skuUnitName!}</td>
+	                       <td>${sku.expectSkuPrice!}</td>
+                      </tr>
+					</#list>
+	            </#if>
+               </tbody>
+             </table>
+       </div>
+       <div class="base mt5">
+         <article class="bor-e6 pt10 pb10">
+         <div class="div">
+<!--              <p  class="mt10">预计芯公里（光缆）：<span class="c-2">${backup.predictFiberKilometers!}</span></p> -->
+<!--              <p class="mt10">预计金额（光配、铜配）：<span class="c-2">${backup.predictAmount!}</span></p> -->
+             <p class="mt10">预计芯公里（光缆）：<input class="no-css" type="text" name="predictFiberKilometers" value="${backup.predictFiberKilometers!}" /></p>
+             <p class="mt10">预计金额（光配、铜配）：<input class="no-css" type="text" name="predictAmount" value="${backup.predictAmount!}" /></p>
+         </div>  
+         </article>              
+       </div>
+       <div class="base mt5 pb20">
+         <p class="pt20 pb10" style="height: 15px;"><span class="c-2 flt">项目跟进情况(<span class="c-f fz12">项目报备以后必须两周内跟进报备一次，如未及时跟进，项目登记将自动失效</span>)</span>
+         	<#if (backup.status=='PROTECTED') >
+         	<a href="javascript:addVisit();" class="c-h fz12 frt mt5 cs-p">添加跟进记录</a>
+         	</#if>
+         </p>
+             <table class="layui-table pop"  lay-skin="line">
+               <colgroup>
+                 <col width="100">
+                 <col width="100">
+                 <col width="100">
+                 <col width="100">
+                 <col width="100">         
+                 <col width="100">
+                 <col width="100">                 
+                 <col width="400">
+               </colgroup>
+               <thead>
+                 <tr>
+                   <th>跟进人</th>
+                   <th>时间</th>
+                   <th>拜访方式</th>
+                   <th>拜访主体</th>
+                   <th>公司名称</th>
+                   <th>联系人</th>
+                   <th>联系电话</th>                          
+                   <th>跟进记录</th>
+                 </tr> 
+               </thead>
+               <tbody>
+	            <#if followList?exists && (followList?size !=0) > 
+					<#list followList as follow>
+                        <tr>
+                           <td>${follow.followMan!}</td>
+	                       <td><#if (follow.followDate??) >${follow.followDate?string('yyyy-MM-dd HH:mm:ss')}</#if></td>
+	                       <td>${(follow.visitType == 'HOUSE')?string('登门拜访','电话联系')}</td>
+	                       <td>${follow.visitMainObject!}</td>
+	                       <td>${follow.visitCompanyName!}</td>
+	                       <td>${follow.visitLinkMan!}</td>
+	                       <td>${follow.visitLinkMobile!}</td>
+	                       <td>${follow.visitContentDescriptor!}</td>
+                      </tr>
+					</#list>
+	            </#if>
+               </tbody>
+             </table>
+       </div>
+       <div id="visitForm" style="display:none" class="base mt5">
+          <form class="layui-form layui-form-pane jun-form-s" action="" style="padding-bottom: 0px;">
+   			<div class="layui-form-item inline mb5 ml20"  style="margin-left: 30px;">
+              <div class="layui-inline">
+                <label class="layui-form-label" style="line-height: 20px; width: 50px">时间：</label>
+                <div class="layui-input-block" style="margin-left: 60px;">
+                  <input name ="followDate" style="height: 30px;width: 240px;" class="layui-input laydate-icon" placeholder="自定义日期格式" onclick="layui.laydate({elem: this, istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" >
+                </div>
+              </div>
+            </div>
+            <div class="layui-form-item inline mb5 ml10 mt10" style="margin-left:13px;">
+             <div class="layui-inline">
+             <label class="layui-form-label" style="width:90px;"><span class="c-f">*</span>跟进人：</label>
+             <div class="layui-input-block" style="margin-left: 90px;">
+               <input value="${SYSTEM_USER_SESSION.systemUser.realName}" style="width: 240px;"  type="text" name="followMan" autocomplete="off" placeholder="请输入跟进人" class="layui-input "><!--bor-ff -->
+             </div>
+             </div>
+           </div>
+            <div class="layui-form-item inline mb5 ml10 jun-form-xl mt10" style="margin-left:7px;">
+              <div class="layui-inline">
+                 <label class="layui-form-label" style="width:90px;"><span class="c-f">*</span>公司名称：</label>
+	              <div class="layui-input-block" style="margin-left: 97px">
+	                  <select name="visitCompanyName" lay-filter="visitCompanyName">
+	                   <option value="">请选择</option>
+					   <#if visitCompanyNames?exists && (visitCompanyNames?size !=0) > 
+							<#list visitCompanyNames as name>
+		                      <option value="${name!}" >${name!}</option>
+							</#list>
+		               </#if>
+	         		</select>
+	              </div>
+              </div>
+            </div><br />
+            <div class="layui-form-item inline mb5 jun-form-xl" style="margin-left: -24px;margin-bottom:7px;">
+              <div class="layui-inline">
+                 <label class="layui-form-label" style="width: 110px;"><span class="c-f">*</span>拜访联系人：</label>
+	              <div class="layui-input-block">
+	                  <select name="visitLink" lay-filter="visitLink">
+						<option value=""></option>
+	         		  </select>
+	              </div>
+              </div>
+               <div class="inline visitLinkContent"></div>
+            </div>
+              <div class="layui-form-item inline mb5 jun-form-xl" style="margin-left: -10px;">
+                  <div class="layui-inline">
+                      <label class="layui-form-label" style="width: 110px;"><span class="c-f">*</span>拜访方式：</label>
+                      <div class="layui-input-block">
+                          <select name="visitType" lay-filter="visitType">
+                              <option value="HOUSE">登门拜访</option>
+                              <option value="PHONE">电话联系</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+            <div class="layui-form-item layui-form-text visitContentDescriptor" style="margin-left:28px;margin-top:-10px;">
+            <label class="layui-form-label"><span class="c-f">*</span>记录：</label>
+              <div class="layui-input-block" style="margin-left:58px;margin-top:-30px;">
+                <textarea name="visitContentDescriptor" placeholder="请输入内容" class="layui-textarea"></textarea>
+              </div>
+            </div>
+          </form>
+           <div class="layui-form-item t-c pt5 pb10">
+	           <div class="layui-input-block mt5">
+	                <button class="btn-click" onclick="saveVisitFollow()" style="width: 88px;">保存</button>
+	                <button type="reset" onclick="cancel()" class="btn-click  ml10" style="width: 88px;">取消</button>
+	            </div>
+            </div>
+       </div>
+        <div class="base mt5" style="margin-bottom: 130px;">
+            <p class="pt20 mb10"><span class="c-2">项目操作日志</span></p>
+            <table id="operationPaginationTbl" class="layui-table pop">
+                <colgroup>
+                    <col width="150">
+                    <col width="100">
+                    <col width="150">
+                    <col width="400">
+                    <col>
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>操作时间</th>
+                    <th>操作人</th>
+                    <th>操作类型</th>
+                    <th>内容</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+            <div id="operationPaginationDiv"></div>
+        </div>
+    </div>
+</div>
+<#if ((hasSubmittedOrauthorizatedEnd=="false") && (backup.status=='PROTECTED' && (backup.changeStatus==null|| backup.changeStatus=='SUCCESS' ||backup.changeStatus=='FAILED'))) >
+    <div id="projectChangeBar" style="display: none" class="layui-form-item t-c pt5 pb10 nav1 nav2 nav3">
+        <div class="layui-input-block mt5">
+            <button class="btn-click" onclick="projectChangeSubmit()" lay-submit lay-filter="submit" style="width: 88px;" >变更提交</button>
+            <button class="btn-click ml10"  onclick="projectChangeCancel()" style="width: 88px;" >取消</button>
+        </div>
+    </div>
+</#if>
+</@base.htmlBase>

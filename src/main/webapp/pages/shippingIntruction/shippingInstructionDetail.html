@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title> 
+    
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <script src="/res/js/jquery-3.1.1.min.js"></script>
+    <script src="/res/public/layui/layui.js"></script>
+    <script src="/res/common/globalVar.js"></script>
+    <script src="/res/common/post.js"></script>
+    <style type="text/css">
+      .form-css .dl-form dt.w110{
+        width: 110px;
+      }
+
+      .form-css .dl-form dd textarea{
+          min-height: 100px;
+          width:750px;
+          padding: 10px;
+       }
+       .form-css .dl-form dd.w200 {
+          width: 200px;
+       }
+    </style>
+</head>
+<script type="text/javascript">
+var shippingDetailId="${shippingDetailId}";
+</script>
+<body>
+<div class="instruction_detail">
+    <div class="operations bz-bb pl20 pr20 pt20 ">
+      <button class="form-btn layui-btn-itoc layui-btn-mini2" onclick="exportShippingInstrution()">导出</button>
+      <button class="form-btn layui-btn-itoc layui-btn-small ml10 sendVendorBtn" v-show="baseInfo.instructionVendorStatus=='NO_SENDED'" @click="sendVendor">发送给供应商</button>
+    </div>
+    <div class="bz-bb pl20 pr20 pt10 jun-form-s form-css">
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+           <dl class="dl-form mb0">
+               <dt class="flt line-middle">订单号：</dt>
+               <dd class="flt line-middle c-2 w240">{{baseInfo.orderPurchaseId}}</dd>
+               <dt class="flt line-middle">创建时间：</dt>
+               <dd class="flt line-middle c-2 w180">{{baseInfo.createDateStr}}</dd>
+               <dt class="flt line-middle w110 ml10">订单状态：</dt>
+               <dd class="flt line-middle c-f w240">{{baseInfo.orderPurchaseStatus}}</dd>
+           </dl>
+           <dl class="dl-form mb0">
+               <dt class="flt line-middle">销售订单客户：</dt>
+               <dd class="flt line-middle w240 one-row" :title="baseInfo.accountName">{{baseInfo.accountName}}</dd>
+               <dt class="flt line-middle">关联销售单号：</dt>
+               <dd class="flt line-middle c-2 w180">{{baseInfo.orderSalesId}}</dd>
+               <dt class="flt line-middle w110 ml10" >是否已发供应商：</dt>
+               <dd class="flt line-middle w240"><span class="c-f">{{baseInfo.instructionVendorStatusCname}}</span><span class="ml10" v-if="baseInfo.instructionVendorStatus=='SENDED'">{{baseInfo.instructionVendorDateStr}}</span></dd>
+            </dl>
+            <dl class="dl-form mb0">
+               <dt class="flt line-middle">收到指令时间：</dt>
+               <dd class="flt line-middle c-f w240">{{baseInfo.instructionDateStr}}</dd>
+           </dl>
+        </blockquote>
+    </div>
+
+    <div class="bz-bb pl20 pr20 mb20 pb20 jun-form-s form-css">
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor pl20">
+            <dl class="dl-form mb0 pl20">
+               <dt class="flt fz12"><span class="c-f">*</span>填写日期：</dt>
+               <dd class="flt layui-form">
+                  <input disabled verify="normalString" id="fillInDate" :value='baseInfo.fillInDate|dateStr' type="text" name="fillInDate" style="height: 32px;width: 240px;" class="layui-input laydate-icon  c-9-i" placeholder="期望交期" onclick="layui.laydate({elem: this,min: laydate.now(), istime: false, format: 'YYYY-MM-DD'})" validate="true">
+               </dd>
+  
+               <dt class="flt fz12 w110" style="margin-left:150px;">到货时间要求：</dt>
+               <dd class="flt layui-form">
+                 <input disabled verify="normalString" id="arriveTime" :value='baseInfo.arriveTime|dateStr' type="text" name="arriveTime" style="height: 32px;width: 240px;" class="layui-input laydate-icon  c-9-i" placeholder="期望交期" onclick="layui.laydate({elem: this,min: laydate.now(), istime: false, format: 'YYYY-MM-DD'})" validate="true">
+               </dd>
+            </dl>
+            <dl class="dl-form mb0 pl20">
+               <dt class="flt line-middle">合同号：</dt>
+               <dd class="flt line-middle c-2 w200">{{baseInfo.contractId}}</dd>
+               <dt class="flt line-middle w110" style="margin-left:150px;">客户名称：</dt>
+               <dd class="flt line-middle c-2 one-row w240" :title="baseInfo.accountName">{{baseInfo.accountName}}</dd>
+            </dl>
+            <dl class="dl-form mb0 pl20">
+               <dt class="flt line-middle">销售联系人：</dt>
+               <dd class="flt line-middle c-2 w200">{{baseInfo.salesContactMan}}</dd>
+               <dt class="flt line-middle w110" style="margin-left:-50px;">生产基地：</dt>
+               <dd class="flt line-middle c-2 one-row w240 w240" :title="baseInfo.produceBase">{{baseInfo.produceBase}}</dd>
+            </dl>
+      
+            <dl class="dl-form mb10 pl20">
+               <dt class="flt fz12"><span class="c-f">*</span>运输方式：</dt>
+               <dd class="flt layui-form">
+                  <input disabled type="radio" name="transportKind" value="YOFC_TRANS"  title="长飞运输"  v-bind:checked="baseInfo.transportKind=='YOFC_TRANS'">
+                  <input disabled type="radio" name="transportKind" value="SELF_PICK"  title="自提"  v-bind:checked="baseInfo.transportKind=='SELF_PICK'">
+                  <input disabled type="radio" name="transportKind" value="OTHER"      title="其他：外协厂运输，汽车"  v-bind:checked="baseInfo.transportKind=='OTHER'">
+               </dd>
+               <dt class="flt fz12" style="margin-left:73px;">木材检疫证：</dt>
+               <dd class="flt layui-form">
+                  <input disabled type="radio" name="woodCheck"  title="需要" v-bind:checked="baseInfo.woodCheck=='NEED'">
+                  <input disabled type="radio" name="woodCheck"  title="不需要" v-bind:checked="baseInfo.woodCheck=='NO_NEED'">
+                  <input disabled type="radio" name="woodCheck"  title="其他" v-bind:checked="baseInfo.woodCheck=='OTHER'">
+               </dd>
+            </dl>
+            <table class="layui-table pop mb0" lay-skin="line">
+                <colgroup>
+                    <col  width="80">
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="150">
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                </colgroup>
+                <thead>
+                  <tr>
+                      <th>序号</th>
+                      <th>到货地址</th>
+                      <th>收货人</th>
+                      <th>收货人电话</th>
+                      <th>型号</th>
+                      <th>数量</th>
+                      <th>单位</th>
+                      <th>结算总价(元)</th>
+                      <th>盘号</th>
+                      <th>备注</th>
+                  </tr>
+                </thead>
+                <tbody>
+	                <template v-if="skulist.length==0">
+		                <tr>
+		                    <td  colspan="11" height="50px"  align="center">
+		                        <span class="fz16">暂无相关信息!</span>
+		                    </td>
+		                </tr>
+	              </template>
+	              <template  v-for="(item,index) in skulist">
+					    <tr>
+					      <td>{{index+1}}</td>
+					      <td>{{item.consigneeAddress}}</td>
+					      <td>{{item.consignee}}</td>
+					      <td>{{item.consigneePhone}}</td>
+					      <td>{{item.skuName}}</td>
+					      <td>{{item.quantity|formatQuantity(item.precisionNum)}}</td>
+					      <td>{{item.unit}}</td>
+					      <td>{{item.settlementAmount|formatQuantity(2)}}</td>
+					      <td>{{item.cableTray}}</td>
+					      <td>{{item.remark}}</td>
+					    </tr>
+			      </template>
+                </tbody>
+            </table>
+
+            <dl class="dl-form mb0 pl20">
+               <dt class="flt fz12 w110"><span class="c-f">*</span>签收单格式：</dt>
+               <dd class="flt layui-form">
+                  <input disabled type="radio" name="signStyleKind"  title="长飞版" v-bind:checked="baseInfo.signStyleKind=='YOFC_KIND'" >
+                  <input disabled type="radio" name="signStyleKind"  title="非长飞版" v-bind:checked="baseInfo.signStyleKind=='NO_YOFC_KIND'" >
+               </dd>
+               <dt class="flt line-middle w110" style="margin-left:218px;">回单份数：</dt>
+               <dd class="flt line-middle c-2 w240">{{baseInfo.receiptNum}}</dd>
+            </dl>
+
+            <dl class="dl-form mb0 pl20">
+               <dt class="flt line-middle w110">签收单盖章要求：</dt>
+               <dd class="flt line-middle c-2 w240">签字并盖章</dd>
+               <dt class="flt line-middle w110" style="margin-left:150px;">回单签章：</dt>
+               <dd class="flt line-middle c-2 w240">签字并盖章</dd>
+            </dl>
+
+            <dl class="dl-form mb0 pl20">
+               <dt class="flt line-middle w110">随货同行客户文件：</dt>
+               <dd class="flt line-middle c-2 w240">检验合格证</dd>
+            </dl>
+
+            <dl class="dl-form mb0 pl20">
+               <dt class="flt line-middle w110">备注：</dt>
+               <dd class="flt">
+                 <textarea placeholder="请输入备注" id="instructionRemark">{{baseInfo.remark}}</textarea>
+               </dd>
+            </dl>
+        </blockquote>
+    </div>
+</div>
+<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+<script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/vue/dist/vue.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+<script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+ <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+<script  type="text/javascript"> 
+
+function exportShippingInstrution(){
+ 	 var param={};
+	   param.template = "sales_inner_shipping_instruction"; 
+	   //param.orderPurchaseId =vm.baseInfo.orderPurchaseId;   
+	   param.shippingIntructionDetailIds =[]; //发货指令详情ids
+	   param.shippingIntructionDetailIds.push(vm.baseInfo.orderPurchaseId);
+ 	   
+       param.zipFileNamePatten =encodeURI("内部合同发货指令");
+       url = '/shippingInstruction/api/shippingInstructionDetailExport';
+       postUtil.get(url, param);
+ }
+
+Vue.filter('time', function (value, format) {
+    value = value || '';
+    if(value == ''){
+        return '--';
+    }
+    format = format || 'YYYY/MM/DD HH:mm:ss';
+    return moment(value).format(format);
+});
+
+Vue.filter('formatQuantity', function (value, length) {
+    length = length;
+    if(value==null || value==''){
+        return '--';
+    }
+    return parseFloat(value).toFixed(length);
+});
+
+
+Vue.filter('dateStr', function (value, format) {
+    value = value || '';
+    if(value == ''){
+        return '--';
+    }
+    format = format || 'YYYY-MM-DD';
+    return moment(value).format(format);
+});
+var form;
+layui.use(['form','laydate'], function() {
+        form = layui.form();
+        var laydate = layui.laydate;
+        var start = {
+            min: laydate.now()
+            ,max: '2099-06-16 23:59:59'
+            ,istoday: false
+            ,choose: function(datas){
+                end.min = datas; //开始日选好后，重置结束日的最小日期
+                end.start = datas //将结束日的初始值设定为开始日
+            }
+        };
+
+        var end = {
+            min: laydate.now()
+            ,max: '2099-06-16 23:59:59'
+            ,istoday: false
+            ,choose: function(datas){
+                start.max = datas; //结束日选好后，重置开始日的最大日期
+            }
+        };
+
+        form.render();
+    })
+    var vm;
+vm= new Vue({
+	 el:'.instruction_detail',
+     data:{
+     	baseInfo:{},
+     	skulist:[]
+     },
+     created:function () {
+         this.showData();
+     },
+     methods:{
+         showData:function () {
+             postUtil.call("/shippingInstruction/api/detail",{"shippingDetailId":shippingDetailId}, function (result) {
+                 if(result.STATUS == "SUCCESS"){
+                	vm.baseInfo = result.DATA;
+                 	vm.skulist = result.DATA.skulist;
+                 	vm.$nextTick(function(){
+                 		form.render();
+                 	})
+                 	if(vm.baseInfo.instructionVendorStatus=='SENDED'){
+                 		$("#instructionRemark").attr("disabled",true);
+                 	}
+                 }
+             });
+         },
+         sendVendor:function(){
+        	  var remark=$("#instructionRemark").val();
+        	  var param={};
+        	  param.shippingInstrDetailId=vm.baseInfo.shippingInstrDetailId;
+        	  param.orderPurchaseId=vm.baseInfo.orderPurchaseId;
+        	  param.remark=remark;
+        	  layer.load();
+        		postUtil.call("/shippingInstruction/api/sendToVendor",param,function(result){
+        			layer.msg(result.MSG,{time:2000});
+        			if(result.STATUS='SUCCESS'){
+        				vm.baseInfo.instructionVendorStatus="SENDED";
+        				vm.baseInfo.instructionVendorStatusCname="已发送";
+        				vm.baseInfo.instructionVendorDateStr=result.DATA;
+        				$("#instructionRemark").attr("disabled",true);
+        			}
+        			layer.closeAll();
+        		});
+         }
+         
+         
+     }
+})
+</script>
+</body>
+</html>

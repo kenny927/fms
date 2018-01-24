@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		  <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+		<link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+		<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css"/>
+	</head>
+	<body>
+		<section id="itocCenter">
+		<header>
+            <div class="corporateName">长飞光纤光缆(上海)有限公司<span class="iconfont icon-gerenzhongxin frt">成姗姗</span><span class="iconfont icon-gerenzhongxin frt">成姗姗</span></div>
+            <div class="search">
+            	<div class="crumbs flt"><a href="javascript:;">首页</a>><a href="javascript:;">采购</a>><a class="c-b-i" href="javascript:;">委托单</a></div>
+            	<div class="searchInput frt">
+            		<form>
+            		<select class="flt">
+            			<option style="height: 50px;">搜商品</option>
+            			<option>搜编号</option>
+            			<option>搜型号</option>
+            			<option>搜关键词</option>
+            		</select>
+            		<input class="flt" type="search" placeholder="请输入商品名称/商品编号/型号/关键词" />
+            		<span class="flt">搜索</span>
+            		<a href="javascript:;">高级搜索</a>
+            		</form>
+            	</div>
+            </div>
+		</header>
+		<footer>
+			<div class="logo">
+				<img src="/res/images/logo.jpg" alt="" />
+			</div>
+			<nav class="itocNav">
+				<ul>
+					<li><a href="javascript:;"><span class="iconfont icon-dingdan"></span>订单</a></li>
+					<li><a href="javascript:;"><span class="iconfont icon-1348weituogoumai"></span>采购</a></li>
+					<li><a href="javascript:;"><span class="iconfont icon-shangpin"></span>商品</a></li>
+					<li><a href="javascript:;"><span class="iconfont icon-kehu"></span>客户</a></li>
+					<li><a href="javascript:;"><span class="iconfont icon-caiwu"></span>财务</a></li>
+					<li><a href="javascript:;"><span class="iconfont icon-tongzhi"></span>通知</a></li>
+					<li><a href="javascript:;"><span class="iconfont icon-wxbbaobiao"></span>报表</a></li>
+				</ul>
+			</nav>
+		</footer>
+	       <section class="itocContent">
+	       	<nav class="purchaseNav">
+	       		<ul>
+	       			<li><a href="/res/html/itocConsignmentList.html">委托单</a></li>
+	       			<li><a href="/res/html/itocInquiryList.html">询价单</a></li>
+	       			<li style="background:#FFFFFF;"><a href="/res/html/itocQuotationList.html">报价单</a></li>
+	       			<li><a href="/res/html/itocOrderList.html">商城订单</a></li>
+	       		</ul>
+	       	</nav>
+	       	<div class="itocMain">
+	       		<div class="purchaseSearch purchasepading">
+	       			<form>
+	       		    <dl class="form-list flt mb10">
+		       		    	<dt style="width: 80px;">搜报价单：</dt>
+		       		    	<dd><input type="text" placeholder="请输入报价单编号/询单编号" /></dd>
+		       		    	<dd><span class="btn ml10">搜索</span></dd>
+	       		    </dl>
+	       			</form>
+	       		</div>
+                    <div class="table">
+					  	<div class="roleDescription orderDescription">
+					  		<ol>
+					  			<li>用户名: <span>谭女士</span></li>
+					  			<li>手机号: <span>18578784565</span></li>
+					  			<li>公司名称: <span>长飞光纤光缆股份有限公司</span></li>
+					  			<li>专属客户经理: <span>朱舟18654477897</span></li>
+					  			<li>关联委托单: <span>23987</span></li>
+					  			<li>关联询价单: <span>03946</span></li>
+					  			<li>报价方式: <span class="c-f">委托平台报价</span></li>
+					  		</ol>
+					  	</div>
+                    	<ul class="th">
+                    		<li style="width:9%;"><div class="mida"><div class="midb">城市</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">公司名称</div></div></li>
+                    		<li style="width:11%;"><div class="mida"><div class="midb">报价单编号</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">接单状态</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">报价单状态</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">报价发送状态</div></div></li>
+                    		<li style="width:18%"><div class="mida"><div class="midb">报价总金额</div></div></li>
+                    	</ul>
+                    	<div class="information-list" style="border-right: none;">
+                    	<ul class="information informationList90">
+                    		<li style="width:9%;"><div class="mida"><div class="midb">上海</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">上海光特通讯科技有限公司</div></div></li>
+                    		<li style="width:11%;"><div class="mida"><div class="midb">023975-777</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">
+                    			<p class="c-2">已接单</p>
+                    			<p class="c-9">2016-12-12 8:00:00</p>
+                    		</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">
+                    			<p class="c-g fw-b">已报价</p>
+                    			<p class="c-g fw-b">2016-12-12 8:00:00</p>
+                    		</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">
+                    			<p class="c-2">未发送</p>
+                    			<button class="btn-click fz12 mt10">发送给工程商</button>
+                    		</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">
+                    			<p class="c-f fw-b">2080.40</p>
+                    			<button class="btn-click fz12 mt10">查看报价</button>
+                    		</div></div></li>
+                    	</ul>
+                    	<ul class="information informationList90">
+                    		<li style="width:9%;"><div class="mida"><div class="midb">上海</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">上海光特通讯科技有限公司</div></div></li>
+                    		<li style="width:11%;"><div class="mida"><div class="midb">023975-777</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">
+                    			<p class="c-2">已接单</p>
+                    			<p class="c-9">2016-12-12 8:00:00</p>
+                    		</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">
+                    			<p class="c-g fw-b">已报价</p>
+                    			<p class="c-g fw-b">2016-12-12 8:00:00</p>
+                    		</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">
+                    			<p class="c-2">未发送</p>
+                    			<button class="btn-click fz12 mt10">发送给工程商</button>
+                    		</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">
+                    			<p class="c-f fw-b">2080.40</p>
+                    			<button class="btn-click fz12 mt10">查看报价</button>
+                    		</div></div></li>
+                    	</ul>
+                    	<ul class="information informationList90">
+                    		<li style="width:9%;"><div class="mida"><div class="midb">上海</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">上海光特通讯科技有限公司</div></div></li>
+                    		<li style="width:11%;"><div class="mida"><div class="midb">023975-777</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">
+                    			<p class="c-2">已接单</p>
+                    			<p class="c-9">2016-12-12 8:00:00</p>
+                    		</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">
+                    			<p class="c-g fw-b">已报价</p>
+                    			<p class="c-g fw-b">2016-12-12 8:00:00</p>
+                    		</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">
+                    			<p class="c-2">未发送</p>
+                    			<button class="btn-click fz12 mt10">发送给工程商</button>
+                    		</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">
+                    			<p class="c-f fw-b">2080.40</p>
+                    			<button class="btn-click fz12 mt10">查看报价</button>
+                    		</div></div></li>
+                    	</ul>
+                    	<ul class="information informationList90">
+                    		<li style="width:9%;"><div class="mida"><div class="midb">上海</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">上海光特通讯科技有限公司</div></div></li>
+                    		<li style="width:11%;"><div class="mida"><div class="midb">023975-777</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">
+                    			<p class="c-2">已接单</p>
+                    			<p class="c-9">2016-12-12 8:00:00</p>
+                    		</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">
+                    			<p class="c-g fw-b">已报价</p>
+                    			<p class="c-g fw-b">2016-12-12 8:00:00</p>
+                    		</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">
+                    			<p class="c-2">未发送</p>
+                    			<button class="btn-click fz12 mt10">发送给工程商</button>
+                    		</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">
+                    			<p class="c-f fw-b">2080.40</p>
+                    			<button class="btn-click fz12 mt10">查看报价</button>
+                    		</div></div></li>
+                    	</ul>
+                    	</div>
+					  	<div class="roleDescription orderDescription">
+					  		<ol>
+					  			<li>用户名: <span>谭女士</span></li>
+					  			<li>手机号: <span>18578784565</span></li>
+					  			<li>公司名称: <span>长飞光纤光缆股份有限公司</span></li>
+					  			<li>专属客户经理: <span>朱舟18654477897</span></li>
+					  			<li>关联委托单: <span>23987</span></li>
+					  			<li>关联询价单: <span>03946</span></li>
+					  			<li>报价方式: <span class="c-f">委托平台报价</span></li>
+					  		</ol>
+					  	</div>
+                    	<ul class="th">
+                    		<li style="width:9%;"><div class="mida"><div class="midb">城市</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">公司名称</div></div></li>
+                    		<li style="width:11%;"><div class="mida"><div class="midb">报价单编号</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">接单状态</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">报价单状态</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">报价发送状态</div></div></li>
+                    		<li style="width:18%"><div class="mida"><div class="midb">报价总金额</div></div></li>
+                    	</ul>
+                    	<div class="information-list" style="border-right: none;">
+                    	<ul class="information informationList90">
+                    		<li style="width:9%;"><div class="mida"><div class="midb">上海</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">上海光特通讯科技有限公司</div></div></li>
+                    		<li style="width:11%;"><div class="mida"><div class="midb">023975-777</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">
+                    			<p class="c-2">已接单</p>
+                    			<p class="c-9">2016-12-12 8:00:00</p>
+                    		</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">
+                    			<p class="c-g fw-b">已报价</p>
+                    			<p class="c-g fw-b">2016-12-12 8:00:00</p>
+                    		</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">
+                    			<p class="c-2">未发送</p>
+                    			<button class="btn-click fz12 mt10">发送给工程商</button>
+                    		</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">
+                    			<p class="c-f fw-b">2080.40</p>
+                    			<button class="btn-click fz12 mt10">查看报价</button>
+                    		</div></div></li>
+                    	</ul>
+                    	<ul class="information informationList90">
+                    		<li style="width:9%;"><div class="mida"><div class="midb">上海</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">上海光特通讯科技有限公司</div></div></li>
+                    		<li style="width:11%;"><div class="mida"><div class="midb">023975-777</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">
+                    			<p class="c-2">已接单</p>
+                    			<p class="c-9">2016-12-12 8:00:00</p>
+                    		</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">
+                    			<p class="c-g fw-b">已报价</p>
+                    			<p class="c-g fw-b">2016-12-12 8:00:00</p>
+                    		</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">
+                    			<p class="c-2">未发送</p>
+                    			<button class="btn-click fz12 mt10">发送给工程商</button>
+                    		</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">
+                    			<p class="c-f fw-b">2080.40</p>
+                    			<button class="btn-click fz12 mt10">查看报价</button>
+                    		</div></div></li>
+                    	</ul>
+                    	<ul class="information informationList90">
+                    		<li style="width:9%;"><div class="mida"><div class="midb">上海</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">上海光特通讯科技有限公司</div></div></li>
+                    		<li style="width:11%;"><div class="mida"><div class="midb">023975-777</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">
+                    			<p class="c-2">已接单</p>
+                    			<p class="c-9">2016-12-12 8:00:00</p>
+                    		</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">
+                    			<p class="c-g fw-b">已报价</p>
+                    			<p class="c-g fw-b">2016-12-12 8:00:00</p>
+                    		</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">
+                    			<p class="c-2">未发送</p>
+                    			<button class="btn-click fz12 mt10">发送给工程商</button>
+                    		</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">
+                    			<p class="c-f fw-b">2080.40</p>
+                    			<button class="btn-click fz12 mt10">查看报价</button>
+                    		</div></div></li>
+                    	</ul>
+                    	<ul class="information informationList90">
+                    		<li style="width:9%;"><div class="mida"><div class="midb">上海</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">上海光特通讯科技有限公司</div></div></li>
+                    		<li style="width:11%;"><div class="mida"><div class="midb">023975-777</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">
+                    			<p class="c-2">已接单</p>
+                    			<p class="c-9">2016-12-12 8:00:00</p>
+                    		</div></div></li>
+                    		<li style="width:13%;"><div class="mida"><div class="midb">
+                    			<p class="c-g fw-b">已报价</p>
+                    			<p class="c-g fw-b">2016-12-12 8:00:00</p>
+                    		</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">
+                    			<p class="c-2">未发送</p>
+                    			<button class="btn-click fz12 mt10">发送给工程商</button>
+                    		</div></div></li>
+                    		<li style="width:18%;"><div class="mida"><div class="midb">
+                    			<p class="c-f fw-b">2080.40</p>
+                    			<button class="btn-click fz12 mt10">查看报价</button>
+                    		</div></div></li>
+                    	</ul>
+                    	</div>
+                    	
+                    	<div id="paginationDiv"></div>
+                    </div>
+	       	</div>
+	       </section>
+		</section>
+		<script src="/res/js/jquery-3.1.1.min.js"></script>
+		<script src="/res/public/layui/layui.js"></script>
+	    <script src="/res/public/layPage/laypage.js"></script>
+		<script type="text/javascript">
+
+   $(function () {
+        loadMallVagueData(1);
+    });
+
+    function loadMallVagueData(currentPageIndex) {
+        var param = {};
+        param.currentPageIndex = currentPageIndex;
+//      postUtil.call("/mallOrder/vagueDemand/vagueDemandListJson", param, function (result) {
+            var pages = 100;
+            laypage({
+                cont: 'paginationDiv',
+                pages: pages,
+                curr: currentPageIndex,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        loadMallVagueData(obj.curr);
+                    }
+                }
+            });
+//      });
+    }
+    
+   $(function () {
+        loadMallVagueData2(1);
+    });
+    function loadMallVagueData2(currentPageIndex) {
+        var param = {};
+        param.currentPageIndex = currentPageIndex;
+//      postUtil.call("/mallOrder/vagueDemand/vagueDemandListJson", param, function (result) {
+            var pages = 100;
+            laypage({
+                cont: 'paginationDiv2',
+                pages: pages,
+                curr: currentPageIndex,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        loadMallVagueData(obj.curr);
+                    }
+                }
+            });
+//      });
+    }
+    
+    		 layui.use('layer', function(){
+         var layer = layui.layer;
+         //是否确认收货弹出层
+		    $(".addInquiry").click(function(){
+				layer.open({
+				  title: '站点提示',
+				  type: 1,
+				  skin: 'itoc120skin',
+				  area: '831px',
+				  btnAlign: 'c',
+				  content: $('#addInquiry'),
+				  btn: ['添加商品至询单', '取消'],
+				  yes: function(index, layero){
+				    //关闭委托单的回调
+				  },btn2: function(index, layero){
+				    //取消的回调
+				  },
+				  cancel: function(){ 
+				    //右上角关闭回调
+				  }
+				});
+		    })
+		  })
+    		 layui.use('tree', function(){
+//           layui.tree(options);
+    		 //tree
+    		 layui.tree({
+    		 	  skin:'shihuang',
+				  elem: '#treeNav' //传入元素选择器
+				  ,nodes: [{ //节点
+				    name: '光缆1'
+				    ,children: [{
+				      name: '室内光缆'
+				    },{
+				      name: '室外光缆'
+				    }]
+				  },{
+				    name: '光缆2'
+				    ,children: [{
+				      name: '室内光缆'
+				      ,children: [{
+				        name: 'GYTA'
+				      }]
+				    }]
+				  }]
+				});
+				})
+		    $(document).on("click",".icon-xiala1",function(){
+			     if($(this).next().css("display")=="none"){
+	             $(this).next().show();
+			     }else{
+	             $(this).next().hide();
+			     }
+		    })
+		</script>
+	</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+</head>
+<style type="text/css">
+    td {
+        width: 130px
+    }
+</style>
+<body>
+<div style="margin-left:50px">
+    <div style="margin-top:10px"></div>
+    <p>1.库存批量维护</p>
+    <table>
+        <tr style="height: 80px;">
+            <td>批量入库:</td>
+            <td>
+                <a href="/manage/file/downloadImportResultByName?fileName=SKU_STORAGE_BATCH_INPUT_TEMPLATE.xlsx">下载模板</a>
+            </td>
+            <td style="width :300px"><input id="batchInput" type="file" name="file"></td>
+            <td></td>
+            <td>
+                <div id="result_batchInput">
+            <td><a href="/manage/file/downloadImportResultByName?fileName=SKU_STORAGE_BATCH_INPUT_RESULT.xlsx">查看结果</a></td>
+</div>
+</td>
+</tr>
+<tr style="height: 80px;">
+    <td>批量报损:</td>
+    <td>
+        <a href="/manage/file/downloadImportResultByName?fileName=SKU_STORAGE_BATCH_UNAVAILABLE_TEMPLATE.xlsx">下载模板</a>
+    </td>
+    <td style="width :300px"><input id="batchUnavailable" type="file" name="file"></td>
+    <td></td>
+    <td>
+        <div id="result_batchUnavailable"></div>
+    </td>
+</tr>
+</table>
+<div style="margin-top:10px"></div>
+</div>
+<script>
+    var resultUrl = '/manage/file/downloadImportResultByName?fileName=';
+
+    layui.use('upload', function () {
+        //现货商品批量入库
+        layui.upload({
+            elem: '#batchInput',
+            title: '点击选择文件导入',
+            skin: 'upload',
+            url: '/skuStorage/batch/input', //上传接口
+            ext: 'xlsx',
+            type: 'file',
+            before: function (input) {
+                // //返回的参数item，即为当前的input DOM对象
+                // console.log('文件上传中');
+                layer.load();
+            },
+            success: function (res) { //上传成功后的回调
+                layer.closeAll("loading");
+                if (res.STATUS) {
+                    if (res.STATUS == 'SUCCESS') {
+                        var totalCount = res.totalCount;
+                        var successCount = res.successCount;
+                        var failCount = res.failCount;
+//                        layer.msg(res.MSG + ",总计：" + totalCount + "条,成功：" + successCount + "条,失败：" + failCount + "条");
+                        layer.msg("后台正在导入中，请稍后点击【查看结果】按钮下载导入结果");
+//                        generateResult("result_batchInput", resultUrl + 'SKU_STORAGE_BATCH_INPUT_RESULT.xlsx');
+                    } else {
+                        layer.msg(res.MSG + "");
+                    }
+                }
+            }
+        });
+
+        //现货商品批量报损
+        layui.upload({
+            elem: '#batchUnavailable',
+            title: '点击选择文件导入',
+            skin: 'upload',
+            url: '/skuStorage/batch/unavailable', //上传接口
+            ext: 'xlsx',
+            type: 'file',
+            before: function (input) {
+                // //返回的参数item，即为当前的input DOM对象
+                // console.log('文件上传中');
+                layer.load();
+            },
+            success: function (res) { //上传成功后的回调
+                layer.closeAll("loading");
+                if (res.STATUS) {
+                    if (res.STATUS == 'SUCCESS') {
+                        var totalCount = res.totalCount;
+                        var successCount = res.successCount;
+                        var failCount = res.failCount;
+                        layer.msg(res.MSG + ",总计：" + totalCount + "条,成功：" + successCount + "条,失败：" + failCount + "条");
+                        generateResult("result_batchUnavailable", resultUrl + 'SKU_STORAGE_BATCH_UNAVAILABLE_RESULT.xlsx');
+                    } else {
+                        layer.msg(res.MSG + "");
+                    }
+                }
+            }
+        });
+    });
+
+    function generateResult(module, resultUrl) {
+        var html = "<td><a href='" + resultUrl + "'>查看结果</a></td>"
+        $('#' + module).html(html);
+    }
+
+</script>
+</body>
+</html>

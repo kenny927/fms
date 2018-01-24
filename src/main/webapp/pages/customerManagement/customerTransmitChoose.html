@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_rcslf61orstyy14i.css<@resVersionDirective>?</@>"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/Area1.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui-mz-min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/MultiSelectDropList.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+      <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+  </head>
+  <style>
+    body[contenteditable="true"]{
+      min-height: 160px!important;
+    }
+  </style>
+  <body>
+  <div class="yofc-body" style="padding-bottom: 0;">
+       <form action="" class="jun-form-s form-css">
+            <dl class="dl-form" style="margin-bottom:10px;">
+            <!-- 
+               <dt class="flt" style="width: 80px;margin-top:4px;">转交对象：</dt>
+               <dd class="flt layui-form dd-city provinceSel dd-city2" style="margin-left:2px;">
+                       <select name="province" lay-filter="province" id="s_province" lay-search>
+                           <option value="">请选择省</option>
+                       </select>
+               </dd>
+              -->
+               <dd class="flt layui-form pre">
+                  <input type="hidden" id="accountIds" value="${accountIds}" >
+                  <!-- 
+                  <input class="inline" type="radio" name="sex" value="销售代表" title="销售代表" checked="" style="margin-top:0px;">
+                   -->
+                  <input class="inline line-middle pl10" type="text" name="title"  id="searchObject" placeholder="请输入员工姓名或岗位" autocomplete="off" class="layui-input" style="width:220px;margin-bottom:5px;">
+               </dd>
+                <dd class="flt ml10"><span class="form-btn layui-btn-small2" onclick="search()">查询</span></dd>
+            </dl>
+              <table class="layui-table pop table-css" lay-skin="line">
+                  <colgroup>
+                    <col  width="50">
+                    <col  width="150">
+                    <col  width="150">
+                    <col  width="150">
+                  </colgroup>
+                  <thead>
+                    <tr class="bor-no">
+                      <th ></th>
+                      <th >姓名</th>
+                      <th >电话</th>
+                      <th >岗位</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+              </table>
+             <div id="paginationDiv" style="margin-right:8px;margin-top:-10px;padding: 0"></div>
+            <dl class="dl-form">
+               <dt class="flt" style="width: 190px;line-height:14px;margin-left:-18px;margin-bottom:10px;"><span class="c-f">*</span>转交原因(长度限制为100)：</dt>
+               <dd class="flt layui-form">
+                 <textarea cols="112" id="transmitReason" name="transmitReason" lay-verify="required" style="min-height:30px" placeholder="请输入内容" class="layui-textarea"></textarea>  
+               </dd>
+            </dl>
+              <div class="t-c mt5 mb20">
+                  <span class="form-btn layui-btn-small2" lay-submit="" lay-filter="saveBtn" id="saveBtn">确定</span>
+                  <span class="form-btn layui-btn-itoc layui-btn-small2" id="cancelBtn">取消</span>
+              </div>
+        </form>
+  </div>
+<script type="text/javascript">
+	var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+	//var _province='${province}';
+	 var $form;
+	 var form;
+	$(document).on('click','.pay_list_c1',function(){
+		$(this).addClass("on").parent().parent().siblings().find("span").removeClass("on");
+	})
+     var areaData = Area; 
+     layui.use(['form'], function(){
+    	 form = layui.form();
+    	 $form = $('form');
+    	 //loadProvince();
+     	 form.verify({
+    	  transmitReason: function(value){
+    	      if(value.length > 100){
+    	        return '转交原因长度限制为100！';
+    	      }
+    	    }
+    	  });
+     	 form.on('submit(saveBtn)', function(data){
+     	  	 if( $("#saveBtn").hasClass("layui-btn-disabled")){
+        		 return;
+        	 }
+        	 var accountIds=$("#accountIds").val();
+        	 var transmitReason=$("#transmitReason").val();
+	         if($(".layui-table tbody").find(".on").length==0){
+	        	  layer.msg("请选择欲转交员工!",{icon: 5});
+	      		return false;
+	          }
+	          var userid= $(".on>input[name=status]").attr("userid");
+        	if(transmitReason==null||transmitReason==""){
+        		layer.msg("请输入转交原因!",{icon: 5});
+        		return false;
+        	}
+        	 $("#saveBtn").addClass("layui-btn-disabled");
+        	 var param = {};
+             param.accountIds =accountIds;
+             param.transmitReason =transmitReason;
+             param.userid =userid;
+             postUtil.call("/customerManagement/saveTransmitRecord", param, function (result) {
+            	 if (result.success) {
+            		 layer.msg("转交成功!", {icon: 6});
+                     setTimeout(function refreshParentPage(){
+                    	 var success = parent.saveTransmitRecordCallback(result);//调用父页面的渲染方法
+                         if (success) {
+                                 parent.layer.close(index);//关闭当前窗口
+                         }
+                     },1000)
+                 } else {
+                     layer.msg("转交失败!失败原因:"+result.msg, {icon: 5});
+                     $("#saveBtn").removeClass("layui-btn-disabled");
+                 }
+             }); 
+ 		    return false;
+ 		  });
+    })
+   
+    /*
+ function loadProvince() {
+      var proHtml = '<option value="' +"" + '" selected>' +
+      "全部" + '</option>';
+//       var proHtml = '';
+      for(var i = 0; i < areaData.length; i++) {
+    	  if(_province != '' && _province == areaData[i].provinceName) {
+              proHtml += '<option value="' + areaData[i].provinceName + '" selected=selected>' +
+                  areaData[i].provinceName + '</option>';
+          } else {
+              proHtml += '<option value="' + areaData[i].provinceName + '">' +
+                  areaData[i].provinceName + '</option>';
+          }
+     }
+    //初始化省数据
+       $form.find('select[name=province]').append(proHtml);
+       form.render();
+       form.on('select(province)', function(data) {
+    	   _province=data.value;
+    	   var searchObject=$('#searchObject').val();
+    		var param={};
+    		param.searchObject=searchObject;
+    		param.currentPageIndex=1;
+    	 	param.province=_province;
+            param.transmitToSubject = 'manager';
+	       	loadDATA(param);
+       });
+       
+       
+}
+    */
+$('#cancelBtn').bind("click", function () {
+	   parent.layer.close(index);//关闭当前窗口
+});
+    
+function isExitsVariable(variableName) {  
+    try {  
+        if (typeof (variableName) == "undefined") {  
+            return "";  
+        } else {  
+            return variableName;  
+        }  
+    } catch (e) {  
+    }  
+    return "";  
+}
+
+$(function(){ 
+	var param={};
+	/*
+	if(_province!="全部"){
+		param.province = _province;
+	}	*/
+	param.currentPageIndex=1;
+    param.transmitToSubject = 'manager';
+	loadDATA(param);
+}); 
+
+
+function loadDATA(param) {
+    postUtil.call("/customerManagement/transmitRecordlist", param, function (result) {
+    	 var pageNumber = result.pageNumber;
+         var pageSize = result.pageSize;
+         var totalPage = result.totalPage;
+         var totalRow = result.totalRow;
+         var dataList = result.list;
+         renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                    	param.currentPageIndex=obj.curr;
+                    	loadDATA(param);
+                    }
+                }
+            });
+        parent.layer.iframeAuto(index);
+ });
+}
+function renderTable(dataList) {
+		var html="";
+        var length = dataList.length;
+        if (length > 0) {
+            for (var i1 = 0; i1 < dataList.length; i1++) {
+                var data = dataList[i1]; 
+                html+='  <tr>'+
+                         '   <td><span class="pay_list_c1"><input type="radio" name="status"  class="radioclass" userid="'+isExitsVariable(data.userId)+'"/></span></td>'+
+                         '   <td>'+isExitsVariable(data.userRealName)+'</td>'+
+			             '   <td>'+isExitsVariable(data.mobile)+'</td>'+
+			             '   <td>'+isExitsVariable(data.departmentName)+'</td>'+
+			             '  </tr>'
+           }
+        }else{
+        	 html+='<tr>'+
+        	 		'<td  colspan="4" height="50px"  align="center">'+
+        	 		'<span class="fz16">暂无相关信息</span> '+
+        	 		'</td>'+
+        	 		'</tr>'
+        }
+        $(".layui-table tbody").html(html);
+    }
+
+$(document).on('click','.icon-sousu',function(){
+	search();
+})
+
+function search(){
+	var searchObject=$('#searchObject').val();
+	var param={};
+	param.searchObject=searchObject;
+	param.currentPageIndex=1;
+	//param.province=_province;
+    param.transmitToSubject = 'manager';
+	loadDATA(param);
+}
+
+ document.onkeydown = function(e){
+	var ev = document.all ? window.event : e;
+	if(ev.keyCode==13&&document.activeElement.id == "searchObject") {
+		search();
+	}
+}
+  </script>
+  </body>
+</html>

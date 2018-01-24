@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" type="text/css" href="/res/public/layui-v2.0.0/layui/css/layui.css"/>
+<link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+<style>
+    [v-cloak]{
+        display: none;
+    }
+    .form-css .dl-form dd input[type='text']{
+      width: 200px;
+    }
+    .form-css .dl-form .dd-city2 input[type='text'],.form-css .dl-form .dd-city .layui-anim-upbit{
+      width: 95px;
+    }
+    .multi_select{
+      float: none;
+    }
+    .multi_select .select_rel{
+       width: 200px !important;
+     }
+     .multi_select .container{
+       width:198px !important;
+     }
+     .multi_select .content{
+      width:198px !important;
+      min-width: 198px;
+     }
+     .pop td a{
+      max-width: 100px;
+     }
+</style>
+<script type="text/javascript">
+   var createUserStr="";
+</script>
+</head>
+<body>
+   <section class="bz-bb pl20 pr20 pt20 pb20" id="myVisitRecord">
+      <div class="jun-form-s form-css">  
+          <dl class="dl-form">
+              <dt class="flt fz12" style="width: 68px;">拜访时间：</dt>
+              <dd class="flt layui-form">
+                  <input type="text" class="layui-input" id="visitTime" placeholder="">
+              </dd>
+
+              <dt class="flt fz12" style="width: 100px;">录入人：</dt>
+              <dd class="flt pre">
+                <div class="multi_select" id="createPerson" style="position:absolute;left:-2px;top:0;z-index:1;"></div>
+              </dd>
+
+               <dt class="flt fz12" style="width: 84px;margin-left:210px;">录入时间：</dt>
+               <dd class="flt layui-form">
+                  <input type="text" class="layui-input" id="createTime" placeholder="">
+               </dd>
+          </dl>
+          <dl class="dl-form">           
+              <dt class="flt fz12" style="width: 68px;">公司名称：</dt>
+              <dd class="flt"><input type="text" name="title" id="accountName"  v-model="queryParam.accountName" placeholder="请输入客户公司名称" autocomplete="off" class="layui-input"></dd>
+
+              <dt class="flt fz12 ml10">联系方式：</dt>
+              <dd class="flt"><input type="text" name="title" id="contact"  placeholder="手机号" autocomplete="off" class="layui-input" v-model="queryParam.contact"></dd>
+
+              <button  @click="queryRecord()" class="form-btn layui-btn-small2 ml10">查询</button>
+          </dl>
+          <@havePermission resourceCode="operation:customer:privateCustomer:manage:prvRecord:list:export"><button class="form-btn layui-btn-itoc layui-btn-small2 mb10 mr10" @click="exportExcel()">导出</button></@>
+      </div>
+
+      <div class="content">
+         <table class="layui-table pop" lay-skin="line">
+              <colgroup>
+                <col  width="100">
+                <col  width="120">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="80">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>拜访时间</th>
+                  <th>客户公司名称</th> 
+                  <th>客户联系人</th>
+                  <th>拜访方式</th>
+                  <th>拜访记录</th>
+                  <th>附件</th>
+                  <th>录入人</th>
+                  <th>录入时间</th>
+                  <th>操作</th>
+                </tr> 
+              </thead>
+              <tbody>
+                <tr v-if="recordList.length==0">
+                  <td colspan="9" style="height: 50px;">暂无相关信息！</td>
+                </tr>                
+                <tr v-for="(item,index) in recordList">
+                    <td>{{item.visitTime}}</td>
+                    <td>{{item.accountName.replace(' ','&nbsp;')}}</td>
+                    <td>{{item.linkmanName}}<br>{{item.linkmanTelephone}}</td>
+                    <td>{{item.visitTypeCname}}</td>
+                    <td class="layui-elip" style="max-width: 100px;" :title="item.content">{{item.content}}</td>
+                    <td v-if="item.ATTACHMENTLIST.length==0">无</td>
+                    <td v-else><a class="mr5 inline layui-elip" v-for="attach in item.ATTACHMENTLIST" :title='attach.name' :href="'/file_server/download?id='+attach.id">{{attach.name}}</a></td>
+                    <td>{{item.userName}}</td>
+                    <td>{{item.createTime}}</td>
+                    <td class="c-h cs-p" @click="seeVisitRecord(item.visitRecordId)">查看详情</td>
+                </tr>
+              </tbody>
+          </table>    
+
+        <div id="page" class="yofc-page mb20"></div>
+      </div> 
+   </section>
+
+<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui-v2.0.0/layui/layui.js"></script>
+<script src="/res/public/layui/Area1.js" type="text/javascript"></script>
+<script src="/res/js/selectMultiple.js"></script>
+<script src="/res/public/js/MultiSelectDropList.js"></script>
+<script src="/res/public/vue/dist/vue.min.js"></script>
+<script>
+var form,laydate,layer,laypage,vm,areaData;
+
+Vue.filter('time', function (value, format) {
+    value = value || '';
+    if(value == ''){
+        return '--';
+    }
+    format = format || 'YYYY/MM/DD';
+    return moment(value).format(format);
+});
+
+
+Vue.filter('default', function (value, defaultValue) {
+    value = value || '';
+    defaultValue = defaultValue || '--';
+    if(value == ''){
+        return defaultValue;
+    }
+    return value;
+});
+
+vm = new Vue({
+     el:'#myVisitRecord',
+     data:{
+          queryParam:{
+                pageNumber:1,
+                pageSize:10,
+                recordType:'VISITING_RECORD',
+                createUser:'', //创建人
+                visitTime:'',     //拜访时间
+                accountName:'',  //公司名称
+                createTime:'',   //创建时间
+                contact:''   ,   //联系方式      
+                excelName:''                   
+            },
+            recordList:[]
+          },
+      mounted:function(){
+        this.$nextTick(function(){
+           this.showData();
+        })
+      },
+      methods:{
+        showData:function(){
+           var createPersonList=[];
+           <#list createUserList as item>
+            var itemParam={};
+            itemParam.text="${item.userRealName}";
+            itemParam.value="${item.userId}";
+           createPersonList.push(itemParam);
+           createUserStr+=("${item.userId}"+";");
+           </#list>
+          
+           //初始化多选控件
+           //所属行业
+             createPersonList.reverse();
+             $('#createPerson').MSDL({
+                'width': '200',
+                'data': createPersonList,
+                'id': "createPersonSelect"
+             });
+           
+            vm.queryParam.createUser = createUserStr;          
+           
+            layui.use(['form','laydate','element','layer','laypage'], function() {
+                    laydate = layui.laydate;
+                    form = layui.form;
+                    element = layui.element;
+                    layer = layui.layer;
+                    laypage = layui.laypage;
+                    
+                    //初始化时间控件  
+                    laydate.render({
+                        elem: '#visitTime',
+                        type:'date',
+                        format:"yyyy-MM-dd",
+                        range: "~",
+                        done:function(value, date){
+                          vm.queryParam.visitTime = value;
+                          console.log(value);
+                        }
+                    });
+                  
+                    laydate.render({
+                        elem: '#createTime',
+                        type:'date',
+                        format:"yyyy-MM-dd",
+                        range: "~",
+                        done:function(value, date){
+                          vm.queryParam.createTime = value;
+                          console.log(value);
+                        }
+                    });
+
+                    vm.getData(vm.queryParam);
+
+                    form.render();
+            });
+        },
+        queryRecord:function () {
+            this.queryParam.pageNumber = 1;
+            this.queryParam.pageSize = 10;
+
+            var createUser = $('#createPersonSelect_hidden').val();
+            if(createUser){
+              vm.queryParam.createUser = createUser ;
+            }else{
+              vm.queryParam.createUser = createUserStr;
+            }
+
+            vm.getData(vm.queryParam);
+        },
+        getData:function(queryParam){
+            layer.load();
+            postUtil.call("/customer/relation/queryList",queryParam,function(result){
+
+              if(result.STATUS=="SUCCESS"){
+                 var pageNumber = result.DATA.pageNumber;
+                 var pageSize = result.DATA.pageSize;
+                 var totalRow = result.DATA.totalRow;  
+
+                 vm.recordList = result.DATA.list; 
+
+                 laypage.render({
+                        elem: 'page'
+                        ,count: totalRow
+                        ,curr : pageNumber
+                        ,first: '首页'
+                        ,last: '尾页'
+                        ,layout: ['count', 'prev', 'page', 'next', 'limit', 'skip']
+                        ,limit: pageSize
+                        ,limits: [5, 10, 15]
+                        ,jump: function(obj,first){
+                            if(!first){
+                                vm.queryParam.pageNumber =  obj.curr;
+                                vm.queryParam.pageSize =  obj.limit;
+                                vm.getData(vm.queryParam);
+                            }
+                        }
+                });  
+
+                layer.closeAll("loading");           
+              }else{
+                layer.closeAll("loading");
+                layer.msg(result.MSG, {icon: 5});
+              }
+
+            });
+        },
+        exportExcel:function(){
+          var createUser = $('#createPersonSelect_hidden').val();
+            if(createUser){
+              vm.queryParam.createUser = createUser ;
+            }else{
+              vm.queryParam.createUser = createUserStr;
+            }
+            vm.queryParam.excelName = "拜访记录导出";
+            var  url = '/customer/relation/exportExcel';
+            postUtil.submit(url,vm.queryParam);
+        },
+        seeVisitRecord: function (visitRecordId) {
+              layer.open({
+                  title: '查看拜访记录',
+                  type: 2,
+                  skin: 'msgskin',
+                  area: ['700px','400px'],
+                  content: "/customer/relation/record/preDetail?visitRecordId="+visitRecordId+"&recordType=VISITING_RECORD",
+              });
+        },
+      }
+
+     })
+
+
+</script>
+</body>
+</html>

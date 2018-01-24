@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/css/daterangepicker.css<@resVersionDirective>?</@>" />
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/vue.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/moment.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/jquery.daterangepicker.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/numCheck.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <style>
+        [v-cloak]{
+            display: none;
+        }
+        .msgskin .layui-layer-content{
+            text-align: center;
+            line-height: 137px!important;
+            height:137px!important;
+            font-size: 16px!important;
+        }
+        .msgskin .layui-layer-title{
+            background: #ffffff!important;
+        }
+        .msgskin2 .layui-layer-content{
+            text-align: center;
+            box-sizing: border-box;
+            height:137px!important;
+            padding-top: 50px!important;
+            font-size: 16px!important;
+        }
+        .msgskin2 .layui-layer-title{
+            background: #ffffff!important;
+        }
+    </style>
+    <script>
+        var skuIdList = '${skuIdList}';
+        var activityInfo = '${activityInfo}';
+        var defaultTime = Date.parse('${defaultTime}');
+        console.log(defaultTime);
+        skuIdList=JSON.parse(skuIdList);
+        if(activityInfo){
+            activityInfo=JSON.parse(activityInfo);
+        }
+        var layer;
+        var vm;
+        var $;
+        var $form;
+        var form;
+        var defaultDate;
+        $(function () {
+           if(skuIdList){
+               if(activityInfo){
+//                   Time1= moment(activityInfo.startTime).format('YYYY-MM-DD HH:mm:ss')+"~"+moment(activityInfo.endTime).format('YYYY-MM-DD HH:mm:ss');
+
+                   var  data={skuList:skuIdList,startTime:activityInfo.startTime,endTime:activityInfo.endTime,activityId:activityInfo.activityId}
+               }else {
+                   var  data={skuList:skuIdList,startTime:defaultTime,endTime:""}
+               }
+               setPromotions(data)
+           }else{
+               setPromotions("");
+           }
+        });
+       function setPromotions(data){
+           Vue.filter('nullValue', function (input) {
+               if (input == "" || input == undefined) {
+                   input = "--";
+               }
+               return input
+           });
+           Vue.filter('date',{
+               read:function(input){ //model-view
+                   return (Number(input) ? moment(Number(input)).format("YYYY-MM-DD HH:mm:ss") : '--');
+               },
+               write:function(val){ //view -> model
+                   return val;
+               }
+           });
+           Vue.filter("formatQuantity2", {
+               read:function(value){
+                   if(value && !isNaN(value)){
+                       var val=parseFloat(value).toFixed(2);
+                       return val;
+                   }
+               },
+               write:function(value){
+                   return value;
+               }
+           });
+
+           vm = new Vue({
+               el:"#setPromotions",
+               data:{
+                   malls: data.skuList,
+                   startTime:data.startTime,
+                   endTime:data.endTime,
+                   activityId:data.activityId,
+                   deleteMsgList:[]
+               },
+               created:function(){
+                   if (this.malls == undefined) {
+                       this.malls=[];
+                       this.malls.push({
+                           skuId: "",
+                           skuName: "",
+                           porperytNameValue:"",
+                           basePrice: 0,
+                           spotPrice:0,
+                           seckPrice:0
+
+                       })
+                       this.malls=[];
+                   }
+               },
+               ready:function () {
+                   console.log(this.startTime)
+                  if(!this.endTime){
+                      $("#endTime").val("");
+                  }
+               },
+               methods:{
+                   deleteMsg: function (n) {
+                       var _this=this;
+//                       if(this.malls.length == 1){
+//                           layer.confirm('是否取消该促销活动？', {
+//                               skin:"confirm-skin",
+//                               btn: ['确定', '取消']
+//                           }, function (index) {
+//                               layer.close(index);
+//                               if(_this.activityId){
+//                                   postUtil.call('/spotMarket/cancelSecondKillActivity', {activityId:_this.activityId}, function (res) {
+//                                       layer.msg("本活动取消成功");
+//                                   })
+//                               }
+//                               _this.malls.splice(n, 1);
+////
+//                           }, function (index) {
+//                               layer.close(index);
+//                           });
+//                       }else{
+                           layer.confirm('是否移除该sku？', {
+                               title:'操作提示',
+                               skin:"msgskin",
+                               area: ['480px', '260px'],
+                               btnAlign: 'c',
+                               btn: ['确定', '取消']
+                           }, function (index) {
+                               layer.close(index);
+                               if(_this.activityId){
+//                                   postUtil.call('/spotMarket/cancelSecondKillActivity', {activityId:_this.activityId}, function (res) {
+//                                       layer.msg("本活动取消成功");
+//                                   })
+                                   _this.deleteMsgList.push({
+                                       activityId:_this.activityId,
+                                       skuId:_this.malls[n].skuId
+                                   })
+//                                   _this.render(_this.activityId,_this.malls[n].skuId);
+                               }
+                               _this.malls.splice(n, 1);
+//
+                           }, function (index) {
+                               layer.close(index);
+                           });
+//                           if(this.activityId){
+//                               this.render(this.activityId,this.malls[n].skuId);
+//                           }
+//                           this.malls.splice(n, 1);
+//                       }
+                   },
+                   render: function (activityId,skuId){
+                       console.log(skuId+":"+activityId);
+                       postUtil.call("/spotMarket/deleteSecondKillSku", {activityId:activityId,skuId:skuId}, function (res) {
+                           if(res.STATUS == "SUCCESS") {
+
+                           }else{
+                               alert("提交有误")
+                           }
+                       })
+                   }
+               }
+           })
+       }
+
+        function addProduct() {
+            layui.use('layer', function() {
+                layer.open({
+                    title: "请选择SKU",
+                    type: 2,
+                    area: ['1000px', '550px'],
+                    fixed: false, //不固定
+                    maxmin: true,
+                    content: '/spotMarket/chooseSkuSpot'
+                });
+            })
+        }
+
+        function chooseSkuCommodityCallback(skuDataList) {
+           console.log(skuDataList);
+            if(skuDataList) {
+                var html = "";
+                $.each(skuDataList, function (index, sku) {
+                    var isExist = false;
+                    $.each(vm.$data.malls, function (idx, item) {
+                        if(item.skuId == sku.skuId) {
+                            isExist = true;
+                            return false;
+                        }
+                    });
+                    if(!isExist) {
+
+                        var product = {};
+                        product.skuId = sku.skuId;
+                        product.skuModel = sku.model;
+                        product.skuName = sku.skuName;
+                        product.skuBrandId = sku.brandId;
+                        product.skuBrandName = sku.brandName;
+                        product.skuUnitId = sku.unitId;
+                        product.skuUnitName = sku.unitName;
+                        product.skuClassifyId = sku.classifyId;
+                        product.skuClassifyName = sku.classifyName;
+                        var precision = unitConfig[sku.unitName];
+                        product.orginImg = sku.orginImgPath;
+                        product.basePrice=sku.basePrice;
+                        if(sku.spotPrice){
+                            product.spotPrice=sku.spotPrice;
+                        }
+                        product.directoryPrice=sku.directoryPrice;
+                        product.skuOfferAmount=0;
+                        product.porperytNameValue=sku.skuPropertyValue;
+                        vm.$data.malls.push(product);
+                    }
+                });
+                renderUnitDisplay();
+            }
+            return true;
+        }
+//        postUtil.call("/spotMarket/getDefaultTime",{},function (result) {
+//            if (result.STATUS == "SUCCESS") {
+//                defaultDate=new Date(result.DATA).getTime();
+//            }
+//        })
+        //提交
+        layui.use(['form','laydate'], function() {
+            var form = layui.form();
+            laydate = layui.laydate;
+            form.on('submit(demo2)', function (data) {
+
+                cardUtil.closeCard("设置促销");
+
+            })
+            form.on('submit(demo3)', function (data) {
+                layer.confirm('是否取消该促销活动？', {
+                    title:'操作提示',
+                    skin:"msgskin",
+                    area: ['480px', '260px'],
+                    btnAlign: 'c',
+                    btn: ['确定', '取消']
+                }, function (index) {
+                    layer.close(index);
+                    vm.malls = [];
+                    postUtil.call('/spotMarket/cancelSecondKillActivity', {activityId: vm.activityId}, function (res) {
+                        layer.msg("本活动取消成功");
+                    })
+//                    cardUtil.refreshCard("现货SKU列表");
+                    cardUtil.closeCard("现货SKU列表");
+                    cardUtil.openCard("现货SKU列表","/spotMarket/preList");
+                    cardUtil.refreshCard("现货SKU列表");
+                    cardUtil.closeCard("设置促销");
+                }, function (index) {
+                    layer.close(index);
+                });
+            })
+            form.on('submit(demo1)', function (data) {
+                $.each(vm.deleteMsgList,function (index,item) {
+                    vm.render(item.activityId,item.skuId);
+                })
+                    var startTime = $("#startTime").val();
+                    var endTime = $("#endTime").val();
+                    var startDate = new Date(startTime).getTime();
+                    var endDate = new Date(endTime).getTime();
+                    var isPass = true;
+                    var msg = "";
+                    var errorCount = 0;
+                    if (startTime == "") {
+                        errorCount++;
+                        msg += "<" + errorCount + ">秒杀促销开始时间不能为空";
+                        if (errorCount % 3 == 0) {
+                            msg += "</br>";
+                        }
+                        isPass = false;
+                    }
+                    if (endTime == "") {
+                        errorCount++;
+                        msg += "<" + errorCount + ">秒杀促销结束时间不能为空";
+                        if (errorCount % 3 == 0) {
+                            msg += "</br>";
+                        }
+                        isPass = false;
+                    }
+                    if (endDate < startDate) {
+                        errorCount++;
+                        msg += "<" + errorCount + ">秒杀促销结束时间需大于开始时间";
+                        if (errorCount % 3 == 0) {
+                            msg += "</br>";
+                        }
+                        isPass = false;
+                    }
+                    //秒杀商品不能为空
+                    if (vm.$data.malls.length == 0) {
+                        errorCount++;
+                        msg += "<" + errorCount + ">您还未设置任何商品参与促销活动，请添加促销活动sku";
+                        if (errorCount % 3 == 0) {
+                            msg += "</br>";
+                        }
+                        isPass = false;
+                    }
+                    $.each(vm.malls, function (index, item) {
+                        var num = Number(index) + 1;
+                        if (item.spotPrice == undefined || item.spotPrice.length == 0) {
+                            errorCount++;
+                            msg += "<" + errorCount + ">第" + num + "个秒杀商品现货价不能为空";
+                            if (errorCount % 3 == 0) {
+                                msg += "</br>";
+                            }
+                            isPass = false;
+                        }
+                        if (item.seckPrice == undefined || item.seckPrice.length == 0) {
+                            errorCount++;
+                            msg += "<" + errorCount + ">第" + num + "个秒杀商品秒杀价不能为空";
+                            if (errorCount % 3 == 0) {
+                                msg += "</br>";
+                            }
+                            isPass = false;
+                        }
+                        if (item.basePrice == undefined || item.basePrice.length == 0) {
+                            errorCount++;
+                            msg += "<" + errorCount + ">第" + num + "个秒杀商品原价不能为空";
+                            if (errorCount % 3 == 0) {
+                                msg += "</br>";
+                            }
+                            isPass = false;
+                        }
+                    })
+                    if (!isPass) {
+                        layer.open({
+                            title: '数据填写有误',
+                            icon: 5,
+                            skin: 'youskin',
+                            area: ['550px', '300px'],
+                            btnAlign: 'c',
+                            content: msg,
+                            btn: ['我知道了'],
+                            yes: function (index1, layero) {
+                                layer.close(index1);
+                            },
+                            cancel: function () {
+                                //右上角关闭回调
+                            }
+                        });
+                    } else {
+                        layer.confirm('<p class="pb10">请确认促销时间段为:</p><p class="c-f">'+startTime+'至'+endTime+'？</p>', {
+                            title:'操作提示',
+                            skin:"msgskin2",
+                            area: ['480px', '260px'],
+                            btnAlign: 'c',
+                            btn: ['确定', '取消']
+                        }, function (index) {
+                            var param = {};
+                            param.skuPriceList = vm.malls;//商城商品
+                            param.startTime = startTime;
+                            param.endTime = endTime;
+                            if (vm.activityId) {
+                                param.activityId = vm.activityId;
+                            }
+                            postUtil.call("/spotMarket/saveSkuPromotions", {"jsonData": JSON.stringify(param)}, function (result) {
+                                if (result.STATUS == "SUCCESS") {
+                                    layer.msg("设置成功");
+                                    setTimeout(function () {
+                                        cardUtil.closeCard("现货SKU列表");
+                                        cardUtil.openCard("现货SKU列表","/spotMarket/preList");
+                                        cardUtil.refreshCard("现货SKU列表");
+                                        cardUtil.closeCard("设置促销");
+                                    }, 1500);
+                                } else {
+                                    layer.msg(result.MSG + "");
+                                }
+                            });
+                        }, function (index) {
+                            layer.close(index);
+                        });
+                    }
+            })
+        })
+
+    </script>
+</head>
+<body>
+<section class="bz-bb pl20 pr20 mt20 pb20"  id="setPromotions"  v-cloak>
+    <form action="" class="jun-form-s form-css">
+        <dl class="dl-form">
+            <dt class="flt fz12"><span class="c-f">*</span>秒杀促销时间：</dt>
+            <!--<dd class="flt pre"  id="picker-css">-->
+                <!--<input class="picker-css" id="date-range1" value="{{Time1}}" style="width:360px;" placeholder="请设置促销时间">-->
+                <!--<img class="cs-p" style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" />-->
+            <!--</dd>-->
+
+            <dd  class="flt"><input name="followDate" id="startTime"  style="height: 32px;width: 240px;" class="layui-input laydate-icon" placeholder="请输入开始时间" onclick="layui.laydate({elem: this, istime: true,min: laydate.now(defaultTime),format: 'YYYY-MM-DD hh:mm:ss'})" validate="true" v-bind:value="startTime |date"></dd>
+            <dd class="flt line-middle ml5 mr5">至</dd>
+            <dd  class="flt"><input name="followDate" id="endTime"  style="height: 32px;width: 240px;" class="layui-input laydate-icon" placeholder="请输入结束时间" onclick="layui.laydate({elem: this, istime: true,format: 'YYYY-MM-DD hh:mm:ss'})" validate="true" v-bind:value="endTime |date"></dd>
+        </dl>
+        <h3 class="mb5">秒杀商品<span class="c-h frt fz12 cs-p under-l" onclick="addProduct()">+添加商城商品</span></h3>
+        <table class="layui-table pop">
+            <colgroup>
+                <col  width="50">
+                <col  width="100">
+                <col  width="200">
+                <col  width="200">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>序号</th>
+                <th>商品编码</th>
+                <th>商品信息</th>
+                <th>商品属性/属性值</th>
+                <th><span class="c-f">*</span>原价</th>
+                <th><span class="c-f">*</span>现货价</th>
+                <th><span class="c-f">*</span>秒杀价</th>
+                <th >操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-show="malls.length==0">
+                <td  colspan="8" height="50px"  align="center">
+                    <span class="fz16">您还未设置任何商品参与促销活动，请添加促销活动sku</span>
+                </td>
+            </tr>
+            <tr v-for="item in malls">
+                <td>{{$index+1}}</td>
+                <td>{{item.skuId}}</td>
+                <td>{{item.skuName | nullValue}}</td>
+                <td>{{item.porperytNameValue}}</td>
+                <td>
+                    <input type="text" name="basePrice"  placeholder="请输入原价"  class="layui-input num2" v-model="item.basePrice|formatQuantity2" />
+                </td>
+                <td>
+                    <input type="text" name="spotPrice"  placeholder="请输入现货价"  class="layui-input num2" v-model="item.spotPrice|formatQuantity2" />
+                </td>
+                <td>
+                    <input type="text" name="seckPrice"  placeholder="请输入秒杀价"  class="layui-input num2" v-model="item.seckPrice|formatQuantity2" />
+                </td>
+                <td><a href="javascript:;" class="c-h cs-p fz12" @click="deleteMsg($index)">移除</a></td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="pb20">
+            <span class="form-btn layui-btn-small2" lay-submit="" lay-filter="demo1">确定</span>
+            <span class="form-btn  layui-btn-primary layui-btn-small2 ml10" lay-submit="" lay-filter="demo2">取消</span>
+            <span v-show="activityId" class="form-btn  layui-btn-primary layui-btn-small2 ml10" lay-submit="" lay-filter="demo3">取消该促销</span>
+        </div>
+    </form>
+</section>
+
+<#include "/res/freemarkerTpl/unitConfig.html" />
+<@unitConfig/>
+</body>
+</html>

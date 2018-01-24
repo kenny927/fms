@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <style>
+        .form_content {
+            margin-top: 20px;
+        }
+
+        .form_content dl {
+            height: 60px;
+        }
+
+        .form_content dl dt {
+            width: 120px;
+            display: inline-block;
+            text-align: right;
+        }
+
+        .form_content dl dd {
+            display: inline-block;
+        }
+
+        .form_content dl dd input {
+            width: 300px;
+            height: 25px;
+        }
+
+        .btn_content {
+            text-align: center;
+        }
+
+        .btn {
+            display: block;
+            width: 80px;
+            height: 36px;
+            font: 12px/36px "microsoft yahei";
+            text-align: center;
+            text-decoration: none;
+            border-radius: 0;
+            background: #035a9d;
+            color: #ffffff;
+            float: left;
+        }
+
+    </style>
+
+</head>
+<body>
+<div class="form_content">
+    <dl>
+        <dt>编码：</dt>
+        <dd>
+            <input type="hidden" id="id" value="${systemDictionary.id}">
+            <input type="text" id="code" value="${systemDictionary.code}" placeholder="请填写code"/>
+        </dd>
+    </dl>
+    <dl>
+        <dt>中文名称：</dt>
+        <dd>
+            <input type="text" id="cName" value="${systemDictionary.cName}" placeholder="请填写cName"/>
+        </dd>
+    </dl>
+    <dl>
+        <dt>英文名称：</dt>
+        <dd>
+            <input type="text" id="eName" value="${systemDictionary.eName}" placeholder="请填写eName"/>
+        </dd>
+    </dl>
+    <dl>
+        <dt>分类编码：</dt>
+        <dd>
+            <input type="text" id="classify" value="${systemDictionary.classify}" placeholder="请填写classify"/>
+        </dd>
+    </dl>
+    <dl>
+        <dt>备注：</dt>
+        <dd>
+            <input type="text" id="remark" value="${systemDictionary.remark}" placeholder="请填写备注信息"/>
+        </dd>
+    </dl>
+    <dl>
+        <dt>序列：</dt>
+        <dd>
+            <input type="text" id="seq" value="${systemDictionary.seq}" placeholder="请填写序列"/>
+        </dd>
+    </dl>
+    <div class="btn_content" style="align-content: center;">
+        <a href="javascript:void(0)" class="btn" id="editSystemDictionaryBtn" style="margin-left: 160px;">修改</a>
+        <a href="javascript:void(0)" class="btn" id="cancelEditSystemDictionaryBtn" style="margin-left: 20px;">取消</a>
+    </div>
+</div>
+<script type="text/javascript">
+
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+
+
+    $(function () {
+
+        $('#cancelEditSystemDictionaryBtn').bind("click", function () {
+            parent.layer.close(index);
+        });
+
+        $('#editSystemDictionaryBtn').bind("click", function () {
+            var id = $('#id').val();
+            var code = $('#code').val();
+            var cName = $('#cName').val();
+            var eName = $('#eName').val();
+            var classify = $('#classify').val();
+            var remark = $('#remark').val();
+            var seq = $('#seq').val();
+
+            if (code == null || code == "") {
+                layer.msg("code不允许为空", {icon: 5});
+                return;
+            }
+            if (cName == null || cName == "") {
+                layer.msg("cName不允许为空", {icon: 5});
+                return;
+            }
+            if (classify == null || classify == "") {
+                layer.msg("classify不允许为空", {icon: 5});
+                return;
+            }
+            if(seq != null && seq != "") {
+                if(isNaN(seq)) {
+                    layer.msg("seq请输入数字",{icon:5});
+                    return;
+                }
+            }
+
+            var param = {};
+            param.id = id;
+            param.code = code;
+            param.cName = cName;
+            param.eName = eName;
+            param.classify = classify;
+            param.remark = remark;
+            param.seq = seq;
+
+            var paramJsonStr = JSON.stringify(param);
+
+            postUtil.call("/systemDictionary/edit", {"paramJsonStr": paramJsonStr}, function (result) {
+                parent.editSystemDictionaryCallBack(result);
+                if (result.STATUS == "SUCCESS") {
+                    layer.msg("修改成功", {icon: 6});
+                    setTimeout(function () {
+                        parent.layer.close(index);
+                    }, 1000);
+                } else {
+                    layer.msg(result.MSG + "", {icon: 5});
+                }
+            });
+
+        });
+    });
+
+</script>
+</body>
+</html>

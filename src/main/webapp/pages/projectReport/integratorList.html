@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_rcslf61orstyy14i.css<@resVersionDirective>?</@>"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/Area1.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui-mz-min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+   
+</head>
+<body>
+<div style="margin-top: 30px;">
+        <dl class="dl-form" style="margin-bottom: 0px;margin-top: -10px;">
+            <dd class="flt" style="margin-left: 20px;">
+                <table class="layui-table pop table-css" lay-skin="line">
+                    <colgroup>
+                        <col  width="210">
+                        <col  width="210">
+                        <col  width="100">
+                        <col  width="150">
+                    </colgroup>
+                    <thead>
+                    <tr class="bor-no">
+                        <th >集成商公司名称</th>
+                        <th >项目名称</th>
+                        <th >授权状态</th>
+                        <th >授权时间</th>
+                    </tr>
+                    </thead>
+                    <tbody id="userTable_tbody">
+                    </tbody>
+                </table>
+            </dd>
+            <dd>
+                <div id="paginationDiv" style="margin-right: 28px;margin-top:10px;"></div>
+            </dd>
+        </dl>
+</div>
+<script type="text/javascript">
+	var backupId="${backupId}";
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    var layer;
+    var $form;
+    var form;
+    var $;
+    
+    layui.use(['form','jquery','laydate','layer'], function(){
+        form = layui.form();
+        $form = $('form');
+        $ = layui.jquery;
+        layer = layui.layer;
+		var param={};
+		param.currentPageIndex=1;
+		param.backupId=backupId;
+       	loadDATA(param);
+    });
+    
+   
+    function loadDATA(param) {
+        postUtil.call("/projectReport/integratorList", param, function (result) {
+        	 var pageNumber = result.data.pageNumber;
+             var pageSize = result.data.pageSize;
+             var totalPage = result.data.totalPage;
+             var totalRow = result.data.totalRow;
+             var dataList = result.data.list;
+             renderTable(dataList);
+                laypage({
+                    cont: 'paginationDiv',
+                    pages: totalPage,
+                    curr: pageNumber,
+                    total: totalRow,
+                    skip: true,
+                    jump: function (obj, first) {
+                        if (!first) {
+                        	param.currentPageIndex=obj.curr;
+                        	loadDATA(param);
+                        }
+                    }
+                });
+     });
+    }
+
+    function renderTable(dataList) {
+    	  var length = dataList.length;
+    		var table = document.getElementById("userTable_tbody");
+            table.innerHTML = "";
+            userDataMap = {};
+            if (length > 0) {
+                for (var i = 0; i < dataList.length; i++) {
+                    var data = dataList[i];
+                    var row = renderRow(data);
+                    table.appendChild(row);
+                }
+            }else {
+                var html = '<tr><td colspan="4">暂无信息！</td></tr>';
+                $(table).html(html);
+            }
+    }
+    
+    function renderRow(rowData) {
+        var ul = document.createElement('tr');
+        ul.appendChild(renderCell(rowData.integratorCompanyName, "width:30%;height:75px;"));
+        ul.appendChild(renderCell(rowData.projectName, "width:30%;height:75px;"));
+        ul.appendChild(renderCell(rowData.statusCname, "width:20%;height:75px;"));
+        ul.appendChild(renderCell(rowData.updateTime, "width:20%;height:75px;"));
+        return ul;
+    }
+
+    function renderCell(value, acceptName,style) {
+        var li = document.createElement('td');
+            if(value) {
+                li.innerText = value;
+            }else {
+                li.innerText = "--";
+            }
+        return li;
+    }
+
+</script>
+</body>
+</html>

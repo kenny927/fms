@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		  <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+		<link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+		<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css"/>
+	</head>
+	<body>
+		<section id="itocCenter">
+		<header>
+            <div class="corporateName">长飞光纤光缆(上海)有限公司<span class="iconfont icon-gerenzhongxin frt">成姗姗</span><span class="iconfont icon-gerenzhongxin frt">成姗姗</span></div>
+            <div class="search">
+            	<div class="crumbs flt"><a href="javascript:;">首页</a>><a href="javascript:;">采购</a>><a class="c-b-i" href="javascript:;">委托单</a></div>
+            	<div class="searchInput frt">
+            		<form>
+            		<select class="flt">
+            			<option style="height: 50px;">搜商品</option>
+            			<option>搜编号</option>
+            			<option>搜型号</option>
+            			<option>搜关键词</option>
+            		</select>
+            		<input class="flt" type="search" placeholder="请输入商品名称/商品编号/型号/关键词" />
+            		<span class="flt">搜索</span>
+            		<a href="javascript:;">高级搜索</a>
+            		</form>
+            	</div>
+            </div>
+		</header>
+		<footer>
+			<div class="logo">
+				<img src="/res/images/logo.jpg" alt="" />
+			</div>
+			<nav class="itocNav">
+				<ul>
+					<li><a href="javascript:;"><span class="iconfont icon-dingdan"></span>订单</a></li>
+					<li><a href="javascript:;"><span class="iconfont icon-1348weituogoumai"></span>采购</a></li>
+					<li><a href="javascript:;"><span class="iconfont icon-shangpin"></span>商品</a></li>
+					<li><a href="javascript:;"><span class="iconfont icon-kehu"></span>客户</a></li>
+					<li><a href="javascript:;"><span class="iconfont icon-caiwu"></span>财务</a></li>
+					<li><a href="javascript:;"><span class="iconfont icon-tongzhi"></span>通知</a></li>
+					<li><a href="javascript:;"><span class="iconfont icon-wxbbaobiao"></span>报表</a></li>
+				</ul>
+			</nav>
+		</footer>
+	       <section class="itocContent">
+	       	<nav class="purchaseNav">
+	       		<ul>
+	       			<li style="background:#FFFFFF;"><a href="/res/html/itocConsignmentList.html">委托单</a></li>
+	       			<li><a href="/res/html/itocInquiryList.html">询价单</a></li>
+	       			<li><a href="/res/html/itocQuotationList.html">报价单</a></li>
+	       			<li><a href="/res/html/itocOrderList.html">商城订单</a></li>
+	       		</ul>
+	       	</nav>
+	       	<div class="itocMain">
+	       		<div class="purchaseSearch">
+	       			<form>
+	       		    <dl class="form-list flt">
+	       			 <dt>委托单查询：</dt>
+	       			 <dd><input type="text" placeholder="请输入委托单号" /></dd>
+	       		    </dl>
+	       		    <dl class="form-list flt status">
+	       		     <dt>委托单状态：</dt>
+	       		     <dd><label><input type="radio" name="a" checked="checked"/><span>全部</span></label></dd>
+	       			 <dd><label><input type="radio" name="a" />待处理</label></dd>
+	       			 <dd><label><input type="radio" name="a" />处理中</label></dd>
+	       			 <dd><label><input type="radio" name="a" />已生成询单</label></dd>
+	       			 <dd><label><input type="radio" name="a" />已关闭</label></dd>
+	       		    </dl>
+	       		    <dl class="form-list flt mt10">
+		       		    	<dt>账号查询：</dt>
+		       		    	<dd><input type="text" placeholder="请输入用户名/手机号/联系人.." /></dd>
+		       		    	<dd><span class="btn ml10">查询</span></dd>
+	       		    </dl>
+	       			</form>
+	       		</div>
+                    <div class="table">
+                    	<ul class="th">
+                    		<li style="width:6%;"><div class="mida"><div class="midb">委托单号</div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb">账号</div></div></li>
+                    		<li style="width:7%;"><div class="mida"><div class="midb">委托单姓名</div></div></li>
+                    		<li style="width:10%;"><div class="mida"><div class="midb">委托单联系电话</div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb">项目的</div></div></li>
+                    		<li style="width:8%;"><div class="mida"><div class="midb">期望交期</div></div></li>
+                    		<li style="width:16%"><div class="mida"><div class="midb">需求</div></div></li>
+                    		<li style="width:9%"><div class="mida"><div class="midb">需求发布时间</div></div></li>
+                    		<li style="width:9%"><div class="mida"><div class="midb">委托状态</div></div></li>
+                    		<li style="width:9%"><div class="mida"><div class="midb">跟进人</div></div></li>
+                    		<li style="width:8%"><div class="mida"><div class="midb">操作</div></div></li>
+                    	</ul>
+                    	<div class="information-list">
+                    	<ul class="information">
+                    		<li style="width:6%;"><div class="mida"><div class="midb">00987</div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb">18627753320</div></div></li>
+                    		<li style="width:7%;"><div class="mida"><div class="midb">彭珊珊</div></div></li>
+                    		<li style="width:10%;"><div class="mida"><div class="midb">18627753320</div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb">湖北省武汉市</div></div></li>
+                    		<li style="width:8%;"><div class="mida"><div class="midb">2017-12-30</div></div></li>
+                    		<li style="width:16%;"><div class="mida"><div class="midb" style="text-align: left;">我需要一个不锈钢304无锡板，厚度4、6、8、10mm我需要一个不锈钢304无锡板，厚度4、6、8、10mm我需要一个不锈钢304mm</div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb"><p>2017-02-01</p><p>12:20:00</p></div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb"><p>待处理</p></div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb"><p>跟进他</p></div></div></li>
+                    		<li style="width:8%;"><div class="mida"><div class="midb">---
+                    			</div></div>
+                    		</li>
+                    	</ul>
+                    	<ul class="information">
+                    		<li style="width:6%;"><div class="mida"><div class="midb">00987</div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb">18627753320</div></div></li>
+                    		<li style="width:7%;"><div class="mida"><div class="midb">彭珊珊</div></div></li>
+                    		<li style="width:10%;"><div class="mida"><div class="midb">18627753320</div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb">湖北省武汉市</div></div></li>
+                    		<li style="width:8%;"><div class="mida"><div class="midb">2017-12-30</div></div></li>
+                    		<li style="width:16%;"><div class="mida"><div class="midb" style="text-align: left;">我需要一个不锈钢304无锡板，厚度4、6、8、10mm我需要一个不锈钢304无锡板，厚度4、6、8、10mm我需要一个不锈钢304mm</div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb"><p>2017-02-01</p><p>12:20:00</p></div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb"><p>待处理</p></div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb"><p><p>朱舟</p><p>18627753320</p></p></div></div></li>
+                    		<li style="width:8%;"><div class="mida"><div class="midb">
+                    			<p><a href="javascript:;" class="addInquiry">新增询价单</a></p>
+                    			<p><a href="javascript:;">修改委托单</a></p>
+                    			<p><a href="javascript:;">查看详情</a></p>
+                    			</div></div>
+                    		</li>
+                    	</ul>
+                    	<ul class="information">
+                    		<li style="width:6%;"><div class="mida"><div class="midb">00987</div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb">18627753320</div></div></li>
+                    		<li style="width:7%;"><div class="mida"><div class="midb">彭珊珊</div></div></li>
+                    		<li style="width:10%;"><div class="mida"><div class="midb">18627753320</div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb">湖北省武汉市</div></div></li>
+                    		<li style="width:8%;"><div class="mida"><div class="midb">2017-12-30</div></div></li>
+                    		<li style="width:16%;"><div class="mida"><div class="midb" style="text-align: left;">我需要一个不锈钢304无锡板，厚度4、6、8、10mm我需要一个不锈钢304无锡板，厚度4、6、8、10mm我需要一个不锈钢304mm</div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb"><p>2017-02-01</p><p>12:20:00</p></div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb"><p>已关闭</p><p>18627753320</p><p class="c-9">2016.12.29 12:23:25</p></div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb"><p>跟进他</p></div></div></li>
+                    		<li style="width:8%;"><div class="mida"><div class="midb">
+                    			<p><a href="javascript:;">查看详情</a></p>
+                    			</div></div>
+                    		</li>
+                        </ul>
+                    	</div>
+                    	<div id="paginationDiv"></div>
+                    </div>
+                	<!--<div  id="addInquiry">
+                	<div class="treeSearch mb20">
+                                         搜商品：<input type="text" placeholder="请输入商品名称" class="mr20" />
+                                         内部分类：<input type="text"  value="全部分类"/><button class="search-btn">搜索</button>
+                    <span class="icon-xiala1"><img src="/res/images/arrow.png" alt="" /></span>                                        
+                	<div id="treeNav"></div>
+                	</div>
+                    <div class="table inquiry">
+                    	<ul class="th th-border">
+                    		<li style="width: 4%;"><div class="mida"><div class="midb"><input type="checkbox" /></div></div></li>
+                    		<li style="width: 45%;"><div class="mida"><div class="midb">商品名称</div></div></li>
+                    		<li style="width: 19%;"><div class="mida"><div class="midb">分类</div></div></li>
+                    		<li style="width: 11%"><div class="mida"><div class="midb">基本售价</div></div></li>
+                    		<li style="width: 10%"><div class="mida"><div class="midb">起订量</div></div></li>
+                    		<li style="width: 11%"><div class="mida"><div class="midb">计量单位</div></div></li>
+                    	</ul>
+                    	<div class="information-list wait" style="border-right: none;">
+                    	<ul class="information">
+                    		<li style="width: 4%;"><div class="mida"><div class="midb"><input type="checkbox" /></div></div></li>
+                    		<li style="width: 45%;"><div class="mida"><div class="midb">
+                    		<dl>
+                    			<dt>
+                    				<img src="/res/images/goods-eg.png" alt="" />
+                    				<span>长飞</span>
+                    			</dt>
+                    			<dd>
+                    				<p class="goodsName">室外多模室外多模中心管式室外多模室外多模中心管式轻铠装光缆室W室外多模室外多模中心管式轻铠装光缆室W轻铠装光缆室W</p>
+                    				<p>产品型号：HT-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-12A1a.2</p>
+                    				<p>商品编码：0126T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1558422</p>
+                    				<p>芯数／光纤类型／颜色：12芯／A1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1a.2 /白色</p>
+                    			</dd>
+                    		</dl>
+                    		</div></div></li>
+                    		<li style="width: 19%;"><div class="mida"><div class="midb">光缆>室内光缆>室内层级绞式履带开光缆GYTA</div></div></li>
+                    		<li style="width: 11%;"><div class="mida"><div class="midb">10.00</div></div></li>
+                    		<li style="width: 10%;"><div class="mida"><div class="midb">100.00</div></div></li>
+                    		<li style="width: 11%;"><div class="mida"><div class="midb">米</div></div></li>
+                      </ul>
+                    	<ul class="information">
+                    		<li style="width: 4%;"><div class="mida"><div class="midb"><input type="checkbox" /></div></div></li>
+                    		<li style="width: 45%;"><div class="mida"><div class="midb">
+                    		<dl>
+                    			<dt>
+                    				<img src="/res/images/goods-eg.png" alt="" />
+                    				<span>长飞</span>
+                    			</dt>
+                    			<dd>
+                    				<p class="goodsName">室外多模室外多模中心管式室外多模室外多模中心管式轻铠装光缆室W室外多模室外多模中心管式轻铠装光缆室W轻铠装光缆室W</p>
+                    				<p>产品型号：HT-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-12A1a.2</p>
+                    				<p>商品编码：0126T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1558422</p>
+                    				<p>芯数／光纤类型／颜色：12芯／A1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1a.2 /白色</p>
+                    			</dd>
+                    		</dl>
+                    		</div></div></li>
+                    		<li style="width: 19%;"><div class="mida"><div class="midb">光缆>室内光缆>室内层级绞式履带开光缆GYTA</div></div></li>
+                    		<li style="width: 11%;"><div class="mida"><div class="midb">10.00</div></div></li>
+                    		<li style="width: 10%;"><div class="mida"><div class="midb">100.00</div></div></li>
+                    		<li style="width: 11%;"><div class="mida"><div class="midb">米</div></div></li>
+                      </ul>
+                    	<ul class="information">
+                    		<li style="width: 4%;"><div class="mida"><div class="midb"><input type="checkbox" /></div></div></li>
+                    		<li style="width: 45%;"><div class="mida"><div class="midb">
+                    		<dl>
+                    			<dt>
+                    				<img src="/res/images/goods-eg.png" alt="" />
+                    				<span>长飞</span>
+                    			</dt>
+                    			<dd>
+                    				<p class="goodsName">室外多模室外多模中心管式室外多模室外多模中心管式轻铠装光缆室W室外多模室外多模中心管式轻铠装光缆室W轻铠装光缆室W</p>
+                    				<p>产品型号：HT-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-12A1a.2</p>
+                    				<p>商品编码：0126T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1558422</p>
+                    				<p>芯数／光纤类型／颜色：12芯／A1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1T-GYXTW-1a.2 /白色</p>
+                    			</dd>
+                    		</dl>
+                    		</div></div></li>
+                    		<li style="width: 19%;"><div class="mida"><div class="midb">光缆>室内光缆>室内层级绞式履带开光缆GYTA</div></div></li>
+                    		<li style="width: 11%;"><div class="mida"><div class="midb">10.00</div></div></li>
+                    		<li style="width: 10%;"><div class="mida"><div class="midb">100.00</div></div></li>
+                    		<li style="width: 11%;"><div class="mida"><div class="midb">米</div></div></li>
+                      </ul>
+                    	</div>
+                    	<div id="paginationDiv2" class="mt20"></div>
+                    </div>
+                </div>-->
+	       	</div>
+	       </section>
+		</section>
+		<script src="/res/js/jquery-3.1.1.min.js"></script>
+		<script src="/res/public/layui/layui.js"></script>
+		<!--<script src="/res/js/genBuyerEnquireData.js"></script>-->
+	    <script src="/res/public/layPage/laypage.js"></script>
+		<script type="text/javascript">
+//  		 layui.use('tree', function(){
+////  		layer.tree(data);
+//var layer = layui.layer
+//,$ = layui.jquery; 
+//  		 layui.tree({
+//  		 	  skin:'shihuang',
+//				  elem: '#treeNav' //传入元素选择器
+// ,nodes: [ //节点
+//    {
+//      name: '常用文件夹'
+//      ,id: 1
+//      ,alias: 'changyong'
+//      ,children: [
+//        {
+//          name: '所有未读（设置跳转）'
+//          ,id: 11
+//          ,href: 'http://www.layui.com/'
+//          ,alias: 'weidu'
+//        }, {
+//          name: '置顶邮件'
+//          ,id: 12
+//        }, {
+//          name: '标签邮件'
+//          ,id: 13
+//        }
+//      ]
+//    }, {
+//      name: '我的邮箱'
+//      ,id: 2
+//      ,spread: true
+//      ,children: [
+//        {
+//          name: 'QQ邮箱'
+//          ,id: 21
+//          ,spread: true
+//          ,children: [
+//            {
+//              name: '收件箱'
+//              ,id: 211
+//              ,children: [
+//                {
+//                  name: '所有未读'
+//                  ,id: 2111
+//                }, {
+//                  name: '置顶邮件'
+//                  ,id: 2112
+//                }, {
+//                  name: '标签邮件'
+//                  ,id: 2113
+//                }
+//              ]
+//            }, {
+//              name: '已发出的邮件'
+//              ,id: 212
+//            }, {
+//              name: '垃圾邮件'
+//              ,id: 213
+//            }
+//          ]
+//        }, {
+//          name: '阿里云邮'
+//          ,id: 22
+//          ,children: [
+//            {
+//              name: '收件箱'
+//              ,id: 221
+//            }, {
+//              name: '已发出的邮件'
+//              ,id: 222
+//            }, {
+//              name: '垃圾邮件'
+//              ,id: 223
+//            }
+//          ]
+//        }
+//      ]
+//    }
+//    ,{
+//      name: '收藏夹'
+//      ,id: 3
+//      ,alias: 'changyong'
+//      ,children: [
+//        {
+//          name: '爱情动作片'
+//          ,id: 31
+//          ,alias: 'love'
+//        }, {
+//          name: '技术栈'
+//          ,id: 12
+//          ,children: [
+//            {
+//              name: '前端'
+//              ,id: 121
+//            }
+//            ,{
+//              name: '全端'
+//              ,id: 122
+//            }
+//          ]
+//        }
+//      ]
+//    }
+//  ]
+//				});
+//				})
+    		 
+
+   $(function () {
+        loadMallVagueData(1);
+    });
+
+    function loadMallVagueData(currentPageIndex) {
+        var param = {};
+        param.currentPageIndex = currentPageIndex;
+//      postUtil.call("/mallOrder/vagueDemand/vagueDemandListJson", param, function (result) {
+            var pages = 100;
+            laypage({
+                cont: 'paginationDiv',
+                pages: pages,
+                curr: currentPageIndex,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        loadMallVagueData(obj.curr);
+                    }
+                }
+            });
+//      });
+    }
+    
+   $(function () {
+        loadMallVagueData2(1);
+    });
+    function loadMallVagueData2(currentPageIndex) {
+        var param = {};
+        param.currentPageIndex = currentPageIndex;
+//      postUtil.call("/mallOrder/vagueDemand/vagueDemandListJson", param, function (result) {
+            var pages = 100;
+            laypage({
+                cont: 'paginationDiv2',
+                pages: pages,
+                curr: currentPageIndex,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        loadMallVagueData(obj.curr);
+                    }
+                }
+            });
+//      });
+    }
+    
+//  		 layui.use('layer', function(){
+//       var layer = layui.layer;
+//       //是否确认收货弹出层
+//		    $(".addInquiry").click(function(){
+//				layer.open({
+//				  title: '站点提示',
+//				  type: 1,
+//				  skin: 'itoc120skin',
+//				  area: '831px',
+//				  btnAlign: 'c',
+//				  content: $('#addInquiry'),
+//				  btn: ['添加商品至询单', '取消'],
+//				  yes: function(index, layero){
+//				    //关闭委托单的回调
+//				  },btn2: function(index, layero){
+//				    //取消的回调
+//				  },
+//				  cancel: function(){ 
+//				    //右上角关闭回调
+//				  }
+//				});
+//		    })
+//		  })
+		    $(document).on("click",".icon-xiala1",function(){
+			     if($(this).next().css("display")=="none"){
+	             $(this).next().show();
+			     }else{
+	             $(this).next().hide();
+			     }
+		    })
+		    
+		    //左侧导航效果
+		    $(document).on("click",".itocNav ul li",function(){
+		    	$(this).find("a").addClass("active").parent().siblings().find("a").removeClass("active");
+		    })
+		</script>
+	</body>
+</html>

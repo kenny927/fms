@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <script src="/res/js/jquery-3.1.1.min.js"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/MultiSelectDropList.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/echarts.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/dateUtil.js<@resVersionDirective>?</@>"></script>
+     <script src="/res/statistics/saleOppStatistics.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+     <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+    <section class="bz-bb pl20 pr20 pt20 pb20">
+        <table class="layui-table pop table-css" lay-skin="line">
+            <colgroup>
+                <col  width="200">
+                <col  width="200">
+                <col  width="200">
+                <col  width="200">
+                <col  width="200">
+                <col  width="200">
+                <col  width="200">
+                <col  width="200">
+                <col  width="200">
+                <col  width="200">
+                <col  width="200">
+            </colgroup>
+            <thead>
+            <tr>
+                <th><span class="fz16 c-2">销售机会</span></th>
+                <th >项目型商机</th>
+                <th >零售型采购</th>
+                <th >零售型比价</th>
+                <th >零售型预算</th>
+                <th >销售机会</th>
+                <th >其他</th>
+                <th >总计</th>
+                <th >对应客户数</th>
+                <th >转化询单</th>
+                <th >待处理</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>今日</td>
+                <td>${todayOppCountMap.projectNum}</td>
+                <td>${todayOppCountMap.retrailPurchaseNum}</td>
+                <td>${todayOppCountMap.retrailPriceCompareNum}</td>
+                <td>${todayOppCountMap.retrailBudgetNum}</td>
+                <td>${todayOppCountMap.salesOppTypeNum}</td>
+                <td>${todayOppCountMap.otherTypeNum}</td>
+                <td>${todayOppCountMap.allNum}</td>
+                <td>${todayOppCountMap.customerForOppNum}</td>
+                <td>${todayOppCountMap.OppBeToDealNum}</td>
+                <td><a class="fz12 jun-a" href="javascript:jumpToInquirList(1);">${todayOppCountMap.toDealOppNum}</td>
+            </tr>
+            <tr>
+                <td>本周</td>
+                <td>${thisWeekOppCountMap.projectNum}</td>
+                <td>${thisWeekOppCountMap.retrailPurchaseNum}</td>
+                <td>${thisWeekOppCountMap.retrailPriceCompareNum}</td>
+                <td>${thisWeekOppCountMap.retrailBudgetNum}</td>
+                <td>${thisWeekOppCountMap.salesOppTypeNum}</td>
+                <td>${thisWeekOppCountMap.otherTypeNum}</td>
+                <td>${thisWeekOppCountMap.allNum}</td>
+                <td>${thisWeekOppCountMap.customerForOppNum}</td>
+                <td>${thisWeekOppCountMap.OppBeToDealNum}</td>
+                <td><a class="fz12 jun-a" href="javascript:jumpToInquirList(2);">${thisWeekOppCountMap.toDealOppNum}</td>
+            </tr>
+            <tr>
+                <td>本月</td>
+                <td>${thisMonthOppCountMap.projectNum}</td>
+                <td>${thisMonthOppCountMap.retrailPurchaseNum}</td>
+                <td>${thisMonthOppCountMap.retrailPriceCompareNum}</td>
+                <td>${thisMonthOppCountMap.retrailBudgetNum}</td>
+                <td>${thisMonthOppCountMap.salesOppTypeNum}</td>
+                <td>${thisMonthOppCountMap.otherTypeNum}</td>
+                <td>${thisMonthOppCountMap.allNum}</td>
+                <td>${thisMonthOppCountMap.customerForOppNum}</td>
+                <td>${thisMonthOppCountMap.OppBeToDealNum}</td>
+                <td><a class="fz12 jun-a" href="javascript:jumpToInquirList(3);">${thisMonthOppCountMap.toDealOppNum}</a></td>
+            </tr>
+            </tbody>
+        </table>
+        <h3 class="mb5 fz12 totalNav"><a href="javascript:searchByDay();" class="c-6 c-h fw-b fz12">按天统计</a><a href="javascript:searchByWeek();" class="c-6 fz12 ml10">按周统计</a><a  class="c-6 fz12 ml10" href="javascript:searchByYear();">按月统计</a></h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="margin-bottom: 0;">
+            <form action="" class="jun-form-s form-css">
+                <dl class="dl-form" style="margin-bottom: 0">
+                    <dt class="flt day">选择月份：</dt>
+                    <dd class="flt day"><input name="fromDateByDay" id="fromDateByDay" value="" style="height: 32px;width: 120px;" class="layui-input laydate-icon" placeholder="自定义日期格式" onclick="layui.laydate({elem: this, istime: true, format: 'YYYY-MM'})" validate="true"></dd>
+                    
+                    <dt class="flt year" style="display:none;">选择年份：</dt>
+                    <dd class="flt year" style="display:none;"><input name="fromDateByYear" id="fromDateByYear" value="" style="height: 32px;width: 120px;" class="layui-input laydate-icon" placeholder="自定义日期格式" onclick="layui.laydate({elem: this, istime: true, format: 'YYYY'})" validate="true"></dd>
+                    <!---->
+                    <!--<dt class="flt month" style="display:none;">至：</dt>-->
+                    <!--<dd class="flt month" style="display:none;"><input name="toDate" id="toDate" value="" style="height: 32px;width: 240px;" class="layui-input laydate-icon" placeholder="自定义日期格式" onclick="layui.laydate({elem: this, istime: true, format: 'YYYY-MM'})" validate="true"></dd>-->
+                    <!---->
+                    <dt class="flt fz12 ml20">类型：</dt>
+                    <dd class="flt pre w240 line-middle" style="height: 32px;">
+                        <div class="multi_select" id="typeSelect" style="position:absolute;left:-2px;top:0;z-index:1">
+                            <!--<img class="cs-p" style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" />-->
+                        </div>
+                    </dd>
+                    <dt class="flt fz12">创建人：</dt>
+                    <dd class="flt layui-form jun-form-l">
+                        <select name="creator" lay-filter="aihao"  id="creator" style="width: 240px;">
+                            <option value="all">全部</option>
+                            <#list saleOppCreators as item>
+                             <option value=${item.userId}>${item.userRealName}</option>
+                            </#list>
+                        </select>
+                    </dd>
+                    <dd class="flt ml10"><span class="form-btn layui-btn-small2" onclick="doSearch()" >查询</span></dd>
+                    <dd class="frt"><span class="form-btn layui-btn-itoc layui-btn-small2 fz12" onclick="exportOpp()">导出</span></dd>
+                </dl>
+                <dl class="dl-form mt5 mb5-i">
+                    <dt class="flt month" style="display:none;"><p class="mr5">至</p></dt>
+                    <dd class="flt month" style="display:none;"><input name="toDate" id="toDate" value="" style="height: 32px;width: 120px;" class="layui-input laydate-icon" placeholder="自定义日期格式" onclick="layui.laydate({elem: this, istime: true, format: 'YYYY-MM'})" validate="true"></dd>
+                </dl>
+            </form>
+
+        </blockquote>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <div id="main" style="width: 100%;height: 450px;" ></div>
+        </blockquote>
+    </section>
+</body>
+<script>
+var _chartType ="1";
+var _chartObject ="2";
+var layer;
+var form
+
+    layui.use(['form','laydate', 'layer'], function() {
+    	layer = layui.layer;
+        form = layui.form();
+        //日期控件 star
+        var start = {
+            min: laydate.now()
+            , max: '2099-06-16 23:59:59'
+            , istoday: false
+            , choose: function (datas) {
+                end.min = datas; //开始日选好后，重置结束日的最小日期
+                end.start = datas //将结束日的初始值设定为开始日
+            }
+        };
+
+        var end = {
+            min: laydate.now()
+            , max: '2099-06-16 23:59:59'
+            , istoday: false
+            , choose: function (datas) {
+                start.max = datas; //结束日选好后，重置开始日的最大日期
+            }
+        };
+    })
+    $(function (){
+        $('#typeSelect').MSDL({
+            'width': '240',
+            'data': [{"text":"销售机会","value":"SALES_OPP"},{"text":"技术咨询","value":"TECH"}
+            ,{"text":"售后咨询","value":"AFTER_SALES"},{"text":"客户投诉","value":"COMPLAIN"},
+            {"text":"项目型商机","value":"PROJECT"},{"text":"零售型采购","value":"RETAIL_PURCHASE"},
+            {"text":"零售型比价","value":"RETAIL_PRICE_COMPARE"},{"text":"零售型预算","value":"RETAIL_BUDGET"}],
+            'id': "type"
+        });
+    });
+    $(document).on('click','.totalNav a',function(){
+        $(this).addClass("c-h fw-b").siblings().removeClass("c-h fw-b");
+        
+        var select = document.getElementById("creator");  
+        for(var i=0; i<select.length; i++){  
+            if(select[i].value == "all"){  
+                select[i].selected = true;  
+                break;  
+            }  
+        }  
+       
+        form.render();
+        $("#typeSelect").empty();
+        var html ="";
+//        html+='<img class="cs-p" style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" />';
+        $('#typeSelect').append(html);
+        $('#typeSelect').MSDL({
+            'width': '240',
+            'data': [{"text":"销售机会","value":"SALES_OPP"},{"text":"技术咨询","value":"TECH"}
+            ,{"text":"售后咨询","value":"AFTER_SALES"},{"text":"客户投诉","value":"COMPLAIN"},
+            {"text":"项目型商机","value":"PROJECT"},{"text":"零售型采购","value":"RETAIL_PURCHASE"},
+            {"text":"零售型比价","value":"RETAIL_PRICE_COMPARE"},{"text":"零售型预算","value":"RETAIL_BUDGET"}],
+            'id': "type"
+        });
+    })
+    
+    function jumpToInquirList(type){
+    	var para ={};
+    	para.bFromStatics=type;
+        cardUtil.openCard("询价单列表" ,"/mallOrder/api/mallInquiry/preMallInquiryOrderList",para);
+        cardUtil.changeCard("询价单列表");
+//     	postUtil.submit
+    }
+    
+</script>
+</html>

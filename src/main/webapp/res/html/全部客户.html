@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css"/>
+    <script src="/res/js/jquery-3.1.1.min.js"></script>
+    <script src="/res/public/layui/Area1.js" type="text/javascript"></script>
+    <script src="/res/public/layui/layui.js"></script>
+    <script src="/res/public/layui/layui-mz-min.js"></script>
+    <script src="/res/js/MultiSelectDropList.js"></script>
+    <script src="/res/public/layPage/laypage.js"></script>
+  </head>
+  <body>
+    <section id="itocCenter">
+         <section class="itocContent">
+          <div class="itocMain">
+          <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px; margin-top:10px;">
+           <form action="" class="jun-form-s form-css">
+              <dl class="dl-form">
+                 <dt class="flt fz12" style="width: 60px;">客户主体：</dt>
+                 <dd class="flt pre">
+                    <div class="multi_select" id="statusSelect1" style="position:absolute;left:-2px;top:0;z-index:2"><img style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" /></div>       
+                 </dd>
+                 <dt class="flt fz12" style="margin-left: 250px;">客户名称：</dt>
+                 <dd class="flt"><input type="text" name="title"  placeholder="请输入客户名称" autocomplete="off" class="layui-input"></dd>
+              </dl>
+              <dl class="dl-form">
+                 <dt class="flt fz12" style="width: 60px;">客户来源：</dt>
+                 <dd class="flt pre">
+                    <div class="multi_select" id="statusSelect2" style="position:absolute;left:-2px;top:0;z-index:1"><img style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" /></div>       
+                 </dd>
+                 <dt class="flt fz12" style="margin-left: 252px;">状态：</dt>
+                 <dd class="flt pre">
+                    <div class="multi_select" id="statusSelect3" style="position:absolute;left:-2px;top:0;z-index:1"><img style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" /></div>       
+                 </dd>
+              </dl>
+              <dl class="dl-form">
+                 <dt class="flt fz12" style="width: 60px;">创建时间：</dt>
+                 <dd class="flt"><input name="followDate" value="2017-04-13 20:56:55" style="height: 32px;width: 240px; margin-left: -2px" class="layui-input laydate-icon" placeholder="自定义日期格式" onclick="layui.laydate({elem: this, istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" validate="true"></dd>
+                 <dt class="flt fz12 ml10">省市联动：</dt>
+                 <dd class="flt layui-form dd-city">
+                    <select name="province" lay-filter="province" id="s_province">
+                        <option value="">请选择省</option>
+                    </select>
+                 </dd>
+                 <dd class="flt layui-form dd-city">
+                    <select name="city" lay-filter="city">
+                        <option value="">请选择市</option>
+                    </select>
+                 </dd>
+                 <dt class="flt fz12">客户经理：</dt>
+                 <dd class="flt"><input type="text"   name="title"  placeholder="请输入标题" autocomplete="off" class="layui-input"></dd>
+                 <dd class="flt ml20">
+                    <button class="form-btn layui-btn-small2" lay-filter="formDemo">查询</button>
+                 </dd>
+              </dl>
+           </form>
+          </div>
+          <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px; margin-top:10px;">
+         <h3 class="mb5"><button class="form-btn layui-btn-itoc layui-btn-mini2">新增</button><button class="form-btn layui-btn-itoc layui-btn-mini2 ml10">转交</button><button class="form-btn layui-btn-itoc layui-btn-mini2 ml10">导出</button></h3>
+          <table class="layui-table pop" lay-skin="line">
+              <colgroup>
+                <col  width="40">
+                <col  width="400">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th><input type="checkbox" name="" /></th>
+                  <th>客户名称</th>
+                  <th >用户名</th>
+                  <th >地址</th>
+                  <th>客户状态</th>
+                  <th >委托单</th>
+                  <th >客户来源</th>
+                  <th >客户经理</th>
+                  <th >创建时间</th>
+                  <th >操作</th>
+                </tr> 
+              </thead>
+              <tbody>
+              <tr>
+              <td  colspan="10" height="50px"  align="center">
+             <span class="fz16">暂无相关信息</span> 
+              </td>
+              </tr>
+              <tr>
+                 <td><input type="checkbox" name="" /></td>
+                 <td>2</td>
+                 <td>2</td>
+                 <td>2</td>
+                 <td>2</td>
+                 <td>2</td>
+                 <td>2</td>
+                 <td>2</td>
+                 <td>2</td>
+                 <td>2</td>
+              </tr>
+              </tbody>
+              </table>
+              </div>
+                <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+          </div>
+         </section>
+    </section>
+
+<script type="text/javascript">
+
+      layui.use(['form','jquery','laydate'], function(){
+        var form = layui.form();
+        var $ = layui.jquery;
+        var laydate = layui.laydate;
+        
+        //下拉多选
+        layui.selMeltiple($);
+
+        //编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+         
+    //日期控件 star 
+        var start = {
+          min: laydate.now()
+          ,max: '2099-06-16 23:59:59'
+          ,istoday: false
+          ,choose: function(datas){
+            end.min = datas; //开始日选好后，重置结束日的最小日期
+            end.start = datas //将结束日的初始值设定为开始日
+          }
+        };
+        
+        var end = {
+          min: laydate.now()
+          ,max: '2099-06-16 23:59:59'
+          ,istoday: false
+          ,choose: function(datas){
+            start.max = datas; //结束日选好后，重置开始日的最大日期
+          }
+        };
+
+        })
+      $(function (){
+            $('#statusSelect1').MSDL({
+                'width': '240',
+                'data': [{"text":"保护中","value":"PROTECTED"},{"text":"保护失效","value":"PROTECTED_INVALID"}],
+                'id': "status"
+            });            
+            $('#statusSelect2').MSDL({
+                'width': '240',
+                'data': [{"text":"保护中","value":"PROTECTED"},{"text":"保护失效","value":"PROTECTED_INVALID"}],
+                'id': "status"
+            });            
+            $('#statusSelect3').MSDL({
+                'width': '240',
+                'data': [{"text":"保护中","value":"PROTECTED"},{"text":"保护失效","value":"PROTECTED_INVALID"}],
+                'id': "status"
+            });
+        });
+//分页
+   $(function () {
+        loadMallVagueData(1);
+    });
+
+    function loadMallVagueData(currentPageIndex) {
+        var param = {};
+        param.currentPageIndex = currentPageIndex;
+//      postUtil.call("/mallOrder/vagueDemand/vagueDemandListJson", param, function (result) {
+            var pages = 100;
+            laypage({
+                cont: 'paginationDiv',
+                pages: pages,
+                curr: currentPageIndex,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        loadMallVagueData(obj.curr);
+                    }
+                }
+            });
+//      });
+    }
+
+//省市联动  star
+    var areaData = Area; 
+    var $form;
+    var form;
+    var $;
+    layui.use('form', function() {
+    form = layui.form();
+    $form = $('form');
+        loadProvince();
+    });
+    function loadProvince() {
+      var proHtml = '';
+     for(var i = 0; i < areaData.length; i++) {
+       proHtml += '<option value="' + areaData[i].provinceCode + '_' + areaData[i].mallCityList.length + '_' + i + '">' +
+            areaData[i].provinceName + '</option>';
+                }
+    //初始化省数据
+       $form.find('select[name=province]').append(proHtml);
+       form.render();
+       form.on('select(province)', function(data) {
+       $form.find('select[name=area]').html('<option value="">请选择县/区</option>').parent().hide();
+       var value = data.value;
+      var d = value.split('_');
+       var code = d[0];
+       var count = d[1];
+       var index = d[2];
+       if(count > 0) {
+          loadCity(areaData[index].mallCityList);
+        } else {
+          $form.find('select[name=city]').parent().hide();
+        }
+      });
+    }
+ 
+    function loadCity(citys) {
+       var cityHtml = '';
+      for(var i = 0; i < citys.length; i++) {
+        cityHtml += '<option value="' + citys[i].cityCode + '_' + citys[i].mallAreaList.length + '_' + i + '">' +
+        citys[i].cityName + '</option>';
+      }
+     $form.find('select[name=city]').html(cityHtml).parent().show();
+     form.render();
+     form.on('select(city)', function(data) {
+     var value = data.value;
+     var d = value.split('_');
+     var code = d[0];
+     var count = d[1];
+     var index = d[2];
+     if(count > 0) {
+     loadArea(citys[index].mallAreaList);
+     } else {
+     $form.find('select[name=area]').parent().hide();
+     }
+     });
+ }
+ 
+     function loadArea(areas) {
+        var areaHtml = '';
+            for(var i = 0; i < areas.length; i++) {
+                areaHtml += '<option value="' + areas[i].areaCode + '">' +
+                 areas[i].areaName + '</option>';
+             }
+            $form.find('select[name=area]').html(areaHtml).parent().show();
+            form.render();
+            form.on('select(area)', function(data) {
+            });
+        }
+</script>
+  </body>
+</html>

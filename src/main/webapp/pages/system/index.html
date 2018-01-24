@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+	<head>
+<meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="${request.contextPath}/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="${request.contextPath}/res/js/echarts.js<@resVersionDirective>?</@>" charset="utf-8"></script>
+    <script src="${request.contextPath}/res/js/echarts.min.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+     <style type="text/css">
+		.undealed:hover{color:blue!important;}
+	</style>
+    <script>
+	function chooseItem(obj){
+		if(obj==1){
+			refreshData("chartItem1","${request.contextPath}/index/lineData?chartType=1&chartObject=1");
+		}else if(obj==2){
+			refreshData("chartItem1","${request.contextPath}/index/lineData?chartType=2&chartObject=1");
+		}else if(obj==3){
+			refreshData("chartItem1","${request.contextPath}/index/lineData?chartType=3&chartObject=1");
+		}else if(obj==4){
+			refreshData("chartItem2","${request.contextPath}/index/lineData?chartType=1&chartObject=2");
+		}else if(obj==5){
+			refreshData("chartItem2","${request.contextPath}/index/lineData?chartType=2&chartObject=2");
+		}else if(obj==6){
+			refreshData("chartItem2","${request.contextPath}/index/lineData?chartType=3&chartObject=2");
+		}
+	}
+    </script>
+	</head>
+	<body>
+		<section id="itocCenter" style="left: 0px;">
+	       <section class="itocContent">
+	       	<div class="itocMain">
+	       	  <div style="background-color:white;width:auto">
+		       	  <div class="header1" style="height:205px">
+		       	 	 <div id="left" class="table" style="float:left;height:205px;width:40%;line-height:45px;padding:20px 1% 2% 2%;padding-left:20px">
+						  <ul class="th" style="height:45px;box-sizing:content-box">                                                                                                               
+				                <li style="width:44%"><div class="mida"><div class="midb" style="font-size:16px;color:#035a9d;margin-left:20px;text-align:left;">待处理事项</div></div></li>
+                          </ul>  
+                          <ul class="td" style="height:45px;border-top:none">                                                                                                               
+				                <li style="width:44%"><div class="mida"><div class="midb" style="font-size:13px;width:160px;margin-left:20px;text-align:left;">待处理的委托单:</div></div></li>
+				                <li style="width:44%"><div class="mida"><div class="midb" style="font-size:13px;"><a class="undealed" style="color:red;" href="javascript:void(0)" onclick="gotoList(1)">${indexParam.unDealedvagueDemand}</a></div></div></li>   
+                          </ul> 
+                          <ul class="td" style="height:45px;border-top:none">                                                                                                               
+				                <li style="width:44%"><div class="mida"><div class="midb" style="font-size:13px;width:160px;margin-left:20px;text-align:left">待处理的报价单:</div></div></li>
+				                <li style="width:44%"><div class="mida"><div class="midb" style="font-size:13px;"><a class="undealed" style="color:red;"  href="javascript:void(0)" onclick="gotoList(2)">${indexParam.unDealedSellOffer}</a></div></div></li>   
+                          </ul> 
+                          <ul class="td" style="height:45px;border-top:none">                                                                                                               
+				                <li style="width:44%"><div class="mida"><div class="midb" style="font-size:13px;width:160px;margin-left:20px;text-align:left">待审核的认证会员:</div></div></li>
+				                <li style="width:44%"><div class="mida"><div class="midb" style="font-size:13px;"><a class="undealed" style="color:red;" href="javascript:void(0)" onclick="gotoList(3)">${indexParam.unDealedMember}</a></div></div></li>   
+                          </ul>   
+					</div>
+					<div id="right" class="table" style="float:right;height:205px;width:60%;line-height:45px;padding:20px 1% 2%;padding-right:20px;padding-left:0%">
+						 <ul class="th" style="height:45px;box-sizing:content-box">                                                                                                               
+				                <li style="width:20%"><div class="mida"><div class="midb" style="font-size:16px;color:#035a9d;margin-left:20px;text-align:left;">商城简报</div></div></li>
+				                <li style="width:20%"><div class="mida"><div class="midb" style="font-size:13px;">新增会员</div></div></li>   
+				                <li style="width:20%"><div class="mida"><div class="midb" style="font-size:13px;">新增上架商品</div></div></li>
+				                <li style="width:20%"><div class="mida"><div class="midb" style="font-size:13px;">订单数量</div></div></li>   
+				                <li style="width:20%"><div class="mida"><div class="midb" style="font-size:13px;">订单金额</div></div></li>
+                          </ul>  
+                           <ul class="td" style="height:45px;border-top:none">                                                                                                               
+				                <li style="width:20%"><div class="mida"><div class="midb" style="font-size:13px;">今日</div></div></li>
+				                <li style="width:20%"><div class="mida"><div class="midb" style="color:red;font-size:13px;">${indexParam.currentDayMember}</div></div></li>   
+				                <li style="width:20%"><div class="mida"><div class="midb" style="color:red;font-size:13px;">${indexParam.currentDayUProduct}</div></div></li>
+				                <li style="width:20%"><div class="mida"><div class="midb" style="color:red;font-size:13px;">${indexParam.currentDayMallOrderItem}</div></div></li>   
+				                <li style="width:20%"><div class="mida"><div class="midb" style="color:red;font-size:13px;">${indexParam.currentDayMallOrderAmount}</div></div></li>
+                          </ul> 
+                          <ul class="td" style="height:45px;border-top:none">                                                                                                               
+				                <li style="width:20%"><div class="mida"><div class="midb" style="font-size:13px;">本周</div></div></li>
+				                <li style="width:20%"><div class="mida"><div class="midb" style="color:red;font-size:13px;">${indexParam.currentWeekMember}</div></div></li>   
+				                <li style="width:20%"><div class="mida"><div class="midb" style="color:red;font-size:13px;">${indexParam.currentWeekUProduct}</div></div></li>
+				                <li style="width:20%"><div class="mida"><div class="midb" style="color:red;font-size:13px;">${indexParam.currentWeekMallOrderItem}</div></div></li>   
+				                <li style="width:20%"><div class="mida"><div class="midb" style="color:red;font-size:13px;">${indexParam.currentWeekMallOrderAmount}</div></div></li>
+                          </ul> 
+                          <ul class="td" style="height:45px;border-top:none">                                                                                                               
+				                <li style="width:20%"><div class="mida"><div class="midb" style="font-size:13px;">本月</div></div></li>
+				                <li style="width:20%"><div class="mida"><div class="midb" style="color:red;font-size:13px;">${indexParam.currentMonthMember}</div></div></li>   
+				                <li style="width:20%"><div class="mida"><div class="midb" style="color:red;font-size:13px;">${indexParam.currentMonthUProduct}</div></div></li>
+				                <li style="width:20%"><div class="mida"><div class="midb" style="color:red;font-size:13px;">${indexParam.currentMonthMallOrderItem}</div></div></li>   
+				                <li style="width:20%"><div class="mida"><div class="midb" style="color:red;font-size:13px;">${indexParam.currentMonthMallOrderAmount}</div></div></li>
+                          </ul>    
+						</div>
+		       	  	</div>
+					<div class="center table">
+						  <ul class="th" style="height:45px;box-sizing:content-box;width:auto;margin-top:20px;line-height:45px">                                                                                                               
+				                <li style="width:40%;"><div class="mida"><div class="midb" style="font-size:16px;color:#035a9d;text-align:left;margin-left:20px">委托单增长趋势</div></div></li>
+                         		<div style="float:right">  <li  style="width:70px;font-size:14px"><input type="radio" name="identity1" value="1" checked="checked"  onclick="chooseItem(1)"/>月</li>
+		    				  		<li style="width:70px;font-size:14px"><input type="radio" name="identity1" value="2"  onclick="chooseItem(2)"/>半年</li>
+		    				  		<li style="width:70px;font-size:14px"><input type="radio" name="identity1" value="3"  onclick="chooseItem(3)"/>年</li></div>
+                          </ul> 
+                          <ul style="width:auto">
+                          	<div id="chartItem1" style="height:400px;width:100%;margin-left:-2%" url="${request.contextPath}/index/lineData?chartType=1&chartObject=1"></div>  
+                          </ul>
+					</div>
+					<div class="center table">
+						  <ul class="th" style="height:45px;box-sizing:content-box;width:auto;margin-top:20px;line-height:45px">                                                                                                               
+				                <li style="width:40%"><div class="mida"><div class="midb" style="font-size:16px;color:#035a9d;text-align:left;margin-left:20px">商城会员增长趋势</div></div></li>
+                         		<div style="float:right">  <li  style="width:70px;font-size:14px"><input type="radio" name="identity2" value="4" checked="checked"  onclick="chooseItem(4)"/>月</li>
+		    				  		<li style="width:70px;font-size:14px"><input type="radio" name="identity2" value="5"  onclick="chooseItem(5)"/>半年</li>
+		    				  		<li style="width:70px;font-size:14px"><input type="radio" name="identity2" value="6"  onclick="chooseItem(6)"/>年</li></div>
+                          </ul> 
+                          <ul style="width:auto">
+                          	<div id="chartItem2" style="height:400px;width:100%;margin-left:-2%" url="${request.contextPath}/index/lineData?chartType=1&chartObject=2"></div>  
+                          <script>
+														var myChart1;  
+														var myChart2; 
+														var eCharts;  
+														
+														require.config({  
+															 paths: {
+														         echarts: 'http://echarts.baidu.com/build/dist'
+														     }
+														});  
+														
+														require(  
+															     [ 'echarts',   
+															       'echarts/chart/line',
+															       'echarts/chart/bar'  
+															     ], DrawEChart //异步加载的回调函数绘制图表  
+															 );  
+														
+														//创建ECharts图表方法  
+														function DrawEChart(ec) {  
+															     eCharts = ec;  
+															     myChart1 = eCharts.init(document.getElementById('chartItem1'));  
+															     myChart1.showLoading({  
+															         text : "图表数据正在努力加载..."  
+															     });
+															     myChart2 = eCharts.init(document.getElementById('chartItem2'));  
+															     myChart2.showLoading({  
+															         text : "图表数据正在努力加载..."  
+															     });
+															     //定义图表options  
+															     var options = {  
+															         title : {  
+															             text : "" 
+															         },  
+															         tooltip : {  
+															             trigger : 'axis',
+															             formatter: "{b} : {c}"
+															         },  
+															         legend : {  
+															             data : [""]  
+															         },  
+															         toolbox : {  
+															             show : true,  
+															             feature : {  
+															                 mark : {  
+															                     show : false  
+															                 },  
+															                 dataView : {  
+															                     show : false,  
+															                     readOnly : false  
+															                 },  
+															                 magicType : {  
+															                     show : true,  
+															                     type : [ 'line', 'bar' ]  
+															                 },  
+															                 restore : {  
+															                     show : true  
+															                 },  
+															                 saveAsImage : {  
+															                     show : true  
+															                 }  
+															             }  
+															         },  
+															         calculable : true,  
+															         xAxis : [ {  
+															             type : 'category',  
+															             boundaryGap : false,  
+															             data : [ '0']  
+															         } ],  
+															         yAxis : [ {  
+															             type : 'value',  
+															             splitArea : {  
+															                 show : true  
+															             }  
+															         } ],  
+															         grid : {  
+															             width : '90%'  
+															         },  
+															         series : [ {  
+															             name : '',  
+															             type : 'line',  
+															             data : [0],//必须是Integer类型的,String计算平均值会出错  
+															              markPoint : {  
+															                 data : [ {  
+															                     type : 'max',  
+															                     name : '最大值'  
+															                 }, {  
+															                     type : 'min',  
+															                     name : '最小值'  
+															                 } ]  
+															             } 
+															         } ]  
+															     };
+															     myChart1.setOption(options); //先把可选项注入myChart中  
+															     getChartData(myChart1,"${request.contextPath}/index/lineData?chartType=1&chartObject=1");//aja后台交互  
+															     myChart2.setOption(options); //先把可选项注入myChart中  
+															     getChartData(myChart2,"${request.contextPath}/index/lineData?chartType=1&chartObject=2");//aja后台交互  
+														}
+														
+														function getChartData(myChart,url) {
+														    //获得图表的options对象  
+														    var options = myChart.getOption();
+														    //通过Ajax获取数据  
+														    $.ajax({  
+														        type : "post",  
+														        async : false, //同步执行  
+														        url :url,  
+														        data : {},  
+														        dataType : "json", //返回数据形式为json  
+														        success : function(result) {  
+														            if (result) {
+														           	 options.xAxis[0].data= ['0'];
+														                options.legend.data = result.legend;
+														                options.xAxis[0].data = result.category;
+														                options.series[0].data = result.series[0].data;  
+														                myChart.hideLoading();  
+														                myChart.setOption(options);  
+														            }  
+														        },  
+														        error : function(errorMsg) {  
+														            myChart.hideLoading();  
+														        }  
+														    });  
+														}  
+															
+														function refreshData(obj,url){
+															require(  
+																     [ 'echarts',   
+																       'echarts/chart/line',
+																       'echarts/chart/bar'  
+																     ], DrawEChart //异步加载的回调函数绘制图表  
+																 );  
+														
+																 //创建ECharts图表方法  
+																 function DrawEChart(ec) {  
+																     eCharts = ec;  
+																     myChart = eCharts.init(document.getElementById(obj));  
+																     myChart.showLoading({  
+																         text : "图表数据正在努力加载..."  
+																     });
+																     //定义图表options  
+																     var options = {  
+																         title : {  
+																             text : "" 
+																         },  
+																         tooltip : {  
+																             trigger : 'axis',
+																             formatter: "{b} : {c}"
+																             
+																         },  
+																         legend : {  
+																             data : [""]  
+																         },  
+																         toolbox : {  
+																             show : true,  
+																             feature : {  
+																                 mark : {  
+																                     show : false  
+																                 },  
+																                 dataView : {  
+																                     show : false,  
+																                     readOnly : false  
+																                 },  
+																                 magicType : {  
+																                     show : true,  
+																                     type : [ 'line', 'bar' ]  
+																                 },  
+																                 restore : {  
+																                     show : true  
+																                 },  
+																                 saveAsImage : {  
+																                     show : true  
+																                 }  
+																             }  
+																         },  
+																         calculable : true,  
+																         xAxis : [ {  
+																             type : 'category',  
+																             boundaryGap : false,  
+																             data : [ '0']  
+																         } ],  
+																         yAxis : [ {  
+																             type : 'value',  
+																             splitArea : {  
+																                 show : true  
+																             }  
+																         } ],  
+																         grid : {  
+																             width : '90%'  
+																         },  
+																         series : [ {  
+																             name : '',  
+																             type : 'line',  
+																             data : [0],//必须是Integer类型的,String计算平均值会出错  
+																              markPoint : {  
+																                 data : [ {  
+																                     type : 'max',  
+																                     name : '最大值'  
+																                 }, {  
+																                     type : 'min',  
+																                     name : '最小值'  
+																                 } ]  
+																             }
+																       /*   ,  
+																             markLine : {  
+																                 data : [ {  
+																                     type : 'average',  
+																                     name : '平均值'  
+																                 } ]  
+																             } */  
+																         } ]  
+																     };
+																     myChart.setOption(options); //先把可选项注入myChart中  
+																    getChartData(myChart,url);//aja后台交互   
+																 }
+														}</script>
+                          </ul>
+					</div>
+			</div>
+	       </section>
+		</section>
+		<script>
+function gotoList(obj){
+	var param={};
+	if("1"==obj){
+		param.vagueDemandStatus="PENDING";
+		postUtil.submit("/mallOrder/vagueDemand/preListVagueDemand",param);
+	}else if("2"==obj){
+		param.mallOfferStatus="OFFERED";
+		param.isSendToBuyerYet="NOT_SEND";
+		postUtil.submit("/mallSellerOffer/offerListPage",param);
+	}else{
+		param.status="VERIFYING";
+		postUtil.submit("/member/verify/preList",param);
+	}
+}
+</script>
+	</body>
+</html>

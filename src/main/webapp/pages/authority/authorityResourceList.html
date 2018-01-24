@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+
+    <!-- ztree v3.5 -->
+    <link rel="stylesheet" type="text/css" href="/res/public/zTree_v3/css/zTreeStyle/zTreeStyle.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/public/zTree_v3/js/jquery.ztree.core-3.5.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/zTree_v3/js/jquery.ztree.excheck-3.5.min.js<@resVersionDirective>?</@>"></script>
+
+    <style>
+        .btn {
+            display: block;
+            width: 86px;
+            height: 36px;
+            font: 12px/36px "microsoft yahei";
+            text-align: center;
+            text-decoration: none;
+            border-radius: 0;
+            background: #035a9d;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div style="padding-top: 30px;">
+                <div style="float: left;border-right: dashed 1px gray;width: 260px;height: 100%;">
+                    <span class="btn" id="addAuthorityResourceBtn" style="cursor: pointer;margin-left: 10px;float: left;">新增资源</span>
+                    <span class="btn" id="updateAuthorityResourceBtn" style="cursor: pointer;margin-left: 10px;float: left;">保存</span>
+                    <ul id="tree" class="ztree" style="width:250px; height: 100%; overflow:auto;"></ul>
+                </div>
+                <div style="float: left;width: 600px;display: block;margin-left: 30px;">
+                    <dl class="form-list" style="height: 60px;">
+                        <dt style="width: 150px;display: inline-block;text-align: right;">资源ID：</dt>
+                        <dd style="display: inline-block;">
+                            <input type="text" id="resourceId" readonly="readonly" style="border:none;width: 300px;">
+                        </dd>
+                    </dl>
+                    <dl class="form-list" style="height: 60px;">
+                        <dt style="width: 150px;display: inline-block;text-align: right;">资源类型：</dt>
+                        <dd style="display: inline-block;">
+                            <input type="text" id="resourceType" readonly="readonly" style="border:none;width: 300px;">
+                        </dd>
+                    </dl>
+                    <dl class="form-list" style="height: 60px;">
+                        <dt style="width: 150px;display: inline-block;text-align: right;">资源模块：</dt>
+                        <dd style="display: inline-block;">
+                            <input type="text" id="resourceModule" readonly="readonly" style="border:none;width: 300px;">
+                        </dd>
+                    </dl>
+                    <dl class="form-list" style="height: 60px;">
+                        <dt style="width: 150px;display: inline-block;text-align: right;">资源名称：</dt>
+                        <dd style="display: inline-block;">
+                            <input type="text" id="resourceAllName" readonly="readonly" style="border:none;width: 300px;">
+                        </dd>
+                    </dl>
+                    <dl class="form-list" style="height: 60px;">
+                        <dt style="width: 150px;display: inline-block;text-align: right;">资源编码：</dt>
+                        <dd style="display: inline-block;">
+                            <input type="text" id="resourceCode" readonly="readonly" style="border:none;width: 300px;">
+                        </dd>
+                    </dl>
+                    <dl class="form-list" style="height: 60px;">
+                        <dt style="width: 150px;display: inline-block;text-align: right;">资源图标：</dt>
+                        <dd style="display: inline-block;">
+                            <input type="text" id="resourceIcon" style="width: 300px;height: 26px;">
+                        </dd>
+                    </dl>
+                    <dl class="form-list" style="height: 60px;">
+                        <dt style="width: 150px;display: inline-block;text-align: right;">资源路径：</dt>
+                        <dd style="display: inline-block;">
+                            <input type="text" id="resourceUrl" style="width: 300px;height: 26px;">
+                        </dd>
+                    </dl>
+
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript">
+
+    var zTree;
+    var setting = {
+        check: {
+            enable: false,
+            chkStyle: "checkbox",
+            chkboxType: {"Y": "s", "Y": "p"} //勾选只影响父节点,取消勾选只影响子节点
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        },
+        callback: {
+            onClick: zTreeOnClick
+        }
+    };
+
+    function zTreeOnClick(event, treeId, treeNode) {
+
+        var resourceId = treeNode.resourceId;
+        postUtil.call("/authorityResource/info/"+resourceId, null, function (result) {
+            if (result) {
+                $("#resourceId").val(result.resourceId);
+                $("#resourceAllName").val(result.resourceAllName);
+                $("#resourceCode").val(result.resourceCode);
+                $("#resourceType").val(result.resourceType);
+                $("#resourceModule").val(result.resourceModule);
+                $("#resourceIcon").val(result.resourceIcon);
+                $("#resourceUrl").val(result.resourceUrl);
+            }
+        });
+
+
+    }
+
+    $(function(){
+        initAuthorityResourceList();
+
+        $("#addAuthorityResourceBtn").bind("click",function(){
+            var nodes = zTree.getSelectedNodes();
+            if(nodes.length !=  1) {
+                layer.msg("请选择一个节点后再进行操作!",{icon:5});
+                return;
+            }
+
+            var url = "/authorityResource/preAdd?pResourceId="+$("#resourceId").val()+"&pResourceAllName="+$("#resourceAllName").val()+"&resourceModule="+$("#resourceModule").val()+"&pResourceCode="+$("#resourceCode").val();;
+            layer.open({
+                title: "资源管理-新增",
+                type: 2,
+                area: ['500px', '550px'],
+                fixed: false, //不固定
+                maxmin: true,
+                content: encodeURI(encodeURI(url))
+            });
+        });
+
+        $('#updateAuthorityResourceBtn').bind("click", function () {
+            var resourceId = $('#resourceId').val();
+            var resourceIcon = $('#resourceIcon').val();
+            var resourceUrl = $('#resourceUrl').val();
+            if (!resourceId) {
+                layer.msg("请编辑资源后再进行保存操作", {icon: 5});
+                return;
+            }
+
+            var updateParam = {};
+            updateParam.resourceId = resourceId;
+            updateParam.resourceIcon = resourceIcon;
+            updateParam.resourceUrl = resourceUrl;
+
+            postUtil.call("/authorityResource/update", updateParam, function (result) {
+                if (result) {
+                    if (result.STATUS == "SUCCESS") {
+                        layer.msg("保存成功", {icon: 6});
+                    } else {
+                        layer.msg(result.MSG, {icon: 6});
+                    }
+                }
+            });
+        });
+    });
+
+
+    function initAuthorityResourceList(){
+        var initParam={};
+        postUtil.call("/authorityResource/listALlJsonForZTree",initParam,function(resultData){
+            var t = $("#tree");
+            t = $.fn.zTree.init(t, setting, resultData);
+            zTree = $.fn.zTree.getZTreeObj("tree");
+        });
+    }
+
+    //新增弹窗 保存后的回调方法
+    function addAuthorityResourceCallBack(result) {
+        if (result.STATUS == "SUCCESS") {
+            initAuthorityResourceList();
+        }
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<div class="bz-bb pt20 pl20 pr20">
+    <p class="t-c pt20  fz16 c-2"><span class="iconfont icon-jinggao c-f fz18 mr5"></span>是否关闭此订单？</p>
+    <form action="" class="layui-form jun-form-s form-css ml20">
+        <dl class="dl-form layui-form mb5-i">
+            <dt class="mt20 c-2 fz12 t-l">请选择关闭原因</dt>
+            <dd class=""><input type="radio" name="reason" lay-filter="reason" value="客户比价" title="客户比价"></dd>
+            <dd class=""><input type="radio" name="reason" lay-filter="reason" value="招投标做预算" title="招投标做预算"></dd>
+            <dd class=""><input type="radio" name="reason" lay-filter="reason" value="商品或交期无法满足客户" title="商品或交期无法满足客户"></dd>
+            <dd class=""><input type="radio" name="reason" lay-filter="reason" value="其他原因" title="其他原因"></dd>
+        </dl>
+        <dl class="dl-form">
+            <dd class="layui-form"><textarea name="closeRemark" lay-filter="closeRemark" cols="130" id="closeRemark" placeholder="请输入关闭原因"
+                                             class="layui-textarea"></textarea></dd>
+        </dl>
+    <div class="layui-layer-btn-c" style="text-align:center">
+        <a class="form-btn layui-btn-small2 nohover" id="confirmCloseBtn" lay-submit="" lay-filter="formDemo">确认关闭</a>
+        <a class="form-btn layui-btn-primary layui-btn-small2 ml10" id="cancelBtn">取消</a>
+    </div>
+    </form>
+</div>
+<script type="text/javascript">
+    var offerId = '${offerId}';
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    layui.use('form', function () {
+        var form = layui.form();
+        form.render();
+        $('#cancelBtn').bind("click", function () {
+            parent.layer.close(index);//关闭当前窗口
+        });
+
+        form.on('radio(reason)', function(data){
+            if(data.value == '其他原因'){
+                $('textarea[name=closeRemark]').removeAttr("disabled");
+            }else{
+                $('textarea[name=closeRemark]').val("");
+                $('textarea[name=closeRemark]').attr("disabled", "disabled");
+            }
+        });
+
+        form.on('submit(formDemo)', function(data) {
+            var reason = data.field.reason || '';
+            if(reason.length < 1){
+                layer.msg("请选择关闭原因!", {icon: 5});
+                return false;
+            }
+            var closeRemark = data.field.closeRemark || '';
+            if( reason == '其他原因' && closeRemark.length < 1 ){
+                layer.msg("请填写关闭原因!", {icon: 5});
+                return false;
+            }
+            if (closeRemark.length > 200) {
+                layer.msg("关闭原因最大限制为200!", {icon: 5});
+                return false;
+            }
+
+            var param = {};
+            param.offerId = offerId;
+            if(reason == '其他原因'){
+                param.closeReason = closeRemark;
+            }else {
+                param.closeReason = reason;
+            }
+            postUtil.call("/mallOrder/api/mallInquiry/close", param, function (result) {
+                if (result.STATUS == "SUCCESS") {
+                    layer.msg("关闭订单成功", {icon: 6});
+                } else {
+                    layer.msg("关闭订单失败:" + result.MSG, {icon: 5});
+                }
+                var success = parent.closeMallOrderCallback(result);//调用父页面的渲染方法
+                if (success) {
+                    setTimeout(function () {
+                        parent.layer.close(index);//关闭当前窗口
+                    }, 1000);
+
+                }
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

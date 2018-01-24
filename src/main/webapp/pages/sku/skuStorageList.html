@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <link rel="stylesheet" type="text/css"
+          href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <style>
+        .btn {
+            display: block;
+            width: 86px;
+            height: 36px;
+            font: 12px/36px "microsoft yahei";
+            text-align: center;
+            text-decoration: none;
+            border-radius: 0;
+            background: #035a9d;
+            color: #ffffff;
+        }
+        body, a, input, button,.layui-table td, .layui-table th{
+            font-size: 12px;
+        }
+
+        a:hover {
+            color: #e80000;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div class="purchaseSearch">
+                <form>
+                    <dl class="form-list flt">
+                        <dt>SKU编码：</dt>
+                        <dd><div class="test_box" contenteditable="true" id="skuId" title="请输入SKU编码，多个单号用回车或空格隔开"></div>
+                        </dd>
+                    </dl>
+                    <dl class="form-list flt">
+                        <dt>商品名称：</dt>
+                        <dd><input type="text" id="skuName" style="width: 150px;" placeholder="请输入商品名称"/></dd>
+                    </dl>
+                    <dl class="form-list flt">
+                        <dt>库存状态：</dt>
+                        <dd>
+                            <select id="salableStatus" style="width: 150px;height: 30px;">
+                                <option value="ALL">全部</option>
+                                <option value="Y">有货</option>
+                                <option value="N">无货</option>
+                            </select>
+                        </dd>
+                    </dl>
+                    <dl class="form-list flt">
+                        <dd><span class="btn ml10" style="cursor: pointer;" id="searchBtn">查询</span></dd>
+                        <dd><span class="btn ml10" style="cursor: pointer;width: 120px;"
+                                  id="syncToRedisBtn">同步到缓存(慎用)</span></dd>
+                    </dl>
+                </form>
+            </div>
+            <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px">
+                <table class="layui-table" lay-skin="line">
+                    <thead>
+                    <tr>
+                        <th style="text-align:center;width:24%">库房(供应商)</th>
+                        <th style="text-align:center;width:10%">配送中心(城市)</th>
+                        <th style="text-align:center;width:10%">库存状态</th>
+                        <th style="text-align:center;width:8%">现货</th>
+                        <th style="text-align:center;width:8%">可售库存</th>
+                        <th style="text-align:center;width:8%">订单预占</th>
+                        <th style="text-align:center;width:8%">待出库预占</th>
+                        <th style="text-align:center;width:8%">不可用</th>
+                        <th style="text-align:center;width:8%">已出库</th>
+                        <th style="text-align:center;width:8%">单位</th>
+                    </tr>
+                    </thead>
+                    <tbody id="skuStorageTable">
+                    </tbody>
+                </table>
+            </div>
+            <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+        </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript">
+    var layer = null;
+    var PAGE_SIZE = 5; //分页数量
+    var currentDataList = null; //当前页面的数据集合
+    layui.use(['layer', 'upload'], function () {
+        layer = layui.layer;
+        skuStorageTableInit();
+    });
+
+    function skuStorageTableInit() {
+        var skuName = $('#skuName').val();
+        var salableStatus = $('#salableStatus').val();
+        var queryParam = {};
+        queryParam.currentPageIndex = 1;
+        queryParam.pageSize = PAGE_SIZE;
+        var skuIdTemp = $("#skuId").html();
+        var skuIdArray = skuIdTemp.split(/[;；,，\n <br>&nbsp]/);
+        var skuId='';
+        for(var i=0;i<skuIdArray.length;i++){
+            skuId+=skuIdArray[i]+';';
+        }
+        queryParam.skuId = skuId;
+        queryParam.skuName = skuName;
+        queryParam.salableStatus = salableStatus;
+        loadSkuStorageData(queryParam);
+    }
+
+    $(function () {
+        $("#searchBtn").bind("click", function () {
+            skuStorageTableInit();
+        });
+        $('#syncToRedisBtn').bind("click", function () {
+            layer.load();
+            postUtil.call("/skuStorage/sync2redis", {}, function (result) {
+                layer.closeAll("loading");
+                if (result.STATUS == "SUCCESS") {
+                    layer.msg("同步成功", {icon: 6});
+                } else {
+                    layer.msg(result.MSG + "", {icon: 5});
+                }
+            });
+        });
+        document.onkeydown = function (e) {
+            var ev = document.all ? window.event : e;
+            if (ev.keyCode == 13) {
+                skuStorageTableInit();
+            }
+        };
+    });
+
+    function loadSkuStorageData(queryParam) {
+        layer.load();
+        postUtil.call("/skuStorage/listJson", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            currentDataList = dataList;
+            renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+
+                        var skuName = $('#skuName').val();
+                        var salableStatus = $('#salableStatus').val();
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        var skuIdTemp = $("#skuId").html();
+                        var skuIdArray = skuIdTemp.split(/[;；,，\n <br>&nbsp]/);
+                        var skuId='';
+                        for(var i=0;i<skuIdArray.length;i++){
+                            skuId+=skuIdArray[i]+';';
+                        }
+                        tempParam.skuId = skuId;
+                        tempParam.skuName = skuName;
+                        tempParam.salableStatus = salableStatus;
+                        loadSkuStorageData(tempParam);
+                    }
+                }
+            });
+            layer.closeAll("loading");
+        });
+    }
+
+    function renderTable(dataList) {
+        var length = dataList.length;
+        var table = document.getElementById("skuStorageTable");
+        table.innerHTML = "";
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                renderMainRow(table, data);
+                var currentSkuStorageDetaiData = data.currentSkuStorageDetaiData;
+                if (currentSkuStorageDetaiData && currentSkuStorageDetaiData.length > 0) {
+                    for (var j = 0; j < currentSkuStorageDetaiData.length; j++) {
+                        var skuStorageDetail = currentSkuStorageDetaiData[j];
+                        var detailRow = renderRow(skuStorageDetail);
+                        table.appendChild(detailRow);
+                    }
+                }
+            }
+        } else {
+            var html = '<tr><td colspan="10"><p class="t-c fz16 c-2" style="line-height: 76px;">未查询到库存数据！</p></td></tr>';
+            $(table).html(html);
+        }
+
+        renderUnitDisplay();
+    }
+
+    function renderMainRow(table, rowData) {
+        var skuId = rowData.skuId;
+        var skuName = rowData.skuName;
+        var unitName = rowData.unitName;
+        var tr = document.createElement('tr');
+        var rowContent = "SKU编码:<span style='color: #e80000'>" + skuId + "</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>SKU名称:<a href='javascript:void(0);' onclick='openSkuDetail(\"" + skuId + "\")'>" + skuName + "</a></span>"
+        tr.appendChild(renderCell("main_row", rowContent, "width:100%;", 10, rowData));
+        table.appendChild(tr);
+
+        var stockQuantity = rowData.stockQuantity;
+        var salableQuantity = rowData.salableQuantity;
+        var orderPreholdingQuantity = rowData.orderPreholdingQuantity;
+        var deliveryPreholdingQuantity = rowData.deliveryPreholdingQuantity;
+        var deliveryQuantity = rowData.deliveryQuantity;
+        var unavailableQuantity = rowData.unavailableQuantity;
+        var tr_2 = document.createElement('tr');
+        tr_2.appendChild(renderCell(null, "全国", "width:24%;", null, rowData));
+        tr_2.appendChild(renderCell(null, "全国", "width:10%;", null, rowData));
+        tr_2.appendChild(renderCell("storageStatus", salableQuantity, "width:10%;", null, rowData));
+        tr_2.appendChild(renderCell(null, stockQuantity, "width:8%;", null, rowData));
+        tr_2.appendChild(renderCell(null, salableQuantity, "width:8%;", null, rowData));
+        tr_2.appendChild(renderCell(null, orderPreholdingQuantity, "width:8%;", null, rowData));
+        tr_2.appendChild(renderCell(null, deliveryPreholdingQuantity, "width:8%;", null, rowData));
+        tr_2.appendChild(renderCell(null, unavailableQuantity, "width:8%;", null, rowData));
+        tr_2.appendChild(renderCell(null, deliveryQuantity, "width:8%;", null, rowData));
+        tr_2.appendChild(renderCell(null, unitName, "width:8%;", null, rowData));
+        table.appendChild(tr_2);
+
+
+    }
+    function renderRow(rowData) {
+        var skuId = rowData.skuId;
+        var unitName = rowData.unitName;
+        var supplierAccountId = rowData.supplierAccountId;
+        var accountName = rowData.accountName;
+        var province = rowData.province;
+        var city = rowData.city;
+        var stockQuantity = rowData.stockQuantity;
+        var salableQuantity = rowData.salableQuantity;
+        var orderPreholdingQuantity = rowData.orderPreholdingQuantity;
+        var deliveryPreholdingQuantity = rowData.deliveryPreholdingQuantity;
+        var deliveryQuantity = rowData.deliveryQuantity;
+        var unavailableQuantity = rowData.unavailableQuantity;
+        var tr = document.createElement('tr');
+        tr.appendChild(renderCell(null, accountName, "width:24%;", null, rowData));
+        tr.appendChild(renderCell(null, city, "width:10%;", null, rowData));
+        tr.appendChild(renderCell("storageStatus", salableQuantity, "width:10%;", null, rowData));
+        tr.appendChild(renderCell(null, stockQuantity, "width:8%;", null, rowData));
+        tr.appendChild(renderCell(null, salableQuantity, "width:8%;", null, rowData));
+        tr.appendChild(renderCell(null, orderPreholdingQuantity, "width:8%;", null, rowData));
+        tr.appendChild(renderCell(null, deliveryPreholdingQuantity, "width:8%;", null, rowData));
+        tr.appendChild(renderCell(null, unavailableQuantity, "width:8%;", null, rowData));
+        tr.appendChild(renderCell(null, deliveryQuantity, "width:8%;", null, rowData));
+        tr.appendChild(renderCell(null, unitName, "width:8%;", null, rowData));
+        return tr;
+    }
+
+    function renderCell(name, value, style, colspan, rowData) {
+        var td = document.createElement('td');
+        td.setAttribute("style", style);
+        if (colspan) {
+            td.setAttribute("colspan", colspan);
+        }
+        if (name == "main_row") {
+            td.setAttribute("align", "left");
+            td.innerHTML = value;
+        } else if (name == "storageStatus") {
+            if (value > 0) {
+                td.innerText = "有货";
+            } else {
+                td.innerText = "无货";
+            }
+        } else {
+            //个性化差异-操作区域
+            if (!isNaN(parseFloat(value))) {
+                td.innerText = value;
+                td.setAttribute("class", "unitDisplay");
+                if (rowData) {
+                    td.setAttribute("unitName", rowData.unitName);
+                }
+            } else if (value) {
+                td.innerText = value;
+            } else {
+                td.innerText = "--";
+            }
+        }
+        return td;
+    }
+
+    function openSkuDetail(skuId) {
+        cardUtil.openCard("预览商品-" + skuId, "/sku/previewBySkuId?skuId=" + skuId);
+        cardUtil.changeCard("预览商品-" + skuId);
+    }
+
+</script>
+<#include "/res/freemarkerTpl/unitConfig.html" />
+<@unitConfig/>
+</body>
+</html>

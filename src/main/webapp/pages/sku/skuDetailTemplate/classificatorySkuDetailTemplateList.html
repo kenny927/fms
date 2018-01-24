@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+		<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+		<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+		<script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+	</head>
+	<body>
+		<section id="itocCenter">
+	       <section class="itocContent">
+	       	<div class="itocMain">
+				<div style="float: left;width: 15%;display: block;">
+					<div style="margin-top: 30px;font-weight: bolder;">商品内部分类：</div>
+					<div style="display: inline-block; width: 200px; height: 600px; padding: 10px; overflow: scroll;">
+						<ul id="treeNav" class="layui-box layui-tree"></ul>
+					</div>
+				</div>
+				<div style="float: left;width: 85%;display: block;">
+	       		<div class="purchaseSearch">
+					<form>
+						<dl class="form-list flt">
+							<dt>当前内部分类：</dt>
+							<dd><input type="text" id="currentSkuClassify" style="width: 180px;" readonly="readonly" /></dd>
+							<dt>模板类型：</dt>
+							<dd>
+								<select id="templateType" style="width: 180px;height: 35px;">
+									<option value="NULL">请选择</option>
+									<option value="DESCRIBE">商品描述</option>
+									<option value="QA">商品问答</option>
+									<option value="PURCHASE">采购说明</option>
+									<option value="AFTER_SALE">售后保障</option>
+									<option value="DOWNLOAD">相关资料下载</option>
+								</select>
+							</dd>
+							<dt>模板名称：</dt>
+							<dd><input type="text" id="templateName" style="width: 180px;" placeholder="模板名称"/></dd>
+							<dd><span class="btn ml10" id="searchBtn" style="cursor: pointer;width: 60px;height: 35px;">查询</span></dd>
+							<dd><span class="btn ml10" id="preAddTemplateBtn" style="cursor: pointer;width: 60px;height: 35px;">新增</span></dd>
+						</dl>
+					</form>
+	       		</div>
+				<div class="table">
+					<ul class="th">
+						<li style="width:10%;"><div class="mida"><div class="midb">模板ID</div></div></li>
+						<li style="width:10%;"><div class="mida"><div class="midb">内部分类</div></div></li>
+						<li style="width:10%"><div class="mida"><div class="midb">模板类型</div></div></li>
+						<li style="width:25%"><div class="mida"><div class="midb">模板名称</div></div></li>
+						<li style="width:10%"><div class="mida"><div class="midb">是否启用</div></div></li>
+						<li style="width:10%"><div class="mida"><div class="midb">创建时间</div></div></li>
+						<li style="width:10%"><div class="mida"><div class="midb">修改时间</div></div></li>
+						<li style="width:15%;"><div class="mida"><div class="midb">操作</div></div></li>
+					</ul>
+					<div class="information-list" id="skuDetailNormalTemplateTable"></div>
+					<div id="paginationDiv"></div>
+				</div>
+	       	</div>
+			</div>
+	       </section>
+		</section>
+		<script type="text/javascript">
+
+			var PAGE_SIZE = 8;
+
+
+
+			var current_classifyId = "0";//默认情况
+			var current_classifyAllParentName = "全部";//默认情况
+
+			<#if templateType>
+			$('#templateType').val("${templateType}");
+			</#if>
+
+			<#if classifyId>
+			current_classifyId = "${classifyId}";
+			</#if>
+
+			<#if classifyAllParentName>
+			current_classifyAllParentName = "${classifyAllParentName}";
+			$('#currentSkuClassify').val(current_classifyAllParentName);
+			</#if>
+
+
+			var layer;
+			layui.use(['tree','layer'], function () {
+				layer = layui.layer;
+				var treeOption = {};
+				treeOption.skin = "shihuang";
+				treeOption.elem = "#treeNav";
+				treeOption.click = function (node) {
+					var classifyIsLeaf = node.classifyIsLeaf;
+					var classifyId = node.classifyId;
+					var classifyName = node.classifyName;
+					var allParentName = node.allParentName;
+					if(classifyId == "0") {
+						allParentName = "全部";
+					}
+					current_classifyId = classifyId;
+					current_classifyAllParentName = allParentName;
+					$('#currentSkuClassify').val(allParentName);
+					var queryParam = {};
+					queryParam.currentPageIndex = 1;
+					queryParam.pageSize = PAGE_SIZE;
+					var templateType = $('#templateType').val();
+					var templateName = $('#templateName').val();
+					queryParam.templateType = templateType;
+					queryParam.templateName = templateName;
+					queryParam.classifyId = node.classifyId;
+					loadSkuDetailClassificatoryTemplateTable(queryParam);
+				};
+				postUtil.call("/reusable/skuClassificatory/getAllSkuClassificatoryJsonForLayuiTree", null, function (result) {
+					treeOption.nodes = result;
+					layui.tree(treeOption);
+				});
+
+				//初始化时默认查询一次
+				doSearch();
+
+			});
+
+
+			function doSearch(){
+				var queryParam = {};
+				queryParam.currentPageIndex = 1;
+				queryParam.pageSize = PAGE_SIZE;
+				var templateType = $('#templateType').val();
+				var templateName = $('#templateName').val();
+				queryParam.templateType = templateType;
+				queryParam.templateName = templateName;
+				queryParam.classifyId = current_classifyId;
+				loadSkuDetailClassificatoryTemplateTable(queryParam);
+			}
+
+			$(function () {
+				$("#searchBtn").bind("click", function () {
+					doSearch();
+				});
+
+				$('#preAddTemplateBtn').bind("click",function(){
+					if(current_classifyId == null || current_classifyId == "0") {
+						layer.msg("请选择分类后再进行操作",{icon:5});
+						return;
+					}
+					var param = {};
+					param.templateType = $('#templateType').val();
+					param.classifyId = current_classifyId;
+					param.classifyAllParentName = current_classifyAllParentName;
+					postUtil.submit("/sku/template/preAddTemplate",param);
+				});
+
+			});
+
+			function loadSkuDetailClassificatoryTemplateTable(queryParam) {
+				if(queryParam.classifyId == null) {
+					layer.msg("请选择分类后再进行查询操作",{icon:5});
+					return;
+				}
+
+				layer.load();
+				postUtil.call("/sku/template/skuDetailClassifyTemplateJson", queryParam, function (pageResult) {
+					var pageNumber = pageResult.pageNumber;
+					var pageSize = pageResult.pageSize;
+					var totalPage = pageResult.totalPage;
+					var totalRow = pageResult.totalRow;
+					var dataList = pageResult.list;
+					renderTable(dataList);
+					laypage({
+						cont: 'paginationDiv',
+						pages: totalPage,
+						curr: pageNumber,
+						total:totalRow,
+						skip: true,
+						jump: function (obj, first) {
+							if (!first) {
+								var tempParam = {};
+								var templateType = $('#templateType').val();
+								var templateName = $('#templateName').val();
+								tempParam.templateType = templateType;
+								tempParam.templateName = templateName;
+								tempParam.classifyId = current_classifyId;
+								tempParam.currentPageIndex = obj.curr;
+								tempParam.pageSize = PAGE_SIZE;
+								loadSkuDetailClassificatoryTemplateTable(tempParam);
+							}
+						}
+					});
+					layer.closeAll("loading");
+				});
+			}
+
+			function renderTable(dataList) {
+				var length = dataList.length;
+				var table = document.getElementById("skuDetailNormalTemplateTable");
+				table.innerHTML = "";
+				if (length > 0) {
+					for (var i = 0; i < dataList.length; i++) {
+						var data = dataList[i];
+						var row = renderRow(data);
+						table.appendChild(row);
+					}
+				}else {
+					var html = '<p class="t-c fz16 c-2" style="line-height: 76px;">暂无分类商品详情模板信息！</p>';
+					$(table).html(html);
+				}
+			}
+
+			function renderRow(rowData) {
+				var templateId = rowData.templateId;
+				var isTemplateGlobal = rowData.isTemplateGlobal;
+				var templateName = rowData.templateName;
+				var templateType = rowData.templateType;
+				var templateTypeName = rowData.templateTypeName;
+				var editorType = rowData.editorType;
+				var templateContent = rowData.templateContent;
+				var otherContent = rowData.otherContent;
+				var applyTime = rowData.applyTime;
+				var applyTimeStr = rowData.applyTimeStr;
+				var createTime = rowData.createTime;
+				var createTimeStr = rowData.createTimeStr;
+				var createUser = rowData.createUser;
+				var updateTime = rowData.updateTime;
+				var updateTimeStr = rowData.updateTimeStr;
+				var updateUser = rowData.updateUser;
+				var status = rowData.status;
+				var classifyId = rowData.classifyId;
+				var classifyName = rowData.classifyName;
+				var classifyAllParentName = rowData.classifyAllParentName;
+
+				var ul = document.createElement('ul');
+				ul.setAttribute("class", "information");
+				ul.setAttribute("style","height:85px;");
+
+				ul.appendChild(renderCell(null, templateId, "width:10%;height:75px;"));
+				ul.appendChild(renderCell(null, classifyAllParentName, "width:10%;height:75px;"));
+				ul.appendChild(renderCell(null, templateTypeName, "width:10%;height:75px;"));
+				ul.appendChild(renderCell(null, templateName, "width:25%;height:75px;"));
+				ul.appendChild(renderCell("isEffective", rowData, "width:10%;height:75px;"));
+				ul.appendChild(renderCell(null, createTimeStr, "width:10%;height:75px;"));
+				ul.appendChild(renderCell("updateTime", updateTimeStr, "width:10%;height:75px;"));
+				ul.appendChild(renderCell("operation", rowData, "width:15%;height:75px;"));
+				return ul;
+			}
+
+			function renderCell(name, value, style) {
+
+				var li = document.createElement('li');
+				li.setAttribute("style", style)
+				var div_mida = document.createElement('div');
+				div_mida.setAttribute("class", "mida");
+				var div_midb = document.createElement('div');
+				div_midb.setAttribute("class", "midb");
+				//个性化差异-操作区域
+				if ("isEffective" == name) {
+					var status = value.status;
+					var statusName = ("Y" == status ? "是":"否");
+					var  contentHtml = '<p>'+statusName+'</p>';
+					if("Y" ==  status) {
+						contentHtml = contentHtml + '<p>最新应用的时间：'+value.applyTimeStr+'</p>';
+					}
+					div_midb.innerHTML = contentHtml;
+				} else if ("operation" == name) {
+					div_midb.innerHTML = '<p><a href="javascript:void(0);" onclick="preEditSkuDetailTemplate(\'' + value.templateId + '\',\''+value.templateName + '\',\''+value.templateTypeName + '\',\''+value.classifyId + '\',\''+value.classifyAllParentName + '\')">编辑</a></p>' +
+							'<p style="margin-top: 5px;"><a href="javascript:void(0);" onclick="preDeleteSkuDetailTemplate(\'' + value.templateId + '\',\''+value.templateName + '\',\''+value.templateTypeName + '\',\''+value.classifyId + '\',\''+value.classifyAllParentName + '\')">删除</a></p>' +
+							'<p style="margin-top: 5px;"><a href="javascript:void(0);" onclick="preApplySkuDetailTemplate(\'' + value.templateId + '\',\''+value.templateName + '\',\''+value.templateTypeName + '\',\''+value.classifyId + '\',\''+value.classifyAllParentName + '\')">应用到当前内部分类</a></p>'+
+							'<p style="margin-top: 5px;"><a href="javascript:void(0);" onclick="previewSkuDetailTemplate(\'' + value.templateId + '\',\''+value.templateName + '\',\''+value.templateTypeName + '\',\''+value.classifyId + '\',\''+value.classifyAllParentName + '\')">预览</a></p>';
+				} else if("updateTime" == name){
+					if(value) {
+						div_midb.innerText = value;
+					}else {
+						div_midb.innerText = "--";
+					}
+				}else {
+					div_midb.innerText = value;
+				}
+				div_mida.appendChild(div_midb);
+				li.appendChild(div_mida);
+				return li;
+			}
+
+			function preEditSkuDetailTemplate(templateId,templateName,templateTypeName,classifyId,classifyAllParentName) {
+				if(current_classifyId == null) {
+					layer.msg("请选择分类后再进行操作",{icon:5});
+					return;
+				}
+				var param = {};
+				param.templateId = templateId;
+				param.classifyId = classifyId;
+				param.classifyAllParentName = classifyAllParentName;
+				postUtil.submit("/sku/template/preEditTemplate",param);
+
+			}
+
+			function preDeleteSkuDetailTemplate(templateId,templateName,templateTypeName,classifyId,classifyAllParentName) {
+				layer.open({
+					title: false,
+					skin: 'myskin3',
+					area: ['450px', '250px'],
+					btnAlign: 'c',
+					content:'<div id="upload" class="t-c c-2" style="padding-top: 40px;"><p style="margin-top: 25px;">是否删除分类:<span class="fz18 c-f fw-b">['+classifyAllParentName+']</span>下的模板<span class="fz18 c-f fw-b">['+templateTypeName+'-'+templateName+']</span>吗？</p></div>',
+					btn: ['确定', '取消'],
+					yes: function(index, layero){
+						var param = {};
+						param.templateId = templateId;
+						param.classifyId = classifyId;
+						postUtil.call("/sku/template/deleteSkuDetailTemplate",param,function(result){
+							if(result.STATUS == "SUCCESS") {
+								layer.msg("已成功删除模板", {icon: 6});
+								layer.close(index);
+								doSearch();
+							}else {
+								layer.msg(result.MSG, {icon: 5});
+								layer.close(index);
+								doSearch();
+							}
+						});
+					},btn2: function(index, layero){
+						layer.close(index);
+					},
+					cancel: function(){
+
+					}
+				});
+			}
+
+			function preApplySkuDetailTemplate(templateId,templateName,templateTypeName,classifyId,classifyAllParentName) {
+				layer.open({
+					title: false,
+					skin: 'myskin3',
+					area: ['450px', '250px'],
+					btnAlign: 'c',
+					content:'<div id="upload" class="t-c c-2" style="padding-top: 40px;"><p style="margin-top: 25px;">是否将分类：<span class="fz18 c-f fw-b">['+classifyAllParentName+']</span>下的<span class="fz18 c-f fw-b">['+templateTypeName+']</span>全部替换为<span class="fz18 c-f fw-b">['+templateName+']</span>吗？</p></div>',
+					btn: ['确定', '取消'],
+					yes: function(index, layero){
+						var param = {};
+						param.templateId = templateId;
+						param.classifyId = classifyId;
+						postUtil.call("/sku/template/applySkuDetailClassificatoryTemplate",param,function(result){
+							if(result.STATUS == "SUCCESS") {
+								layer.msg("已成功应用到所属的分类中", {icon: 6});
+								layer.close(index);
+								doSearch();
+							}else {
+								layer.msg(result.MSG, {icon: 5});
+								layer.close(index);
+								doSearch();
+							}
+						});
+					},btn2: function(index, layero){
+						layer.close(index);
+					},
+					cancel: function(){
+
+					}
+				});
+			}
+
+            function previewSkuDetailTemplate(templateId,templateTypeName,templateName) {
+                var param = {};
+                param.templateId = templateId;
+                cardUtil.openCard("预览模板-"+templateId, "/sku/template/previewTemplate", {jsonData:JSON.stringify(param)});
+                cardUtil.changeCard("预览模板-"+templateId);
+            }
+
+		</script>
+	</body>
+</html>

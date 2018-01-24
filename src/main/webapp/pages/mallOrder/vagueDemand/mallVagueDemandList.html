@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+		<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+	</head>
+	<body>
+		<section id="itocCenter">
+	       <section class="itocContent">
+	       	<div class="itocMain">
+	       		<div class="purchaseSearch">
+					<form>
+						<dl class="form-list flt">
+							<dt>委托单号：</dt>
+							<dd><input type="text" id="vagueDemandId" placeholder="请输入委托单号"/></dd>
+						</dl>
+						<dl class="form-list flt status">
+							<dt>委托单状态：</dt>
+							<dd><label><input type="radio" value="ALL" name="vagueDemandStatus" checked="checked"/><span>全部</span></label></dd>
+							<dd><label><input type="radio" value="PENDING" name="vagueDemandStatus"/>待处理</label></dd>
+							<dd><label><input type="radio" value="PROCESSING" name="vagueDemandStatus"/>处理中</label></dd>
+							<dd><label><input type="radio" value="COMPLETED" name="vagueDemandStatus"/>已生成询单</label></dd>
+							<dd><label><input type="radio" value="CLOSED" name="vagueDemandStatus"/>已关闭</label></dd>
+						</dl>
+						<dl class="form-list flt mt10">
+							<dt>账号：</dt>
+							<dd><input type="text" id="mallUserMobile" placeholder="请输商城用户的手机号"/></dd>
+						</dl>
+						<dl class="form-list flt mt10">
+							<dt>联系人：</dt>
+							<dd><input type="text" id="contactsName" placeholder="请输委托单联系人姓名"/></dd>
+						</dl>
+						<dl class="form-list flt mt10">
+							<dt>联系人电话：</dt>
+							<dd><input type="text" id="contactsMobileOrFixedPhoneNumber" placeholder="请输委托单联系人电话"/></dd>
+							<dd><span class="btn ml10" style="cursor: pointer;" id="searchBtn">查询</span></dd>
+						</dl>
+					</form>
+	       		</div>
+                    <div class="table">
+                    	<ul class="th">
+                    		<li style="width:12%;"><div class="mida"><div class="midb">委托单号</div></div></li>
+                    		<!--<li style="width:9%;"><div class="mida"><div class="midb">账号</div></div></li>-->
+                            <li style="width:12%"><div class="mida"><div class="midb">需求发布时间</div></div></li>
+                            <li style="width:12%"><div class="mida"><div class="midb">跟进人</div></div></li>
+                    		<li style="width:12%;"><div class="mida"><div class="midb">委托单姓名</div></div></li>
+                    		<li style="width:12%;"><div class="mida"><div class="midb">委托单联系电话</div></div></li>
+                    		<li style="width:10%;"><div class="mida"><div class="midb">项目地址</div></div></li>
+                    		<li style="width:12%;"><div class="mida"><div class="midb">期望交期</div></div></li>
+                    		<!--<li style="width:16%"><div class="mida"><div class="midb">需求</div></div></li>-->
+                    		<li style="width:9%"><div class="mida"><div class="midb">委托状态</div></div></li>
+                    		<li style="width:7%"><div class="mida"><div class="midb">操作</div></div></li>
+                    	</ul>
+                    	<div class="information-list" id="mallVagueDemandListTable"></div>
+                    	<div id="paginationDiv"></div>
+                    </div>
+	       	</div>
+	       </section>
+		</section>
+		<script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+	    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript">
+
+            var PAGE_SIZE = 5;
+			var vagueDemandStatus='${vagueDemandStatus}';
+			var buyerAccountId='${buyerAccountId}';
+            function vagueDemandTableInit(){
+                var queryParam = {};
+                queryParam.currentPageIndex = 1;
+                queryParam.pageSize = PAGE_SIZE;
+                if(vagueDemandStatus){
+                	queryParam.vagueDemandStatus =vagueDemandStatus;
+                	$("input[name=vagueDemandStatus][value="+vagueDemandStatus+"]").attr("checked",true);
+                }
+                if(buyerAccountId!=null&&buyerAccountId!=""){
+                	queryParam.buyerAccountId =buyerAccountId;
+                }
+                loadMallVagueDemandData(queryParam);
+            }
+
+            $(function () {
+                vagueDemandTableInit();
+
+                $("#searchBtn").bind("click",function(){
+                    var vagueDemandId = $('#vagueDemandId').val();
+                    var mallUserMobile = $('#mallUserMobile').val();
+                    var vagueDemandStatus = $('input[name="vagueDemandStatus"]:checked ').val();
+					var contactsName = $('#contactsName').val();
+					var contactsMobileOrFixedPhoneNumber = $('#contactsMobileOrFixedPhoneNumber').val();
+                    var queryParam = {};
+                    queryParam.currentPageIndex = 1;
+                    queryParam.pageSize = PAGE_SIZE;
+                    queryParam.vagueDemandId = vagueDemandId;
+                    queryParam.mallUserMobile = mallUserMobile;
+                    queryParam.vagueDemandStatus = vagueDemandStatus;
+                    queryParam.contactsName = contactsName;
+                    queryParam.contactsMobileOrFixedPhoneNumber = contactsMobileOrFixedPhoneNumber;
+                    if(buyerAccountId!=null&&buyerAccountId!=""){
+                    	queryParam.buyerAccountId =buyerAccountId;
+                    }
+                    loadMallVagueDemandData(queryParam);
+                });
+            });
+
+            function loadMallVagueDemandData(queryParam) {
+
+                postUtil.call("/mallOrder/vagueDemand/vagueDemandListJson", queryParam, function (pageResult) {
+                    var pageNumber = pageResult.pageNumber;
+                    var pageSize = pageResult.pageSize;
+                    var totalPage = pageResult.totalPage;
+                    var totalRow = pageResult.totalRow;
+                    var dataList = pageResult.list;
+                    renderTable(dataList);
+                    laypage({
+                        cont: 'paginationDiv',
+                        pages: totalPage,
+                        curr: pageNumber,
+						total:totalRow,
+                        skip: true,
+                        jump: function (obj, first) {
+                            if (!first) {
+                                var tempVagueDemandId = $('#vagueDemandId').val();
+                                var tempMallUserMobile = $('#mallUserMobile').val();
+                                var tempVagueDemandStatus = $('input[name="vagueDemandStatus"]:checked ').val();
+								var contactsName = $('#contactsName').val();
+								var contactsMobileOrFixedPhoneNumber = $('#contactsMobileOrFixedPhoneNumber').val();
+                                var tempParam = {};
+                                tempParam.currentPageIndex = obj.curr;
+                                tempParam.pageSize = PAGE_SIZE;
+                                tempParam.vagueDemandId = tempVagueDemandId;
+                                tempParam.mallUserMobile = tempMallUserMobile;
+                                tempParam.vagueDemandStatus = tempVagueDemandStatus;
+								tempParam.contactsName = contactsName;
+								tempParam.contactsMobileOrFixedPhoneNumber = contactsMobileOrFixedPhoneNumber;
+								 if(buyerAccountId!=null&&buyerAccountId!=""){
+									 tempParam.buyerAccountId =buyerAccountId;
+					                }
+								loadMallVagueDemandData(tempParam);
+                            }
+                        }
+                    });
+                });
+            }
+
+            function renderTable(dataList) {
+                var length = dataList.length;
+                var table = document.getElementById("mallVagueDemandListTable");
+                table.innerHTML = "";
+
+                if (length > 0) {
+                    for (var i = 0; i < dataList.length; i++) {
+                        var data = dataList[i];
+                        var row = renderRow(data);
+                        table.appendChild(row);
+                    }
+                }
+            }
+
+            function renderRow(rowData) {
+                var demandId = rowData.demandId;
+                var buyerUserId = rowData.buyerUserId;
+                var buyerUserMobile = rowData.buyerUserMobile;
+                var buyerAccountId = rowData.buyerAccountId;
+                var buyerAccountName = rowData.buyerAccountName;
+                var accountManagerId = rowData.accountManagerId;
+                var accountManagerName = rowData.accountManagerName;
+                var accountManagerMobile = rowData.accountManagerMobile;
+                var contactsName = rowData.contactsName;
+                var contactsMobileOrFixedPhoneNumber = rowData.contactsMobileOrFixedPhoneNumber;
+                var projectProvince = rowData.projectProvince;
+                var projectCity = rowData.projectCity;
+                var projectDetailAddress = rowData.projectDetailAddress;
+                var expectDeliveryTime = rowData.expectDeliveryTime;
+                var expectDeliveryTimeStr = rowData.expectDeliveryTimeStr;
+                var demandDescribe = rowData.demandDescribe;
+                var createTime = rowData.createTime;
+                var createTimeStr = rowData.createTimeStr;
+                var replyTime = rowData.replyTime;
+                var replyTimeStr = rowData.replyTimeStr;
+                var status = rowData.status;
+                var statusName = rowData.statusName;
+				var operationRole = rowData.operationRole;
+				var operationUserId = rowData.operationUserId;
+				var operationUserName = rowData.operationUserName;
+				var operationTime = rowData.operationTime;
+				var operationTimeStr = rowData.operationTimeStr;
+
+
+                var ul = document.createElement('ul');
+                ul.setAttribute("class","information informationList90");
+
+                ul.appendChild(renderCell(null,demandId,"width:12%;"));
+//                ul.appendChild(renderCell(null,buyerUserMobile,"width:9%;"));
+                ul.appendChild(renderCell(null,createTimeStr,"width:12%;"));
+                ul.appendChild(renderCell("followUp",rowData,"width:12%;"));
+                ul.appendChild(renderCell(null,contactsName,"width:12%;"));
+                ul.appendChild(renderCell(null,contactsMobileOrFixedPhoneNumber,"width:12%;"));
+                ul.appendChild(renderCell(null,projectProvince+projectCity,"width:10%;"));
+                ul.appendChild(renderCell(null,expectDeliveryTimeStr,"width:12%;"));
+//                ul.appendChild(renderCell("demandDescribe",demandDescribe,"width:16%;"));
+                ul.appendChild(renderCell("status",rowData,"width:9%;"));
+                ul.appendChild(renderCell("operation",rowData,"width:7%;"));
+                return ul;
+            }
+
+            function renderCell(name, value,style) {
+
+                var li = document.createElement('li');
+                li.setAttribute("style",style)
+                var div_mida = document.createElement('div');
+                div_mida.setAttribute("class", "mida");
+                var div_midb = document.createElement('div');
+                div_midb.setAttribute("class", "midb");
+                //个性化差异-操作区域
+                if ("operation" == name) {
+                    if ("PENDING" == value.status && ( "" == value.accountManagerName || null == value.accountManagerName)) {
+                        div_midb.innerHTML = '';
+                    }else if("PENDING" == value.status && ( null != value.accountManagerName && "" != value.accountManagerName  )) {
+                        div_midb.innerHTML = '<p><a href="javascript:void(0);" onclick="handleVagueDemand(\'' + value.demandId + '\')">处理TA</a></p>';
+                    } else if ("PROCESSING" == value.status) {
+						div_midb.innerHTML = '<p><a href="javascript:void(0);" onclick="showVagueDemandDetail(\'' + value.demandId + '\')">查看详情</a></p>' +
+								'<p style="margin-top: 5px;"><a href="javascript:void(0);" onclick="showVagueDemandDetail(\'' + value.demandId + '\')">新增询价单</a></p>' +
+								'<p style="margin-top: 5px;"><a href="javascript:void(0);" onclick="closeVagueDemand(\'' + value.demandId + '\')">关闭委托单</a></p>';
+					} else if ("COMPLETED" == value.status || "CLOSED" == value.status) {
+						div_midb.innerHTML = '<p><a href="javascript:void(0);" onclick="showVagueDemandDetail(\'' + value.demandId + '\')">查看详情</a></p>';
+					}
+				} else if ("followUp" == name) {
+					if ("PENDING" == value.status && ( "" == value.accountManagerName || null == value.accountManagerName)) {
+						div_midb.innerHTML = '<p><a href="javascript:void(0);" onclick="doFollowUp(\'' + value.demandId + '\')">跟进TA</a></p>';
+					} else {
+						div_midb.innerHTML = '<p>'+(value.accountManagerName == undefined ? "":value.accountManagerName)+'</p>'+'<p>'+(value.accountManagerMobile == undefined ? "":value.accountManagerMobile)+'</p>';
+					}
+				} else if ("status" == name) {
+					if("CLOSED" == value.status || "COMPLETED" == value.status) {
+						div_midb.innerHTML = '<p>'+value.statusName+'</p>'+'<p>'+value.operationUserName+'</p>'+'<p>'+value.operationTimeStr+'</p>';
+					}else {
+							div_midb.innerText = value.statusName;
+					}
+				} else if ("demandDescribe" == name) {
+                    div_midb.setAttribute("class", "midb two-row");
+                    div_midb.setAttribute("style","width: 160px;");
+                    div_midb.setAttribute("title",value);
+					div_midb.innerHTML = '<p>'+value+'</p>';
+
+                } else {
+					div_midb.innerText = (value||'');
+				}
+				div_mida.appendChild(div_midb);
+				li.appendChild(div_mida);
+				return li;
+            }
+
+
+            function doFollowUp(demandId){
+                if (confirm("确认跟进此单?")) {
+                    var param = {};
+                    param.demandId = demandId;
+                    postUtil.call("/mallOrder/vagueDemand/followUpMallVagueDemand", param, function (result) {
+                        if (result.STATUS == "SUCCESS") {
+							layer.msg(result.MSG, {icon: 6});
+                            vagueDemandTableInit();
+                        } else {
+							layer.msg(result.MSG, {icon: 5});
+                        }
+                    });
+                }
+            }
+
+            function closeVagueDemand(demandId) {
+				layer.msg('确认关闭此单？', {
+					time: 0 //不自动关闭
+					,btn: ['确认', '取消']
+					,yes: function(index){
+						var param = {};
+						param.demandId = demandId;
+						postUtil.call("/mallOrder/vagueDemand/closeVagueDemand", param, function (result) {
+							if (result.STATUS == "SUCCESS") {
+								layer.msg(result.MSG, {icon: 6});
+								vagueDemandTableInit();
+							} else {
+								layer.msg(result.MSG, {icon: 5});
+							}
+						});
+					}
+				});
+
+            }
+
+			function handleVagueDemand(demandId) {
+				layer.msg('处理此单？', {
+					time: 0 //不自动关闭
+					, btn: ['确认', '取消']
+					, yes: function (index) {
+						var param = {};
+						param.demandId = demandId;
+						postUtil.call("/mallOrder/vagueDemand/handleMallVagueDemand", param, function (result) {
+							if (result.STATUS == "SUCCESS") {
+								layer.msg(result.MSG, {icon: 6});
+								vagueDemandTableInit();
+							} else {
+								layer.msg(result.MSG, {icon: 5});
+							}
+						});
+					}
+				});
+			}
+
+			function showVagueDemandDetail(demandId) {
+				var param = {};
+				param.demandId = demandId;
+				postUtil.submit("/mallOrder/vagueDemand/preVagueDemandDetail", param);
+			}
+		</script>
+	</body>
+</html>

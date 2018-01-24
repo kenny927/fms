@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="${request.contextPath}/res/css/login/loginStyle.css" rel="stylesheet">
+
+<style type="text/css">
+.ui-input {
+	width: 280px;
+	padding: 0 0 0 3px;
+	border: 1px solid #999999;
+	font-size: 14px;
+	line-height: 40px;
+	height: 34px;
+	border-left: 0;
+	padding-left: 38px;
+	position: relative;
+	top: 0;
+	left: 0px;
+}
+
+.iconfont {
+	position: absolute;
+	right: -3px;
+	top: 44px;
+	cursor: pointer;
+}
+
+.login-tip {
+	position: absolute;
+	top: 51px;
+	right: 54px;
+}
+
+.poptip {
+	border: 1px solid #f3d995;
+	height: 16px;
+	line-height: 16px;
+	padding: 5px 20px 5px 15px;
+	background: #fefcee;
+	position: relative;
+}
+
+.poptip-arrow {
+	top: 8px;
+	right: 0;
+}
+
+.poptip-arrow em {
+	top: 0;
+	left: 1px;
+	border-left-color: #f3d995;
+	border-width: 6px 0 6px 6px;
+}
+
+.poptip-arrow span {
+	border-left-color: #fefcee;
+	border-width: 6px 0 6px 6px;
+}
+/*.poptip-arrow em, .poptip-arrow span {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-color: rgba(255,255,255,0);
+            border-style: solid;
+            overflow: hidden;
+            top: 0;
+            left: 0;
+        }*/
+.poptip .poptip-content {
+	color: #df9c1f;
+	font-size: 12px;
+	font-weight: 400;
+}
+</style>
+<script type="text/javascript">
+	if(window.parent != window) {
+		window.parent.location.href = "/login/preLogin";
+	}
+</script>
+</head>
+<body class="move">
+	<div class="dv2" style="margin-top: 20px;">
+		<div class="dv_logo">
+			<a href="javascript:void(0);" id="logo_a" title=""> <img
+				src="${request.contextPath}/res/images/login/logo.png" border="0"
+				id="logo_img" />
+			</a>
+		</div>
+	</div>
+
+	<div class="dv3">
+		<div class="left">
+			<div class="login_welcom">
+				<img
+					src="${request.contextPath}/res/images/login/login_banner1.png"
+					id="login_welcom_img" />
+			</div>
+		</div>
+		<div class="right">
+			<div class="register-banner">
+				<div class="op-box-bg">
+					<div class="op-box">
+						<div class="control-box">
+
+							<!-- 
+                            <img src="smlogin.png" class="iconfont" id="login-type" data-type="sm" />
+                            -->
+							<div id="login-pc">
+								<form action="${request.contextPath}/login/doLogin" onsubmit="return preSubmit()" method="post">
+									<div class="login_title">长飞电商运营平台</div>
+									<div class="control-group">
+										<div class="control-input">
+											<input type="text" class="ui-input" id="userName"
+												name="userName" tabindex="1" maxlength="20"
+												placeholder="请输入手机号/用户名/邮箱" /> 
+											<label class="label-tip label-tip-info" title="请输入用户名"></label>
+											<em class="arow arow_user"></em>
+										</div>
+									</div>
+									<div class="control-group">
+										<div class="control-input">
+											<input type="password" id="password" name="password"
+												class="ui-input" tabindex="2" maxlength="20"
+												placeholder="请输入密码" /> <label
+												class="label-tip label-tip-info" title="请输入密码"> </label> <em
+												class="arow arow_pwd"></em>
+										</div>
+									</div>
+									<!-- 验证码，只有当错误次数三次以上才出现验证码 -->
+									<#if WRONG_TIMES?? >
+									<#if ( WRONG_TIMES?number > 3 ) >
+									<div class="control-group">
+										<div class="control-input">
+											<input type="text" id="validateCode" name="validateCode"
+												class="ui-input inp-verfCode" tabindex="3" maxlength="6"
+												placeholder="请输入验证码" /> 
+											<label class="label-tip label-tip-info" title="请输入6位数字验证码"></label>
+											<em class="arow arow_valid"></em>
+											<img id="CreateCheckCode"
+												src="${request.contextPath}/login/generateValidatePic" height="38"
+												width="80" class="getvaildcode auth-image">
+											<div class="refesh-box getvaildcode">
+												<a href="javascript:void(0);" onclick="reloadValidatePic();" class="refresh-auth"> 看不清<br>
+													换一张
+												</a>
+											</div>
+										</div>
+									</div>
+									</#if>
+									</#if>
+									<!--  
+									<div class="loginremember_div">
+										<input type="checkbox" checked id="loginremember_me"
+											name="loginremember_me" class="remember_me" tabindex="5"
+											value="1" /><label class="remember_label"
+											for="loginremember_me">记住我</label>
+									</div>
+									-->
+									<div class="control-group mt20">
+										<div class="control-input">
+											<input type="submit" class="ui-btn ui-btn-theme btn-register" tabindex="4" value="登录" />
+											<div class="err-message"></div>
+											<div class="alink mt20 allowReg"></div>
+										</div>
+									</div>
+								</form>
+							</div>
+							<div id="login_container">
+							<h5 style="color: red;">${loginResult.MSG}</h5>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="foot-wrap">
+		<div class="left"></div>
+		<div class="floot right">
+			<span class="ICP">Copyright © 2016 长飞光纤光缆股份有限公司 鄂ICP备08005228号</span><br />
+			使用 <a href="http://rj.baidu.com/soft/detail/14744.html?ald"
+				target="_blank">Chrome</a> 或 <a href="http://www.firefox.com.cn/"
+				target="_blank">Firefox</a> 浏览器访问本系统会获得最佳体验<br />
+			<a href="javascript:;" class="desktop">保存到桌面↓</a>
+		</div>
+	</div>
+	<script>
+	
+function reloadValidatePic() {  
+  document.getElementById("CreateCheckCode").src = document.getElementById("CreateCheckCode").src+"?nocache=" + new Date().getTime();  
+}  
+
+function preSubmit(){
+	var name =  document.getElementById("userName").value;
+	var password =  document.getElementById("password").value;
+	if( name == null || name == "") {
+		alert("登录名不允许为空");
+		return false;
+	}
+	if( password == null || password == "") {
+		alert("登录密码不允许为空");
+		return false;
+	}
+	var validateCodeObj =  document.getElementById("validateCode");
+	if(validateCodeObj != undefined && validateCodeObj != null) {
+		var validateCodeValue = validateCodeObj.value;
+		if( validateCodeValue == null || validateCodeValue == "") {
+			alert("验证码不允许为空");
+			return false;
+		}
+	}
+}
+
+</script>
+</body>

@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+		<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+		<link rel="stylesheet" type="text/css" href="/res/css/sku.css<@resVersionDirective>?</@>"/>
+		<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+		<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+		<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+		<script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+		<script src="/res/js/MultiSelectDropList.js<@resVersionDirective>?</@>"></script>
+		<style type="text/css">
+			/*#itocCenter .itocContent .itocMain .inquiry ul dl dd .goodsName {*/
+				/*height: 40px;*/
+				/*line-height: 20px;*/
+				/*width: 400px;*/
+				/*text-overflow: ellipsis;*/
+				/*color: #222222;*/
+			/*}*/
+
+			/*#itocCenter .itocContent .itocMain .inquiry ul dl dd p {*/
+				/*height: 20px;*/
+				/*line-height: 20px;*/
+				/*color: #999999;*/
+				/*width: 400px;*/
+				/*text-overflow: ellipsis;*/
+			/*}*/
+			#imgshow{
+				position:absolute;
+				border:1px solid ;
+				background:white;
+				padding:1px;
+				display:none;
+				width:180px;
+				height:200px;
+			}
+		</style>
+	</head>
+	<body>
+		<section id="itocCenter">
+		<section class="itocContent">
+			<div class="itocMain" style="min-height: 860px;">
+				<div id="addInquiry" style="display: block">
+					<div class="addSku" style="padding-top: 20px;margin-left: -58px;margin-bottom: -40px;font-size: 12px;">
+						<dl class="sku-list inline">
+							<dt class="mt10">商品编码：</dt>
+							<dd class="inputContent" style="width:220px;">
+								<input type="text" id="skuId" placeholder="请输入商品编码" style="width:208px;height:33px;">
+							</dd>
+						</dl>
+						<dl class="sku-list inline">
+							<dt class="mt10">商品内部分类：</dt>
+							<dd class="inputContent" style="width:250px;">
+								<input type="hidden" id="skuClassifyId">
+								<input type="hidden" id="skuClassifyName">
+								<input type="text" readonly="readonly" id="classifyDisplayName" placeholder="请选择内部分类" style="width:238px;height:33px;">
+								<div class="xiala">
+									<img src="/res/images/arrow2.png" alt="">
+								</div>
+								<div id="treeNav" style="left:-1px;top:35px;"></div>
+							</dd>
+						</dl>
+						<dl class="sku-list inline">
+							<dt class="mt10">商品名称：</dt>
+							<dd class="inputContent" style="width:220px;">
+								<input type="text" id="skuName"  placeholder="请输入商品名称" style="width:208px;height:33px;">
+							</dd>
+						</dl>
+						<dl class="sku-list inline">
+							<dt class="mt10">商品品牌：</dt>
+							<dd class="inputContent" style="width:220px;">
+								<select id="brandId" style="width:220px;height:35px;">
+									<option value=""><span style="color: transparent;">请选择品牌</span></option>
+								</select>
+							</dd>
+						</dl>
+						<dl class="sku-list inline">
+							<dt class="mt10">商品类型：</dt>
+							<dd style="height: 35px;">
+								<div class="multi_select" id="statusSelect" style="position:absolute;left:-2px;top:0;z-index: 1;">
+									<!--<img class="cs-p" style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" />-->
+								</div>
+							</dd>
+						</dl>
+					</div>
+					<!--<div class="purchaseSearch purchasepading">-->
+						<!--<form>-->
+							<!--<dl class="form-list status">-->
+								<!--<dt style="width: 80px;line-height: 28px;">类&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;型：</dt>-->
+								<!--<dd style="margin-top: 5px;"><label style="cursor: pointer;"><span class="pay_list_c1 on"><input type="radio" name="type"  class="radioclass" value="" checked="checked" /></span>全部</label></dd>-->
+								<!--<dd style="margin-top: 5px;"><label style="cursor: pointer;"><span class="pay_list_c1"><input type="radio" name="type"  class="radioclass" value="COMMODITY"/></span>商品</label></dd>-->
+								<!--<dd style="margin-top: 5px;"><label style="cursor: pointer;"><span class="pay_list_c1"><input type="radio" name="type"  class="radioclass" value="PRODUCT"/></span>产品</label></dd>-->
+							<!--</dl>-->
+						<!--</form>-->
+					<!--</div>-->
+					<div class="purchaseSearch purchasepading" id="commodityStatus">
+						<form>
+							<dl class="form-list status">
+								<dt style="width: 80px;line-height: 28px;">商品状态：</dt>
+								<dd style="margin-top: 5px;"><label style="cursor: pointer;"><span class="pay_list_c1 on"><input type="radio" name="upStatus"  class="radioclass" value="" checked="checked" /></span>全部</label></dd>
+								<dd style="margin-top: 5px;"><label style="cursor: pointer;"><span class="pay_list_c1"><input type="radio" name="upStatus"  class="radioclass" value="U"/></span>上架</label></dd>
+								<dd style="margin-top: 5px;"><label style="cursor: pointer;"><span class="pay_list_c1"><input type="radio" name="upStatus"  class="radioclass" value="D"/></span>下架</label></dd>
+							</dl>
+
+						</form>
+					</div>
+					<!--<div class="purchaseSearch purchasepading mb20" id="productStatus">-->
+						<!--<form>-->
+							<!--<dl class="form-list status">-->
+								<!--<dt style="width: 80px;line-height: 28px;">产品状态：</dt>-->
+								<!--<dd style="margin-top: 5px;"><label style="cursor: pointer;"><span class="pay_list_c1 on"><input type="radio" name="status"  class="radioclass" value="" checked="checked" /></span>全部</label></dd>-->
+								<!--<dd style="margin-top: 5px;"><label style="cursor: pointer;"><span class="pay_list_c1"><input type="radio" name="status"  class="radioclass" value="Y"/></span>有效</label></dd>-->
+								<!--<dd style="margin-top: 5px;"><label style="cursor: pointer;"><span class="pay_list_c1"><input type="radio" name="status"  class="radioclass" value="N"/></span>无效</label></dd>-->
+							<!--</dl>-->
+						<!--</form>-->
+					<!--</div>-->
+					<div class="purchaseSearch ml10" style="padding-bottom: 0px;">
+						<button id="searchBtn" class="search-btn" style="cursor: pointer;">搜索</button>
+						<#if _addSkuBtn == "true">
+							<button id="goAdd" class="search-btn" style="cursor: pointer;">新增</button>
+						</#if>
+					</div>
+					<div class="table mt20">
+						<ul class="th th-border">
+							<li style="width: 2%;">
+								<div class="mida">
+									<div class="midb"><input type="checkbox" id="selectAll"></div>
+								</div>
+							</li>
+							<li style="width: 43%;">
+								<div class="mida">
+									<div class="midb">商品名称</div>
+								</div>
+							</li>
+							<li style="width: 10%;">
+								<div class="mida">
+									<div class="midb">内部分类</div>
+								</div>
+							</li>
+							<li style="width: 12%">
+								<div class="mida">
+									<div class="midb">供应商</div>
+								</div>
+							</li>
+							<li style="width: 6%">
+								<div class="mida">
+									<div class="midb">采购价</div>
+								</div>
+							</li>
+							<li style="width: 6%">
+								<div class="mida">
+									<div class="midb">基本售价</div>
+								</div>
+							</li>
+							<li style="width: 6%">
+								<div class="mida">
+									<div class="midb">起订量</div>
+								</div>
+							</li>
+							<li style="width: 4%">
+								<div class="mida">
+									<div class="midb">计量单位</div>
+								</div>
+							</li>
+							<li style="width: 6%">
+								<div class="mida">
+									<div class="midb">状态</div>
+								</div>
+							</li>
+							<li style="width: 5%">
+								<div class="mida">
+									<div class="midb">操作</div>
+								</div>
+							</li>
+						</ul>
+						<div class="information-list wait" id="skuCommodityTable_tbody">
+						</div>
+						<div style="margin-bottom: 100px;">
+							<div style="float:left;margin-top: 15px;">
+								<#if _batchUpSkuBtn == "true">
+									<a href="javascript:void(0);" onclick="batchSetUpStatus('U');">批量上架</a>
+								</#if>
+								<#if _batchDownSkuBtn == "true">
+									<a href="javascript:void(0);" onclick="batchSetUpStatus('D');" style="margin-left: 10px;">批量下架</a>
+								</#if>
+								<a href="javascript:void(0);" onclick="batchUpdataIndex();">批量更新索引</a>
+								<a href="javascript:void(0);" onclick="allUpdataIndex();">全量更新索引</a>
+
+								<!--<a href="javascript:void(0);" onclick="batchSetStatus('Y');" style="margin-left: 10px;">批量有效</a>-->
+								<!--<a href="javascript:void(0);" onclick="batchSetStatus('N');" style="margin-left: 10px;">批量无效</a>-->
+							</div>
+							<div id="paginationDiv" style="float:right;"></div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</section>
+		</section>
+
+		<script type="text/javascript">
+
+            var _upSkuBtn = "${_upSkuBtn}";
+            var _downSkuBtn = "${_downSkuBtn}";
+            var _editSkuBtn = "${_editSkuBtn}";
+            var _copySkuBtn = "${_copySkuBtn}";
+
+			$(function () {
+                $(".pay_list_c1").on("click",function(){
+                    $(this).addClass("on").parent().parent().siblings().find("span").removeClass("on");
+                })
+				$('#addInquiry').show();
+
+                initData();
+			});
+			function initData() {
+				//初始化品牌
+                postUtil.call("/reusable/skuBrand/allBrandJsonData", null, function (result) {
+                    if(result && result.length > 0) {
+                        var html = "";
+                        $.each(result, function (index, item) {
+                            html +='<option value="'+item.brandId+'">'+item.brandChineseName+'</option>';
+                        })
+                        $("#brandId").append(html);
+                    }
+                });
+            }
+
+			layui.use(['tree','layer'], function () {
+				var layer = layui.layer;
+				var treeOption = {};
+				treeOption.skin = "shihuang";
+				treeOption.elem = "#treeNav";
+				treeOption.click = function (node) {
+                    var classifyIsLeaf = node.classifyIsLeaf;
+                    var classifyId = node.classifyId;
+                    var classifyName = node.classifyName;
+                    var allParentName = node.allParentName;
+                    if(classifyId == "0") {
+                        classifyName = "全部";
+                        allParentName = "全部";
+                    }
+                    $('#skuClassifyId').val(classifyId);
+                    $('#classifyDisplayName').val(allParentName);
+                    $('#treeNav').hide();
+				};
+
+				postUtil.call("/reusable/skuClassificatory/getAllSkuClassificatoryJsonForLayuiTree", null, function (result) {
+					treeOption.nodes = result;
+					layui.tree(treeOption);
+				});
+
+			});
+
+			$(document).on("click", ".xiala", function () {
+				if ($(this).next().css("display") == "none") {
+					$(this).next().show();
+				} else {
+					$(this).next().hide();
+				}
+			});
+            $(document).on("click","#classifyDisplayName",function(){
+                if($(".xiala").next().css("display")=="none"){
+                    $(".xiala").next().show();
+                }else{
+                    $(".xiala").next().hide();
+                }
+            })
+
+			var PAGE_SIZE = 10;
+			var skuDataMap = {};
+
+
+			var layer = null;
+			layui.use('layer', function () {
+				layer = layui.layer;
+
+				var skuId = $('#skuId').val();
+				var skuName = $('#skuName').val();
+				var skuClassifyName = $('#skuClassifyName').val();
+				var skuClassifyId = $('#skuClassifyId').val();
+				var brandId = $('#brandId').val();
+				var queryParam = {};
+				queryParam.currentPageIndex = 1;
+				queryParam.pageSize = PAGE_SIZE;
+				queryParam.skuName = skuName;
+				queryParam.skuId = skuId;
+				queryParam.skuClassifyName = skuClassifyName;
+				queryParam.skuClassifyId = skuClassifyId;
+				queryParam.brandId = brandId;
+				loadSkuCommodityData(queryParam);
+
+				$("#searchBtn").bind("click", function () {
+                    var skuId = $('#skuId').val();
+					var skuName = $('#skuName').val();
+					var skuClassifyName = $('#skuClassifyName').val();
+					var skuClassifyId = $('#skuClassifyId').val();
+					var brandId = $('#brandId').val();
+					var skuType = $('#skuType_hidden').val();
+					var queryParam = {};
+					queryParam.currentPageIndex = 1;
+					queryParam.pageSize = PAGE_SIZE;
+                    queryParam.skuId = skuId;
+					queryParam.skuName = skuName;
+					queryParam.skuClassifyName = skuClassifyName;
+					queryParam.skuClassifyId = skuClassifyId;
+					queryParam.brandId = brandId;
+                    queryParam.statusList = getStatusList();
+                    queryParam.skuType = skuType
+
+					loadSkuCommodityData(queryParam);
+				});
+
+                $("#goAdd").bind("click", function () {
+//                    postUtil.submit("/sku/goAdd");
+                    cardUtil.openCard("新增商品","/sku/goAdd");
+                    cardUtil.changeCard("新增商品");
+                });
+
+//				$('#selectAllCheckBox').bind("click", function () {
+//					var selectAllChecked = document.getElementById("selectAllCheckBox").checked;
+//					var skuChecks = document.getElementsByName("skuIdCheckBox");
+//					if (skuChecks.length > 0) {
+//						for (var i = 0; i < skuChecks.length; i++) {
+//							skuChecks[i].checked = selectAllChecked;
+//						}
+//					}
+//				});
+			});
+
+			function getStatusList() {
+//                var type = $('input[name="type"]:checked').val();
+                var upStatus = $('input[name="upStatus"]:checked').val();
+//                var status = $('input[name="status"]:checked').val();
+                var statusList = "";
+//                if(type == "") {
+                    if(upStatus!="") {
+                        statusList += upStatus+',';
+					}
+//					if(status!="") {
+//                        statusList += status+',';
+//					}
+//				} else if(type == "COMMODITY"){
+//                    if(upStatus!="") {
+//                        statusList += upStatus+',';
+//                    } else {
+//                        statusList += "U,D,";
+//					}
+//				} else if(type == "PRODUCT") {
+//                    if(status!="") {
+//                        statusList += status+',';
+//                    } else {
+//                        statusList += "Y,N,";
+//					}
+//				}
+                return statusList;
+			}
+
+			function loadSkuCommodityData(queryParam) {
+				layer.load();
+				postUtil.call("/sku/getList", queryParam, function (pageResult) {
+					var pageNumber = pageResult.pageNumber;
+					var pageSize = pageResult.pageSize;
+					var totalPage = pageResult.totalPage;
+					var totalRow = pageResult.totalRow;
+					var dataList = pageResult.list;
+					renderTable(dataList);
+					layer.closeAll("loading");
+					laypage({
+						cont: 'paginationDiv',
+						pages: totalPage,
+						curr: pageNumber,
+						total:totalRow,
+						skip: true,
+						jump: function (obj, first) {
+							if (!first) {
+								var skuName = $('#skuName').val();
+								var skuClassifyName = $('#skuClassifyName').val();
+								var skuClassifyId = $('#skuClassifyId').val();
+								var brandId = $('#brandId').val();
+								var skuType = $('#skuType_hidden').val();
+								var tempParam = {};
+								tempParam.currentPageIndex = obj.curr;
+								tempParam.pageSize = PAGE_SIZE;
+								tempParam.skuName = skuName;
+								tempParam.skuClassifyName = skuClassifyName;
+								tempParam.skuClassifyId = skuClassifyId;
+								tempParam.brandId = brandId;
+                                tempParam.statusList = getStatusList();
+                                tempParam.skuType = skuType;
+								loadSkuCommodityData(tempParam);
+							}
+						}
+					});
+				});
+			}
+
+			function renderTable(dataList) {
+				var length = dataList.length;
+				var table = document.getElementById("skuCommodityTable_tbody");
+				table.innerHTML = "";
+				skuDataMap = {};
+				if (length > 0) {
+					for (var i = 0; i < dataList.length; i++) {
+						var data = dataList[i];
+						var skuId = data.skuId;
+						skuDataMap[skuId] = data;
+						var row = renderRow(data);
+						table.appendChild(row);
+					}
+				} else {
+                    var html = '<p class="t-c fz16 c-2" style="line-height: 76px;">暂无商品信息！</p>';
+                    $(table).html(html);
+				}
+				//渲染单位控制小数输入位数
+				renderUnitDisplay();
+			}
+
+			function renderRow(rowData) {
+
+				var skuId = rowData.skuId;
+				var skuName = rowData.skuName;
+				var minnum = rowData.minnum;
+				var model = rowData.model;
+				var classifyId = rowData.classifyId;
+				var classifyName = rowData.classifyName;
+				var classifyAllParentName = rowData.classifyAllParentName;
+				var brandId = rowData.brandId;
+				var brandName = rowData.brandName;
+				var unitId = rowData.unitId;
+				var unitName = rowData.unitName;
+				var basePrice = rowData.basePrice;
+				var status = rowData.status;
+				var statusDisplay = "";
+				if(status == "U") {
+                    statusDisplay = "上架";
+				} else if(status == "D") {
+                    statusDisplay = "下架";
+				} else if(status == "Y") {
+                    statusDisplay = "有效";
+                } else if(status == "N") {
+                    statusDisplay = "无效";
+                }
+                rowData.statusDisplay = statusDisplay;
+				var ul = document.createElement('ul');
+				ul.setAttribute("class", "information");
+
+				ul.appendChild(renderCell("select", rowData, "width:2%;"));
+				ul.appendChild(renderCell("baseInfo", rowData, "width:43%;"));
+				ul.appendChild(renderCell("classifyAllParentName", classifyAllParentName, "width:10%;"));
+				ul.appendChild(renderCell("vendor", rowData, "width:12%;"));
+				ul.appendChild(renderCell("purchasePrice", rowData, "width:6%;"));
+				ul.appendChild(renderCell("basePrice", basePrice, "width:6%;"));
+				ul.appendChild(renderCell("minnum", rowData, "width:6%;"));
+				ul.appendChild(renderCell(null, unitName, "width:4%;"));
+				ul.appendChild(renderCell("status", rowData, "width:6%;"));
+				ul.appendChild(renderCell("operation", rowData, "width:5%;"));
+				return ul;
+			}
+
+			function renderCell(name, value, style) {
+
+				var li = document.createElement('li');
+				li.setAttribute("style", style);
+				var div_mida = document.createElement('div');
+				div_mida.setAttribute("class", "mida");
+				var div_midb = document.createElement('div');
+				div_midb.setAttribute("class", "midb");
+				if ("skuIdcheckBox" == name) {
+					div_midb.innerHTML = '<input type="checkbox" name="skuIdCheckBox" value="' + value + '" />';
+				} else if ("baseInfo" == name) {
+					var skuPropertyList = value.skuPropertyList;
+					var skuPropertyInfo = "";
+					if(skuPropertyList.length == 0) {
+						skuPropertyInfo = "暂无属性信息";
+					}else {
+						for(var i=0;i<skuPropertyList.length;i++) {
+							var property = skuPropertyList[i];
+							var propertyName = property.propertyName;
+							var propertyValue = property.propertyValue;
+							if(i != skuPropertyList.length -1) {
+								skuPropertyInfo = skuPropertyInfo + propertyName + ":" + propertyValue + "|";
+							}else {
+								skuPropertyInfo = skuPropertyInfo + propertyName + ":" + propertyValue ;
+							}
+						}
+					}
+
+					var smallImgPath = value.orginImgPath;
+					if(smallImgPath == undefined || smallImgPath == null || smallImgPath == "") {
+						smallImgPath = "/res/images/nopic.png";
+					}
+
+					console.log(value);
+
+					var leftIcon = '',
+					    rightIcon= '';
+					 if(value.skuType == "SPOT"){
+                        if(value.secondKillNum>0){
+					 		leftIcon = "<span class='pro-classfiy secKill'></span>";
+					 	}else if(value.secondKillNum==0){
+                            leftIcon = "<span class='pro-classfiy promote'></span>";
+					 	}
+					 }
+
+					 if(value.mallSkuNum>0){
+					 	rightIcon = "<span class='pro-come shopPro'></span>";
+					 }
+
+					div_midb.innerHTML = "<div class=\"goods-detail\"><dl>" +
+							"<dt style='position:relative;'>" +leftIcon +
+							"<img width='70' height='70' src=\""+smallImgPath+"\" alt=\"\"/>" +
+							"<p>" + value.brandName + "</p>" +
+							"</dt>" +
+							"<dd class=\"t-l ml10\" style='position:relative;'>" +
+							"<p class=\"one-row c-2\" style='width:95%;' title=\""+value.skuName+"\"><a href=\"javascript:void(0);\" onclick=\"goPreview('"+value.skuId+"');\">" + value.skuName + "</a>"+ "</p>" + rightIcon +
+							"<p  class=\"mt15\" title=\""+value.model+"\">" + "产品型号：" + value.model + "</p>" +
+							"<p  class=\"mt5\" title=\""+value.skuId+"\">" + "商品编码：" + value.skuId + "</p>" +
+							"<p  class=\"mt5\" title=\""+skuPropertyInfo+"\">" +"商品属性："+ skuPropertyInfo + "</p>" +
+							"</dd>" +
+							"</dl></div>";
+				} else if ("basePrice" == name) {
+				    if(!isNaN(value)) {
+                        div_midb.innerText = parseFloat(value).toFixed(2);
+					} else {
+                        div_midb.innerText = "--";
+					}
+				} else if ("status" == name) {
+                    div_midb.setAttribute("id", "status_"+value.skuId);
+                    div_midb.innerText = value.statusDisplay;
+                } else if ("classifyAllParentName" == name) {
+                    var vals = value.split(",");
+                    var allParentName = "";
+                    var notNullVals = [];
+                    for (var i = 0; i < vals.length; i++) {
+                        var temp = vals[i];
+                        if (null != temp && (temp.replace(/(^s*)|(s*$)/g, "").length != 0)) {
+                            notNullVals.push(temp);
+                        }
+                    }
+                    for (var i = 0; i < notNullVals.length; i++) {
+                        if (i != notNullVals.length - 1) {
+                            allParentName = allParentName + notNullVals[i] + ">";
+                        } else {
+                            allParentName = allParentName + notNullVals[i];
+                        }
+                    }
+                    div_midb.innerText = allParentName;
+                } else if("operation" == name) {
+				    var html = "";
+				    if(value.status == "U") {
+				        if(_downSkuBtn == "true") {
+                            html += '<p><a id="changeLink_'+value.skuId+'" href="javascript:changeUpStatus(\''+value.skuId+'\');">下架</a></p>';
+						}
+					} else if(value.status == "D") {
+				        if(_upSkuBtn == "true") {
+                            html += '<p><a id="changeLink_'+value.skuId+'" href="javascript:changeUpStatus(\''+value.skuId+'\');">上架</a></p>';
+                        }
+					} else if(value.status == "Y") {
+                        html += '<p><a id="changeLink_'+value.skuId+'" href="javascript:changeStatus(\''+value.skuId+'\');">无效</a></p>';
+                    } else if(value.status == "N") {
+                        html += '<p><a id="changeLink_'+value.skuId+'" href="javascript:changeStatus(\''+value.skuId+'\');">有效</a></p>';
+					}
+					if(_editSkuBtn == "true") {
+                        html += '<p style="margin-top: 5px;"><a href="javascript:goEdit(\''+value.skuId+'\');">修改</a></p>';
+                    }
+					if(_copySkuBtn == "true") {
+                        html += '<p style="margin-top: 5px;"><a href="javascript:goCopy(\''+value.skuId+'\');">复制SKU</a></p>';
+                    }
+                    div_midb.innerHTML = html;
+				} else if ("vendor" == name) {
+				    var html = "";
+				    var purchasePriceList = value.purchasePriceList;
+				    if(purchasePriceList && purchasePriceList.length > 0) {
+				        $.each(purchasePriceList, function (index, item) {
+//                            if(index > 2) {
+//								return true;
+//                            }
+				            if(item.isDefault == "Y") {
+                                html += '<p style="color: red;">'+item.vendorName+'</p>';
+//                                html += '<p>'+item.vendorName+'</p>';
+//                                return false;
+							}
+ 							else {
+                                html += '<p>'+item.vendorName+'</p>';
+							}
+                        });
+					}
+                    div_midb.innerHTML = html;
+                } else if ("purchasePrice" == name) {
+				    var html = "";
+                    var purchasePriceList = value.purchasePriceList;
+                    if(purchasePriceList && purchasePriceList.length > 0) {
+                        $.each(purchasePriceList, function (index, item) {
+//                            if(index > 2) {
+//                                return true;
+//                            }
+							var priceStr = "--";
+							if(!isNaN(item.purchasePrice)) {
+                                priceStr = parseFloat(item.purchasePrice).toFixed(2)
+							}
+							html += '<p>'+priceStr+'</p>';
+//							return false;
+                        });
+                    }
+                    div_midb.innerHTML = html;
+                } else if ("select" == name) {
+				    var html = '<input type="checkbox" name="selectSku" value="'+value.skuId+'">';
+                    div_midb.innerHTML = html;
+                } else if ("minnum" == name) {
+                    div_midb.setAttribute("class", "mida unitDisplay");
+                    div_midb.setAttribute("unitName", value.unitName);
+                    var minnumStr = "--";
+                    if(!isNaN(value.minnum)) {
+                        minnumStr = parseFloat(value.minnum).toFixed(2)
+                    }
+                    div_midb.innerText = minnumStr;
+                } else {
+				    if(value && value != "" && value != undefined && value != null) {
+                        div_midb.innerText = value;
+					} else {
+                        div_midb.innerText = "--";
+					}
+				}
+
+
+				div_mida.appendChild(div_midb);
+				li.appendChild(div_mida);
+				return li;
+			}
+
+			function goEdit(skuId) {
+                cardUtil.openCard("修改商品-" + skuId,"/sku/goEdit?skuId=" + skuId);
+                cardUtil.changeCard("修改商品-" + skuId);
+            }
+            function goCopy(skuId) {
+                cardUtil.openCard("复制商品","/sku/goCopy?skuId=" + skuId);
+                cardUtil.changeCard("复制商品");
+			}
+            function goPreview(skuId) {
+                cardUtil.openCard("预览商品-" + skuId,"/sku/previewBySkuId?skuId=" + skuId);
+                cardUtil.changeCard("预览商品-" + skuId);
+            }
+
+			function changeUpStatus(skuId) {
+                postUtil.call("/sku/changeUpStatus", {skuId:skuId}, function (res) {
+                    if(res.STATUS == "SUCCESS") {
+                        if($('#changeLink_'+skuId).text() == "上架") {
+                            $('#changeLink_'+skuId).text("下架");
+                        } else if($('#changeLink_'+skuId).text() == "下架") {
+                            $('#changeLink_'+skuId).text("上架");
+                        }
+                        if($('#status_'+skuId).text() == "上架") {
+                            $('#status_'+skuId).text("下架");
+                        } else if($('#status_'+skuId).text() == "下架") {
+                            $('#status_'+skuId).text("上架");
+                        }
+                    } else {
+                        layer.msg(res.MSG, {icon: 5});
+                    }
+                })
+            }
+
+            function changeStatus(skuId) {
+                postUtil.call("/sku/changeStatus", {skuId:skuId}, function (res) {
+                    if(res.STATUS == "SUCCESS") {
+                        if($('#changeLink_'+skuId).text() == "有效") {
+                            $('#changeLink_'+skuId).text("无效");
+                        } else if($('#changeLink_'+skuId).text() == "无效") {
+                            $('#changeLink_'+skuId).text("有效");
+                        }
+                        if($('#status_'+skuId).text() == "有效") {
+                            $('#status_'+skuId).text("无效");
+                        } else if($('#status_'+skuId).text() == "无效") {
+                            $('#status_'+skuId).text("有效");
+                        }
+                    } else {
+                        layer.msg(res.MSG, {icon: 5});
+                    }
+                })
+            }
+
+            xOffset = 10;
+            yOffset = 30;
+            $(document).on("mouseover", ".midb img", function (e) {
+                jQuery("<img id='imgshow' src='" + this.src + "' />").appendTo("body");
+                jQuery("#imgshow")
+                    .css("top", (e.pageY - xOffset) + "px")
+                    .css("left", (e.pageX + yOffset) + "px")
+                    .fadeIn("fast");
+            });
+            $(document).on("mouseout", ".midb img", function () {
+                jQuery("#imgshow").remove();
+            });
+            $(document).on("mousemove", ".midb img", function (e) {
+                jQuery("#imgshow")
+                    .css("top", (e.pageY - xOffset) + "px")
+                    .css("left", (e.pageX + yOffset) + "px")
+            });
+
+            $(document).on("click","#selectAll",function(){
+                var checkStatus = $("#selectAll").is(':checked');
+
+                $('input:checkbox[name="selectSku"]').each(function() {
+                    this.checked = checkStatus;
+                });
+            });
+
+            $(document).on("click",'input:checkbox[name="selectSku"]',function(){
+                setAllSelect();
+            });
+
+            function setAllSelect() {
+                var isAllSelect = true;
+                $('input:checkbox[name="selectSku"]').each(function (index, item) {
+                    if(!item.checked) {
+                        isAllSelect = false;
+                        return false;
+                    }
+                });
+                if($('input:checkbox[name="selectSku"]').length==0){
+                    isAllSelect = false;
+                }
+                if(isAllSelect) {
+                    $("#selectAll").prop("checked", true);
+                } else {
+                    $("#selectAll").prop("checked", false);
+                }
+            }
+            function batchUpdataIndex() {
+                if($('input[name="selectSku"]:checked').length == 0) {
+                    layer.msg("请选择商品", {icon: 5});
+                    return;
+                }
+                var skuIdList = [];
+                $.each($('input[name="selectSku"]:checked'), function (index, item) {
+                        skuIdList.push(this.value);
+                });
+                var param = {};
+                param.skuIdList = skuIdList;
+                postUtil.call("/sku/batchUpdataIndex", {jsonData:JSON.stringify(param)}, function (res) {
+                    if(res.STATUS == "SUCCESS") {
+                        layer.msg("批量处理成功", {icon: 6});
+                    }
+                    else {
+                        layer.msg(res.MSG, {icon: 5});
+                    }
+                    layer.closeAll("loading");
+                });
+            }
+            
+            function allUpdataIndex() {
+                postUtil.call("/sku/allUpdataIndex",null, function (res) {
+                    if(res.STATUS == "SUCCESS") {
+                        layer.msg("批量处理成功", {icon: 6});
+                    }
+                    else {
+                        layer.msg(res.MSG, {icon: 5});
+                    }
+                    layer.closeAll("loading");
+                });
+            }
+
+            function batchSetUpStatus(status) {
+                if($('input[name="selectSku"]:checked').length == 0) {
+                    layer.msg("请选择商品", {icon: 5});
+                    return;
+				}
+				layer.load();
+                var checkStatusText = "";
+              	if(status == "U") {
+                    checkStatusText = "下架";
+				} else {
+                    checkStatusText = "上架";
+				}
+				var isPass = true;
+				var skuIdList = [];
+              	var msg = "";
+				$.each($('input[name="selectSku"]:checked'), function (index, item) {
+					if($('#status_'+this.value).text() != checkStatusText) {
+//                        msg = "请选择状态为"+checkStatusText+"商品进行操作";
+//                        isPass = false;
+//                        return false;
+					} else {
+                        skuIdList.push(this.value);
+					}
+				});
+
+				if(!isPass) {
+                    layer.msg(msg, {icon: 5});
+                    layer.closeAll("loading");
+				    return;
+				}
+                console.log(skuIdList);
+                var param = {};
+                param.skuIdList = skuIdList;
+                param.status = status;
+                postUtil.call("/sku/batchSetUpStatus", {jsonData:JSON.stringify(param)}, function (res) {
+                    if(res.STATUS == "SUCCESS") {
+                        $.each(skuIdList, function (index, item) {
+                            if($('#changeLink_'+item).text() == "上架") {
+                                $('#changeLink_'+item).text("下架");
+                            } else if($('#changeLink_'+item).text() == "下架") {
+                                $('#changeLink_'+item).text("上架");
+                            }
+                            if($('#status_'+item).text() == "上架") {
+                                $('#status_'+item).text("下架");
+                            } else if($('#status_'+item).text() == "下架") {
+                                $('#status_'+item).text("上架");
+                            }
+                        });
+                        layer.msg("批量处理成功", {icon: 6});
+                    } else {
+                        layer.msg(res.MSG, {icon: 5});
+                    }
+                    layer.closeAll("loading");
+                });
+            }
+
+            function batchSetStatus(status) {
+                if($('input[name="selectSku"]:checked').length == 0) {
+                    layer.msg("请选择商品", {icon: 5});
+                    return;
+                }
+                layer.load();
+                var checkStatusText = "";
+                if(status == "Y") {
+                    checkStatusText = "无效";
+                } else {
+                    checkStatusText = "有效";
+                }
+                var isPass = true;
+                var skuIdList = [];
+                var msg = "";
+                $.each($('input[name="selectSku"]:checked'), function (index, item) {
+                    if($('#status_'+this.value).text() != checkStatusText) {
+                        msg = "请选择状态为"+checkStatusText+"商品进行操作";
+                        isPass = false;
+                        return false;
+                    }
+                    skuIdList.push(this.value);
+                });
+
+                if(!isPass) {
+                    layer.msg(msg, {icon: 5});
+                    layer.closeAll("loading");
+                    return;
+                }
+                console.log(skuIdList);
+                var param = {};
+                param.skuIdList = skuIdList;
+                param.status = status;
+                postUtil.call("/sku/batchSetStatus", {jsonData:JSON.stringify(param)}, function (res) {
+                    if(res.STATUS == "SUCCESS") {
+                        $.each(skuIdList, function (index, item) {
+                            if($('#changeLink_'+item).text() == "有效") {
+                                $('#changeLink_'+item).text("无效");
+                            } else if($('#changeLink_'+item).text() == "无效") {
+                                $('#changeLink_'+item).text("有效");
+                            }
+                            if($('#status_'+item).text() == "有效") {
+                                $('#status_'+item).text("无效");
+                            } else if($('#status_'+item).text() == "无效") {
+                                $('#status_'+item).text("有效");
+                            }
+                        });
+                        layer.msg("批量处理成功", {icon: 6});
+                    } else {
+                        layer.msg(res.MSG, {icon: 5});
+                    }
+                    layer.closeAll("loading");
+                });
+            }
+
+            $(document).on("click","input[name='type']",function(){
+                var value = $('input[name="type"]:checked').val();
+                if(value=="COMMODITY") {
+                    $("#commodityStatus").show();
+                    $("#productStatus").hide();
+				} else if(value=="PRODUCT") {
+                    $("#commodityStatus").hide();
+                    $("#productStatus").show();
+				} else {
+                    $("#commodityStatus").show();
+                    $("#productStatus").show();
+				}
+            });
+            $(function (){
+                $('#statusSelect').MSDL({
+                    'width': '240',
+                    'data': [{"text":"商城商品","value":"MALL"},
+                        {"text":"现货商品","value":"SPOT"},
+                        {"text":"秒杀商品","value":"SECOND_KILL"},
+                        {"text":"订货商品","value":"NORMAL"}],
+                    'id': "skuType"
+                });
+            });
+		</script>
+		<#include "/res/freemarkerTpl/unitConfig.html" />
+		<@unitConfig/>
+	</body>
+</html>

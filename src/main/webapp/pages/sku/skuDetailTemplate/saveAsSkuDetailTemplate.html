@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/js/ajaxfileupload_final.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <!-- kindediter -->
+    <link rel="stylesheet" type="text/css" href="/res/public/kindeditor4.1.7/themes/default/default.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/public/kindeditor4.1.7/kindeditor-all-min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/kindeditor4.1.7/lang/zh_CN.js<@resVersionDirective>?</@>"></script>
+
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <style>
+        .file {
+            position: relative;
+            display: inline-block;
+            background: #D0EEFF;
+            border: 1px solid #99D3F5;
+            border-radius: 4px;
+            padding: 4px 12px;
+            overflow: hidden;
+            color: #1E88C7;
+            text-decoration: none;
+            text-indent: 0;
+            line-height: 20px;
+        }
+        .file input {
+            position: absolute;
+            font-size: 100px;
+            right: 0;
+            top: 0;
+            opacity: 0;
+        }
+        .file:hover {
+            background: #AADFFD;
+            border-color: #78C3F3;
+            color: #004974;
+            text-decoration: none;
+        }
+        dd #treeNav {
+            display: none;
+            position: absolute;
+            left: 150px;
+            top: 173px;
+            width: 250px;
+            border: 1px solid #e6e6e6;
+            border-top: none;
+            background: #ffffff;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div class="purchaseSearch">
+                <form>
+                    <dl class="form-list" style="height: 60px;">
+                    <dt style="width: 150px;">模板ID：</dt>
+                    <dd>
+                        <input type="text" style="width: 300px;border: none;" readonly="readonly" value="--"/>
+                    </dd>
+                    </dl>
+                    <dl id="tempType" class="form-list" style="height: 60px;">
+                        <dt style="width: 150px;">设置为：</dt>
+                        <dd style="margin-top: 8px;">
+                            <label class="ml20" style="margin-left: 10px;">
+                                <span class="pay_list_c1 on"><input type="radio" name="isGlobal"  class="radioclass" checked="checked" value="Y"/></span>通用模板</label>
+                            <label class="ml20">
+                                <span class="pay_list_c1"><input type="radio" name="isGlobal"  class="radioclass" value="N" /></span>分类模板</label>
+                        </dd>
+                    </dl>
+                    <dl id="classifyDiv" class="form-list" style="height: 60px;">
+                        <dt style="width: 150px;">所属内部分类：</dt>
+                        <input type="hidden" id="skuClassifyId">
+                        <dd id="classifySelect">
+                            <input type="text" readonly="readonly" id="skuClassifyName" placeholder="请选择内部分类">
+                            <div class="xiala" style="position: absolute;top: 147px;left: 382px;">
+                                <img src="/res/images/arrow2.png" alt="">
+                            </div>
+                            <div id="treeNav"></div>
+                        </dd>
+                    </dl>
+                    <dl class="form-list" style="height: 60px;">
+                        <dt style="width: 150px;">模板类型：</dt>
+                        <dd>
+                            <select id="templateType" onchange="changeTemplateType(this)" style="width: 312px;height: 40px;">
+                                <!--<option value="NULL">请选择</option>-->
+                                <!--<#if classifyId>-->
+                                    <!--<option value="DESCRIBE">商品描述</option>-->
+                                    <!--<option value="QA">商品问答</option>-->
+                                    <!--<option value="PURCHASE">采购说明</option>-->
+                                    <!--<option value="AFTER_SALE">售后保障</option>-->
+                                    <!--<option value="DOWNLOAD">相关资料下载</option>-->
+                                    <!--<#else>-->
+                                        <!--<option value="PURCHASE">采购说明</option>-->
+                                        <!--<option value="AFTER_SALE">售后保障</option>-->
+                                        <!--<option value="DOWNLOAD">相关资料下载</option>-->
+                                <!--</#if>-->
+                            </select>
+                        </dd>
+                    </dl>
+                    <dl class="form-list" style="height: 60px;">
+                        <dt style="width: 150px;">模板名称：</dt>
+                        <dd>
+                            <input type="text" id="templateName" style="width: 300px;" placeholder="请输入模板名称，便于您选择模板"/>
+                        </dd>
+                    </dl>
+                    <dl id="normalEditor" class="form-list" style="height: 460px;display:none;">
+                        <dt style="width: 150px;">模板内容：</dt>
+                        <dd>
+                            <textarea name="templateContent" style="width:600px;height:400px;visibility:hidden;"></textarea>
+                        </dd>
+                    </dl>
+                    <dl id="uploadEditor" class="form-list" style="height: 460px;width:100%;display:none;">
+                        <dt style="width: 150px;">模板内容：</dt>
+                        <dd style="width: 800px;">
+                            <div class="table inquiry" style="width: 100%;">
+                                <a href="javascript:;" class="file frt">添加文件
+                                    <input type="file" name="file" id="skuDetailTemplateFileAttachment" onchange="doUploadTemplateFile()">
+                                </a>
+                                <ul class="th compact">
+                                    <li style="width: 20%;">
+                                        <div class="mida">
+                                            <div class="midb">排序</div>
+                                        </div>
+                                    </li>
+                                    <li style="width: 60%;">
+                                        <div class="mida">
+                                            <div class="midb">文件名称</div>
+                                        </div>
+                                    </li>
+                                    <li style="width: 20%;">
+                                        <div class="mida">
+                                            <div class="midb">操作</div>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <div class="information-list" id="templateAttachmentTable">
+
+                                </div>
+                            </div>
+                        </dd>
+                    </dl>
+                    <dl class="form-list" style="height:100px;margin-left: 120px;">
+                        <!--<dd><span class="btn ml10" id="chooseSkuDetailTemplateBtn" style="cursor: pointer;width: 120px;">从已有模板复制</span></dd>-->
+                        <dd><span class="btn ml10" id="addNormalSkuDetailTemplateBtn" style="cursor: pointer;">新增</span></dd>
+                        <!--<dd><span class="btn ml10" id="addAndApplySkuDetailTemplateBtn" style="cursor: pointer;width: 120px;">应用</span></dd>-->
+                        <dd><span class="btn ml10" id="cancelAddNormalSkuDetailTemplateBtn" style="cursor: pointer;">取消</span></dd>
+                        <dd><span class="btn ml10" id="previewTemplateBtn" style="cursor: pointer;">预览</span></dd>
+                    </dl>
+                </form>
+            </div>
+        </div>
+    </section>
+</section>
+<script>
+
+    //当你在iframe页面关闭自身时
+    var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+
+    layui.use(['tree','layer'], function () {
+        var layer = layui.layer;
+        var treeOption = {};
+        treeOption.skin = "shihuang";
+        treeOption.elem = "#treeNav";
+        treeOption.click = function (node) {
+//            var classifyIsLeaf = node.classifyIsLeaf;
+            var classifyLevel = node.classifyLevel;
+            if(classifyLevel != 0) {
+                $('#skuClassifyName').val(node.allParentName);
+                $('#skuClassifyId').val(node.classifyId);
+                $('#treeNav').hide();
+            }else {
+                layer.msg("请选择分类节点",{"icon":"5"});
+
+            }
+        };
+
+        postUtil.call("/reusable/skuClassificatory/getAllSkuClassificatoryJsonForLayuiTree", null, function (result) {
+            treeOption.nodes = result;
+            layui.tree(treeOption);
+        });
+
+    });
+
+    $(document).on("click",".xiala",function(){
+        if($(this).next().css("display")=="none"){
+            $(this).next().show();
+        }else{
+            $(this).next().hide();
+        }
+    });
+    $(document).on("click","#skuClassifyName",function(){
+        if($(".xiala").next().css("display")=="none"){
+            $(".xiala").next().show();
+        }else{
+            $(".xiala").next().hide();
+        }
+    });
+
+    $(document).on("click",'[name="isGlobal"]',function(){
+        if(this.value == "N") {
+            $("#classifyDiv").show();
+        } else {
+            $("#classifyDiv").hide();
+        }
+        setTypeOption(this.value);
+    });
+
+    function setTypeOption(isGlobal) {
+        var html ="";
+        if(isGlobal == "N") {
+            html += '<option value="DESCRIBE">商品描述</option>';
+            html += '<option value="QA">商品问答</option>';
+            html += '<option value="PURCHASE">采购说明</option>';
+            html += '<option value="AFTER_SALE">售后保障</option>';
+            html += '<option value="DOWNLOAD">相关资料下载</option>';
+        } else {
+            html += '<option value="PURCHASE">采购说明</option>';
+            html += '<option value="AFTER_SALE">售后保障</option>';
+            html += '<option value="DOWNLOAD">相关资料下载</option>';
+        }
+        $("#templateType").empty();
+        $("#templateType").html(html);
+    }
+
+    var currentTemplateType = null;
+    var currentFileAttachment = [];
+    var templateType = "${templateType}";
+//    var classifyId = "${classifyId}";
+//    var classifyName = "${classifyAllParentName}";
+//    var isTemplateGlobal;
+//    if(classifyId) {
+//        $('#classifyDiv').show();
+//        isTemplateGlobal = "N";
+//    }else {
+//        $('#classifyDiv').hide();
+//        isTemplateGlobal = "Y";
+//    }
+
+
+    /*初始化富文本编辑器*/
+    var add_editor = null;
+    KindEditor.ready(function (K) {
+        add_editor = K.create('textarea[name="templateContent"]', {
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            allowFileUpload: true,
+            filterMode: false,
+            uploadJson: '/file_server/images/uploadForKindEditor'
+        });
+    });
+
+    function setEditorValue(data) {
+        add_editor.html(data);
+    }
+
+    function setDownloadContent(data) {
+        for (var i = 0; i < data.length; i++) {
+            currentFileAttachment.push(data[i]);
+        }
+        renderTemplateAttachmentTable(data);
+    }
+
+    $(function () {
+
+        $('#templateType').val(templateType);
+        var templateTypeObj = {};
+        templateTypeObj.value = templateType;
+        changeTemplateType(templateTypeObj);
+
+        $('#addNormalSkuDetailTemplateBtn').bind("click", function () {
+
+            var templateContent = add_editor.html();
+            var templateType = $('#templateType').val();
+            var templateTypeName = $("#templateType").find("option:selected").text();
+            var templateName = $('#templateName').val();
+            var classifyId = $('#skuClassifyId').val();
+            var isTemplateGlobal = $('input[name="isGlobal"]:checked').val();
+
+            if(isTemplateGlobal == "N") {
+                if (!classifyId || classifyId == '') {
+                    layer.msg("创建分类模板时分类不允许为空", {icon: 5});
+                    return;
+                }
+            }
+
+            if (!templateType || templateType == "NULL" || templateType == '') {
+                layer.msg("模板类型不允许为空", {icon: 5});
+                return;
+            }
+
+            if (templateName == null || "" == templateName) {
+                layer.msg("模板名称不允许为空", {icon: 5});
+                return;
+            }
+
+            if(currentTemplateType == "DOWNLOAD") {
+                if(currentFileAttachment.length == 0) {
+                    layer.msg("文件下载列表不允许为空", {icon: 5});
+                    return;
+                }
+            }else {
+                if (templateContent == null || "" == templateContent) {
+                    layer.msg("模板内容不允许为空", {icon: 5});
+                    return;
+                }
+            }
+
+
+
+            layer.open({
+                title: false,
+                skin: 'myskin3',
+                area: ['450px', '250px'],
+                btnAlign: 'c',
+                content: '<div id="upload" class="t-c c-2" style="padding-top: 40px;"><p style="margin-top: 25px;">确定新增模板：<span class="fz18 c-f fw-b">[' +  templateTypeName + '-' + templateName + ']</span>吗？</p></div>',
+                btn: ['确定', '取消'],
+                yes: function (idx, layero) {
+                    var param = {};
+                    param.templateType = templateType;
+                    param.templateName = templateName;
+                    param.templateContent = templateContent;
+                    param.isTemplateGlobal = isTemplateGlobal;
+                    param.classifyId = classifyId;
+                    param.currentFileAttachment = JSON.stringify(currentFileAttachment);
+                    postUtil.call("/sku/template/addSkuDetailNormalTemplate", param, function (result) {
+                        if (result.STATUS == "SUCCESS") {
+                            layer.msg("已经成功添加模板", {icon: 6});
+
+//                            if("Y" == isTemplateGlobal) {
+//                                setTimeout(function () {
+//                                    postUtil.submit("/sku/template/preListNormalTemplate");
+//                                }, 1000);
+//                            }else if("N" == isTemplateGlobal) {
+//                                setTimeout(function () {
+//                                    var param = {};
+//                                    param.templateType = templateType;
+//                                    param.classifyId = classifyId;
+//                                    param.classifyAllParentName = $('#classifyAllParentName').val();
+//                                    postUtil.submit("/sku/template/preListClassificatoryTemplate",param);
+//                                }, 1000);
+//                            }
+                            setTimeout(function () {
+                                parent.layer.close(index);//关闭当前窗口
+                                }, 1000);
+
+                        } else {
+                            layer.msg(result.MSG, {icon: 5});
+                            layer.close(idx);
+                        }
+                    });
+                }, btn2: function (idx, layero) {
+                    layer.close(idx);
+                },
+                cancel: function () {
+
+                }
+            });
+
+
+
+        });
+
+
+        $('#cancelAddNormalSkuDetailTemplateBtn').bind("click", function () {
+            parent.layer.close(index);//关闭当前窗口
+        });
+
+        $('#previewTemplateBtn').bind("click", function () {
+            var templateContent = "";
+            if(currentTemplateType != "DOWNLOAD") {
+                templateContent = add_editor.html();
+            }
+            var templateType = $('#templateType').val();
+            if(!templateType || templateType == "") {
+                layer.msg("请选择类型",{icon:5});
+                return;
+            }
+            var templateName = $('#templateName').val();
+            var param = {};
+            param.templateType = templateType;
+            param.templateContent = templateContent;
+            if(currentTemplateType == "DOWNLOAD") {
+                if(currentFileAttachment.length != 0) {
+                    param.otherContent = JSON.stringify(currentFileAttachment);;
+                }
+            }
+//            postUtil.submit("/sku/template/previewTemplate",{jsonData:JSON.stringify(param)},"_blank")
+            parent.cardUtil.openCard("预览模板-"+templateName, "/sku/template/previewTemplate", {jsonData:JSON.stringify(param)});
+            parent.cardUtil.changeCard("预览模板-"+templateName);
+        });
+
+    });
+
+    function changeTemplateType(obj) {
+        currentTemplateType = obj.value;
+        if (obj.value == "DOWNLOAD") {
+            $('#normalEditor').hide();
+            $('#uploadEditor').show();
+        } else {
+            $('#uploadEditor').hide();
+            $('#normalEditor').show();
+        }
+    }
+
+    function doUploadTemplateFile() {
+        var url = '/file_server/mall/generalFileUpload';
+        var param = {};
+        $.ajaxFileUpload({
+            url: url,
+            secureuri: false,
+            fileElementId: 'skuDetailTemplateFileAttachment',
+            data: param,
+            dataType: 'text',
+            success: function (result) {
+                var rtnResult = eval('(' + result + ')');
+                if (rtnResult.STATUS == "SUCCESS") {
+                    var fileObjList = rtnResult.data;
+                    for (var i = 0; i < fileObjList.length; i++) {
+                        var attachmentFileId = fileObjList[i].MALL_FILE_ATTACHMENT_ID;
+                        var attachmentFileName = fileObjList[i].MALL_FILE_NAME;
+                        currentFileAttachment.push(fileObjList[i]);
+                    }
+                    renderTemplateAttachmentTable(fileObjList);
+                } else {
+                    layer.msg(rtnResult.MSG,{icon:5});
+                }
+            },
+            error: function (data, status, e) {
+                layer.msg("上传过程中出现异常，请稍后再试",{icon:5});
+            }
+        });
+    }
+
+    function renderTemplateAttachmentTable(dataList) {
+        var length = dataList.length;
+        var table = document.getElementById("templateAttachmentTable");
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var row = renderTemplateAttachmentRow(data);
+                table.appendChild(row);
+            }
+        }
+    }
+    function renderTemplateAttachmentRow(rowData) {
+        var mallFileAttachmentId = rowData.MALL_FILE_ATTACHMENT_ID;
+        var mallFileName = rowData.MALL_FILE_NAME;
+        var ul = document.createElement('ul');
+
+        ul.setAttribute("class", "information informationList compact");
+        ul.setAttribute("id", "ul_template_attachment_row_" + mallFileAttachmentId);
+        ul.appendChild(renderTemplateAttachmentCell(null, mallFileAttachmentId, "width:20%;"));
+        ul.appendChild(renderTemplateAttachmentCell(null, mallFileName, "width:60%;"));
+        ul.appendChild(renderTemplateAttachmentCell("operation", rowData, "width:20%;"));
+        return ul;
+    }
+
+    function renderTemplateAttachmentCell(name, value, style) {
+        var li = document.createElement('li');
+        li.setAttribute("style", style)
+        var div_mida = document.createElement('div');
+        div_mida.setAttribute("class", "mida");
+        var div_midb = document.createElement('div');
+        div_midb.setAttribute("class", "midb");
+        //个性化差异-操作区域
+        if ("operation" == name) {
+            div_midb.innerHTML = '<p><a href="javascript:void(0);" onclick="removeTemplateAttachmentRow(\'' + value.MALL_FILE_ATTACHMENT_ID + '\')">删除</a>&nbsp;&nbsp;' +
+                    '<a href="javascript:void(0);" onclick="downLoadMallAttachment(\'' + value.MALL_FILE_ATTACHMENT_ID + '\')">下载</a></p>';
+        } else {
+            div_midb.innerText = value;
+        }
+        div_mida.appendChild(div_midb);
+        li.appendChild(div_mida);
+        return li;
+    }
+
+    function removeTemplateAttachmentRow(mallFileAttachmentId) {
+        var param = {};
+        param.fileAttachmentId = mallFileAttachmentId;
+        postUtil.call("/file_server/mall/generalFileDelete", param, function (result) {
+            if (result.STATUS == "SUCCESS") {
+                $('#ul_template_attachment_row_' + mallFileAttachmentId).remove();
+                for (var i = 0; i < currentFileAttachment.length; i++) {
+                    var tempAttachmentFile = currentFileAttachment[i];
+                    if (tempAttachmentFile.MALL_FILE_ATTACHMENT_ID == mallFileAttachmentId) {
+                        currentFileAttachment.splice(i, 1);
+                    }
+                }
+            } else {
+                layer.msg(result.MSG, {icon: 5});
+            }
+        });
+    }
+
+    function downLoadMallAttachment(mallFileAttachmentId) {
+        var param = {};
+        param.fileAttachmentId = mallFileAttachmentId;
+        postUtil.submit("/file_server/mall/generalFileDownload", param);
+    }
+
+    //单选
+    $(".pay_list_c1").on("click",function(){
+        $(this).addClass("on").parent().siblings().find("span").removeClass("on");
+    })
+    //单选
+    $(".pay_list_c2").on("click",function(){
+        $(this).addClass("on").parent().parent().siblings().find(".pay_list_c2").removeClass("on");
+    })
+</script>
+
+</body>
+</html>

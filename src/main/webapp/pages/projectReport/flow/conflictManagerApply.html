@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="/res/public/css/style.css<@resVersionDirective>?</@>" />
+	<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_svvppt2njx9u23xr.css<@resVersionDirective>?</@>" />
+	<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+	<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>" />
+	<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>" />
+	<link rel="stylesheet" href="/res/css/project.css<@resVersionDirective>?</@>">
+	<script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+	<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+	<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+	<script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+	<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+	<script type="text/javascript" src="/res/js/projectReport/projectDetail_flow.js<@resVersionDirective>?</@>"></script>
+	<script type="text/javascript" src="/res/js/rg.js<@resVersionDirective>?</@>"></script>
+	<script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+	<script src="/res/common/area.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+	<script src="/res/common/multiple-select.js<@resVersionDirective>?</@>"></script>
+	<link href="/res/css/multiple-select.css<@resVersionDirective>?</@>" rel="stylesheet">
+	<script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<section id="itocCenter">
+	<section class="itocContent">
+		<div class="main">
+			<div class="jun-base">
+				<div class="base mt5">
+					<p class="pt20 mb10"><span class="c-2"></span></p>
+					<article class="bor-e6 pt10 pb10">
+						<div class="fz12 clr">
+							<p class="ml20 flt" id="bindSalesEmployee" style="line-height:39px;display: flex;width: 60%;"></p>
+							<p class="mt5 frt t-r">
+							    <button class="btn-click frt mr10 cs-p" style="height:34px;width:86px;" onclick="watchAttachments()">查看附件</button>
+								<button class="search-btn mr10 cs-p fz12 test5" style="width: 86px;" lay-submit="" lay-filter="rejectBtn">驳回</button>
+								<button class="search-btn fz12 mr10 cs-p" style="width: 86px;" lay-submit="" lay-filter="submitBtn">通过</button>
+							</p>
+						</div>
+					</article>
+				</div>
+				<#include "/res/freemarkerTpl/projectReport_basic.html" />
+				<@project_report_detail_basic/>
+			</div>
+		</div>
+	</section>
+</section>
+
+<script>
+var taskId = "${eFlowTaskId}";
+var _backupId = "${_busniessKey}";
+var backupId = "${_busniessKey}";
+$(function(){
+	queryProjectDetail(_backupId);
+	layui.use(['element','layer'], function(){
+		var layer = layui.layer;
+
+		$("button[lay-filter=rejectBtn]").click(function () {
+			var param = {};
+			param.taskId = taskId;
+			param.approveStatus =  "FAILED";
+			layer.open({
+				title: '项目驳回',
+				type: 2,
+				skin:'myskin',
+				scrollbar: false,
+				area: ['600px', '400px'],
+				fixed: false, //不固定
+				maxmin: true,
+				content: '/projectReport/preConflictLay/' + taskId,
+				btn: ['确定','取消'],
+				btnAlign: 'c',
+				yes: function(index, layero){
+					var body = layer.getChildFrame('body', index);
+					var textarea = body.find("textarea");
+					if(textarea){
+						var reason = $(textarea).val() || '';
+						if(($.trim(reason)).length < 1){
+							layer.msg('请填写拒绝原因！', {icon: 5});
+							return;
+						}
+					}else{
+						return;
+					}
+					var data = {};
+					data.taskId = taskId;
+					data.approveStatus = "FAILED";
+					data.comment = $(textarea).val();
+					postUtil.call('/projectReport/doConflictManagerApply',data,function(data){
+						if(data.STATUS == 'SUCCESS'){
+                            cardUtil.refreshCard("项目审核");
+							postUtil.submit('/projectReport/projectDetail?backupId=' + _backupId, null);
+						}else{
+							layer.alert(data.MSG, {icon: 5});
+						}
+					})
+				}
+				,btn2: function(index, layero){
+
+				}
+			});
+		});
+		$("button[lay-filter=submitBtn]").click(function () {
+			layer.open({
+				title: '审核提示',
+				type: 2,
+				skin:'myskin',
+				scrollbar: false,
+				area: ['600px', '400px'],
+				fixed: false, //不固定
+				maxmin: true,
+				content: '/projectReport/preConflictPassLay/' + taskId,
+				btn: ['确定','取消'],
+				btnAlign: 'c',
+				yes: function(index, layero){
+					var body = layer.getChildFrame('body', index);
+					var textarea = body.find("textarea");
+					if(textarea){
+						var reason = $(textarea).val() || '';
+						if(($.trim(reason)).length < 15){
+							layer.msg('请填写备注信息，至少15个字符！', {icon: 5});
+							return;
+						}
+					}else{
+						return;
+					}
+					submitConflict($(textarea).val());
+				}
+				,btn2: function(index, layero){
+
+				}
+			});
+		});
+
+		function submitConflict(agreeCommit){
+			var param = {};
+			param.taskId = taskId;
+			param.agreeCommit = agreeCommit;
+			param.approveStatus =  "PROTECTED";
+			postUtil.call("/projectReport/doConflictManagerApply", param, function(result) {
+				layer.open({
+					title: '操作提示',
+					skin: 'youskin',
+					area: ['480px', '300px'],
+					btnAlign: 'c',
+					content: '<p class="iconfont icon-yiwancheng1" style="text-align: center;margin-top: 30px;"></p><p style="text-align: center;margin-top: 30px;font-size:12px;color:#222222">' + result.MSG + '</p>',
+					btn: ['关闭'],
+					yes: function (index, layero) {
+						cardUtil.refreshCard("项目审核");
+						postUtil.submit('/projectReport/projectDetail?backupId=' + _backupId, null);
+					}
+				});
+			});
+		}
+	})
+});
+
+</script>
+
+</body>
+</html>

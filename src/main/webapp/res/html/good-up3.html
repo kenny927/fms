@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <link rel="stylesheet" href="/res/public/css/daterangepicker.css" />
+    <script src="/res/js/jquery-3.1.1.min.js"></script>
+    <script src="/res/public/layui/layui.js"></script>
+    <script src="/res/public/layPage/laypage.js"></script>
+    <script src="/res/public/layui/moment.min.js"></script>
+    <script src="/res/public/layui/jquery.daterangepicker.js"></script>
+</head>
+<body>
+    <section class="bz-bb pl20 pr20 pt20 pb20">
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="margin-bottom: 0;border-bottom: none">
+            <form action="" class="jun-form-s form-css">
+                <dl class="dl-form" style="margin-bottom: 0">
+                    <dt class="flt fz12">时间范围：</dt>
+                    <dd class="flt layui-form jun-form-l">
+                        <select name="interest" lay-filter="aihao"  style="width: 240px;">
+                            <option value=""></option>
+                            <option value="0">自定义查询</option>
+                            <option value="1" selected="">按周查询</option>
+                            <option value="2">按月查询</option>
+                        </select>
+                    </dd>
+                    <!--日期范围参数参考网站http://www.htmleaf.com/Demo/201504251738.html-->
+                 <dd class="flt pre ml10"  id="picker-css">
+                        <input class="picker-css" id="date-range0" value="">
+                        <img class="cs-p" style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" />
+                    </dd>
+                    <dd class="flt ml10"><span class="form-btn layui-btn-small2">查询</span></dd>
+                    <dd class="frt"><span class="form-btn layui-btn-itoc layui-btn-small2 fz12"><span class="iconfont icon-daochu"></span>导出</span></dd>
+                </dl>
+            </form>
+        </blockquote>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="margin-bottom: 0;">
+            <table class="layui-table pop table-css" lay-skin="line">
+                <colgroup>
+                    <col  width="200">
+                    <col  width="200">
+                    <col  width="200">
+                    <col  width="300">
+                    <col  width="200">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>分类</th>
+                    <th >上架数量</th>
+                    <th >下架数量</th>
+                    <th >总数量</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>5</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>5</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>5</td>
+                </tr>
+                </tbody>
+            </table>
+            <div id="paginationDiv"></div>
+        </blockquote>
+    </section>
+</body>
+<script>
+    $('#date-range0').dateRangePicker();
+
+    layui.use(['form'], function() {
+        var form = layui.form();
+        //日期控件 star
+    })
+    $(document).on('click','#picker-css',function(){
+        if($(".date-picker-wrapper").css("display")=="none"){
+            console.log(11)
+            $(".date-picker-wrapper").show();
+            $(this).find("img").attr('src','/res/images/arrow4.png');
+            return false;
+        }else{
+            $(".date-picker-wrapper").hide();
+            $(this).find("img").attr('src','/res/images/arrow3.png');
+        }
+    })
+
+    //分页
+    $(function () {
+        loadMallVagueData(1);
+    });
+
+    function loadMallVagueData(currentPageIndex) {
+        var param = {};
+        param.currentPageIndex = currentPageIndex;
+//      postUtil.call("/mallOrder/vagueDemand/vagueDemandListJson", param, function (result) {
+        var pages = 100;
+        laypage({
+            cont: 'paginationDiv',
+            pages: pages,
+            curr: currentPageIndex,
+            skip: true,
+            jump: function (obj, first) {
+                if (!first) {
+                    loadMallVagueData(obj.curr);
+                }
+            }
+        });
+//      });
+    }
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+</script>
+</html>

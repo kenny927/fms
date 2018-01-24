@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <style>
+        .w150{
+            width: 150px!important;
+        }
+        /*错误时候边框变红*/
+        .bor-errno input[type='text']{
+            border:1px solid #ff4800!important;
+        }
+        .msg{
+            position: absolute;
+            left: 0;
+            top:32px;
+            display: none;
+            font-size: 12px;
+            color: #ff4800;
+        }
+        .icon-tongguo{
+            display: none;
+            position: absolute;
+            right: -20px;
+            top:5px;
+            display: none;
+            color: #00a930;
+            font-size: 14px;
+        }
+        .show{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="bz-bb pt20 pl20 pr20">
+    <form action="" class="jun-form-s form-css ml20" style="min-height: 260px;">
+        <dl class="dl-form mt20">
+            <dt class="flt"><span class="c-f">*</span>任务名称：</dt>
+            <dd class="flt pre"><input type="text" name="jobName" value="${job.jobName!}"  placeholder="请输入任务名称" autocomplete="off" class="layui-input">
+                <span class="msg show">请填写任务名称</span>
+                <span class="iconfont icon-tongguo show"></span>
+                <!--默认隐藏 show 显示-->
+            </dd>
+            <dt class="flt w150"><span class="c-f">*</span>任务Java Class名：</dt>
+            <dd class="flt pre"><input type="text" name="jobClassDescript" value="${job.jobClassDescript!}" placeholder="请输入任务Java Class名" autocomplete="off" class="layui-input">
+                <span class="msg show">请填写任务任务Java Class名</span>
+                <span class="iconfont icon-tongguo show"></span>
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt"><span class="c-f">*</span>任务状态：</dt>
+            <dd class="flt pre layui-form">
+                 <select name="status" lay-filter="status"  style="width: 240px;">
+                    <option value=""></option>
+                    <option value="ENABLE" <#if job.status?exists && job.status=='ENABLE'>selected<#else>selected</#if> >启用</option>
+                    <option value="DISABLE" <#if job.status?exists && job.status=='DISABLE'>selected</#if> >停用</option>
+                </select>
+                <span class="msg show">请填写任务状态</span>
+                <span class="iconfont icon-tongguo show"></span>
+            </dd>
+            <dt class="flt w150"><span class="c-f">*</span>任务说明：</dt>
+            <dd class="flt pre"><input type="text" name="memo" value="${job.memo!}"  placeholder="请输入任务说明" autocomplete="off" class="layui-input">
+                <span class="msg show">请填写任务说明</span>
+                <span class="iconfont icon-tongguo show"></span>
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt" style="width: 110px;margin-left: -20px;"><span class="c-f">*</span>任务类型：</dt>
+            <dd class="flt pre layui-form">
+                <select name="triggerType" lay-filter="triggerType"  style="width: 240px;">
+                    <option value=""></option>
+                    <option value="CRON" <#if job.triggerType?exists && job.triggerType=='CRON'>selected<#else>selected</#if> >CRON</option>
+                    <option value="SIMPLE" <#if job.triggerType?exists && job.triggerType=='SIMPLE'>selected</#if> >SIMPLE</option>
+                </select>
+                <span class="msg show">请选择任务类型</span>
+                <span class="iconfont icon-tongguo show"></span>
+            </dd>
+        </dl>
+        <dl id="timeExpress" class="dl-form <#if job.triggerType?exists && job.triggerType=='SIMPLE'>show</#if>">
+        	<dt class="flt" style="width: 110px;margin-left: -20px;"><span class="c-f">*</span>时间表达式：</dt>
+        	 <dd class="flt pre"><input type="text" name="timeExpress" value="${job.timeExpress!}"  placeholder="请输入标题" autocomplete="off" class="layui-input">
+                <span class="msg show">请填写时间表达式</span>
+                <span class="iconfont icon-tongguo show"></span>
+            </dd>
+        </dl>
+        <dl id="timeRange" class="dl-form <#if !job.triggerType?exists >show<#else><#if job.triggerType=='CRON'>show</#if></#if>">
+            <dt class="flt"><span class="c-f">*</span>开始时间：</dt>
+            <dd class="flt pre"><input id='LAY_demorange_s' type="text" value="<#if job.startTime?exists>${job.startTime?string('yyyy-MM-dd hh:mm:ss')}</#if>" name="startTime" placeholder="请输入开始时间" autocomplete="off" class="layui-input laydate-icon">
+                <span class="msg show">请填写开始时间</span>
+                <span class="iconfont icon-tongguo show"></span>
+            </dd>
+            <dt class="flt  w150"><span class="c-f"></span>结束时间：</dt>
+            <dd class="flt pre"><input id='LAY_demorange_e' type="text" value="<#if job.endTime?exists>${job.endTime?string('yyyy-MM-dd hh:mm:ss')}</#if>" name="endTime" placeholder="请输入结束时间" autocomplete="off" class="layui-input laydate-icon" >
+                <span class="msg show">请填写结束时间</span>
+                <span class="iconfont icon-tongguo show"></span>
+            </dd>
+        </dl>
+        <dl id="interval" class="dl-form <#if !job.triggerType?exists >show<#else><#if job.triggerType=='CRON'>show</#if></#if>">
+            <dt class="flt"><span class="c-f">*</span>重复次数：</dt>
+            <dd class="flt pre"><input type="text" name="repeatCount" value="${job.repeatCount!}"  placeholder="请输入重复次数" autocomplete="off" class="layui-input">
+                <span class="msg show">请填写重复次数</span>
+                <span class="iconfont icon-tongguo show"></span>
+            </dd>
+            <dt class="flt  w150"><span class="c-f">*</span>间隔时间毫秒：</dt>
+            <dd class="flt pre"><input type="text" name="intervalMillisecond" value="${job.intervalMillisecond!}" placeholder="请输入间隔时间" autocomplete="off" class="layui-input">
+                <span class="msg show">请填写间隔时间毫秒数</span>
+                <span class="iconfont icon-tongguo show"></span>
+            </dd>
+        </dl>
+    </form>
+    <div class="pb20 t-c">
+      <button onclick='save()' class="form-btn layui-btn-big" >保存</button>
+      <button onclick="closePage()" class="form-btn layui-btn-big" style="background-color: #cccccc;">取消</button>
+    </div>
+</div>
+<script type="text/javascript">
+	var jobId = '${job.jobId!}';
+
+	var layer;
+    layui.use(['form','laydate','layer'], function() {
+    	layer = layui.layer;
+        var  form = layui.form();
+		form.on('select(triggerType)', function(data) {
+			var value = data.value;
+			if(value=='CRON'){
+				$('#timeExpress').show();
+				$('#timeRange').hide();
+				$('#interval').hide();
+			}else{
+				$('#timeExpress').hide();
+				$('#timeRange').show();
+				$('#interval').show();			
+			}
+	    }); 
+		var laydate = layui.laydate;
+		var start = {
+		    min: laydate.now(),
+		    format: 'YYYY-MM-DD hh:mm:ss',
+		    istime:true,
+		    max: '2099-06-16 23:59:59',
+		    choose: function(datas){
+		      end.min = datas; //开始日选好后，重置结束日的最小日期
+		      end.start = datas //将结束日的初始值设定为开始日
+		    }
+		};
+		var end = {
+		    min: laydate.now(),
+		    format: 'YYYY-MM-DD hh:mm:ss',
+		    istime:true,
+		    max: '2099-06-16 23:59:59',
+		    choose: function(datas){
+		      start.max = datas; //结束日选好后，重置开始日的最大日期
+		    }
+		};
+		document.getElementById('LAY_demorange_s').onclick = function(){
+			start.elem = this;
+			laydate(start);
+		}
+		document.getElementById('LAY_demorange_e').onclick = function(){
+		    end.elem = this;
+		    laydate(end);
+		}
+		//form.render();
+    });
+    $(document).on('blur','input',function(){
+      	if(!$(this).val()){
+      		$(this).parent().addClass('bor-errno');
+      		$(this).next().show();
+      		$(this).next().next().hide();
+      	}else {
+      		$(this).next().next().show();
+      		$(this).next().hide();
+      		$(this).parent().removeClass('bor-errno');
+      	}
+      });
+    function closePage(){
+    	var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    	parent.layer.close(index);//关闭当前窗口
+    }
+    
+    function save(){
+    	var validFlag = true;
+    	var triggerType = $("select[name='triggerType']").val();
+    	var status = $("select[name='status']").val();
+    	var param ={
+    		status:status,
+    		triggerType:triggerType
+    	};
+    	$.each($('input'),function(index,element){
+    		var name = $(element).attr('name');
+    		if(triggerType=='CRON'){
+    			if('jobName|jobClassDescript|memo|timeExpress'.indexOf(name)>=0){
+    				var val = $(element).val();
+    		      	if(!val){
+    		      		$(element).parent().addClass('bor-errno');
+    		      		$(element).next().show();
+    		      		$(element).next().next().hide();
+    		      		validFlag = false;
+    		      	}else{
+    		      		param[name]=val;
+    		      	}
+    			}
+    		}else{
+    			if('jobName|jobClassDescript|memo|startTime|endTime|repeatCount|intervalMillisecond'.indexOf(name)>=0){
+    				var val = $(element).val();
+    		      	if(!val && name!='endTime'){
+    		      		$(element).parent().addClass('bor-errno');
+    		      		$(element).next().show();
+    		      		$(element).next().next().hide();
+    		      		validFlag = false;
+    		      	}else{
+    		      		param[name]=val;
+    		      	}
+    			}
+    		}
+    	});
+    	if(validFlag){
+        	if(jobId){
+        		param.jobId = jobId;
+        		postUtil.call('/system/scheduler/updateJob',param,function(res){
+        			if(res.STATUS=='SUCCESS'){
+        				layer.msg('任务修改成功',{icon:5},function(){
+        					parent.window.location.reload();
+        					closePage();
+        				});
+        			}else{
+        				layer.msg('添加修改失败',{icon:6});
+        			}
+        		});
+        	}else{
+        		postUtil.call('/system/scheduler/addJob',param,function(res){
+        			if(res.STATUS=='SUCCESS'){
+        				layer.msg('添加任务成功',{icon:5},function(){
+        					parent.window.location.reload();
+        					closePage();
+        					
+        				});
+        			}else{
+        				layer.msg('添加任务失败',{icon:6});
+        			}
+        		});
+        	}
+
+    	}else{
+    		layer.msg('有必填信息没有填完全',{icon:6});
+    	}
+    }
+    function update(){
+    	
+    }
+</script>
+</body>
+</html>

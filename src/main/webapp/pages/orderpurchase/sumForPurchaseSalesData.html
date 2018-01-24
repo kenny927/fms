@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>" />
+<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>" />
+<script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+	<section id="itocCenter">
+		<section class="itocContent">
+			<div class="itocMain">
+				<div style="width: 100%; box-sizing: border-box; padding: 0 20px; margin-right: 20px">
+					<table class="layui-table pop" lay-skin="line">
+						<thead>
+							<tr>
+								<th>采购单笔数</th>
+								<th>总金额</th>
+								<th>供应商数</th>
+							</tr>
+						</thead>
+						<tbody id="sumForData">
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+	</section>
+	<script type="text/javascript">
+		var orderPurchaseIds = '${orderPurchaseIds}';
+		var status = '${status}';
+		var customerAccountName = '${customerAccountName}';
+		var accountName = '${accountName}';
+		var layer;
+		layui.use([ 'layer' ], function() {
+			layer = layui.layer;
+		})
+		$(function() {
+			var param = {};
+			param.orderPurchaseIds = orderPurchaseIds;
+			if (orderPurchaseIds == "") {
+				param.status = status;
+				param.accountName = accountName;
+				param.customerAccountName = customerAccountName;
+			}
+			postUtil.call("/order/purchaseSale/sumForData", param, function(result) {
+				if (result.STATUS == "SUCCESS") {
+					var data = result.DATA;
+					renderTable(data);
+
+				} else {
+					layer.msg(result.MSG, {
+						icon : 5
+					});
+				}
+			});
+
+		});
+
+		function renderTable(data) {
+			var table = document.getElementById("sumForData");
+			table.innerHTML = "";
+			var html = '<tr><td><p>' + data.purchaseNum + '</p></td><td><p>'
+					+ data.sumForAll.toFixed(2) + '</p></td><td><p>' + data.acountNum
+					+ '</p></td></tr>';
+			$(table).html(html);
+		}
+	</script>
+</body>
+</html>

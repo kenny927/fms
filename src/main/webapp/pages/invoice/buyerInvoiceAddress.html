@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta charset="UTF-8">
+	<title>Insert title here</title>
+	<link rel="stylesheet" type="text/css" href="/res/public/css/style_order.css"/>
+	<link rel="stylesheet" href="http://at.alicdn.com/t/font_7a2ayjuwhe5c23xr.css">
+	<script src="/res/js/jquery-3.1.1.min.js"></script>
+	<script type="text/javascript">
+		var province='${province!}';
+		var city='${city!}';
+		var dist='${dist!}';
+
+		$(document).on('change blur', '.inputxt', function() {
+			if ($(this).attr("name") == 'consigneePostCode'){
+				if (!$(this).val()) {
+					$(this).next().hide();
+				}else{
+					$(this).next().show();
+				}
+				return;
+			}
+			if (!$(this).val()) {
+				$(this).css("border", "1px solid #ff4770");
+				$(this).next().hide();
+				$(this).next().next().show();
+				$(this).attr("validate", "false")
+			} else {
+				if ($(this).attr("name") == 'consigneeMobile') {
+	       			var v = $(this).val();
+				    var reg1 = /^0?1[3|4|5|7|8][0-9]\d{8}$/; 
+				    var reg2 = /^0[\d]{2,3}-[\d]{7,8}$/
+					if(!reg1.test(v)&&!reg2.test(v)){  
+			       		$(this).css("border","1px solid #ff4770");
+			       		$(this).next().hide();
+			       		$(this).next().next().show();
+			       		$(this).attr("validate","false");
+					}else{
+		           		$(this).next().show();
+		           		$(this).next().next().hide();
+		           		$(this).css("border","1px solid #e6e6e6");
+		           		$(this).attr("validate","true")
+					}
+				}else if($(this).attr("name") == 'prov') {
+					var v = $(this).val();
+					if(v=='省份'){
+			       		$(this).css("border","1px solid #ff4770");			       		
+			       		$(this).parent().next().show();
+			       		$(this).next().next().next().next().next().hide();
+			       		$(this).attr("validate","false");
+					}else{
+						$(this).css("border","1px solid #e6e6e6");
+						$(this).attr("validate","true");
+					}
+				}else if($(this).attr("name") == 'city'){
+					var v = $(this).val();
+					if(v=='地级市'){
+			       		$(this).css("border","1px solid #ff4770");
+			       		$(this).parent().next().show();
+			       		$(this).next().next().next().next().hide();
+			       		$(this).attr("validate","false");
+					}else{
+						$(this).css("border","1px solid #e6e6e6");
+						$(this).attr("validate","true");
+					}
+				}else if($(this).attr("name") == 'dist'){
+					var v = $(this).val();
+					if(v=='请选择'){
+			       		$(this).css("border","1px solid #ff4770");
+			       		$(this).parent().next().show();
+			       		$(this).next().next().next().hide();
+			       		$(this).attr("validate","false");
+					}else{
+						$(this).css("border","1px solid #e6e6e6");
+						$(this).attr("validate","true");
+						
+						var prov= $("#s_province").val();
+						var city= $("#s_city").val();
+						if(city!='地级市' && prov!='省份'){
+							$(this).parent().next().hide();
+							$(this).next().next().next().show();
+						}
+					}
+				}else{
+					$(this).next().show();
+					$(this).next().next().hide();
+					$(this).css("border", "1px solid #e6e6e6");
+					$(this).attr("validate", "true")
+				}
+			}
+		})
+
+		$(function() {
+			if (province) {
+				$("#s_province").val(province);
+				change(1);
+				$("#s_city").val(city);
+				change(2);
+				$("#s_county").val(dist);
+			}
+		});
+	</script>
+</head>
+<body>
+<form id="addressForm">
+	<div id="tradingCenter" style="border-top: none;">
+		<div class="tradingCenter" style="margin: 0"> 
+			<div class="content" style="min-height: auto; width:100%; margin: 0">
+					<div class="detailContent Inquirytitle detailedMessage" style="box-sizing: border-box;padding-left: 9%;padding-right: 9%; border: none; padding-bottom: 0">
+						<dl class="detail-list">
+							<dt style="width:27%;"></dt>
+							<dd  style="width: 70%" >
+                             	<span class="c-f">收票地址将关系到能否正常收到增值税发票，请谨慎填写！</span>
+							</dd>
+						</dl>
+						<dl class="detail-list inputHeight">
+							<dt style="width:27%;"><span class="c-f">*</span>收票人：</dt>
+							<dd  style="width: 70%" ><input type="text" class="inputxt" name="consignee" id="consignee" placeholder="请输入收票人" value="${address.consignee!}"  style="width: 88%" />
+                             <span class="jun-success-msg iconfont icon-tongguo c-g fz18"></span>
+                             <span class="jun-wrong-msg c-f">请填写收票人!</span>
+							</dd>
+						</dl>
+						<dl class="detail-list inputHeight">
+							<dt style="width:27%;"><span class="c-f">*</span>联系电话：</dt>
+							<dd  style="width: 70%" ><input class="inputxt" type="text" name="consigneeMobile" id="consigneeMobile" placeholder="请输入联系电话" value="${address.consigneeMobile!}"  style="width: 88%" />
+                             <span class="jun-success-msg iconfont icon-tongguo c-g fz18"></span>
+                             <span class="jun-wrong-msg c-f">请填写正确的联系电话!</span>
+							</dd>
+						</dl>
+						<dl class="detail-list inputHeight">
+							<dt style="width:27%;"><span class="c-f">*</span>所在地区：</dt>
+							<dd  style="width: 70%" >
+								<div id="city"  class="jun-city">
+									<select class="inputxt" id="s_province" style="width: 24.3%" name="prov"></select>  
+								    <select class="inputxt" id="s_city" style="width: 28.3%" name="city" ></select>  
+								    <select class="inputxt" id="s_county" style="width: 28.8%" name="dist"></select>
+								    <script class="resources library" src="${request.contextPath}/res/public/js/area.js" type="text/javascript"></script>
+								    <script type="text/javascript">_init_area();</script>
+								    <span class="jun-success-msg iconfont icon-tongguo c-g fz18" style="left: 88%;"></span>
+							    </div>
+                             <span class="jun-wrong-msg c-f">请选择正确的省市区! </span>
+							</dd>
+						</dl>
+						<dl class="detail-list inputHeight">
+							<dt style="width:27%;"><span class="c-f">*</span>详细地址：</dt>
+							<dd  style="width: 70%" ><input class="inputxt" type="text" name="consigneeAddress" id="consigneeAddress" placeholder="请输入详细地址" value="${address.consigneeAddress!}"  style="width: 88%" />
+                             <span class="jun-success-msg iconfont icon-tongguo c-g fz18"></span>
+                             <span class="jun-wrong-msg c-f">请填写详细地址!</span>
+							</dd>
+						</dl>
+						<dl class="detail-list inputHeight">
+							<dt style="width:27%;">邮编：</dt>
+							<dd  style="width: 70%" ><input class="inputxt" type="text" name="consigneePostCode" id="consigneePostCode" placeholder="请输入邮编" value="${address.consigneePostCode!}"  style="width: 88%" />
+                             <span class="jun-success-msg iconfont icon-tongguo c-g fz18"></span>
+							</dd>
+						</dl>
+					</div>
+				</div>
+			</div>
+	</div>
+</form>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+	<link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+	<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css"/>
+	<script src="/res/js/jquery-3.1.1.min.js"></script>
+	<script src="/res/public/layui/layui.js"></script>
+	<script src="/res/common/post.js"></script>
+	<script type="text/javascript">
+		var accountId = '${accountId}';
+		var userId = '${user.userId!}';
+		var departmentId = '${user.departmentId!}';
+
+		var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+	
+	    var form;
+	    layui.use('form', function() {
+	    	form = layui.form();
+	    	form.on('submit(cancel)', function(data){
+	    		parent.layer.close(index);//关闭当前窗口
+	    		return false;
+	    	});
+	    	
+	    	form.on('submit(save)', function(data){
+	    		if(checkValidate()){
+	    			var param = getFormData()
+	    			param.accountId = accountId;
+	    			if(userId){//修改
+	    				param.userId = userId;
+		    			postUtil.call("/distributor/user/editUser",{data:JSON.stringify(param)},function(res){
+		    				if(res.STATUS=="SUCCESS"){
+		    					layer.msg('修改员工成功！',{icon:6},function(){
+		    						parent.loadEmployeeslist({accountId:accountId});
+		    						parent.layer.close(index);//关闭当前窗口
+		    					});
+		    				}else{
+		    					layer.msg('修改失败，原因：'+res.MSG,{icon:5})
+		    				}
+		    			});
+	    			}else{//新增
+		    			postUtil.call("/distributor/user/addUser",{data:JSON.stringify(param)},function(res){
+		    				if(res.STATUS=="SUCCESS"){
+		    					layer.msg('添加员工成功！',{icon:6},function(){
+		    						parent.loadEmployeeslist({accountId:accountId});
+		    						parent.layer.close(index);//关闭当前窗口
+		    					});
+		    				}else{
+		    					layer.msg('添加失败，原因：'+res.MSG,{icon:5})
+		    				}
+		    			});
+	    			}
+	    		}
+	    		return false;
+	    	});
+	    	form.on('select(departmentId)', function(data){
+            	$("#departmentId").parent().find('input').removeClass('bor-ff');
+            	$("#departmentId").parent().find('span').hide();
+	    	});
+	    	
+	    	postUtil.call("/distributor/user/position",null,function(res){
+	    		var data =res.DATA;
+	    		if(data && data.length>0){
+		    		for(var i=0;i<data.length;i++){
+		    			$("#departmentId").append("<option value='"+data[i].departmentId+"' "+(data[i].departmentId==departmentId?'selected':'')+" >"+data[i].cName+"</option>")
+		    		}
+		    		form.render('select');
+	    		}
+	    	});
+	    });
+	    
+	    function getFormData(){
+			var data={
+				userName:$("input[name='userName']").val(),
+				userRealName :$("input[name='userRealName']").val(),
+				sex:$("input[name='sex']:checked").val(),
+				mobile:$("input[name='mobile']").val(),
+				departmentId:$("select[name='departmentId']").val(),
+				telephone:$("input[name='telephone']").val(),
+				email:$("input[name='email']").val(),
+				qq:$("input[name='qq']").val(),
+				selfDepartmentName:$("input[name='selfDepartmentName']").val(),
+				selfPosition:$("input[name='selfPosition']").val()
+			};
+			return data;
+	    }
+	    
+	    function validate(element){
+        	var value = $(element).val();
+            if ($(element).attr("name") == 'userName'){
+                if (!value) {
+                	$(element).addClass('bor-ff');
+                    $(element).next().text('由字母或数字组成，长度为4-20位').show();
+                    return false;
+                }else{
+                	var reg = /^[a-z0-9A-Z]{4,20}$/;
+                	if(reg.test(value)){
+                		var resp = postUtil.syncCall("/distributor/user/checkUserName",{userName:value,userId:userId});
+                		resp = JSON.parse(resp);
+                		if(resp.STATUS=='SUCCESS'){
+                			if(!resp.DATA){
+                				$(element).addClass('bor-ff');
+                				$(element).next().text('用户名重复').show();
+                				return false;
+                			}else{
+                        		$(element).removeClass('bor-ff');
+                        		$(element).next().hide();
+                        		return true;
+                			}
+                		}
+                	}else{
+                		$(element).addClass('bor-ff');
+                		$(element).next().text('由字母或数字组成，长度为4-20位').show();
+                		return false;
+                	}
+                }
+            }
+            if ($(element).attr("name") == 'userRealName'){
+                if (!value) {
+                	$(element).addClass('bor-ff');
+                	$(element).next().show();
+                	return false;
+                }else{
+                	$(element).removeClass('bor-ff');
+                	$(element).next().hide();
+                	return true;
+                }
+            }
+            if ($(element).attr("name") == 'mobile'){
+                if (!value) {
+                	$(element).addClass('bor-ff');
+                	$(element).next().text('请输入正确的手机号').show();
+                	return false;
+                }else{
+                	var reg1 = /^0?1[3|4|5|7|8][0-9]\d{8}$/;
+                	if(reg1.test(value)){
+                		var resp = postUtil.syncCall("/distributor/user/checkMobile",{mobile:value,userId:userId});
+                		resp = JSON.parse(resp);
+                		if(resp.STATUS=='SUCCESS'){
+                			if(resp.DATA){
+                        		$(element).addClass('bor-ff');
+                        		$(element).next().text('与'+resp.DATA.accountName+"的"+resp.DATA.userRealName+"重复").show();
+                        		return false;
+                			}else{
+                        		$(element).removeClass('bor-ff');
+                        		$(element).next().hide();
+                        		return true;
+                			}
+                		}
+                	}else{
+                		$(element).addClass('bor-ff');
+                		$(element).next().text('请输入正确的手机号').show();
+                		return false;
+                	}
+                }
+            }
+            if ($(element).attr("name") == 'telephone'){
+                if (value) {
+                	var reg1 = /^0[\d]{2,3}-[\d]{7,8}$/;
+                	if(!reg1.test(value)){
+                		$(element).addClass('bor-ff');
+                		$(element).next().show();
+                		return false;
+                	}else{
+                    	$(element).removeClass('bor-ff');
+                    	$(element).next().hide();
+                    	return true;
+                	}
+                }else{
+                	$(element).removeClass('bor-ff');
+                	$(element).next().hide();
+                	return true;
+                }
+            }
+            if ($(element).attr("name") == 'email'){
+                if (value) {
+                	var reg1 = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/ ;
+                	if(!reg1.test(value)){
+                		$(element).addClass('bor-ff');
+                		$(element).next().show();
+                		return false;
+                	}else{
+                    	$(element).removeClass('bor-ff');
+                    	$(element).next().hide();
+                    	return true;
+                	}
+                }else{
+                	$(element).removeClass('bor-ff');
+                	$(element).next().hide();
+                	return true;
+                }
+            }
+            if ($(element).attr("name") == 'departmentId'){
+                if (!value) {
+                	$(element).parent().find('input').addClass('bor-ff');
+                	$("#departmentId").parent().find('span').show();
+                	return false;
+                }else{
+                	$(element).parent().find('input').removeClass('bor-ff');
+                	$("#departmentId").parent().find('span').hide();
+                	return true;
+                }
+            }
+            return true;
+	    }
+	    
+	    function checkValidate(){
+	    	var array = [];
+	    	$.each($(".layui-input"),function(index,element){
+	    		var result = validate(element);
+	    		if(!result){
+	    			array.push("false");
+	    		}
+	    	});
+	    	if(array.indexOf("false")>-1){
+	    		return false;
+	    	}
+	    	return true
+	    }
+	    
+        $(document).on('change', '.layui-input', function() {
+        	validate(this);
+        });
+            
+	</script>
+</head>
+<body  style="overflow: hidden ;">
+	<div class="bz-bb pl20 pr20 pt20 mt10">
+		<form id="userInfoForm" class="jun-form-s form-css ">
+			<dl class="dl-form">
+	           <dt class="flt fz12"><span class="c-f">*</span>登录名：</dt>
+	           <dd class="flt pre"><input type="text" value='${user.userName!}' name="userName"  placeholder="请输入登录名" autocomplete="off" class="layui-input">
+	           	   <span style="display:none;position:absolute;top:32px;left:0" class="c-f fz12">由字母或数字组成，长度为4-20位</span>
+	           </dd>
+	           <dt class="flt fz12"><span class="c-f">*</span>员工姓名：</dt>
+	           <dd class="flt pre"><input type="text" value='${user.userRealName!}' name="userRealName"  placeholder="请输入员工姓名" autocomplete="off" class="layui-input">
+	           	   <span style="display:none;position:absolute;top:32px;left:0" class="c-f fz12">请输入员工姓名</span>
+	           </dd>
+	        </dl>
+	        <dl class="dl-form">
+	           <dt class="flt fz12"><span class="c-f">*</span>性别：</dt>
+	           <dd class="flt layui-form" style="width: 240px">
+	           	  <input type="radio" name="sex" value="male" title="男" <#if user.sex?exists && user.sex=='male'>checked<#else>checked</#if> >
+                  <input type="radio" name="sex" value="female" title="女" <#if user.sex?exists && user.sex=='female'>checked</#if> >
+	           </dd>
+	           <dt class="flt fz12"><span class="c-f">*</span>手机号：</dt>
+	           <dd class="flt pre"><input type="text" name="mobile" ${(user.userId?exists)?string('readonly','')} value='${user.mobile!}' placeholder="请输入手机号" autocomplete="off" class="layui-input">
+	           	   <span style="display:none;position:absolute;top:32px;left:0" class="c-f fz12">请输入正确的手机号</span>
+	           </dd>
+	        </dl>
+	        <dl class="dl-form">
+	           <dt class="flt fz12"><span class="c-f">*</span>岗位：</dt>
+	           <dd class="flt pre layui-form jun-form-l">
+	           	   <select id="departmentId" lay-filter="departmentId" name="departmentId" class="layui-input">
+	           			<option value=""></option>
+	           	   </select>
+	           	   <span style="display:none;position:absolute;top:32px;left:0" class="c-f fz12">请选择岗位</span>
+	           </dd>
+	           <dt class="flt fz12">座机：</dt>
+	           <dd class="flt pre"><input type="text" value='${user.telephone!}' name="telephone"  placeholder="请输入座机号" autocomplete="off" class="layui-input">
+	               <span style="display:none;position:absolute;top:32px;left:0" class="c-f fz12">请输入正确的座机号(例如:027-12345678)</span>
+	           </dd>
+	        </dl>
+	        <dl class="dl-form">
+	           <dt class="flt fz12">邮箱：</dt>
+	           <dd class="flt pre"><input type="text" name="email" value='${user.email!}' placeholder="请输入邮箱" autocomplete="off" class="layui-input">
+	           	   <span style="display:none;position:absolute;top:32px;left:0" class="c-f fz12">请输入正确的邮箱(例如:XXX@yofc.com)</span>
+	           </dd>
+	           <dt class="flt fz12">QQ：</dt>
+	           <dd class="flt"><input type="text" name="qq" value='${user.qq!}' placeholder="请输入QQ号" autocomplete="off" class="layui-input"></dd>
+	        </dl>
+	        <dl class="dl-form">
+	           <dt class="flt fz12">部门：</dt>
+	           <dd class="flt"><input type="text" name="selfDepartmentName" value='${user.selfDepartmentName!}' placeholder="请输入部门" autocomplete="off" class="layui-input"></dd>
+	           <dt class="flt fz12">职位：</dt>
+	           <dd class="flt"><input type="text" name="selfPosition" value='${user.selfPosition!}' placeholder="请输入职位" autocomplete="off" class="layui-input"></dd>
+	        </dl>
+	        <div class="pt10 pb20 t-c">
+	        	<button class="form-btn layui-btn-small2" lay-submit lay-filter="save">保存</button>
+      			<button class="form-btn layui-btn-itoc layui-btn-small2 ml10" lay-submit lay-filter="cancel">取消</button>
+			</div>
+		</form>
+	</div>
+</body>
+</html>

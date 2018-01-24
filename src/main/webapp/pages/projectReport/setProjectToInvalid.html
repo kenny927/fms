@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/public/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_svvppt2njx9u23xr.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <link rel="stylesheet" href="/res/css/project.css<@resVersionDirective>?</@>">
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+</head>
+<body style="background-color: #fff">
+
+    <div class="itocMain main" style="padding: 20px;">
+        <form id="conflictForm" class="layui-form" action="">
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label" style="width: 80%;text-align:left;">
+                    <span class="c-f">是否确认将该项目报备置为失效？</span>如确认，请填写原因</label>
+                <div class="layui-input-block ml10-i mr10">
+                    <textarea name="comment" placeholder="请输入内容" class="layui-textarea" style="min-height: 150px;"></textarea>
+                </div>
+
+            </div>
+        </form>
+    </div>
+<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+<script>
+    layui.use([ 'form', 'layedit', 'laydate', 'layer' ], function(){
+        var form = layui.form(), layer = layui.layer, layedit = layui.layedit, laydate = layui.laydate;
+
+    })
+
+</script>
+</body>
+</html>

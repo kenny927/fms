@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+      <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_rcslf61orstyy14i.css<@resVersionDirective>?</@>"/>    
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/Area1.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui-mz-min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/MultiSelectDropList.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+      <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+  </head>
+  <style>
+/*     body[contenteditable="true"]{
+      min-height: 160px!important;
+    } */
+  </style>
+  <body>
+  <div style="margin-left:20px;margin-top:10px;" class="clr">
+    <form action="" class="jun-form-s form-css flt" style="width:480px;">
+            <dl class="dl-form" style="margin-bottom:10px;">
+               <dd class="flt layui-form pre">
+                  <input type="text" name="title"  id="searchObject" placeholder="手机号/姓名/邮箱/公司名称" autocomplete="off" class="layui-input">
+               </dd>
+               <dd class="flt pre ml10">
+                    <div class="multi_select" id="statusSelect2" style="position:absolute;left:1px;top:0;z-index:1">
+                        <!--<img style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" />-->
+                    </div>
+               </dd>
+            </dl>
+     </form>
+            <div class="ml20 flt" style="text-align:right;"><button class="form-btn layui-btn-small2 searchChooseBtn" onclick="searchChooseBtn()">搜索</button></div>
+             
+   </div>
+  <!-- <form action="" class="jun-form-s form-css layui-form"> -->
+      <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;margin-top:10px;">
+          <table class="layui-table pop table-css" lay-skin="line">
+              <colgroup>
+                <col  width="30">
+                <col  width="120">
+                <col  width="100">
+                <col  width="300">
+                <col  width="120">
+                <col  width="120">
+                <col  width="100">
+              </colgroup>
+              <thead>
+                <tr class="bor-no">
+                  <th ></th>
+                  <th >账号（手机号）</th>
+                  <th >姓名</th>
+                  <th >公司名称</th>
+                  <th >来源</th>
+                  <th >注册时间</th>
+                  <th>客户经理</th>
+                </tr> 
+              </thead>
+              <tbody>
+             
+              </tbody>
+              </table>
+         </div>
+      <div id="paginationDiv" style="margin-right:8px;margin-top:-20px"></div>
+      <div class="t-c">
+          <button class="form-btn layui-btn-small2 confirmChooseBtn" onclick="confirmChooseBtn()">确定</button>
+          <button class="form-btn  layui-btn-primary layui-btn-small2 cancelChooseBtn ml10"  onclick="cancelChooseBtn()">取消</button>
+      </div>
+<!-- </form> -->
+<script type="text/javascript">
+	var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+	$(document).on('click','.pay_list_c1',function(){
+		$(this).addClass("on").parent().parent().siblings().find("span").removeClass("on");
+	})
+layui.use(['form','jquery','laydate','layer'], function(){
+    form = layui.form();
+    $form = $('form');
+    $ = layui.jquery;
+    layer = layui.layer;
+})
+	function confirmChooseBtn(){
+		    if($(".layui-table tbody").find(".on").length==0){
+		  	  layer.msg("请选择工程商!",{icon: 5});
+				return false;
+		    }
+		   var userId= $(".on>input[name=status]").attr("userId");
+		   var mobile= $(".on").parent().siblings().eq(0).html();
+		   var accountName= $(".on").parent().siblings().eq(2).html();
+		   var linkman=$(".on").parent().siblings().eq(1).html();
+		   var accountResourceCname= $(".on").parent().siblings().eq(3).html();
+		   var createDate= $(".on").parent().siblings().eq(4).html();
+		   var accountManagerName= $(".on").parent().siblings().eq(5).html();
+		   var accountManagerId= $(".on").parent().siblings().eq(6).html();
+		   var accountId= $(".on").parent().siblings().eq(7).html();
+		   var userRealName= $(".on").parent().siblings().eq(8).html();
+		   var email= $(".on").parent().siblings().eq(9).html();
+		    var result={};
+		    result.userId=userId;
+		    result.accountId=accountId;
+		    result.accountName=accountName;
+		    result.linkman=linkman;
+		    result.mobile=mobile;
+		    result.userRealName=userRealName;
+		    result.email=email;
+		    result.accountName=accountName;
+		    result.accountResourceCname=accountResourceCname;
+		    result.createDate=createDate;
+		    result.accountManagerId=accountManagerId;
+		    result.accountManagerName=accountManagerName;
+		    parent.backChooseSystemAccountRecordCallback(result);//调用父页面的渲染方法
+            parent.layer.close(index);//关闭当前窗口
+	}
+
+  function cancelChooseBtn(){
+			 parent.layer.close(index);//关闭当前窗口
+	}
+	
+
+    
+function isExitsVariable(variableName) {  
+    try {  
+        if (typeof (variableName) == "undefined") {  
+            return "";  
+        } else {  
+            return variableName;  
+        }  
+    } catch (e) {  
+    }  
+    return "";  
+}
+
+$(function(){ 
+	var param={};
+	param.currentPageIndex=1;
+	loadDATA(param);
+	
+	  $('#statusSelect2').MSDL({
+          'width': '240',
+          'data': [{"text":"手动新增","value":"MANUAL"},{"text":"商城个人注册","value":"MALL_PERSONAGE_REGIST"},{"text":"商城企业注册","value":"MALL_ENTERPRISE_REGISTION"},{"text":"分销商项目报备","value":"DISTRIBUTOR_PROJECT_BACKUP"},{"text":"销售员项目报备","value":"SALES_PROJECT_BACKUP"}],
+          'id': "status"
+      });
+    $(".select_rel").attr("placeholder","请选择来源");
+});
+function loadDATA(param) {
+    postUtil.call("/systemAccount/loadSystemAccountlist", param, function (result) {
+    	 var pageNumber = result.pageNumber;
+         var pageSize = result.pageSize;
+         var totalPage = result.totalPage;
+         var totalRow = result.totalRow;
+         var dataList = result.list;
+         renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                    	param.currentPageIndex=obj.curr;
+                    	loadDATA(param);
+                    }
+                }
+            });
+ });
+}
+function renderTable(dataList) {
+		var html="";
+        var length = dataList.length;
+        if (length > 0) {
+            for (var i1 = 0; i1 < dataList.length; i1++) {
+                var data = dataList[i1]; 
+                var sexCname=isExitsVariable(data. sexCname);
+                html+='  <tr style="height:58px;">'+
+                         '   <td><span class="pay_list_c1"><input type="radio" name="status"  class="radioclass" userId="'+isExitsVariable(data.userId)+'"/></span></td>'+
+                         '   <td>'+isExitsVariable(data.mobile)+'</td>';
+			              if(sexCname==""){
+			            	  html+= '   <td>'+isExitsVariable(data.userRealName)+'</td>';
+			              }else{
+			            	  html+= '   <td>'+isExitsVariable(data.userRealName)+'('+sexCname+')</td>';
+			              }
+                 html+=  '   <td>'+isExitsVariable(data.accountName)+'</td>'+
+			             '   <td>'+isExitsVariable(data.accountResourceCname)+'</td>'+
+			             '   <td>'+isExitsVariable(data.createTimeStr)+'</td>'+
+			             '   <td>'+isExitsVariable(data.accountManagerName)+'</td>'+
+			             '   <td style="display:none">'+isExitsVariable(data.accountManagerId)+'</td>'+
+			             '   <td style="display:none">'+isExitsVariable(data.accountId)+'</td>'+
+			             '   <td style="display:none">'+isExitsVariable(data.userRealName)+'</td>'+
+			             '   <td style="display:none">'+isExitsVariable(data.email)+'</td>'+
+			             '  </tr>'
+           }
+        }else{
+        	 html+='<tr>'+
+        	 		'<td  colspan="7" height="50px"  align="center">'+
+        	 		'<span class="fz16">暂无相关信息</span> '+
+        	 		'</td>'+
+        	 		'</tr>'
+        }
+        $(".layui-table tbody").html(html);
+    }
+
+function searchChooseBtn(){
+	var searchObject=$('#searchObject').val();
+	var accountResource = $('#statusSelect2 #status_hidden').val();
+	var param={};
+	param.searchObject=searchObject;
+	param.accountResource=accountResource;
+	param.currentPageIndex=1;
+	loadDATA(param);
+}
+ document.onkeydown = function(e){
+	var ev = document.all ? window.event : e;
+	if(ev.keyCode==13) {
+		var searchObject=$('#searchObject').val();
+		var param={};
+		param.searchObject=searchObject;
+		param.currentPageIndex=1;
+		loadDATA(param);
+	}
+}
+
+  </script>
+  </body>
+</html>

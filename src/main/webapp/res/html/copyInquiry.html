@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <script src="/res/js/jquery-3.1.1.min.js"></script>
+    <script src="/res/public/layui/layui.js"></script>
+    <script src="/res/public/layui/Area1.js" type="text/javascript"></script>
+    <script src="/res/public/layPage/laypage.js"></script>
+    <script src="/res/common/globalVar.js"></script>
+    <script src="/res/common/post.js"></script>
+    <script src="/res/js/moment.js"></script>
+    <script src="/res/common/numCheck.js"></script>
+    <script src="/res/js/vue.js"></script>
+    <script src="/res/js/ajaxfileupload_final.js"></script>
+    <style>
+        input[type="file"]::-webkit-file-upload-button {
+            width: 70px;
+            height: 40px;
+            overflow: hidden;
+            line-height: 3em;
+            background: #FFFFFF;
+            content: "";
+            cursor: pointer;
+            background:url(/res/images/addfile.jpg) no-repeat 0 0;
+            outline: none;
+            border: 0 none;z-index: 2;
+        }
+
+        p[name="attachmentFile"]{
+            color: blue !important;
+        }
+    </style>
+</head>
+<body>
+<div id="queryBuyerEnquireDetail">
+    <div class="bz-bb pl20 pr20 pt10">
+        <form action="" class="jun-form-s form-css">
+            <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">复制询价单</h3>
+            <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+                     <dl class="form">
+                         <dd>原始询价单：023是否为统一询价需求</dd>
+                         <dd class="layui-form">
+                             <input type="radio" name="sex" value="是" title="是" lay-filter="inquiry" >
+                             <input type="radio" name="sex" value="否" title="否" lay-filter="inquiry2">
+                         </dd>
+                     </dl>
+            </blockquote>
+            <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">工程商</h3>
+            <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <span class="form-btn layui-btn-itoc layui-btn-big chooseSystemAccount" v-show="msg5">请选择工程商</span>
+            <div v-show="msg1">
+                <table  class="layui-table pop table-css table-style">
+                <colgroup>
+                    <col  width="100">
+                    <col  width="400">
+                    <col  width="100">
+                    <col  width="400">
+                    </colgroup>
+                <tbody>
+                <tr>
+                    <td bgcolor="#f0f0f0" align="right">账号</td>
+                    <td align="left">{{chooseSystemAccount.mobile}}</td>
+                    <td bgcolor="#f0f0f0" align="right">专属客户经理</td>
+                    <td align="left">{{chooseSystemAccount.accountManagerName}}</td>
+                    </tr>
+                <tr>
+                    <td bgcolor="#f0f0f0" align="right">姓名</td>
+                    <td align="left">{{chooseSystemAccount.linkman}}</td>
+                    <td bgcolor="#f0f0f0" align="right">邮箱</td>
+                    <td align="left">{{chooseSystemAccount.email}}</td>
+                    </tr>
+                <tr>
+                    <td bgcolor="#f0f0f0" align="right">公司名称</td>
+                    <td align="left">{{chooseSystemAccount.accountName}}</td>
+                    <td bgcolor="#f0f0f0" align="right">来源</td>
+                    <td align="left">{{chooseSystemAccount.accountResourceCname}}</td>
+                    </tr>
+                <tr>
+                    <td bgcolor="#f0f0f0" align="right">注册时间</td>
+                    <td colspan="3" align="left">{{chooseSystemAccount.createDate}}</td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+        </blockquote>
+        <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">商品信息</h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <h3 class="mb5">商城商品<span class="c-h frt fz12 cs-p under-l" onclick="addProduct()">+添加商城商品</span></h3>
+            <table class="layui-table pop">
+                <colgroup>
+                    <col  width="400">
+                    <col  width="100">
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="200">
+                    <col v-show="msg3"  width="100">
+                    <col v-show="msg3"  width="100">
+                    <col  width="100">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>商品</th>
+                    <th >目录价</th>
+                    <th ><span class="c-f">*</span>数量</th>
+                    <th >计量单位</th>
+                    <th >商品描述</th>
+                    <th v-show="msg3" ><span>*</span>商品报价(含税/不含税)</th>
+                    <th  v-show="msg3">报价小计</th>
+                    <th >操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-show="malls.length==0">
+                    <td  colspan="8" height="50px"  align="center">
+                        <span class="fz16">暂无相关信息</span>
+                    </td>
+                </tr>
+                <tr v-for="item in malls">
+                    <td class="goods-detail">
+                        <dl>
+                            <dt><img v-bind:src="item.skuProductImage"  alt="">
+                            <p>{{item.skuBrandName}}</p>
+                            </dt>
+                            <dd class="t-l ml10">
+                                <p class="one-row c-2">{{item.skuName|nullValue}}</p>
+                                <p class="mt10">商品型号:{{item.skuMode}}</p>
+                                <p>商品编码:{{item.skuId}}</p>
+                                <p>商品属性:{{item.skuProperty}}</p>
+                            </dd>
+                        </dl>
+                    </td>
+                    <td>{{item.skuDirectoryPrice | currency '' '2'}}</td>
+                    <td class="reduce-add">
+                        <dl>
+                            <dd class="cs-p min" v-on:click="min(item,key)">-</dd>
+                            <dd><input type="text"  v-model="item.skuQuantity" @keyup="multiply(item,key)"  /></dd>
+                            <dd class="cs-p add" v-on:click="add(item,key)">+</dd>
+                        </dl>
+                    </td>
+                    <td>{{item.skuUnitName}}</td>
+                    <td class="lay-form">
+                        <textarea cols="130" placeholder="请输入内容" class="layui-textarea"  v-model="item.skuremark"></textarea>
+                    </td>
+                    <td v-show="msg3">
+                        <input type="text" name="skuOfferPrice"  placeholder="请输入报价"  class="layui-input" v-model="item.skuOfferPrice" @keyup="multiply(item,key)"/>
+                    </td>
+                    <td v-show="msg3">{{item.skuOfferAmount|currency '' '2'}}</td>
+                    <td><a href="javsscript:;" class="c-h cs-p fz12" v-on:click="deleteMsg($index)">删除</a></td>
+                </tr>
+                </tbody>
+            </table>
+            <h3 class="mb5"><span class="c-h frt fz12 cs-p under-l"   v-on:click="addCustomProduct()">+添加自定义商品</span></h3>
+            <table class="layui-table pop">
+                <colgroup>
+                    <col  width="300">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="200">
+                    <col v-show="msg3" width="200">
+                    <col v-show="msg3" width="150">
+                    <col  width="100">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th><span class="c-f">*</span>商品名称</th>
+                    <th ><span class="c-f">*</span>商品型号</th>
+                    <th ><span class="c-f">*</span>品牌</th>
+                    <th ><span class="c-f">*</span>数量</th>
+                    <th ><span class="c-f">*</span>计量单位</th>
+                    <th >商品描述</th>
+                    <th v-show="msg3" ><span>*</span>商品报价(含税/不含税)</th>
+                    <th v-show="msg3"><span>*</span>商品报价(含税/不含税)</th>
+                    <th >操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-show="diys.length==0">
+                <td  colspan="9" height="50px"  align="center">
+                <span class="fz16">暂无相关信息</span>
+                </td>
+                </tr>
+                <tr class="diy-input"  v-for="item in diys">
+                    <td><input type="text" name="title"  autocomplete="off" placeholder="请输入商品名称" class="layui-input" v-model="item.skuName"></td>
+                    <td><input type="text" name="title"  autocomplete="off" placeholder="请输入商品型号" class="layui-input"  v-model="item.skuMode"></td>
+                    <td><input type="text" name="title"  autocomplete="off" placeholder="请输入品牌" class="layui-input" v-model="item.skuBrandName"></td>
+                    <td><input type="text" name="title"  autocomplete="off" placeholder="请输入数量" class="layui-input" v-model="item.skuQuantity" @keyup="multiply2(item,key)"></td>
+                    <td><input type="text" name="title"  autocomplete="off" placeholder="请输入计量单位" class="layui-input" v-model="item.skuUnitName"></td>
+                    <td><input type="text" name="title"  autocomplete="off" placeholder="请输入商品描述" class="layui-input" v-model="item.remark"></td>
+                    <td v-show="msg3"><input type="text" name="title"  autocomplete="off" placeholder="请输入商品报价"  class="layui-input"  v-model="item.skuPrice" @keyup="multiply2(item,key)"></td>
+                    <td v-show="msg3">{{item.skuAmount|currency '' '2'}}</td>
+                <td><a href="javascript:;" v-on:click="deleteMsg2($index)">删除</a></td>
+                </tr>
+                </tbody>
+            </table>
+            <div v-show="msg3" class="mt20  clr">
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">商品总报价：</dt>
+                        <dd class="flt line-middle w100">{{skuProductPrice|currency '' '2'}}</dd>
+                        <dd class="flt line-middle ml5">元</dd>
+                    </dl>
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">运费：</dt>
+                        <dd class="flt"><input type="text" name="title" v-model="datas.offerFreight" @keyup="multiply3(datas.offerFreight,datas.offerOtherFees)" placeholder="请输入标题" autocomplete="off" class="layui-input w100""></dd>
+                        <dd class="flt line-middle ml5">元</dd>
+                    </dl>
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">其他费用描述：</dt>
+                        <dd class="flt"><input type="text" name="title" v-model="datas.offerOtherFeesDesc" placeholder="请输入标题" autocomplete="off" class="layui-input w100"></dd>
+                        <dd class="flt line-middle ml5">元</dd>
+                        <dt class="flt">金额：</dt>
+                        <dd class="flt"><input type="text" name="title" placeholder="请输入标题" v-model="datas.offerOtherFees" @keyup="multiply3(datas.offerFreight,datas.offerOtherFees)" autocomplete="off" class="layui-input w100""></dd>
+                        <dd class="flt line-middle ml5">元</dd>
+                    </dl>
+                    <dl class="dl-form frt mb5-i" >
+                        <dt class="flt">总价：</dt>
+                        <dd class="flt line-middle w100">{{offerTotalPrice|currency '' '2'}}</dd>
+                        <dd class="flt line-middle ml5">元</dd>
+                    </dl>
+            </div>
+        </blockquote>
+        <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">详细信息</h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <dl class="dl-form">
+                <dt class="flt w78"><span class="c-f">*</span>期望交期：</dt>
+                <dd class="flt w240"><input type="text" id="enquire_expectDeliveryTime" name="followDate"  style="height: 32px;width: 240px;" class="layui-input laydate-icon" placeholder="请选择期望交期" onclick="layui.laydate({elem: this, istime: true, format: 'YYYY-MM-DD'})" validate="true"></dd>
+                <dt class="flt" v-show="msg3"><span class="c-f">*</span>回复交期：</dt>
+                <dd class="flt" v-show="msg3"><input name="followDate" id="enquire_replyDeliveryDate"  style="height: 32px;width: 240px;" class="layui-input laydate-icon" placeholder="自定义日期格式" onclick="layui.laydate({elem: this, istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" validate="true"></dd>
+            </dl>
+            <dl class="dl-form">
+                <dt class="flt"><span class="c-f">*</span>收货地：</dt>
+                <dd class="flt layui-form dd-city dd-city2">
+                    <select name="province" lay-filter="province" id="enquire_projectProvince">
+                        <option value="">请选择省</option>
+                    </select>
+                </dd>
+                <dd class="flt layui-form dd-city dd-city2 ml10">
+                    <select name="city" lay-filter="city"  id="enquire_projectCity">
+                        <option value="">请选择市</option>
+                    </select>
+                </dd>
+                <dt class="flt" v-show="msg3"><span class="c-f">*</span>报价有效期至：</dt>
+                <dd class="flt" v-show="msg3"><input name="followDate" id="enquire_offerValidUntil"  style="height: 32px;width: 240px;" class="layui-input laydate-icon" placeholder="自定义日期格式" onclick="layui.laydate({elem: this, istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" validate="true"></dd>
+
+            </dl>
+            <dl class="dl-form mb10-i">
+                    <dt class="flt"><span class="c-f">*</span>配送方式：</dt>
+                    <dd class="flt layui-form">
+                        <input type="radio" name="deliveryMode" value="LORRY" title="汽车" checked="true">
+                        <input type="radio" name="deliveryMode" value="RAILWAY" title="铁路">
+                        <input type="radio" name="deliveryMode" value="AIRLIFT" title="空运">
+                        <input type="radio" name="deliveryMode" value="EXPRESS" title="快递">
+                        <input type="radio" name="deliveryMode" value="SELF_PICK" title="客户自提">
+                        <input type="radio" name="deliveryMode" value="OTHER" title="其他">
+                    </dd>
+                    <dd class="flt"><input type="text" name="title" id="deliveryModeRemark" placeholder="请输入其他配送方式"  autocomplete="off" class="layui-input"></dd>
+                </dl>
+                <dl class="dl-form mb10-i layui-form">
+                    <dt class="flt"><span class="c-f">*</span>结算方式：</dt>
+                    <dd class="flt"><input type="radio" name="payMode" value="CASH_BEFORE_DELIVERY" title="先款后货" checked="true"><input type="radio" name="payMode"  value="DEPOSIT" title="订金支付"></dd>
+                    <dd class="flt"><input type="text" name="title" id="payModeRemark1" autocomplete="off" class="layui-input" style="width: 40px;margin-left:-18px;" value="30"></dd>
+                    <dd class="flt line-middle">%</dd>
+                    <dd class="flt ml20"><input type="radio" name="payMode" value="CASH_ON_DELIVERY" title="账期支付(货到"></dd>
+                    <dd class="flt"><input type="text" name="payModeRemark2" id="payModeRemark2" placeholder="输入天数" autocomplete="off" class="layui-input" style="width: 80px;margin-left:-18px;"></dd>
+                    <dd class="flt  line-middle fz12">付款)</dd>
+                </dl>
+                <dl class="dl-form mb10-i">
+                    <dt class="flt"><span class="c-f">*</span>是否开票：</dt>
+                    <dd class="flt layui-form">
+                        <input type="radio" name="isNeedInvoice" value="Y" title="开票（增值税专用发票）" checked="true">
+                        <input type="radio" name="isNeedInvoice" value="N" title="不开票">
+                    </dd>
+                </dl>
+                <dl class="dl-form mb5-i">
+                    <dt class="flt fz12">备注：</dt>
+                    <dd class="flt layui-form pre">
+                        <textarea id="remark" cols="130" rows="5"  placeholder="输入您对商品的其他要求,400以内" v-model="datas.purchasingRequisitionDesc" class="layui-textarea demandDescribe" style="resize: none;"></textarea>
+                        <span class="wordwrap" style="position: absolute;right: 10px;bottom: 0;"><var class="word" id="demandDescribeWord" style="color: red;">400</var>/400</span>
+                        <span class="msg" style="display: none;color: red;" id="demandDescribeMsg"></span>
+                    </dd>
+                </dl>
+                <dl class="dl-form mb5-i">
+                    <dt class="flt fz12">附件：</dt>
+                    <dd class="flt">
+                        <ul id="buyerAttachmentList" class="attachmentFileList clr" v-for="item in attachmentList">
+                            <li class="flex flt"><p class="t-l" style="flex: 5;" onclick="downLoadFile('{{item.attachmentId}}')" >{{item.attachmentName}}</p>
+                                <a class="delete" href="javadcript:;" style="flex: 1;" onclick="deleteAttachmentFile(this,'{{item.logId}}')">删除</a></li>
+                        </ul>
+                        <div class="t-l" v-show="attachment">
+                            <input type="file" name="file" id="buyerAttachmentListFileBtn"  class="layui-upload-file inline" lay-title="上传合同" />
+                            <p class="msg fz12 c-9 inline ml10">最多5个附件,单个附件8M以内,格式不限</p>
+                        </div>
+                    </dd>
+                </dl>
+        </blockquote>
+        <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">添加报价人</h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" id="choseBidder">
+            <div class="mb20">
+                <span class="form-btn layui-btn-small2 layui-btn-itoc">平台报价</span>
+            </div>
+            <div>
+                <span class="form-btn layui-btn-small2 layui-btn-itoc">分销商报价</span>
+                <a href="javascript:;" class="fz12 cs-p c-h ml10 mr20" style="display: none" onclick="chooseDistributor(2)">{{msg4}}</a><span class="fz12 c-2">{{msg2}}</span>
+            </div>
+        </blockquote>
+        <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">操作日志<span class="c-h frt fz12 cs-p under-l mr20"   @click="fn()">{{word}}></span></h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <table class="layui-table pop mb5-i" lay-skin="line">
+                <colgroup>
+                    <col  width="200">
+                    <col  width="200">
+                    <col  width="200">
+                    <col  width="400">
+                    <col  width="200">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th >时间</th>
+                    <th >操作人</th>
+                    <th >询单状态</th>
+                    <th >操作内容</th>
+                    <th >操作</th>
+                </tr>
+                </thead>
+                <tbody v-show="willShow">
+                    <tr v-show="lis.length==0">
+                        <td  colspan="5" height="50px"  align="center">
+                            <span class="fz16">暂无相关信息</span>
+                        </td>
+                    </tr>
+                    <tr v-for="item in lis">
+                        <td>{{item.operationTime}}</td>
+                        <td>{{item.operationAccountName}}{{item.operationUserName}}</td>
+                        <td>{{item.offerStatus}}</td>
+                        <td>{{item.operationContent}}</td>
+                        <td><a href="javascript:;" class="c-h fz12 cs-p" v-show="$index==0">查看原始单据</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </blockquote>
+            <div class="t-c"><span class="form-btn layui-btn-small2 mb20" lay-submit="" lay-filter="demo1">生成询价单</span></div>
+     </form>
+</div>
+<script src="/res/js/editInquiryDetail.js"></script>
+</body>
+</html>

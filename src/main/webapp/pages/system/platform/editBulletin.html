@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+
+    <!-- kindediter -->
+    <link rel="stylesheet" type="text/css" href="/res/public/kindeditor4.1.7/themes/default/default.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/public/kindeditor4.1.7/kindeditor-all-min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/kindeditor4.1.7/lang/zh_CN.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div class="purchaseSearch">
+                <form>
+                    <dl class="form-list" style="height: 60px;">
+                        <dt style="width: 150px;">公告ID：</dt>
+                        <dd>
+                            <input type="text" readonly="readonly" id="id" style="width: 300px;"/>
+                        </dd>
+                    </dl>
+
+                    <dl class="form-list" style="height: 60px;">
+                        <dt style="width: 150px;">是否置顶：</dt>
+                        <dd>
+                            <select disabled="disabled" id="isDefault" style="width: 312px;height: 40px;">
+                                <option value="NULL">请选择</option>
+                                <option value="Y">置顶</option>
+                                <option value="N">不置顶</option>
+                            </select>
+                        </dd>
+                    </dl>
+                    <dl class="form-list" style="height: 60px;">
+                        <dt style="width: 150px;">公告标题名称：</dt>
+                        <dd>
+                            <input type="text" readonly="readonly" id="bulletinName" style="width: 300px;"/>
+                        </dd>
+                    </dl>
+                    <dl class="form-list" style="height: 460px;">
+                        <dt style="width: 150px;">公告内容：</dt>
+                        <dd>
+                            <textarea name="bulletinContent" style="width:600px;height:400px;visibility:hidden;"></textarea>
+                        </dd>
+                    </dl>
+                    <dl class="form-list" style="height:100px;margin-left: 120px;">
+                        <dd><span class="btn ml10" id="editSystemMessageTemplateBtn" style="cursor: pointer;">确认修改</span></dd>
+                        <dd><span class="btn ml10" id="cancelEditSystemMessageTemplateBtn" style="cursor: pointer;">取消</span></dd>
+                    </dl>
+                </form>
+            </div>
+        </div>
+    </section>
+</section>
+<script>
+
+    var templateId = "${templateId}";
+    if(!templateId) {
+        layer.msg("页面加载过程中出现错误,请稍后重试",{icon:5});
+    }
+
+
+    /*初始化富文本编辑器*/
+    var edit_editor = null;
+    KindEditor.ready(function (K) {
+        edit_editor = K.create('textarea[name="bulletinContent"]', {
+            allowFlashUpload: false,
+            allowMediaUpload: false,
+            allowFileUpload: true,
+            filterMode: false,
+            uploadJson: '/file_server/images/uploadForKindEditor'
+        });
+    });
+
+    $(function () {
+
+        //初始化修改表单
+        layer.load();
+        var initParam = {};
+        initParam.templateId = templateId;
+        postUtil.call("/system/platformBulletinProblem/getCommonBulletin",initParam,function(result){
+            layer.closeAll("loading");
+            if(result.STATUS == "SUCCESS") {
+                $("#id").val(result.DATA.id);
+                $("#isDefault").val(result.DATA.isDefault);
+                $("#bulletinName").val(result.DATA.bulletinName);
+                $("#bulletinContent").val(result.DATA.bulltinContent);
+                edit_editor.html(result.DATA.bulltinContent);
+            }else {
+                layer.msg(result.MSG,{icon:5});
+            }
+        });
+
+        $('#editSystemMessageTemplateBtn').bind("click", function () {
+            var id = $('#id').val();
+            var isDefault = $('#isDefault').val();
+            var bulletinName = $('#bulletinName').val();
+            var bulletinContent = edit_editor.html();
+            if(bulletinContent == null || bulletinContent == '' || bulletinContent == undefined) {
+                bulletinContent = edit_editor.text();
+            }
+            if (bulletinContent == null || "" == bulletinContent) {
+                layer.msg("公告容不允许为空", {icon: 5});
+                return;
+            }
+
+            layer.open({
+                title: false,
+                skin: 'myskin3',
+                area: ['450px', '250px'],
+                btnAlign: 'c',
+                content: '<div id="upload" class="t-c c-2" style="padding-top: 40px;"><p style="margin-top: 25px;">确定修改模板：<span class="fz18 c-f fw-b">[' + $('#bulletinName').val() + ']</span>吗？</p></div>',
+                btn: ['确定', '取消'],
+                yes: function (index, layero) {
+                    var param = {};
+                    param.id = id;
+                    param.bulletinName = bulletinName;
+                    param.isDefault = isDefault;
+                    param.bulletinContent = bulletinContent;
+                    postUtil.call("/system/platformBulletinProblem/addPlatformBulletin", param, function (result) {
+                        if (result.STATUS == "SUCCESS") {
+                            layer.msg("已经成功修改模板", {icon: 6});
+                            setTimeout(function(){
+                                postUtil.submit("/system/platformBulletinProblem/prePlatformBulletin");
+                            }, 1000);
+                        } else {
+                            layer.msg(result.MSG, {icon: 5});
+                            layer.close(index);
+                        }
+                    });
+                }, btn2: function (index, layero) {
+                    layer.close(index);
+                },
+                cancel: function () {
+
+                }
+            });
+
+        });
+
+        $('#cancelEditSystemMessageTemplateBtn').bind("click", function () {
+            returnToSkuDetailTemplateList();
+        });
+
+    });
+
+    function returnToSkuDetailTemplateList() {
+        postUtil.submit("/system/platformBulletinProblem/prePlatformBulletin");
+    }
+
+</script>
+</body>
+</html>

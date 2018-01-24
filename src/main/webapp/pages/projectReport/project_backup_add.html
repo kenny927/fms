@@ -1,0 +1,1021 @@
+<#import "/res/template/indexBase.html" as base/>
+<@base.htmlBase>
+<script src="/res/common/numCheck.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<script src="/res/common/area.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<link href="/res/bootstrap3.3/dist/css/bootstrap.min.css<@resVersionDirective>?</@>" rel="stylesheet">
+<link href="/res/bootstrap3.3/dist/css/bootstrap-theme.css<@resVersionDirective>?</@>" rel="stylesheet">
+<link href="/res/bootstrap3.3/_style.css<@resVersionDirective>?</@>" rel="stylesheet">
+<script src="/res/bootstrap3.3/dist/js/bootstrap.min.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<script src="/res/bootstrap3.3/jquery.dataTables.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<script src="/res/bootstrap3.3/dist/js/dataTables.bootstrap.min.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<script src="/res/js/ajaxfileupload_final.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<script src="/res/js/projectReport/project_backup_add.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+<script src="/res/js/projectReport/projectOperationLog.js<@resVersionDirective>?</@>"></script>
+<script src="/res/common/multiple-select.js<@resVersionDirective>?</@>"></script>
+<script src="/res/common/map.js<@resVersionDirective>?</@>"></script>
+<link href="/res/css/multiple-select.css<@resVersionDirective>?</@>" rel="stylesheet">
+<style>
+	.nav3{height:55px; margin-left: -20px;
+	    border-top: 1px solid #f0f0f0;bottom:13px;}
+	.nav3  button{height:35px;}
+	.jun-form-select .layui-form-select{
+	   display: inline-block;
+	}
+	.jun-layui-form-radio .layui-form-radio:nth-of-type(3){
+	   margin-left:250px;
+	}
+	.bor-ff {
+    	border: 1px solid #ff4800!important;
+    }	
+</style>
+<script type="text/javascript">
+
+	var backupId ='${backup.backupId!}';
+	
+	var action = '${action}';
+
+	var layer;
+	layui.use('layer', function(){
+	 	layer = layui.layer;
+	});
+	
+	layui.use('laydate', function(){
+
+	});
+	var contextPath='${request.contextPath}';
+
+    var $form;
+    var form;
+    $(function(){
+        layui.use('form', function() {
+    		form = layui.form();
+    		  //监听提交
+    		  	form.on('radio(projectLevel)', function(data){
+    		   if(data.value=="B"){
+    			   $('.spanProprietor').hide();
+    			   $('#proprietorTableBody').prev().find('th').find('span').hide();
+    		   }else{
+    			   $('.spanProprietor').show();
+    			   $('#proprietorTableBody').prev().find('th').find('span').show();
+    		   }
+    	  	});  
+    		
+    		form.on('radio(secrecyOpt)', function(data){
+   			   if(data.value=="OPEN_TO_SOMEAREA"){
+   				  $('.ms-choice').attr("disabled",false);
+   				  $('#isOpenSkuDiv').show();
+   			   }else if(data.value=='SECRETIVE'){
+				  $('.ms-choice').attr("disabled",true);
+    	   		  $('#secrecyArea').multipleSelect("uncheckAll");
+    	   		  $('#isOpenSkuDiv').hide();
+   			   }else{
+   				  $('.ms-choice').attr("disabled",true);
+   				  $('#secrecyArea').multipleSelect("uncheckAll");
+   				  $('#isOpenSkuDiv').show();
+   			   }
+    		   $('input[name=secrecyOpt]:checked').parent().parent().find(".jun-wrong-msg.c-f").hide();
+    		   $('.ms-choice').removeClass("bor-ff");
+    		   $('input[name=secrecyOpt]').attr("validate","true");
+    		});
+
+    		form.on('submit(save)', function(data){
+    			reset();
+    			if(action=='add'){
+    				$("input").trigger("blur");
+    				if($("input[validate=false]").length>0){
+    					$("input[validate=false]")[0].focus();
+    				 	return false;
+    				}
+    				$("textarea").trigger("blur");
+    				if($("textarea[validate=false]").length>0){
+    					$("textarea[validate=false]")[0].focus();
+    				 	return false;
+    				}
+    			   data.field.backupId= backupId;
+    			   if(data.field.secrecyOpt=='OPEN_TO_SOMEAREA'){
+       				   	var secrecyAreaArray= $("#secrecyArea").val(); 
+    				   	var secrecyArea='';
+    					for(var i=0;i<secrecyAreaArray.length;i++){
+    						secrecyArea+=secrecyAreaArray[i]+",";
+    					}
+    				    data.field.secrecyArea=secrecyArea;
+    			   }
+    			   data.field.skuList= JSON.stringify(getSkuData());
+    			   data.field.proprietorList= JSON.stringify(getProprietorData());
+    			   data.field.integratorList= JSON.stringify(getIntegratorData());
+    			   
+    			   var visitCompanyName = data.field.visitCompanyName;
+    			   var manAndMobile = initVisitCompanyNameMap.get(visitCompanyName);
+    			   if(manAndMobile && manAndMobile[2]){
+    				   data.field.visitMainObject = manAndMobile[2];
+    			   }
+    			   data.field.visitCompanyName = visitCompanyName.substring(visitCompanyName.indexOf('_')+1);
+    			   layer.load();
+    			   postUtil.call("${request.contextPath}/projectReport/backupAdd", data.field, function(result) {
+    				   layer.closeAll('loading');
+    				   if(result.success){
+    					   postUtil.submit("${request.contextPath}/projectReport/myPreReportList",null);
+    				   }else{
+    					   showMsg(result.data);
+    				   }
+    			   });
+    			}else{
+    			   $("input").trigger("blur");
+    			   if($("input[validate=false]").length>0){
+    				   $("input[validate=false]")[0].focus();
+    				   return false;
+    			   }
+       				$("textarea").trigger("blur");
+    				if($("textarea[validate=false]").length>0){
+    					$("textarea[validate=false]")[0].focus();
+    				 	return false;
+    				}
+    			   data.field.skuList= JSON.stringify(getSkuData());
+    			   data.field.proprietorList= JSON.stringify(getProprietorData());
+    			   data.field.integratorList= JSON.stringify(getIntegratorData());
+    			   data.field.backupId= backupId;
+    			   if(data.field.secrecyOpt=='OPEN_TO_SOMEAREA'){
+    				  var secrecyAreaArray= $("#secrecyArea").val(); 
+    				  var secrecyArea='';
+    				  for(var i=0;i<secrecyAreaArray.length;i++){
+    					  secrecyArea+=secrecyAreaArray[i]+",";
+    				  }
+    			      data.field.secrecyArea=secrecyArea;
+    			   }
+    			   var visitCompanyName = data.field.visitCompanyName;
+    			   var manAndMobile = initVisitCompanyNameMap.get(visitCompanyName);
+    			   if(manAndMobile && manAndMobile[2]){
+    				   data.field.visitMainObject = manAndMobile[2];
+    			   }
+    			   data.field.visitCompanyName = visitCompanyName.substring(visitCompanyName.indexOf('_')+1);
+    			   layer.load();
+    			   postUtil.call("${request.contextPath}/projectReport/backupUpdate", data.field, function(result) {
+    				   layer.closeAll('loading');
+    				   if(result.success){
+    					   postUtil.submit("${request.contextPath}/projectReport/myPreReportList",null);
+    				   }else{
+    					   showMsg(result.data);
+    				   }
+    			   });
+    			}
+    		   return false;
+    		});
+    		form.on('submit(submit)', function(data){
+    			reset();
+    			$("input").trigger("blur"); //有效性校验
+    			$("textarea").trigger("blur");
+    			nonBlankValidation();//非空校验
+    			if($("input[validate=false]").length>0){
+    				$("input[validate=false]")[0].focus();
+    			 	return false;
+    			}
+    			if($("textarea[validate=false]").length>0){
+    				$("textarea[validate=false]")[0].focus();
+    			 	return false;
+    			}
+    			if($("select[validate=false]").length>0){
+    				$("select[validate=false]")[0].focus();
+    			 	return false;
+    			}
+    		   var skuData = getSkuData();
+    		   if(skuData.length==0){
+    			   openEmptySkuNotice();
+    			   return false;
+    		   }
+    		   var proprietorData = getProprietorData();
+    		   var integratorData = getIntegratorData();
+    		   
+    		   if(data.field.projectLevel=='A'){
+    			   if(proprietorData.length==0||integratorData.length==0){
+    				   openProprietorIntegratorNoticeInfo("业主信息和集成商信息都是必填的！")
+    				   return false;
+    			   }
+    		   }else{
+    			   if(integratorData.length==0){
+    				   openProprietorIntegratorNoticeInfo("集成商信息是必填的")
+    				   return false;
+    			   }
+    		   }
+    		   if(proprietorData.length>0 && integratorData.length>0){
+    			   for(var i=0;i<proprietorData.length;i++){
+    				   for(var j=0;j<integratorData.length;j++){
+    					   if(proprietorData[i].proprietorCompanyName==integratorData[j].integratorCompanyName){
+    						   showMsg("业主和分销商公司名称不能相同");
+    						   return false;
+    					   }
+    				   }
+    			   }
+    		   }
+    		   data.field.skuList= JSON.stringify(skuData);
+    		   data.field.proprietorList= JSON.stringify(proprietorData);
+    		   data.field.integratorList= JSON.stringify(integratorData);
+    		   
+    		   data.field.backupId= backupId;
+    		   data.field.action=action;
+    		   if(data.field.secrecyOpt=='OPEN_TO_SOMEAREA'){
+    			   	var secrecyAreaArray= $("#secrecyArea").val(); 
+    			   	var secrecyArea='';
+    				for(var i=0;i<secrecyAreaArray.length;i++){
+    					secrecyArea+=secrecyAreaArray[i]+",";
+    				}
+    			   data.field.secrecyArea=secrecyArea;
+    		   }
+			   var visitCompanyName = data.field.visitCompanyName;
+			   var manAndMobile = initVisitCompanyNameMap.get(visitCompanyName);
+			   if(manAndMobile && manAndMobile[2]){
+				   data.field.visitMainObject = manAndMobile[2];
+			   }
+			   data.field.visitCompanyName = visitCompanyName.substring(visitCompanyName.indexOf('_')+1);
+    		   layer.load();
+    		   postUtil.call("${request.contextPath}/projectReport/conflictCheck",data.field,function(result){
+    			   layer.closeAll('loading');
+    			   if(result.success){
+    				   openSubmitNotice(data.field,result.data)
+    			   }else{
+    				   showMsg(result.data);
+    			   }
+    		   });
+    		   return false;
+    		});		
+    		//避免上传按钮提交表单
+    		form.on('submit(upload)', function(data){
+    			manageAttachment('PROJECT_BACKUP_FILE_TYPE')
+    			return false;
+    		});
+    		form.on('submit(viewFile)', function(data){
+    			listAttachment('${backup.backupId!}','PROJECT_BACKUP_FILE_TYPE')
+    			return false;
+    		});
+    		
+
+    		$form = $('form');
+    		loadProvince();
+    		form.on('select(visitCompanyName)', function(data) {
+    			var value = data.value;
+    			if(value && value.length>0){
+    				$form.find('select[name=visitCompanyName]').attr("validate","true");
+    			}
+    			manAndMobile = initVisitCompanyNameMap.get(value);
+    			if(manAndMobile[0]){
+    				$("input[name=visitLinkMan]").val(manAndMobile[0]);
+    			}
+    			if(manAndMobile[1]){
+    				$("input[name=visitLinkMobile]").val(manAndMobile[1]);
+    			}
+    	    });
+    		setTimeout('form.render()',1000);
+        });
+    });
+
+	var projectLevel='${backup.projectLevel!}';
+	$(function(){
+		if(projectLevel=="B"){
+			 $('.spanProprietor').hide();
+		}
+	});
+
+    function openEmptySkuNotice(data){
+        $.get(contextPath+'/pages/projectReport/msg/emptySkuNotice.html', {}, function(str){
+	        layer.open({
+	            title: '操作提示',
+	            skin: 'jun-close',
+	            area: ['480px', '250px'],
+	            btnAlign: 'c',
+	            content: str,
+	            btn: ['关闭'],
+	            yes: function(index, layero){
+	              //关闭委托单的回调
+	               layer.close(index);
+	            },
+	            cancel: function(){ 
+	              //右上角关闭回调
+	            }
+	          });
+          });
+    }
+    $(document).on("click",".jun-yang-msg.iconfont.icon-asmkticon0239",function(){
+    	$.get(contextPath+'/pages/projectReport/msg/creditInfo.html', {}, function(str){
+            layer.open({
+                title: '站点提示',
+                skin: 'jun-close0',
+                area: ['650px', '500px'],
+                content: str,
+                btnAlign: 'c',
+                btn: ['关闭'],
+                yes: function(index, layero){
+                   layer.close(index);
+                },
+                cancel: function(){ 
+                }
+            });
+    	});
+    });
+    
+    //项目跟进的拜访公司下拉框初始值
+    var initVisitCompanyNameMap = new Map();
+    
+    <#if integratorList?exists && (integratorList?size>0) > 
+	<#list integratorList as integrator>
+		var manAndMobile_integrator_${integrator_index} = new Array();
+		manAndMobile_integrator_${integrator_index}[0] = '${integrator.integratorLinkMan}';
+		manAndMobile_integrator_${integrator_index}[1]= '${integrator.integratorLinkMobile}';
+		manAndMobile_integrator_${integrator_index}[2]= '集成商';
+		initVisitCompanyNameMap.put('${integrator.integratorCompanyName}',manAndMobile_integrator_${integrator_index});
+	</#list>
+    </#if>
+    
+ 	<#if proprietorList?? && (proprietorList?size>0) > 
+	<#list proprietorList as proprietor>
+	var manAndMobile_proprietor_${proprietor_index} = new Array();
+	manAndMobile_proprietor_${proprietor_index}[0] = '${proprietor.proprietorLinkMan}';
+	manAndMobile_proprietor_${proprietor_index}[1]= '${proprietor.proprietorLinkMobile}';
+	manAndMobile_proprietor_${proprietor_index}[2]= '业主';
+	initVisitCompanyNameMap.put('${proprietor.proprietorCompanyName}',manAndMobile_proprietor_${proprietor_index});
+	</#list>
+    </#if>
+
+    //初始化省数据
+    var areaData = Area;
+    var projectProvince = '${backup.projectProvince!}';
+    var projectCity = '${backup.projectCity!}';
+    function loadProvince() {
+		var proHtml = '';
+      	for(var i = 0; i < areaData.length; i++) {
+			if(projectProvince != '' && projectProvince == areaData[i].provinceName) {
+                proHtml += '<option value="' + areaData[i].provinceName + '" selected>' +
+                    areaData[i].provinceName + '</option>';
+			} else {
+                proHtml += '<option value="' + areaData[i].provinceName + '">' +
+                    areaData[i].provinceName + '</option>';
+			}
+        }
+        if(projectProvince != '') {
+            var cities = getCityByProvince(areaData, projectProvince);
+            loadCity(cities, projectCity);
+		}
+        $form.find('select[name=projectProvince]').append(proHtml);
+        form.render();
+        form.on('select(province)', function(data) {
+			var value = data.value;
+			if(value && value.length>0){
+				$form.find('select[name=projectProvince]').attr("validate","true");
+				$form.find('select[name=projectCity]').attr("validate","true");
+			}
+            var cities = getCityByProvince(areaData, value);
+            if(cities.length > 0) {
+                loadCity(cities);
+            } else {
+                $form.find('select[name=projectCity]').parent().hide();
+            }
+        });
+    }
+    function getCityByProvince(areaData, provinceName) {
+        var cities = [];
+        $.each(areaData, function (index, item) {
+            if(item.provinceName == provinceName) {
+                cities = item.mallCityList;
+                return false;
+            }
+        });
+        return cities;
+    }
+    function loadCity(citys, selCity) {
+		var cityHtml = '';
+       	for(var i = 0; i < citys.length; i++) {
+			if(selCity != '' && selCity == citys[i].cityName) {
+                cityHtml += '<option value="' + citys[i].cityName + '" selected>' +
+                    citys[i].cityName + '</option>';
+			} else {
+                cityHtml += '<option value="' + citys[i].cityName + '">' +
+                    citys[i].cityName + '</option>';
+			}
+		}
+      	$form.find('select[name=projectCity]').html(cityHtml).parent().show();
+      	form.render();
+      	
+      	form.on('select(city)', function(data) {
+      		var value = data.value;
+    		if(value && value.length>0){
+    			$form.find('select[name=projectCity]').attr("validate","true");
+    		}
+      	});
+  	}
+
+    function reset(){
+    	$("input").removeClass("bor-ff");
+    	$("input").attr("validate","true");
+    	$("textarea").removeClass("bor-ff");
+    	$("textarea").attr("validate","true");
+    	$("select").parent().find("input").removeClass("bor-ff");
+    	$("select").parent().find("input").attr("validate","true");
+    	$(".jun-wrong-msg.c-f").css('display','none');
+    	$(".jun-danger-msg.iconfont.icon-jinggao-copy.c-f").css('display','none');
+    	
+    	$('#proprietorNoticeInfo').css('display','none');
+    	$('#integratorNoticeInfo').css('display','none');
+    	$('#skuNoticeInfo').css('display','none');
+    	
+    	$('.ms-choice').removeClass("bor-ff");
+    }
+    
+    $(function() {
+    	var proHtml = '';
+    	var secrecyArea = '${backup.secrecyArea!}';
+      	for(var i = 0; i < areaData.length; i++) {
+            proHtml += '<option value="' + areaData[i].provinceName;
+            if(secrecyArea.indexOf(areaData[i].provinceName)>-1){
+            	proHtml+='" selected >';
+            }else{
+            	proHtml+= '">' ;
+            }
+            proHtml+=areaData[i].provinceName + '</option>';
+      	}
+      	$('#secrecyArea').html(proHtml);
+      	
+        $('#secrecyArea').change(function() {
+        	if($('input[name=secrecyOpt]:checked').val()=='OPEN_TO_SOMEAREA'){
+	        	if($(this).val().length!=0){
+	    			$('input[name=secrecyOpt]:checked').parent().parent().find(".jun-wrong-msg.c-f").hide();
+	    			$('.ms-choice').removeClass("bor-ff");
+	    			$('input[name=secrecyOpt]').attr("validate","true");
+	        	}else{
+	    			$('input[name=secrecyOpt]:checked').parent().parent().find(".jun-wrong-msg.c-f").show();
+	    			$('.ms-choice').addClass("bor-ff");
+	    			$('input[name=secrecyOpt]').attr("validate","false");
+	        	}
+        	}
+        }).multipleSelect({
+            width: '200px',
+            selectAllText:'全部',
+            allSelected:'全部',
+            countSelected:''
+        });
+        
+        if(action=='add'){
+        	$('.ms-choice').attr("disabled",true);
+        }else{
+        	
+        }
+        
+    });
+</script>
+<!-- 附件模块 -->
+<#if (backup.backupId!=null) >
+<#assign v_m_businessKey  = backup.backupId/>
+<#else>
+<#assign v_m_businessKey  = ''/>
+</#if>
+<#assign v_m_useremployId  = SYSTEM_USER_SESSION.systemUser.employId/>
+<#include "/res/template/_attachment_manage.html"/>
+<@attachment_manage/>
+
+<!-- 附件模块 -->
+<#assign v_businessKey  = backup.backupId/>
+<#include "/res/template/_attachment_info.html"/>
+<@attachment_info/>
+<div class="main pre" style="padding-bottom:80px">
+	<form class="layui-form layui-form-pane jun-form-s" action="">
+		<div class="jun-base">
+			<div class="base">
+				<p class="pt5 pt20" style="clear:both;padding-bottom:30px;"><span class="c-2 fz14 flt pt15">分销商信息</span>								
+					<button lay-submit lay-filter="upload" data-toggle="modal" data-target="#attachment_modal" class="btn-click frt fz12">上传附件</button>
+					<button lay-submit lay-filter="viewFile" class="btn-click frt fz12" style="margin-right:10px" data-toggle="modal" data-target="#list_attachment_modal">查看附件</button>				
+				</p>
+				<aside class="bor-e6 pt20 fz12">
+					<div class="layui-form-item" style="margin-left:60px;margin-bottom: 0px;">
+						<div class="layui-inline">
+							<label class="layui-form-label" style="width: 90px">公司名称：</label>
+							<div class="layui-input-block jun-form-xl" style="margin-left:90px;">
+								<select name="distributorAccountId" lay-search  >
+									<option value="">请选择</option>
+									<#list distributors as distributor>
+										<#if (distributor.accountId==backup.distributorAccountId) >
+											<option value="${distributor.accountId}" selected="selected">${distributor.accountName}</option>
+										<#else>
+											<option value="${distributor.accountId}">${distributor.accountName}</option>
+										</#if>
+									</#list>
+		                       	</select>
+								<span class="jun-wrong-msg c-f" style="left: 37px;display:none"></span>
+		                     	<span class="jun-danger-msg iconfont icon-jinggao-copy c-f" style="display:none"></span>                              
+							</div>
+						</div>
+						<a href="javascript:$('select[name=distributorAccountId]').val('');form.render('select');">清除</a>
+					</div>
+					<div class="layui-form-item inline" style="margin-bottom: 5px;">
+						<div class="layui-inline">
+							<label class="layui-form-label" style="width: 150px">分销商本项目负责人：</label>
+							<div class="layui-input-block" style="margin-left:150px;">
+								<input  style="width: 240px;" placeholder="请填写项目负责人" value="${backup.distributorPrincipalName!}" type="text" name="distributorPrincipalName" autocomplete="off"  class="layui-input">
+								<span class="jun-wrong-msg c-f" style="left: 37px;display:none"></span>
+		                     	<span class="jun-danger-msg iconfont icon-jinggao-copy c-f" style="display:none"></span>                              
+							</div>
+						</div>
+					</div>
+					<div class="layui-form-item inline" style="margin-bottom: 5px;">
+						<div class="layui-inline">
+	                   		<label class="layui-form-label t-r-i">联系电话：</label>
+	                   		<div class="layui-input-block" style="margin-left: 120px;">
+		                     	<input  style="width: 240px;" placeholder="请填写联系电话" value="${backup.distributorPrincipalMobile!}"  type="text" name="distributorPrincipalMobile" autocomplete="off"  class="layui-input bor-e6">
+		                     	<span class="jun-wrong-msg c-f" style="display:none">请输入正确的电话号码</span>
+		                     	<span class="jun-danger-msg iconfont icon-jinggao-copy c-f" style="display:none"></span>
+	                   		</div>
+						</div>
+					</div>
+					<div class="layui-form-item inline" style="margin-bottom: 5px;">
+	                   	<div class="layui-inline">
+	                   		<label class="layui-form-label t-r-i" style="width: 50px;">邮箱：</label>
+	                   		<div class="layui-input-block" style="margin-left: 60px;">
+	                     		<input  style="width: 240px;" placeholder="请填写邮箱" value="${backup.distributorPrincipalEmail!}" type="text" name="distributorPrincipalEmail" autocomplete="off"  class="layui-input bor-e6">
+	                     		<span class="jun-wrong-msg c-f" style="display:none">请输入正确的邮箱</span>
+ 	                     		<!--<span class="jun-danger-msg iconfont icon-jinggao-copy c-f" style="display:none"></span> -->
+	                   		</div>
+						</div>
+					</div>
+				</aside>
+     		</div>
+			<div class="base mt5">
+				<p class="pt20 mb10"><span class="c-2">项目基本信息</span></p>
+		       	<aside class="bor-e6 pt20 fz12" style="height: auto;">
+					<div class="layui-form-item inline mb5" style="margin-bottom:0;">
+						<div class="layui-inline">
+			               	<label class="layui-form-label" style="margin-left: 20px; width: 90px;"><span class="c-f">*</span>项目名称：</label>
+			               	<div class="layui-input-block" style="margin-left: 110px;">
+			                 	<input  style="width: 240px;" placeholder="请填写项目名称" value="${backup.projectName!}" type="text" name="projectName" autocomplete="off"  class="layui-input bor-e6">
+			                 	<span class="jun-wrong-msg c-f" style="display:none">请填写项目名称</span>
+			                 	<span class="jun-danger-msg iconfont icon-jinggao-copy c-f" style="display:none"></span>
+			               	</div>
+	               		</div>
+					</div>
+					<div class="layui-form-item inline mb5" style="margin-bottom:0;">
+						<div class="layui-inline">
+							<label class="layui-form-label t-r-i" style="width: 78px;"><span class="c-f">*</span>项目编号：</label>
+		               		<div class="layui-input-block" style="margin-left: 90px;">
+			                 	<input  style="width: 240px;" placeholder="请填写项目编号" value="${backup.projectNumber!}" type="text" name="projectNumber" autocomplete="off"  class="layui-input bor-e6">
+			                 	<span class="jun-wrong-msg c-f" style="display:none">请填写项目编号</span>
+			                 	<span class="jun-danger-msg iconfont icon-jinggao-copy c-f" style="display:none"></span>
+		               		</div>
+		               </div>
+					</div>
+					<div class="layui-form-item inline mb10"  style="margin-bottom:0;" >
+		               	<div class="layui-inline">
+		               		<label class="layui-form-label t-r-i" style="width: 90px;"><span class="c-f">*</span>项目等级：</label>
+							<div class="layui-input-block" style="margin-left: 90px; height: 30px; margin-top: -2px;">
+								<input type="radio" lay-filter="projectLevel" name="projectLevel" value="A" title="A" ${(backup.projectLevel==null || backup.projectLevel=='A')?string('checked','')} />
+								<input type="radio" lay-filter="projectLevel" name="projectLevel" value="B" title="B" ${(backup.projectLevel!=null && backup.projectLevel=='B')?string('checked','')} />
+							</div>
+						</div>
+					</div>
+					<br />
+					<div class="layui-form-item inline  mb10">
+						<div class="layui-inline">
+							<label class="layui-form-label ml10" style="line-height: 30px;width: 100px;"><span class="c-f">*</span>要求保护期：</label>
+		                 	<div class="layui-input-block mt5" style="margin-left: 110px;">
+		                   		<input style="width: 240px;" value="<#if (backup.projectProtectDate??) >${backup.projectProtectDate?string('yyyy-MM-dd')}</#if>" name="projectProtectDate" class="layui-input laydate-icon bor-e6" placeholder="自定义日期格式" onclick="layui.laydate({elem: this, istime: false, format: 'YYYY-MM-DD'})" >
+	                     		<span class="jun-wrong-msg c-f" style="top: 33px;display:none"></span>
+	                     		<span class="jun-danger-msg iconfont icon-jinggao-copy c-f" style="right: 30px;display:none"></span>
+		                 	</div>
+              	 		</div>
+	             	</div>
+	             	<div class="layui-form-item inline  mb5" >
+               			<div class="layui-inline">
+                 			<label class="layui-form-label  t-r-i" style="line-height: 30px; width:77px;"><span class="c-f">*</span>所在区域：</label>
+                 			<div class="layui-input-block mt5" style="margin-left: 90px;">
+	                   			<div class="layui-input-inline" style="width: 120px;">
+	                      			<select name="projectProvince" lay-filter="province" id="s_province">
+			                           <option value="">请选择省</option>
+		                       		</select>
+	                   			</div>
+	                   			<div class="layui-input-inline" style="width: 120px;">
+	                       			<select name="projectCity" lay-filter="city">
+		                           		<option value="">请选择市</option>
+		                       		</select>
+                   				</div>
+	                     		<span class="jun-wrong-msg c-f" style="top: 33px;display:none">请选择正确的省市信息</span>
+	                     		<span class="jun-danger-msg iconfont icon-jinggao-copy c-f" style="right: -10px;display:none"></span>
+	                 		</div>
+	               		</div>
+	             	</div>
+	             	<div class="layui-form-item ml10  mb5" >
+               			<div class="layui-inline jun-layui-form-radio">
+							<label class="layui-form-label  t-r-i" style="line-height: 30px; width:90px;"><span class="c-f">*</span>项目保密选择：</label>
+                 			<div class="layui-input-block" style="margin-left: 90px;">
+	                            <input lay-filter="secrecyOpt" type="radio" name="secrecyOpt" value="SECRETIVE" title="保密" ${(backup.secrecyOpt==null || backup.secrecyOpt=='SECRETIVE')?string('checked','')} />
+		                 		<input lay-filter="secrecyOpt" type="radio" name="secrecyOpt" value="OPEN_TO_SOMEAREA" title="对某些区域公开" ${(backup.secrecyOpt!=null && backup.secrecyOpt=='OPEN_TO_SOMEAREA')?string('checked','')} />
+		                 		<input lay-filter="secrecyOpt" type="radio" name="secrecyOpt" value="OPEN_TO_ALL" title="对所有区域公开" ${(backup.secrecyOpt!=null && backup.secrecyOpt=='OPEN_TO_ALL')?string('checked','')} />
+	                 		</div>
+	                 		<span class="jun-wrong-msg c-f" style="top:37px;left:288px; display: none">请选择具体的区域</span>
+	               		</div>
+	             	</div>
+	             	<div class="layui-form-item ml10  mb5" id="isOpenSkuDiv" style="display:none">
+               			<div class="layui-inline jun-layui-form-radio">
+							<label class="layui-form-label  t-r-i" style="line-height: 30px; width:90px;"><span class="c-f">*</span>公开商品：</label>
+                 			<div class="layui-input-block" style="margin-left: 90px;">
+	                            <input lay-filter="isOpenSku" type="radio" name="isOpenSku" value="N" title="否" ${(backup.isOpenSku==null || backup.isOpenSku=='N')?string('checked','')} />
+		                 		<input lay-filter="isOpenSku" type="radio" name="isOpenSku" value="Y" title="是" ${(backup.isOpenSku!=null && backup.isOpenSku=='Y')?string('checked','')} />
+	                 		</div>
+	               		</div>
+	             	</div>
+		       </aside>
+	     	</div>  
+	     	<div class="base mt5">
+<!-- 		       <p class="pt20" style="height: 15px;"></p> -->
+		           <table class="layui-table pop">
+		             <colgroup>
+		               <col width="300">
+		               <col width="200">
+		               <col width="150">
+		               <col width="150">                        
+		               <col width="150">
+		               <col width="80">
+		             </colgroup>
+					   <thead>
+					   <tr>
+						   <th colspan="6"style="text-align: left !important;background:#ffffff;">
+						   <span class="c-f spanProprietor">*</span>业主信息
+						   <span class="fz12 spanProprietor">(<span class="c-f fz12">请务必填写企业全称，否则可能导致项目报备失败</span>)</span>
+						   <a href="javascript:addProprietor();" class="c-h fz12 frt cs-p">添加业主信息</a>
+						   </th>
+					   </tr>
+					   </thead>
+		             <thead>
+		               <tr>
+		                 <th><span class="c-f spanProprietor">*</span>公司名称</th>
+		                 <th><span class="c-f spanProprietor">*</span>统一社会信用代码</th>
+		                 <th><span class="c-f spanProprietor">*</span>联系人</th>
+		                 <th><span class="c-f spanProprietor">*</span>联系电话</th>                          
+		                 <th><span class="c-f spanProprietor">*</span>职位</th>
+		                 <th>操作</th>
+		               </tr> 
+		             </thead>
+		             <tbody id="proprietorTableBody">
+		             	<#if proprietorList?? && (proprietorList?size>0) > 
+							<#list proprietorList as proprietor>
+								<tr id="proprietor${proprietor_index}">
+				             		<td><input type="text" oldvalue="${proprietor.proprietorCompanyName!}" placeholder="请填写公司名称" value="${proprietor.proprietorCompanyName!}" name="proprietorCompanyName" autocomplete="off" class="layui-input bor-e6"></td>
+				             		<td class="pre">
+				             			<input type="text" placeholder="如果是事业单位，请填无" style="width:95%" value="${proprietor.proprietorCreditId!}" name="proprietorCreditId" autocomplete="off" class="layui-input bor-e6">
+				             			<span class="placeholder"></span>
+				             			<span style="right:5px;top:30%;" class="jun-yang-msg iconfont icon-asmkticon0239"></span>
+				             		</td>
+				             		<td><input type="text" oldvalue="${proprietor.proprietorLinkMan!}" placeholder="请填写联系人" value="${proprietor.proprietorLinkMan!}" name="proprietorLinkMan" autocomplete="off" class="layui-input bor-e6"></td>
+				             		<td><input type="text" oldvalue="${proprietor.proprietorLinkMobile!}" placeholder="请填写联系电话" value="${proprietor.proprietorLinkMobile!}" name="proprietorLinkMobile" autocomplete="off" class="layui-input bor-e6"></td>
+				             		<td><input type="text" placeholder="请填写职位" value="${proprietor.proprietorLinkPosition!}" name="proprietorLinkPosition" autocomplete="off" class="layui-input bor-e6"></td>
+				             		<td><a  class="fz12" href="javascript:deleteProprietorRow('proprietor${proprietor_index}')">删除</a></td>
+				             	</tr>
+							</#list>
+						<#else> 
+						  	<tr id="proprietor0">
+			             		<td><input type="text" oldvalue="" placeholder="请填写公司名称" autocomplete="off" name="proprietorCompanyName" class="layui-input bor-e6"></td>
+			             		<td class="pre">
+			             			<input type="text" placeholder="如果是事业单位，请填无" style="width:95%"  name="proprietorCreditId" autocomplete="off" class="layui-input bor-e6">
+			             			<span class="placeholder"></span>
+			             			<span style="right:5px;top:30%;" class="jun-yang-msg iconfont icon-asmkticon0239"></span>
+			             		</td>
+			             		<td><input type="text" oldvalue="" placeholder="请填写联系人" autocomplete="off" name="proprietorLinkMan" class="layui-input bor-e6"></td>
+			             		<td><input type="text" oldvalue="" placeholder="请填写联系电话" autocomplete="off" name="proprietorLinkMobile" class="layui-input bor-e6"></td>
+			             		<td><input type="text" placeholder="请填写职位" autocomplete="off" name="proprietorLinkPosition" class="layui-input bor-e6"></td>
+			             		<td><a  class="fz12" href="javascript:deleteProprietorRow('proprietor0')">删除</a></td>
+			             	</tr>
+						</#if> 
+ 					</tbody>
+		           </table>
+		           <p id="proprietorNoticeInfo" style="display:none;margin-left:20px;margin-bottom: 5px;"><span class="c-f" >*为必填项</span></p>
+		     </div>
+	     	<div class="base mt5">
+<!-- 		       <p class="pt20" style="height: 15px;"></p> -->
+		           <table class="layui-table pop">
+		             <colgroup>
+		               <col width="300">
+		               <col width="200">
+		               <col width="150">
+		               <col width="150">                        
+		               <col width="150">
+		               <col width="80">
+		             </colgroup>
+					   <thead>
+					   <tr>
+						   <th colspan="6" style="text-align: left !important;background:#ffffff;">
+						   	<span class="c-f">*</span>集成商信息
+						   	(<span class="c-f fz12">请务必填写企业全称，否则可能导致项目报备失败</span>)
+						   	<a href="javascript:addIntegrator();" class="c-h fz12 frt mt5 cs-p">添加集成商信息</a>
+						   	</th>
+					   </tr>
+					   </thead>
+		             <thead>
+		               <tr>
+		                 <th><span class="c-f">*</span>公司名称</th>
+		                 <th><span class="c-f">*</span>统一社会信用代码</th>
+		                 <th><span class="c-f">*</span>联系人</th>
+		                 <th><span class="c-f">*</span>联系电话</th>                          
+		                 <th><span class="c-f">*</span>职位</th>
+		                 <th>操作</th>
+		               </tr> 
+		             </thead>
+		             <tbody id="integratorTableBody">
+		             <#if integratorList?exists && (integratorList?size>0) > 
+						<#list integratorList as integrator>
+			             	<tr id="integrator${integrator_index}">
+			             		<td><input type="text" oldvalue="${integrator.integratorCompanyName!}" placeholder="请填写公司名称" value="${integrator.integratorCompanyName!}" name="integratorCompanyName" autocomplete="off" class="layui-input bor-e6"></td>
+			             		<td class="pre">
+			             			<input placeholder="请填写统一社会信用代码" type="text" style="width:95%" value="${integrator.integratorCreditId!}" name="integratorCreditId" autocomplete="off" class="layui-input bor-e6">
+			             			<span class="jun-wrong-msg c-f" style="top: 33px;"></span>
+			             			<span style="right:5px;top:30%;" class="jun-yang-msg iconfont icon-asmkticon0239"></span>
+			             		</td>
+			             		<td><input placeholder="请填写联系人" oldvalue="${integrator.integratorLinkMan!}" type="text" value="${integrator.integratorLinkMan!}" name="integratorLinkMan" autocomplete="off" class="layui-input bor-e6"></td>
+			             		<td><input placeholder="请填写联系电话" oldvalue="${integrator.integratorLinkMobile!}" type="text" value="${integrator.integratorLinkMobile!}" name="integratorLinkMobile" autocomplete="off" class="layui-input bor-e6"></td>
+			             		<td><input placeholder="请填写职位" type="text" value="${integrator.integratorLinkPosition!}" name="integratorLinkPosition" autocomplete="off" class="layui-input bor-e6"></td>
+			             		<td><a class="fz12" href="javascript:deleteIntegratorRow('integrator${integrator_index}')">删除</a></td>
+			             	</tr>						
+						</#list>
+					 <#else> 
+		             	<tr id="integrator0">
+		             		<td><input type="text" oldvalue="" placeholder="请填写公司名称" value="" name="integratorCompanyName" autocomplete="off" class="layui-input bor-e6"></td>
+		             		<td class="pre">
+		             			<input type="text" placeholder="请填写统一社会信用代码" style="width:95%" value="" name="integratorCreditId"  autocomplete="off" class="layui-input bor-e6">
+		             			<span class="jun-wrong-msg c-f" style="top: 33px;"></span>
+		             			<span style="right:5px;top:30%;" class="jun-yang-msg iconfont icon-asmkticon0239"></span>
+		             		</td>
+		             		<td><input placeholder="请填写联系人" oldvalue="" type="text" value="" name="integratorLinkMan" autocomplete="off" class="layui-input bor-e6"></td>
+		             		<td><input placeholder="请填写联系电话" oldvalue="" type="text" value="" name="integratorLinkMobile" autocomplete="off" class="layui-input bor-e6"></td>
+		             		<td><input placeholder="请填写职位" type="text" value="" name="integratorLinkPosition" autocomplete="off" class="layui-input bor-e6"></td>
+		             		<td><a  class="fz12" href="javascript:deleteIntegratorRow('integrator0')">删除</a></td>
+		             	</tr>
+		             </#if> 
+		             </tbody>
+		           </table>
+		           <p id="integratorNoticeInfo" style="display:none;margin-left:20px;margin-bottom: 5px;"><span class="c-f" >*为必填项</span></p>
+		     </div>	     			     
+		     <div class="base mt5">
+		       <p class="pt20" style="height: 15px;"><a href="javascript:addProduct();" class="c-h fz12 frt mt5 cs-p">添加平台商品</a></p>
+		           <table class="layui-table pop">
+		             <colgroup>
+		               <col width="200">
+		               <col width="150">
+		               <col width="300">
+		               <col width="150">                        
+		               <col width="150">
+		               <col width="200">
+		               <col width="80">
+		             </colgroup>
+		             <thead>
+		               <tr>
+		               	 <th style="display:none">skuId</th>
+		                 <th><span class="c-f">*</span>商品型号</th>
+		                 <th><span class="c-f">*</span>品牌</th>
+		                 <th><span class="c-f">*</span>商品名称</th>
+		                 <th><span class="c-f">*</span>数量</th>                          
+		                 <th><span class="c-f">*</span>计量单位</th>
+		                 <th>希望厂家配合报出的价格</th>
+		                 <th>操作</th>
+		               </tr> 
+		             </thead>
+		             <tbody id="skuTableBody">
+		             <#if skuList?exists && (skuList?size !=0) > 
+						<#list skuList as sku>
+							<#if (sku.type=='0') >
+		                        <tr id="${sku.skuId}">
+		                        	<td style='display:none'>sku.skuId</td>
+			                        <td>${sku.skuModel!}</td>
+			                        <td>${sku.skuBrandName!}</td>
+			                        <td>${sku.skuName!}</td>
+			                        <td><input name="skuQuantity" placeholder="请填写数量" type="text" value="${sku.skuQuantity!}" autocomplete="off"  class="layui-input bor-e6 unitCheck unitDisplay" unitName="${sku.skuUnitName}"></td>
+			                        <td>${sku.skuUnitName!}</td>
+			                        <td><input name="expectSkuPrice" placeholder="请填写价格" type="text" value="${sku.expectSkuPrice!}" autocomplete="off"  class="layui-input bor-e6 num2"></td>
+			                        <td><a  class="fz12" href="javascript:removeSkuNoticeInfo('${sku.skuId}','sku');">删除</a></td>
+		                        </tr>
+	                        </#if>
+						</#list>
+		             </#if>
+		             </tbody>
+		           </table>
+		           <p style="display:none;margin-left:20px;margin-bottom: 5px;"><span class="c-f" >*为必填项</span></p>
+		     </div>
+		     <div class="base mt5 pre">
+		       <p class="pt20" style="height: 15px;"><a href="javascript:addCustomProduct();" class="c-h fz12 frt mt5 cs-p">添加自定义商品</a></p>		       
+		           <table class="layui-table pop">
+		             <colgroup>
+		               <col width="200">
+		               <col width="150">
+		               <col width="300">
+		               <col width="150">                        
+		               <col width="150">
+		               <col width="200">
+		               <col width="80">
+		             </colgroup>
+		             <thead>
+		               <tr>
+		                 <th><span class="c-f">*</span>商品型号</th>
+		                 <th><span class="c-f">*</span>品牌</th>
+		                 <th><span class="c-f">*</span>商品名称</th>
+		                 <th><span class="c-f">*</span>数量</th>                          
+		                 <th><span class="c-f">*</span>计量单位</th>
+		                 <th>希望厂家配合报出的价格</th>
+		                 <th>操作</th>
+		               </tr> 
+		             </thead>
+		             <tbody id="skuCustomTableBody">
+		             <#if skuList?exists && (skuList?size !=0) > 
+						<#list skuList as sku>
+							<#if (sku.type=='1') >
+	                          <tr id="customProduct${sku_index}">
+		                        <td><input type="text" name="skuModel" placeholder="请填写商品型号" value="${sku.skuModel!}" autocomplete="off"  class="layui-input bor-e6"></td>
+		                        <td><input type="text" name="skuBrandName" placeholder="请填写品牌" value="${sku.skuBrandName!}" autocomplete="off"  class="layui-input bor-e6"></td>
+		                        <td><input type="text" name="skuName" placeholder="请填写商品名称" value="${sku.skuName!}" autocomplete="off"  class="layui-input bor-e6"></td>
+		                        <td><input type="text" name="skuQuantity" placeholder="请填写数量" value="${sku.skuQuantity!}" autocomplete="off"  class="layui-input bor-e6 num3"></td>
+		                        <td><input type="text" name="skuUnitName" placeholder="请填写计量单位" value="${sku.skuUnitName!}" autocomplete="off"  class="layui-input bor-e6"></td>
+		                        <td><input type="text" name="expectSkuPrice" placeholder="请填写价格" value="${sku.expectSkuPrice!}" autocomplete="off"  class="layui-input bor-e6 num2"></td>
+		                       	<td><a href="javascript:removeSkuNoticeInfo('customProduct${sku_index}','customSku');">删除</a></td>
+		                       </tr>
+	                        </#if>
+						</#list>
+		             </#if>
+		             </tbody>
+		           </table>
+		           <p style="display:none;margin-left:20px;margin-bottom: 5px;"><span class="c-f" >*为必填项</span></p>
+		     </div>
+		     <div class="base mt20">
+		       <aside class="bor-e6 pt20 fz12">
+		           <div class="layui-form-item inline" style="margin-bottom:5px;">
+		             <div class="layui-inline" style="width: 400px;">
+		             <label class="layui-form-label" style="width: 150px"><span class="c-f">*</span>预计芯公里（光缆）：</label>
+		             <div class="layui-input-block">
+		               <input style="width: 240px;" placeholder="请输入预计公里" value="${backup.predictFiberKilometers!}" type="text" name="predictFiberKilometers" autocomplete="off"  class="layui-input bor-e6">
+		                 <span class="jun-wrong-msg c-f" style="left: 36px;display:none">请输入预计芯公里</span>
+		                 <span class="jun-danger-msg iconfont icon-jinggao-copy c-f" style="right: 20px;display:none"></span>
+		             </div>
+		             </div>
+		           </div>
+		           <div class="layui-form-item inline" style="margin-bottom:5px;">
+		             <div class="layui-inline">
+			             <label class="layui-form-label t-r-i" style="width: 160px;"><span class="c-f">*</span>
+							预计金额（光配、铜配）：
+						 </label>
+			             <div class="layui-input-block" style="margin-left: 170px;">
+			               <input placeholder="请输入预计金额" style="width: 240px;" value="${backup.predictAmount!}" type="text" name="predictAmount" autocomplete="off"  class="layui-input bor-e6">
+			                 <span class="jun-wrong-msg c-f" style="display:none">请输入预计金额</span>
+			                 <span class="jun-danger-msg iconfont icon-jinggao-copy c-f" style="display:none"></span>
+			             </div>
+		             </div>
+		           </div>
+		       </aside>
+		     </div>
+		     <div class="base">
+		       <p class="pt20 mb10"><span class="c-f">*</span><span class="c-2">项目描述</span><span class="c-9 fz12">（项目描述、集成商或分销商对本项目所做的工作、需要厂家特别注意的事项等）</span></p>
+		           <div class="layui-form-item layui-form-text">
+		             <div class="layui-input-block">
+		               <textarea name="projectDecription" placeholder="请输入项目描述" class="layui-textarea">${backup.projectDecription!}</textarea>
+		             	   <span class="jun-wrong-msg c-f" style="top:100px;display:none">请输入项目描述，至少15个字</span>
+                           <span class="jun-danger-msg iconfont icon-jinggao-copy c-f" style="display:none"></span>
+		             </div>
+		           </div>
+		     </div>
+		     <div class="base">
+		       <p class="pt20 mb10"><span class="c-2">项目跟进情况</span><span class="c-9 fz12">（项目报备成功后必须两周内跟进报备一次，如未及时跟进，项目登记将自动失效）</span></p>
+		       <aside class="bor-e6 pt20 fz12">
+                    <div class="layui-form-item inline mb5">
+                      <div class="layui-inline">
+                        <label class="layui-form-label" style="line-height: 20px; width: 50px; margin-left: 25px;"><span class="c-f">*</span>时间：</label>
+                        <div class="layui-input-block" style="margin-left: 85px;">
+                          <input name ="followDate" value="<#if (follow.followDate??) >${follow.followDate?string('yyyy-MM-dd HH:mm:ss')}</#if>" style="height: 30px;width: 240px;" class="layui-input laydate-icon" placeholder="自定义日期格式" onclick="layui.laydate({elem: this, istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" >
+                        <span class="jun-wrong-msg c-f" style="display:none"></span>
+                        <span class="jun-danger-msg iconfont icon-jinggao-copy c-f" style="right: 30px;display:none"></span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="layui-form-item inline mb5">
+                      <div class="layui-inline">
+                        <label class="layui-form-label" style="line-height: 20px; width: 64px; margin-left: 25px;"><span class="c-f">*</span>跟进人：</label>
+                        <div class="layui-input-block" style="margin-left: 100px;">
+                          <input name ="followMan" value="${SYSTEM_USER_SESSION.systemUser.realName}" style="height: 30px;width: 240px;" class="layui-input" placeholder="请输入跟进人" >
+                        <span class="jun-wrong-msg c-f" style="display: none">请填写跟进人</span>
+                        <span class="jun-danger-msg iconfont icon-jinggao-copy c-f" style="right: 30px;display:none"></span>
+                        </div>
+                      </div>
+                    </div>
+				   <!-- 拜访方式-登门拜访，电话联系 -->
+				   <div class="layui-form-item inline jun-form-xl mb5">
+					   <div class="layui-inline">
+						   <label class="layui-form-label" style="line-height: 20px; width: 66px; margin-left: 25px;"><span class="c-f">*</span>拜访方式：</label>
+						   <div class="layui-input-block" style="margin-left: 100px;">
+							   <select name="visitType" id="visitType" lay-filter="visitType">
+								   <option value="HOUSE" ${(follow.visitType == 'HOUSE')?string('selected','')}>登门拜访</option>
+								   <option value="PHONE" ${(follow.visitType == 'PHONE')?string('selected','')}>电话联系</option>
+							   </select>
+							   <span class="jun-wrong-msg c-f" style="display:none"></span>
+							   <span class="jun-danger-msg iconfont icon-jinggao-copy c-f" style="right: 30px;display:none"></span>
+						   </div>
+					   </div>
+				   </div>
+                    <br />
+<!--                     <div class="layui-form-item inline jun-form-xl mb5"> -->
+<!--                       <div class="layui-inline"> -->
+<!--                         <label class="layui-form-label" style="line-height: 20px; width: 85px; margin-left: 25px;"><span class="c-f">*</span>主体：</label> -->
+<!--                         <div class="layui-input-block inline" style="margin-left: 0px;"> -->
+<!--                             <select name="visitMainObject"> -->
+<!--                                	<option value="集成商" ${(follow.visitMainObject!=null && follow.visitMainObject=='集成商')?string('selected','')}>集成商</option> -->
+<!-- 							  	<option value="业主" ${(follow.visitMainObject!=null && follow.visitMainObject=='业主')?string('selected','')}>业主</option> -->
+<!-- 			                </select> -->
+<!--                         <span class="jun-wrong-msg c-f" style="display:none"></span> -->
+<!--                         <span class="jun-danger-msg iconfont icon-jinggao-copy c-f" style="right: 30px;display:none"></span> -->
+<!--                         </div> -->
+<!--                       </div> -->
+<!--                     </div> <br /> -->
+                    <div class="layui-form-item inline jun-form-xl mb5">
+                      <div class="layui-inline">
+                        <label class="layui-form-label" style="line-height: 20px; width: 66px; margin-left: 5px;"><span class="c-f">*</span>公司名称：</label>
+                        <div class="layui-input-block" style="margin-left: 85px;">
+<!-- 			                <input name ="visitCompanyName" value="${follow.visitCompanyName!}" style="height: 30px;width: 240px;" class="layui-input" placeholder="请输入拜访公司名称" /> -->
+                        	<select name="visitCompanyName" id="visitCompanyName" lay-filter="visitCompanyName">
+                        		<option value="">请选择</option>
+                        		    <#if integratorList?exists && (integratorList?size>0) > 
+									<#list integratorList as integrator>
+										<option value="${integrator.integratorCompanyName}" ${(follow.visitCompanyName!=null && (follow.visitCompanyName==integrator.integratorCompanyName))?string('selected','')}>${integrator.integratorCompanyName}</option>
+									</#list>																	    
+								    </#if>
+								    
+								 	<#if proprietorList?? && (proprietorList?size>0) > 
+									<#list proprietorList as proprietor>
+										<option value="${proprietor.proprietorCompanyName}" ${(follow.visitCompanyName!=null && (follow.visitCompanyName==proprietor.proprietorCompanyName))?string('selected','')}>${proprietor.proprietorCompanyName}</option>
+									</#list>
+								    </#if>
+                        	</select>                        
+                        <span class="jun-wrong-msg c-f" style="display:none"></span>
+                        <span class="jun-danger-msg iconfont icon-jinggao-copy c-f" style="right: 30px;display:none"></span>
+                        </div>
+                      </div>
+                    </div>   
+                    <div class="layui-form-item inline mb5">
+                      <div class="layui-inline">
+                        <label class="layui-form-label" style="width: 80px;margin-left: 5px;"><span class="c-f">*</span>拜访联系人：</label>
+                        <div class="layui-input-block"  style="margin-left: 100px;">
+                          <input style="width: 240px;" readonly="readonly" value="${follow.visitLinkMan!}" type="text" name="visitLinkMan" autocomplete="off" placeholder="请输入拜访联系人" class="layui-input bor-e6">
+                          <span class="jun-wrong-msg c-f" style="display:none"></span>
+                          <span class="jun-danger-msg iconfont icon-jinggao-copy c-f" style="display:none"></span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="layui-form-item inline mb5">
+                      <div class="layui-inline">
+                      <label class="layui-form-label t-r-i" style="width: 90px;"><span class="c-f">*</span>联系电话：</label>
+                      <div class="layui-input-block" style="margin-left: 110px;">
+                        <input style="width: 240px;" readonly="readonly" type="text" name="visitLinkMobile" value="${follow.visitLinkMobile!}" autocomplete="off" placeholder="请输入联系电话" class="layui-input bor-e6">
+                        <span class="jun-wrong-msg c-f" style="display:none">请输入正确的电话信息</span>
+                        <span class="jun-danger-msg iconfont icon-jinggao-copy c-f" style="display:none"></span>
+                      </div>
+                      </div>
+                    </div>                 
+					<div class="layui-form-item layui-form-text" style="margin-top: -10px">
+                    	<label class="layui-form-label" style="line-height: 20px; width: 50px; margin-left: 28px;"><span class="c-f">*</span>记录：</label>
+                      	<div class="layui-input-block" style="margin-left: 85px; box-sizing: border-box;padding-right: 20px; margin-top: -35px;">
+                          <textarea name="visitContentDescriptor" placeholder="请填写跟进记录" class="layui-textarea">${follow.visitContentDescriptor!}</textarea>
+                        	<span class="jun-wrong-msg c-f" style="top:100px;display:none">请输入回访记录，至少15个字</span>
+                            <span class="jun-danger-msg iconfont icon-jinggao-copy c-f" style="right:26px;display:none"></span>
+                        </div>
+					</div>
+				</aside>
+			</div>
+			<#if action != 'add'>
+			<div class="base mt5" style="margin-bottom: 30px;">
+				<p class="pt20 mb10"><span class="c-2">项目操作日志</span></p>
+				<table id="operationPaginationTbl" class="layui-table pop">
+					<colgroup>
+						<col width="150">
+						<col width="100">
+						<col width="150">
+						<col width="400">
+						<col>
+					</colgroup>
+					<thead>
+					<tr>
+						<th>操作时间</th>
+						<th>操作人</th>
+						<th>操作类型</th>
+						<th>内容</th>
+					</tr>
+					</thead>
+					<tbody>
+
+					</tbody>
+				</table>
+				<div id="operationPaginationDiv"></div>
+			</div>
+			</#if>
+	    </div>
+        <div class="layui-form-item t-c pt5 pb10 nav1 nav2 nav3">
+          <div class="layui-input-block mt5">
+            <button class="btn-click" lay-submit lay-filter="save" style="width: 88px;">保存</button>
+            <button class="btn-click ml10" lay-submit lay-filter="submit" style="width: 88px;" >正式提交</button>
+          </div>
+        </div>
+ 	</form>
+	<div style="position:absolute;left:332px;top:370px;">
+        <div style="display:inline;">
+	        <select id="secrecyArea" name="secrecyArea" multiple="multiple" style="width: 220px;">
+
+	       	</select>
+        </div>
+ 	</div>
+ </div>
+</@base.htmlBase>

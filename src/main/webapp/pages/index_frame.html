@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>专网运营平台</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <link rel="stylesheet" href="/res/public/css/style_frame.css<@resVersionDirective>?</@>">
+    <link rel="stylesheet" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css<@resVersionDirective>?</@>">
+    <link rel="stylesheet" href="/res/public/css/itocstyle.css<@resVersionDirective>?</@>">
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<!-- admin -->
+<div class="layui-layout layui-layout-admin">
+    <!-- header -->
+    <div class="layui-header my-header jun-header">
+        <a href="index.html">
+            <div class="my-header-logo"><img src="/res/images/jun-logo.png" alt=""></div>
+        </a>
+        <ul class="layui-nav jun-head-nav" lay-filter="" id="firstLevelMenuArea">
+           <!-- 一级菜单区域 -->
+        </ul>
+        <ul class="layui-nav my-header-user-nav">
+            <li class="layui-nav-item">
+                <a class="name" href="javascript:;"><span class="iconfont icon-gerenzhongxin1"></span>
+                    <#if (SYSTEM_USER_SESSION != null)>
+                        ${SYSTEM_USER_SESSION.systemUser.realName}
+                    </#if>
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="javascript:;">个人信息</a></dd>
+                    <dd><a href="javascript:void(0);" id="updatePasswordBtn">修改密码</a></dd>
+                    <dd><a href="/login/doLoginOut">退出</a></dd>
+                </dl>
+            </li>
+        </ul>
+    </div>
+    <!-- side -->
+    <div class="layui-side my-side jun-nav">
+        <div class="layui-side-scroll">
+            <ul class="layui-nav layui-nav-tree" lay-filter="side" id="subMenuArea">
+                <!-- 二级、三级菜单区域 -->
+            </ul>
+        </div>
+    </div>
+    <!-- body -->
+    <div class="layui-body my-body jun-body">
+        <div class="layui-tab layui-tab-card my-tab" lay-filter="card" lay-allowClose="true">
+            <ul class="layui-tab-title jun-tab-title">
+                <li class="layui-this" lay-id="0"><span>欢迎页</span></li>
+            </ul>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                    <img src="/res/images/index_welcome.jpg" style="position:absolute;left:50%;margin-left: -555px;top: 50%;margin-top: -271px;z-index: -99999999999;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript">
+    var element = null;
+    var layer = null;
+    layui.use(['layer', 'element', 'util'], function () {
+        element = layui.element(), layer = layui.layer, $ = layui.jquery, util = layui.util; //导航的hover效果、二级菜单等功能，需要依赖element模块
+        var side = $('.my-side');
+        var body = $('.my-body');
+        var footer = $('.my-footer');
+
+        // 监听导航栏收缩
+        $('.btn-nav').on('click', function(){
+            if(localStorage.log == 0){
+                localStorage.log = 1;
+                navShow(50);
+            }else{
+                localStorage.log = 0;
+                navHide(50);
+            }
+        });
+
+        // 导航栏收缩
+        function navHide(t){
+            var time = t ? t : 100;
+            side.animate({'left':-190},time);
+            body.animate({'left':0},time);
+            footer.animate({'left':0},time);
+        }
+
+        // 导航栏展开
+        function navShow(t){
+            var time = t ? t : 100;
+            side.animate({'left':0},time);
+            body.animate({'left':190},time);
+            footer.animate({'left':190},time);
+        }
+
+        //监听导航(side)点击切换页面
+        element.on('nav(side)', function (elem) {
+            var card    = 'card';                                   // 选项卡对象
+            var title   = elem.text();                              // 导航栏text
+            var count = elem.find("span").text();
+            if(count && count.length > 0) {
+                title = title.replace(count, "");
+            }
+            var src     = elem.children('a').attr('href-url');      // 导航栏跳转URL
+            var id      = new Date().getTime();                     // ID
+            var flag    = getTitleId(card, title);                  // 是否有该选项卡存在
+            // 大于0就是有该选项卡了
+            if(flag > 0){
+                id = flag;
+                $("#iframe_"+id).attr("src", src);
+            }else{
+                //新增
+                element.tabAdd(card, {
+                    title: '<span>'+title+'</span>'
+                    , content: '<iframe id="iframe_'+id+'" src="' + src + '" frameborder="0"></iframe>'
+                    , id: id
+                });
+            }
+            // 切换相应的ID tab
+            element.tabChange(card, id);
+            // 提示信息
+            layer.msg(title);
+            // 关闭弹窗
+            layer.closeAll();
+        });
+
+        element.on('tab(card)', function(data){
+//            console.log("card switch");
+        });
+
+
+        // 监听控制content高度
+        function init(){
+            // 起始判断收缩还是展开
+            if(localStorage.log == 0){
+                navHide(1);
+            }else{
+                navShow(1);
+            }
+            // 选项卡高度
+            cardTitleHeight = $(document).find(".layui-tab[lay-filter='card'] ul.layui-tab-title").height();
+            // 需要减去的高度
+            height = $(window).height() - $('.layui-header').height() - cardTitleHeight - $('.layui-footer').height();
+            // 设置高度
+            $(document).find(".layui-tab[lay-filter='card'] div.layui-tab-content").height( height - 2 );
+        }
+
+        // 自适应
+        $(window).on('resize', function() {
+            if($(this).width() > 1024){
+                if(localStorage.log == 0){
+                    localStorage.log = 1;
+                    navShow();
+                }
+            }else{
+                if(localStorage.log == 1){
+                    localStorage.log = 0;
+                    navHide();
+                }
+            }
+            init();
+        });
+
+        // 初始化
+        init();
+
+        // 分辨率小于1024  使用内部工具组件
+        if ($(window).width() < 1024) {
+            util.fixbar({
+                bar1: '&#xe602;'
+                , css: {left: 10, bottom: 54}
+                , click: function (type) {
+                    if (type === 'bar1') {
+                        //iframe层
+                        layer.open({
+                            type: 1,                        // 类型
+                            title: false,                   // 标题
+                            offset: 'l',                    // 定位 左边
+                            closeBtn: 0,                    // 关闭按钮
+                            anim: 0,                        // 动画
+                            shadeClose: true,               // 点击遮罩关闭
+                            shade: 0.8,                     // 半透明
+                            area: ['150px', '100%'],        // 区域
+                            skin: 'my-mobile',              // 样式
+                            content: $('body .my-side').html() // 内容
+                        });
+                    }
+                    element.init();
+                }
+            });
+            localStorage.log = 0;
+            navHide(1);
+        }
+
+        $('#updatePasswordBtn').bind("click",function () {
+            layer.open({
+                title: "修改密码",
+                type: 2,
+                area: ['500px', '300px'],
+                fixed: false, //不固定
+                maxmin: true,
+                content: '/preUpdatePasswordPage'
+            });
+        });
+    });
+
+    function updatePasswordCallBack(success) {
+        if(success) {
+            setTimeout(function(){
+                postUtil.submit("/login/doLoginOut");
+            },2000);
+        }
+    }
+
+    // 根据导航栏text获取lay-id
+    function getTitleId(card,title){
+        var id = -1;
+        $(document).find(".layui-tab[lay-filter=" + card + "] ul li").each(function(){
+            if(title === $(this).find('span').text()){
+                id = $(this).attr('lay-id');
+            }
+        });
+        return id;
+    }
+
+    function refreshCard(title, url) {
+        var id = parent.getTitleId("card", title);
+        if(id == -1) {
+            return;
+        }
+        if(url && url !='') {
+            $("#iframe_"+id).attr("src", url);
+        } else {
+            $("#iframe_"+id).attr("src", $("#iframe_"+id).attr("src"));
+        }
+    }
+
+    function postData(title, url, param) {
+        var id = parent.getTitleId("card", title);
+        if(id == -1) {
+            return;
+        }
+        if(param) {
+            var iframeDoc = document.getElementById( "iframe_"+ id).contentWindow.document;
+            var tempform = iframeDoc.createElement("form");
+            tempform.action = url;
+            tempform.method = "post";
+            tempform.style.display = "none";
+            tempform.target = "_self";
+
+            for (var x in param) {
+                var opt = iframeDoc.createElement("input");
+                opt.name = x;
+                opt.value = param[x];
+                tempform.appendChild(opt);
+            }
+
+            var opt = iframeDoc.createElement("input");
+            opt.type = "submit";
+            tempform.appendChild(opt);
+            iframeDoc.body.appendChild(tempform);
+            tempform.submit();
+            iframeDoc.body.removeChild(tempform);
+        }
+    }
+
+    $(function(){
+
+        //页面初始化时加载运营中心第一级的菜单
+        //运营中心-资源ID 001 固定
+        var param = {};
+        postUtil.call("/authorityResource/firstLevelMenuJsonData",param,function(result){
+            if(result && result.length > 0) {
+                renderFirstLevelMenu(result);
+            }
+        });
+
+    });
+
+    var g_firstLevelMenus = null;
+
+    function renderFirstLevelMenu(menuList) {
+        g_firstLevelMenus = menuList;
+        for(var i=0;i<menuList.length;i++) {
+            var menu = menuList[i];
+            var resourceId = menu.resourceId;
+            var resourceName = menu.resourceName;
+            var menuStr = '<li class="layui-nav-item" id="resource_'+resourceId+'" onclick="renderSubMenus(\'' + resourceId + '\')"><a href="javascript:void(0);">'+resourceName+'</a></li>';
+            $('#firstLevelMenuArea').append(menuStr);
+        }
+        var crmMenu = '<li class="layui-nav-item" id="resource_crm" onclick="jumpToOtherPlatform(1)"><a href="javascript:void(0);">集团CRM</a></li>'+
+        			  '<li class="layui-nav-item" onclick="jumpToOtherPlatform(2)"><a href="javascript:void(0);">在线学习平台</a></li>';
+        $('#firstLevelMenuArea').append(crmMenu);
+    }
+
+    function jumpToOtherPlatform(flag){
+    	if(flag==1){
+    		window.open("http://crm.yofc.com:8080/yofccrm/auth/org.gocom.abframe.auth.Login.flow");
+    	}else if(flag==2){
+    		window.open("http://yofc.21tb.com/os/html/deskTop.init.do");
+    	}
+    }
+
+    function renderSubMenus(resourceId){
+        $('#resource_'+resourceId).siblings().removeClass("layui-this");
+        $('#resource_'+resourceId).addClass("layui-this");
+        var currentFirstLevelMenu = null;
+        if(g_firstLevelMenus) {
+            for(var i=0;i<g_firstLevelMenus.length;i++) {
+                if(resourceId == g_firstLevelMenus[i].resourceId) {
+                    currentFirstLevelMenu = g_firstLevelMenus[i];
+                    break;
+                }
+            }
+        }
+
+        //将当前一级菜单的地址赋值给欢迎页,同时切换至欢迎页，删除其他选项卡
+        if(currentFirstLevelMenu) {
+            if(currentFirstLevelMenu.resourceUrl) {
+                $('#iframe').attr("src",currentFirstLevelMenu.resourceUrl)
+            }
+        }
+        element.tabChange("card", "0");
+
+
+        //查询当前菜单的子节点
+        if(subMenuDataMap[resourceId]){
+            var childrenMenu = subMenuDataMap[resourceId];
+            assembleSubMenu(childrenMenu);
+        }else {
+            var param = {};
+            param.resourceId = resourceId;
+            postUtil.call("/authorityResource/childrenMenuJsonData",param,function(childrenMenu){
+                assembleSubMenu(childrenMenu);
+                subMenuDataMap[resourceId] = childrenMenu;
+            });
+        }
+
+    }
+
+    function assembleSubMenu(childrenMenu) {
+        if(childrenMenu) {
+            $('#subMenuArea').html("");
+            for(var i=0;i<childrenMenu.length;i++) {
+                var menu = childrenMenu[i];
+                var menuChildren = childrenMenu[i].children;
+                if(menuChildren.length == 0) {
+                    var line = "<li class=\"layui-nav-item\">\n" +
+                            "   <a href=\"javascript:;\" href-url=\""+menu.resourceUrl+"\" data-type=\"tabAdd\">\n" +
+                            "       <span class=\"iconfont icon-dinghuodan mr5\"></span><span>"+menu.resourceName+"</span>\n" +
+                            "   </a>\n" +
+                            "</li>";
+                    $('#subMenuArea').append(line);
+                }else{
+                    var before = "<li class=\"layui-nav-item layui-nav-itemed\"><a href=\"javascript:;\"><span class=\"iconfont icon-dinghuodan mr5\"></span><span>"+menu.resourceName+"</span></a><dl class=\"layui-nav-child\">";
+                    var content = "";
+                    for(var j=0;j<menuChildren.length;j++) {
+                        content = content + "<dd><a href=\"javascript:;\" href-url=\""+menuChildren[j].resourceUrl+"\" data-type=\"tabAdd\">"+menuChildren[j].resourceName+"</a></dd>";
+                    }
+                    var after = "</dl></li>";
+                    $('#subMenuArea').append(before+content+after);
+                }
+            }
+            element.init();
+        }
+    }
+
+    var subMenuDataMap = {};
+
+</script>
+</body>
+</html>

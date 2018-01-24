@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+	<link rel="stylesheet" type="text/css" href="/res/public/css/style.css<@resVersionDirective>?</@>" />
+	<link rel="stylesheet" href="/res/css/project.css<@resVersionDirective>?</@>">
+	<script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+	<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+	<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+	<script type="text/javascript" src="/res/js/projectReport/projectDetail.js<@resVersionDirective>?</@>"></script>
+	<script type="text/javascript" src="/res/js/rg.js<@resVersionDirective>?</@>"></script>
+	<style type="text/css">
+
+		#itocCenter .itocContent .itocMain {
+			width: 100%;
+			box-sizing: border-box;
+			border-left: 20px solid #f0f0f0;
+			border-right: 50px solid #f0f0f0;
+			background: #ffffff;
+			padding-bottom: 30px;
+			min-height: 800px;
+			height: auto;
+		}
+	</style>
+</head>
+<body>
+<section id="itocCenter">
+	
+	<section class="itocContent">
+		<div class="itocMain main">
+			<div class="jun-base">
+				<div class="base mt5">
+                    <p class="pt20 mb10"><span class="c-2"></span></p>
+                    <article class="bor-e6 pt10 pb10">
+                        <div>
+                            <p style="position: absolute;margin-top: 11px;"  id="bindSalesEmployee"></p>
+                            <p class="t-r-i mt5">
+                                <button class="btn-click frt ml10" style="height:34px;width:86px;" onclick="watchAttachments()">查看附件</button>
+                            </p>
+                        </div>
+                    </article>
+                </div>
+				<#include "/res/freemarkerTpl/projectReport_basic.html" />
+				<@project_report_detail_basic/>
+			</div>
+		</div>
+	</section>
+</section>
+<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+
+<script>
+	var taskId = "${eFlowTaskId}";
+	var _backupId = "${backupId}";
+	$(function(){
+		queryProjectDetail(_backupId);
+	})
+
+	layui.use(['element','layer'], function(){
+		var layer = layui.layer;
+		var element = layui.element();
+
+	})
+</script>
+
+</body>
+</html>

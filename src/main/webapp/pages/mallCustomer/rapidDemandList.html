@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+	    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+	    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css<@resVersionDirective>?</@>"/>
+	    <link rel="stylesheet" href="/res/public/css/daterangepicker.css<@resVersionDirective>?</@>" />
+	    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+	    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+	    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+        <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+        <script src="/res/public/layui/moment.min.js<@resVersionDirective>?</@>"></script>
+    	<script src="/res/public/layui/jquery.daterangepicker.js<@resVersionDirective>?</@>"></script>
+    	<script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+	</head>
+	<body>
+		<section class="itocContent" id="itocCenter">
+			<div class="itocMain">
+	          <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px; margin-top:30px;">
+	           <form action="" class="jun-form-s form-css">
+	              <dl class="dl-form">
+	                 <dt class="flt fz12" style="width: 68px;">创建时间：</dt>
+	                 <dd class="flt pre"  id="picker-css">
+	                     <input class="picker-css" id="date-range0" value="">
+	                     <img class="cs-p" style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" />
+	                 </dd>
+	                 <dt class="flt fz12 ml10">委托人：</dt>
+	                 <dd class="flt"><input type="text" id="createUser"  name="entrustOrderContact"  placeholder="请输入委托人姓名" autocomplete="off" class="layui-input"></dd>
+	                 <dt class="flt fz12" style="width: 100px;">联系方式：</dt>
+					 <dd class="flt"><input type="text" id="linkPhone"  name="entrustOrderContactMobile"  placeholder="请输入联系方式" autocomplete="off" class="layui-input"></dd>
+	                 <dd class="flt ml20">
+	                 <dd style="margin-left:230px;"><span class="btn ml10 fz12" onclick="search()" style="height: 32px;cursor:pointer;width: 70px;background-color: #035a9d;color: #ffffff;display: inline-block;text-align: center;line-height: 32px;cursor: pointer;">查询</span></dd>
+	
+	              </dl>
+	              <dl class="dl-form">
+	              	<dt class="flt fz12" style="width: 68px;">终端来源：</dt>
+	              	<dd class="flt layui-form jun-form-l">
+	              		<select name="deviceSource">
+	              			<option value=""></option>
+	              			<option value="ALL">全部</option>
+	              			<option value="PC">PC端</option>
+	              			<option value="WAP">移动端</option>
+	              		</select>
+	              	</dd>
+	              </dl>
+	           </form>
+	          </div>
+	          <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px; margin-top:10px;">
+		          <table class="layui-table pop" lay-skin="line">
+					<colgroup>
+<!-- 		                <col  width="40"> -->
+		                <col  width="120">
+		                <col  width="120">
+		                <col  width="100">
+		                <col  width="300">
+		                <col  width="100">
+		                <col  width="80">
+		                <col  width="100">
+					</colgroup>
+		            <thead>
+		                <tr>
+<!-- 		                  <th><input type="checkbox" name="chooseAll" /></th> -->
+		                  <th>创建时间</th>
+		                  <th>委托人姓名</th>
+		                  <th>联系方式</th>
+		                  <th>内容</th>
+		                  <th>附件</th>
+		                  <th>跟进人</th>
+		                  <th>操作</th>
+		                </tr> 
+		            </thead>
+		            <tbody>
+					</tbody>
+				</table>
+			</div>
+			<div id="paginationDiv" style="margin-right:7px;margin-top:-10px;padding-bottom: 30px;"></div>
+			</div>
+		</section>
+
+		<script type="text/javascript">		
+			var hasAddSalesOpportunityPermission = false;
+			var hasGenerateAuthorizeUserPermission = false;
+			<#list SYSTEM_USER_SESSION.systemUser.authorityResource as item >
+				<#if item.resourceCode =='operation:customer:engineer:manage:rapiddemand:generateAuthorizeUser' >
+					hasAddSalesOpportunityPermission = true;
+				</#if>
+				<#if item.resourceCode =='operation:customer:engineer:manage:rapiddemand:addSalesOpportunity' >
+					hasGenerateAuthorizeUserPermission = true;
+				</#if>
+			</#list>
+			
+			$('#date-range0').dateRangePicker({
+			
+			});
+			$('#date-range0').val(moment(new Date()).format("YYYY-MM")+"-01 to "+moment(new Date()).format("YYYY-MM-DD"));
+		
+			var layer;
+		    layui.use(['form','layer'], function(){
+				var form = layui.form();
+				layer = layui.layer;
+				var param = {
+					createDate:$('#date-range0').val()
+				};
+				loadRapidDemandList(param);
+		    });
+		    
+			function loadRapidDemandList(param) {
+				var currentPageIndex = param.currentPage || 1; //如果currentPage没定义就设置为1
+				layer.load();
+				postUtil.call("/mallRapidDemand/demandListData", param, function(result) {
+					layer.closeAll("loading");
+					if(result.STATUS=='SUCCESS'){
+						var pages = result.DATA.totalPage;
+						renderTable(result.DATA.list);
+						laypage({
+							cont : 'paginationDiv',
+							pages : pages,
+							total : result.DATA.totalRow,
+							curr : currentPageIndex,
+							skip : true,
+							jump : function(obj, first) {
+								if (!first) {
+									var jumpParam = {
+										currentPage : obj.curr,
+										createDate:$('#date-range0').val()
+									};
+									var entrustOrderContact = $("input[name=entrustOrderContact]").val()
+									var entrustOrderContactMobile = $("input[name=entrustOrderContactMobile]").val()
+									var deviceSource = $("select[name=deviceSource]").val();
+									if(entrustOrderContact){
+										jumpParam.entrustOrderContact = entrustOrderContact;
+									}
+									if(entrustOrderContactMobile){
+										jumpParam.entrustOrderContactMobile = entrustOrderContactMobile;
+									}
+									if(deviceSource){
+										jumpParam.deviceSource = deviceSource;
+									}
+									loadRapidDemandList(jumpParam);
+								}
+							}
+						});
+					}else{
+						layer.msg('数据加载失败',{icon:5})
+					}
+	
+				});
+			}
+	
+			function renderTable(dataList) {
+				var html = "";
+				for(var i=0;i<dataList.length;i++){
+					//html+="<tr><td><input type='checkbox'></td>"
+					html+="<tr>"
+						+"<td>"+(dataList[i].createTime?moment(dataList[i].createTime).format("YYYY-MM-DD HH:mm:ss"):'')+"</td>"
+						+"<td><a href='javascript:openCustomDetail(\""+dataList[i].buyerAccountId+"\")'>"+dataList[i].entrustOrderContact+"</a></td>"
+						+"<td>"+dataList[i].entrustOrderContactMobile+"</td>"
+						+"<td><p class='two-row' title='"+"【"+dataList[i].inquiryOrderProvince+dataList[i].inquiryOrderCity+"】"+(dataList[i].purchasingRequisitionDesc||'') +"'>"+"<span class='c-f'>【"+dataList[i].inquiryOrderProvince+dataList[i].inquiryOrderCity+"】</span>"+(dataList[i].purchasingRequisitionDesc||'')+"</p></td>"
+						+"<td>";
+						if(dataList[i].attach){
+							for(var j=0;j<dataList[i].attach.length;j++){
+								html += '<a href="javascript:void(0);" onclick="downLoadMallAttachment(' + dataList[i].attach[j].attachmentId + ');" title="'+dataList[i].attach[j].attachmentName+'">'+dataList[i].attach[j].attachmentName+'</a>';
+								if(j<dataList[i].attach.length-1){
+									html+='<br>';
+								}
+							}
+						}else{
+							html+='无';
+						}
+					html+="</td>"
+						+"<td>"+(dataList[i].userRealName||'暂无')+"</td>"
+						if(!dataList[i].orderBaseTempId){
+							html+="<td>";
+							if(hasAddSalesOpportunityPermission){
+								if(dataList[i].mallUserId){
+									html+="<span style='color:#999999'>创建商城账号</span><br/>";
+								}else{
+									html+="<a href='javascript:generateAuthorizeUser(\""+dataList[i].entrustOrderContactMobile+"\")'>创建商城账号</a><br/>";
+								}
+							}
+							if(hasGenerateAuthorizeUserPermission){
+								html+="<a href='javascript:addSalesOpportunity(\""+dataList[i].offerId+"\")'>创建销售机会</a>";
+							}
+							html+='</td>';
+						}else{
+							html+="<td>";
+							if(hasAddSalesOpportunityPermission){
+								if(dataList[i].mallUserId){
+									html+="<span style='color:#999999'>创建商城账号</span><br/>";
+								}else{
+									html+="<a href='javascript:generateAuthorizeUser(\""+dataList[i].entrustOrderContactMobile+"\")'>创建商城账号</a><br/>";
+								}
+							}
+							if(hasGenerateAuthorizeUserPermission){
+								html+="<span style='color:#999999'>创建销售机会</span>";
+							}
+							html+='</td>';
+						}
+					html +="</tr>";
+				}
+				if(dataList.length==0){
+					 html = '<tr><td colspan="7"><p class="t-c fz16 c-2" style="line-height: 76px;">暂无快捷委托单数据！</p></td></tr>';
+				}
+				
+				$(".layui-table tbody").html(html);
+			}
+			/*
+			$("input[name=chooseAll]").on("click",function() {
+				if ($(this).prop("checked")) {
+					$("input[name=single]").prop("checked", true);
+					$("input[name=single]").each(function() {
+						var obj = $(this).attr("accountId");
+						if (seletedItems.indexOf(obj) < 0) {
+							seletedItems += (obj + ",");
+						}
+					});
+				} else {
+					$("input[name=single]").prop("checked", false);
+					$("input[name=single]").each(function() {
+						var obj = $(this).attr("accountId");
+						if (seletedItems.indexOf(obj) >= 0) {
+							seletedItems = seletedItems.replace((obj + ","), "");
+						}
+					});
+				}
+			});*/
+			function search(){
+				var jumpParam = {
+					createDate:$('#date-range0').val()
+				};
+				var entrustOrderContact = $("input[name=entrustOrderContact]").val()
+				var entrustOrderContactMobile = $("input[name=entrustOrderContactMobile]").val()
+				var deviceSource = $("select[name=deviceSource]").val();
+				if(entrustOrderContact){
+					jumpParam.entrustOrderContact = entrustOrderContact;
+				}
+				if(entrustOrderContactMobile){
+					jumpParam.entrustOrderContactMobile = entrustOrderContactMobile;
+				}
+				if(deviceSource){
+					jumpParam.deviceSource = deviceSource;
+				}
+				loadRapidDemandList(jumpParam);
+			}
+			
+			function generateAuthorizeUser(mobile){
+				layer.load();
+				postUtil.call("/mallRapidDemand/generateAuthorizeUser", {mobile:mobile}, function(result) {
+					layer.closeAll("loading");
+					if(result.STATUS=='SUCCESS'){
+						layer.msg('生成商城账号成功',{icon:6},function(){
+							var param = {
+								createDate:$('#date-range0').val()
+							};
+							loadRapidDemandList(param);
+						});
+					}else{
+						layer.msg(result.MSG,{icon:5});
+					}
+				});
+			}
+		    function downLoadMallAttachment(mallFileAttachmentId) {
+		        var param = {};
+		        param.fileAttachmentId = mallFileAttachmentId;
+		        postUtil.submit("/file_server/mall/generalFileDownload", param);
+		    }
+		    
+		    function addSalesOpportunity(offerId){
+		        layer.open({
+		            skin: 'msgskin',
+		            title: '新建销售机会<span class="fz12">（客户所有者：<span>暂无</span>）</span>',
+		            type: 2,
+		            area: ['750px', '500px'],
+		            fixed: false, //不固定
+		            maxmin: true,
+		            content: '/mallRapidDemand/addSalesOpportunity?offerId=' + offerId
+		        });
+		    }
+		    
+		    function addSalesOpportunityCallback(){
+				var param = {
+					createDate:$('#date-range0').val()
+				};
+				loadRapidDemandList(param);
+				return true;
+		    }
+		    
+		    function openCustomDetail(accountId){
+		    	cardUtil.closeCard("客户详情-" + accountId);
+		    	cardUtil.openCard("订单详情-" + accountId,"/mallCustomer/preDetail?accountId="+accountId);
+		        cardUtil.changeCard("订单详情-" + accountId);
+		    }
+		</script>
+	</body>
+</html>

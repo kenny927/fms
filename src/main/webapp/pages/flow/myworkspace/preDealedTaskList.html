@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/public/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div class="purchaseSearch purchasepading">
+                <form>
+                    <!--dl class="form-list flt mt10 status">
+                                <dt style="width: 80px;line-height: 28px;">状态筛选：</dt>
+                                <dd><label><input type="radio" checked="checked" name="status" class="userType" value=""/>全部</label></dd>
+                            <dd><label><input type="radio" name="status" class="userType" value="VERIFYING"/>待审核</label></dd>
+                            <dd><label><input type="radio" name="status" class="userType"   value="VERIFIED"/>认证成功</label></dd>
+                            <dd><label><input type="radio" name="status" class="userType"   value="VERIFY_FAILED"/>未通过</label></dd>
+                    </dl-->
+                </form>
+            </div>
+            <div class="layui-form" style="width:96%;margin-left:2%;margin-top:2.3%">
+                <table class="layui-table" lay-skin="line">
+                    <colgroup>
+                        <col width="25%">
+                        <col width="25%">
+                        <col width="25%">
+                        <col width="25%">
+                        <col>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th style="text-align:center">任务ID</th>
+                        <th style="text-align:center">任务名称</th>
+                        <th style="text-align:center">开始时间</th>
+                        <th style="text-align:center">结束时间</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div id="paginationDiv"></div>
+        </div>
+    </section>
+</section>
+<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+<script>
+    var html2 = "";
+    function isExitsVariable(variableName) {
+        try {
+            if (typeof (variableName) == "undefined") {
+                return "";
+            } else {
+                return variableName;
+            }
+        } catch (e) {
+        }
+        return "";
+    }
+
+    $(function () {
+        loadMallCustomerList(1, status);
+        //initLayUi();
+    });
+    function loadMallCustomerList(currentPageIndex, status) {
+        var param = {};
+        param.currentPage = currentPageIndex;
+        if (status) {
+            param.status = status;
+        }
+        //alert(JSON.stringify(param));
+        postUtil.call("/flow/myworkspace/queryDealedTaskList", param, function (result) {
+            //alert(JSON.stringify(result));
+            var pageNumber = result.DATA.pageNumber;
+            var pageSize = result.DATA.pageSize;
+            var totalPage = result.DATA.totalPage;
+            var totalRow = result.DATA.totalRow;
+            var dataList = result.DATA.list;
+            renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        loadMallCustomerList(obj.curr, status);
+                    }
+                }
+            });
+        });
+    }
+
+    function renderTable(dataList) {
+        var html = "";
+        var length = dataList.length;
+        if (length > 0) {
+            for (var i1 = 0; i1 < dataList.length; i1++) {
+                var data = dataList[i1];
+                var operationHtml = formatAction(data);
+                html += '  <tr>' +
+                        '   <td  width="25%">' + isExitsVariable(data.id) + '</td>' +
+                        '   <td  width="25%">' + isExitsVariable(data.name) + '</td>' +
+                        '   <td  width="25%">' + isExitsVariable(data.createTime) + '</td>' +
+                        '   <td  width="25%">' + isExitsVariable(data.endTime) + '</td>' +
+                        '  </tr>'
+            }
+        }
+        $(".layui-table tbody").html(html);
+    }
+
+    function formatAction(row) {
+        return "<a  href='javascript:openFinishTaskTab(" + row.id + ")' >办理任务</a>&nbsp;&nbsp;" + "<a target='_blank' href='javascript:openCurrentProcessView(" + row.id + ")' >查看当前流程图</a>";
+    }
+
+    function openFinishTaskTab(taskId) {
+        postUtil.submit("/task/redirectPage", {taskId: taskId});
+    }
+
+</script>
+</body>
+</html>

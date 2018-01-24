@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/vue.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <style>
+        [v-cloak]{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="queryBuyerEnquireDetail" v-cloak>
+    <div class="bz-bb pl20 pr20 pt20 flex">
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor fz12" style="height: 150px;flex: 1;">
+            <p class="t-c fz16 line-middle">工程商（买方）</p>
+            <p class="line-middle pl20">用户名：{{todos.buyerSellerInfo.userRealName}}</p>
+            <p class="line-middle pl20">手机号：{{todos.buyerSellerInfo.mobile}}</p>
+            <p class="line-middle pl20">公司名称：{{todos.buyerSellerInfo.accountName}}</p>
+            <p class="line-middle pl20" v-if="todos.entrustOrderContact != null && todos.entrustOrderContact !='' ">联系人/联系电话：{{todos.entrustOrderContact}}/{{todos.entrustOrderContactMobile}}</p>
+        </blockquote>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor ml20 mr20" style="height: 150px;flex: 1;">
+            <template v-if="todos.offerType=='PLATFORM_OFFER'">
+                <p class="t-c fz16">报价人</p>
+                <p class="line-middle t-c">平台</p>
+            </template>
+            <template v-else>
+                <p class="t-c fz16">报价人</p>
+                <p class="line-middle pl20">所在地：{{todos.buyerSellerInfo.city | default '--'}}</p>
+                <p class="line-middle pl20">公司名称：{{todos.buyerSellerInfo.offerAccountName | default '--'}}</p>
+            </template>
+        </blockquote>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="height: 150px;flex: 1;">
+            <p class="t-c fz16">专属客户经理：{{todos.accountManagerName | default '--'}}</p>
+            <p class="line-middle pl20" v-if="todos.accountManagerName !=null && todos.accountManagerName !='' ">手机：{{todos.mobile}}</p>
+            <p class="line-middle pl20" v-if="todos.accountManagerName !=null && todos.accountManagerName !='' ">QQ：{{todos.qq | default '--'}}</p>
+            <p class="line-middle pl20" v-if="todos.accountManagerName !=null && todos.accountManagerName !='' ">邮箱：{{todos.email | default '--'}}</p>
+        </blockquote>
+    </div>
+    <div class="bz-bb pl20 pr20 pt10">
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor bg-f0">
+            <form action="" class="jun-form-s form-css">
+                <dl class="dl-form mb5-i">
+                    <dt class="flt w78">询单编号：</dt>
+                    <dd class="flt line-middle c-2 w240">{{todos.offerId}}</dd>
+                    <dt class="flt w78">来源：</dt>
+                    <dd class="flt line-middle c-2" style="width: 200px;">{{todos.inquiryOrderSourceName}}</dd>
+                    <template v-if="!isOffered">
+                    <dt class="flt w78">询单状态：</dt>
+                    <dd class="flt line-middle" style="width: 200px;"><span class="c-2">{{todos.inquiryOrderStatusName}}</span><span class="c-9">{{todos.operationTime | time}}</span></dd>
+                    <dt class="flt w78">期望交期：</dt>
+                    <dd class="flt line-middle fw-b" style="width: 140px;">{{todos.expectDeliveryDate | time 'YYYY-MM-DD'}}</dd>
+                    </template>
+                </dl>
+                <template v-if = "isOffered">
+                <dl class="dl-form mb5-i">
+                    <dt class="flt w78">询单状态：</dt>
+                    <dd class="flt line-middle w240"><span class="c-2">{{todos.inquiryOrderStatusName}}</span><span class="c-9">{{todos.operationTime | time}}</span></dd>
+                    <dt class="flt w78" v-if="isOffered">报价：</dt>
+                    <dd class="flt line-middle w240" v-if="isOffered"><span class="c-f fw-b">{{todos.offerTotalPrice | currency '' | default '--'}}</span><span class="c-2">元</span></dd>
+                    <dt class="flt" v-if="isOffered"><span class="c-f">*</span>有效期至：</dt>
+                    <dd class="flt line-middle fw-b w240" v-if="isOffered">{{todos.offerValidUntil | time 'YYYY-MM-DD'}}</dd>
+                </dl>
+                <dl class="dl-form mb5-i">
+                    <dt class="flt w78">期望交期：</dt>
+                    <dd class="flt line-middle fw-b w240">{{todos.expectDeliveryDate | time 'YYYY-MM-DD'}}</dd>
+                    <dt class="flt w78" v-if="isOffered"><span class="c-f"></span>回复交期：</dt>
+                    <dd class="flt line-middle fw-b w240" v-if="isOffered && todos.replyDeliveryDate">{{todos.replyDeliveryDate | time 'YYYY-MM-DD'}}</dd>
+                    <dd v-if="isOffered && todos.deliverDays" class="flt line-middle ml5">付款后</dd>
+                    <dd v-if="isOffered && todos.deliverDays" class="flt ml5 line-middle">{{todos.deliverDays}}</dd>
+                    <dd v-if="isOffered && todos.deliverDays" class="flt line-middle mr5 ml5">天发货</dd>
+                    <!--<dd class="flt w78" v-if="isOffered && todos.deliverDays">付款后<input id="deliverDays" v-bind:value="todos.deliverDays" style="height: 32px;width: 40px;" class="layui-input" >天发货</dd>-->
+                    <!--dd class="flt ml10"><span class="form-btn layui-btn-small2">修改</span></dd>
+                    <dd class="flt ml10"><span class="form-btn  layui-btn-primary layui-btn-small2">邮件发送</span></dd>
+                    <dd class="flt ml10"><span class="form-btn  layui-btn-primary layui-btn-small2">复制询价单</span></dd>
+                    <dd class="flt ml10"><span class="form-btn  layui-btn-primary layui-btn-small2" id="close">关闭询价单</span></dd-->
+                </dl>
+                </template>
+            </form>
+        </blockquote>
+        <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">商品信息</h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <h3 class="mb5 fw-b">商城商品</h3>
+            <table class="layui-table pop">
+                <colgroup>
+                    <col  width="400">
+                    <col  width="100">
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="200">
+                    <col  width="100" v-if="isOffered">
+                    <col  width="100" v-if="isOffered">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>商品</th>
+                    <th >目录价</th>
+                    <th >数量</th>
+                    <th >计量单位</th>
+                    <th >商品描述</th>
+                    <th v-if="isOffered"><span>*</span>商品报价(含税/不含税)</th>
+                    <th v-if="isOffered">报价小计</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-show="malls==undefined">
+                    <td  colspan="8" height="50px"  align="center">
+                        <span class="fz16">暂无相关信息</span>
+                    </td>
+                </tr>
+                <tr  v-for="item in malls">
+                    <td class="goods-detail">
+                        <dl>
+                            <dt><img src="{{item.imgUrl}}{{item.orginImg | default 'http://'}}"  alt="">
+                            <p>{{item.skuBrandName}}</p>
+                            </dt>
+                            <dd class="t-l ml10">
+                                <p class="one-row c-2">{{item.skuName}}</p>
+                                <p class="mt10">商品型号:{{item.skuModel}}</p>
+                                <p>商品编码:{{item.skuId}}</p>
+                                <p>芯数/光纤类型/颜色:{{item.skuPropertyList}}</p>
+                            </dd>
+                        </dl>
+                    </td>
+                    <td>{{item.directoryPrice | currency ''}}</td>
+                    <td v-if="item.skuUnitName == '米' || item.skuUnitName == '千米'">{{item.skuQuantity | formatQuantity '3'}}</td>
+                    <td v-else>{{item.skuQuantity}}</td>
+                    <td>{{item.skuUnitName}}</td>
+                    <td><span class="four-row" style="max-width: 120px;" title="{{item.remark}}">{{item.remark}}</td>
+                    <td v-if="isOffered">{{item.skuOfferPrice | currency ''}}</td>
+                    <td v-if="isOffered">{{item.skuOfferAmount | currency ''}}</td>
+                </tr>
+                </tbody>
+            </table>
+            <h3 class="mb5 fw-b">自定义商品</h3>
+            <table class="layui-table pop">
+                <colgroup>
+                    <col  width="300">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="200">
+                    <col  width="200" v-if="isOffered">
+                    <col  width="150" v-if="isOffered">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>商品名称</th>
+                    <th >商品型号</th>
+                    <th >品牌</th>
+                    <th >数量</th>
+                    <th >计量单位</th>
+                    <th >商品描述</th>
+                    <th v-if="isOffered"><span>*</span>商品报价(含税/不含税)</th>
+                    <th v-if="isOffered">报价小计</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-show="diys==undefined">
+                    <td  colspan="9" height="50px"  align="center">
+                        <span class="fz16">暂无相关信息</span>
+                    </td>
+                </tr>
+                <tr v-for="item in diys">
+                    <td>{{item.skuName}}</td>
+                    <td>{{item.skuModel}}</td>
+                    <td>{{item.skuBrandName}}</td>
+                    <td>{{item.skuQuantity | formatQuantity '3'}}</td>
+                    <td>{{item.skuUnitName}}</td>
+                    <td><span class="four-row" style="max-width: 100px;" title="{{item.remark}}">{{item.remark}}</span></td>
+                    <td v-if="isOffered">{{item.skuPrice | currency ''}}</td>
+                    <td v-if="isOffered">{{item.skuAmount | currency ''}}</td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="mt20" v-if="todos.offerTotalPrice != null && offerersAccountId!='' && todos.offerTotalPrice > 0">
+                <form action="" class="jun-form-s form-css clr">
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">商品总报价：</dt>
+                        <dd class="flt line-middle w100  t-r">{{todos.offerSkuTotalPrice | default 0 | currency '' }}</dd>
+                        <dd class="flt line-middle ml5">元</dd>
+                    </dl>
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">运费：</dt>
+                        <dd class="flt line-middle w100  t-r">{{todos.offerFreight  | default 0 | currency '' }}</dd>
+                        <dd class="flt line-middle ml5">元</dd>
+                    </dl>
+                    <dl class="dl-form frt mb10-i">
+                        <template v-if="todos.offerOtherFeesDesc != null && todos.offerOtherFeesDesc != ''">
+                            <dt class="flt">{{todos.offerOtherFeesDesc}}：</dt>
+                        </template>
+                        <template v-else>
+                            <dt class="flt">其他费用：</dt>
+                        </template>
+                        <dd class="flt line-middle w100 t-r">{{todos.offerOtherFees | default 0 | currency '' }}</dd>
+                        <dd class="flt line-middle ml5">元</dd>
+                    </dl>
+                    <dl class="dl-form frt mb5-i" >
+                        <dt class="flt">总价：</dt>
+                        <dd class="flt line-middle w100  t-r">{{todos.offerTotalPrice | default 0 | currency '' }}</dd>
+                        <dd class="flt line-middle ml5">元</dd>
+                    </dl>
+                </form>
+            </div>
+        </blockquote>
+        <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">详细信息</h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <form action="" class="jun-form-s form-css">
+                <dl class="dl-form mb5-i">
+                    <dt class="flt">配送方式：</dt>
+                    <dd class="flt line-middle c-2" v-if="todos.deliveryMode == 'OTHER'">{{todos.deliveryModeName}} {{todos.deliveryModeRemark}}</dd>
+                    <dd class="flt line-middle c-2" v-else>{{todos.deliveryModeName}}</dd>
+                </dl>
+                <dl class="dl-form mb5-i">
+                    <dt class="flt">收货地：</dt>
+                    <dd class="flt line-middle c-2">{{todos.inquiryOrderProvince}}/{{todos.inquiryOrderCity}}</dd>
+                </dl>
+                <dl class="dl-form mb5-i">
+                    <dt class="flt">详细地址：</dt>
+                    <template v-if="todos.consigneeAddress != null && todos.consigneeAddress !=''">
+                    <dd class="flt line-middle c-2">{{todos.consigneeAddress}}  {{todos.consignee}}  {{todos.consigneeMobile}}</dd>
+                    </template>
+                    <template v-else>
+                        <dd class="flt line-middle c-2">--</dd>
+                    </template>
+                </dl>
+                <dl class="dl-form mb5-i layui-form">
+                    <dt class="flt">结算方式：</dt>
+                    <template  v-if="todos.payMode=='DEPOSIT'">
+                        <dd class="flt line-middle c-2">{{todos.payModeName}}{{todos.payModeRemark}}%</dd>
+                    </template>
+                    <template v-else>
+                        <dd class="flt line-middle c-2" v-if="todos.payMode=='CASH_ON_DELIVERY'">货到<span class="c-f fw-b">{{todos.payModeRemark}}</span>天付款</dd>
+                        <dd class="flt line-middle c-2" v-else>{{todos.payModeName}}</dd>
+                    </template>
+                </dl>
+                <dl class="dl-form mb5-i">
+                    <dt class="flt">公司名称：</dt>
+                    <dd class="flt line-middle c-2">{{todos.buyerAccountName}}</dd>
+                </dl>
+                <dl class="dl-form mb5-i">
+                    <dt class="flt">是否开票：</dt>
+                    <dd class="flt line-middle  c-2">{{todos.isNeedInvoice == "Y"?"开票（增值税专用发票）":"不开票"}}</dd>
+                </dl>
+                <dl class="dl-form mb5-i" v-if="todos.isNeedInvoice == 'Y'">
+                    <dt class="flt">发票信息：</dt>
+                    <dd class="flt line-middle  c-2">
+                        <template v-if="todos.invoiceCorporationName != null && todos.invoiceCorporationName!= '' ">
+                        开票单位名称：{{todos.invoiceCorporationName | default '--'}}
+                        纳税人识别码：{{todos.invoiceEaxpayerIdentificationNumber | default '--'}}
+                        注册地址：{{todos.invoiceCorporationAddress | default '--'}}
+                        开户银行：{{todos.invoiceCorporationBankDesc | default '--'}}
+                        银行账号：{{todos.invoiceCorporationBankAccount | default '--'}}
+                        </template>
+                        <template v-else>
+                            --
+                        </template>
+                    </dd>
+                </dl>
+                <dl class="dl-form mb5-i" v-if="todos.isNeedInvoice == 'Y'">
+                    <dt class="flt">收票地址：</dt>
+                    <dd class="flt line-middle  c-2">
+                        <template v-if="todos.invoiceConsigneeAddress != null && todos.invoiceConsigneeAddress!= '' ">
+                        {{todos.invoiceConsigneeAddress | default '--'}} {{todos.invoiceConsignee}} {{todos.invoiceConsigneeMobile | default '--'}}
+                        </template>
+                        <template v-else>
+                            --
+                        </template>
+                    </dd>
+                </dl>
+                <dl class="dl-form mb5-i">
+                    <dt class="flt fz12">备注：</dt>
+                    <dd class="flt line-middle  c-2" style="max-width: 820px;">{{todos.purchasingRequisitionDesc | default '--'}}</dd>
+                </dl>
+                <dl class="dl-form mb5-i">
+                    <dt class="flt fz12">附件：</dt>
+                    <dd class="flt line-middle">
+                        <template v-if="attachment!=null || attachment.length > 0">
+                        <a href="javascript:;" class="c-h cs-p mr20 fz12" v-for="item in attachment" onclick="downLoadMallAttachment('{{item.attachmentId}}')">{{item.attachmentName}}</a>
+                        </template>
+                        <template v-else>
+                        --
+                        </template>
+                    </dd>
+                </dl>
+            </form>
+        </blockquote>
+        <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">添加报价人</h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <div class="mb10" v-if="todos.offerType == 'PLATFORM_OFFER' || todos.offerType== null || todos.offerType == '' ">
+                <span class="form-btn layui-btn-small2" lay-filter="formDemo">平台报价</span>
+            </div>
+            <div v-if="todos.offerType == 'DISTRIBUTOR_OFFER' || todos.offerType== null || todos.offerType == ''" >
+                <span class="form-btn layui-btn-small2" lay-filter="formDemo">分销商报价</span>
+                <span class="fz12 c-2">{{todos.buyerSellerInfo.offerAccountName}}</span>
+            </div>
+        </blockquote>
+        <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">操作日志 <span class="c-h frt fz12 cs-p under-l mr20"   @click="fn()">{{word}}></span></h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <table class="layui-table pop mb5-i" lay-skin="line" v-show="willShow">
+                <colgroup>
+                    <col  width="200">
+                    <col  width="200">
+                    <col  width="200">
+                    <col  width="400">
+                    <col  width="200">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th >时间</th>
+                    <th >操作人</th>
+                    <th >询单状态</th>
+                    <th >操作内容</th>
+                    <th >操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="item in lis">
+                    <td>{{item.operationTime | time}}</td>
+                    <td>{{item.operationAccountName}}</td>
+                    <td>{{item.offerStatusName}}</td>
+                    <td>{{item.operationContent}}</td>
+                    <td v-if="lis.length == $index + 1 "><a href="javascript:;" class="c-h fz12 cs-p" onclick="openHistoryDetail('{{item.offerHistoryId}}');">查看原始单据</a></td>
+                    <td v-else></td>
+                </tr>
+                </tbody>
+            </table>
+        </blockquote>
+    </div>
+</div>
+<script type="text/javascript">
+    var offerId = '${offerId}';
+    var layer;
+
+    Vue.filter('time', function (value, format) {
+        value = value || '';
+        if(value == ''){
+            return '--';
+        }
+        format = format || 'YYYY/MM/DD HH:mm:ss';
+        return moment(value).format(format);
+    });
+
+    Vue.filter('default', function (value, defaultValue) {
+        value = value || '';
+        if(value == ''){
+            return defaultValue;
+        }
+        return value
+    });
+
+
+    //页面加载完后调用
+    $(function () {
+
+
+    });
+
+    function downLoadMallAttachment(mallFileAttachmentId) {
+        var param = {};
+        param.fileAttachmentId = mallFileAttachmentId;
+        postUtil.submit("/file_server/mall/generalFileDownload", param);
+    }
+
+    function inquiryOrderHistoryDetail(value){
+       Vue.filter("formatQuantity", function(value, length) {   //全局方法 Vue.filter() 注册一个自定义过滤器,必须放在Vue实例化前面
+            return value.toFixed(length);
+       });
+
+       new Vue({
+            el:'#queryBuyerEnquireDetail',
+            data:{
+                todos: value,
+                malls: value.skuList,
+                diys : value.customSkuList,
+                lis : value.operationLog,
+                attachment : value.attachmentList,
+                word : "展开",
+                willShow : false,
+                isOffered : (value.inquiryOrderStatusPercent == '80%' || value.inquiryOrderStatusPercent == '100%')
+            },
+            methods:{
+               fn:function(){
+                   if(this.willShow==true){
+                       this.willShow=false;
+                       this.word="展开";
+                   }else{
+                       this.willShow=true;
+                       this.word="收起";
+                   }
+               }
+            }
+        });
+    }
+
+    function openHistoryDetail(offerHistoryId) {
+        cardUtil.openCard("原始单据-" + offerHistoryId,"/mallOrder/api/inquiryOrderHistory/enterHistory", {offerHistoryId:offerHistoryId});
+        cardUtil.changeCard("原始单据-" + offerHistoryId);
+    }
+
+    function goProductPreview(skuId) {
+        cardUtil.closeCard("预览商品-" + skuId);
+        cardUtil.openCard("预览商品-" + skuId,"/sku/previewBySkuId?skuId=" + skuId);
+        cardUtil.changeCard("预览商品-" + skuId);
+    }
+
+    layui.use(['form', 'element', 'layer'], function () {
+        layer = layui.layer;
+        var index = layer.load();
+        postUtil.call("/mallOrder/api/mallInquiry/detail", {offerId:offerId}, function (result) {
+            if (result.STATUS == 'SUCCESS') {
+                console.log(result.DATA)
+                inquiryOrderHistoryDetail(result.DATA);
+                layer.closeAll('loading');
+            } else {
+                layer.msg('系统发生未知错误' + result.MSG, {icon: 5});
+            }
+        });
+    })
+
+</script>
+</body>
+</html> 

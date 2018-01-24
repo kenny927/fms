@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+<link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+<script src="/res/js/jquery-3.1.1.min.js"></script>
+<script src="/res/public/layui/Area1.js" type="text/javascript"></script>
+<script src="/res/public/layui/layui.js"></script>
+<script src="/res/public/layPage/laypage.js"></script>
+<style>
+  .form-css .dl-form dd input[type='text']{
+    width: 100px;
+  }
+  .form-css .dl-form{
+    margin-bottom: 0px;
+  }
+  .content .layui-form-radio:last-of-type{
+    margin-right: 0px;
+  }
+</style>
+</head>
+<body>
+  <div class="jun-form-s form-css mt10" style="width:580px;">
+      <dl class="dl-form mt10 clr">
+         <dt class="flt">产品类型：</dt>
+         <dd class="flt layui-form content">
+            <input type="radio" value="" title="光缆" name="classify">
+            <input type="radio" value="" title="配件" name="classify">
+            <input type="radio" value="" title="综合布线" name="classify">
+            <input type="radio" value="" title="其它" name="classify">
+            <input type="text" placeholder=""  autocomplete="off" class="layui-input frt" name="title">
+         </dd>
+      </dl>
+      <dl class="dl-form mt10">
+         <dt class="flt">转交对象：</dt>
+         <dd class="flt layui-form pre">
+            <input type="radio" value="transferToSale" title="转交给销售代表" checked="" name="duixiang" lay-filter="duixiang">
+            <input type="radio" value="transferToDistributor" title="转交给分销商" name="duixiang" lay-filter="duixiang">
+         </dd>
+      </dl>
+      <dl class="dl-form mt10 ml10">
+         <dd class="flt ml20"><input type="text" style="width: 200px;" placeholder="请输入员工姓名或部门" autocomplete="off" class="layui-input search">
+          <span class="iconfont icon-sousuo-sousuo frt mr10 c-9 cs-p" style="margin-top: -25px;"></span>
+         </dd>
+         <dt class="flt fz12">省份：</dt>
+         <dd class="flt layui-form dd-city">
+              <select name="province" lay-filter="province" id="s_province"  lay-search >
+                  <option value="">请选择省</option>
+              </select>
+         </dd>
+      </dl>            
+  </div>
+  <div class="transferToSale" style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;margin-top:10px;">
+      <table class="layui-table pop table-css" lay-skin="line">
+          <colgroup>
+            <col  width="30">
+            <col  width="100">
+            <col  width="100">
+            <col  width="100">
+          </colgroup>
+          <thead>
+            <tr class="bor-no">
+              <th ></th>
+              <th >公司销售</th>
+              <th >电话</th>
+              <th >部门</th>
+            </tr> 
+          </thead>
+          <tbody>
+            <tr class="bor-no">
+              <th ><input type="radio" value="" checked="" name="item"></th>
+              <th >株洲</th>
+              <th >12890865567</th>
+              <th >南区部,销售一组</th>
+            </tr> 
+            <tr class="bor-no">
+              <th ><input type="radio" value="" name="item"></th>
+              <th >株洲</th>
+              <th >12890865567</th>
+              <th >南区部,销售一组</th>
+            </tr>  
+            <tr class="bor-no">
+              <th ><input type="radio" value="" name="item"></th>
+              <th >株洲</th>
+              <th >12890865567</th>
+              <th >南区部,销售一组</th>
+            </tr>   
+          </tbody>
+          </table>
+  </div>
+  <div class="transferToDistributor" style="display:none;width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;margin-top:10px;">
+      <table class="layui-table pop table-css" lay-skin="line">
+          <colgroup>
+            <col  width="30">
+            <col  width="200">
+            <col  width="150">
+            <col  width="200">
+            <col  width="100">
+          </colgroup>
+          <thead>
+            <tr class="bor-no">
+              <th ></th>
+              <th >公司名称</th>
+              <th >销售代表/客户经理</th>
+              <th >分销商对接人</th>
+              <th >身份</th>
+            </tr> 
+          </thead>
+          <tbody>
+            <tr class="bor-no">
+              <th ><input type="radio" value="" checked="" name="item1"></th>
+              <th >公司名称</th>
+              <th >销售代表</th>
+              <th >分销商对接人</th>
+              <th >身份</th>
+            </tr> 
+            <tr class="bor-no">
+              <th ><input type="radio" value="" name="item1"></th>
+              <th >公司名称</th>
+              <th >销售代表</th>
+              <th >分销商对接人</th>
+              <th >身份</th>
+            </tr>  
+            <tr class="bor-no">
+              <th ><input type="radio" value="" name="item1"></th>
+              <th >公司名称</th>
+              <th >销售代表</th>
+              <th >分销商对接人</th>
+              <th >身份</th>
+            </tr>   
+          </tbody>
+          </table>
+  </div>
+  <div id="paginationDiv" style="margin-right:8px;margin-top:-20px"></div>
+  <div class="t-c">
+      <button class="form-btn layui-btn-small2 confirmChooseBtn" onclick="confirmChooseBtn()">确定</button>
+      <button class="form-btn  layui-btn-primary layui-btn-small2 cancelChooseBtn ml10"  onclick="cancelChooseBtn()">取消</button>
+  </div>
+<script type="text/javascript">
+//省市联动  star
+  var areaData = Area; 
+  var $form;
+  var form;
+  var $;
+  layui.use(['form','laydate','layer'], function() {
+      form = layui.form();
+      $form = $('.form-css');
+      $ = layui.jquery;
+      layer = layui.layer;
+      loadProvince();
+
+
+      form.on('radio(duixiang)', function(data){ 
+
+         if(data.value=="transferToSale"){
+            $('.transferToSale').show();
+            $('.transferToDistributor').hide();
+         }else if(data.value=="transferToDistributor"){
+            $('.transferToSale').hide();
+            $('.transferToDistributor').show();
+         }
+
+       });
+  });
+
+  function loadProvince() {
+    var proHtml = '';
+        proHtml = '<option value="">全部</option>';
+   for(var i = 0; i < areaData.length; i++) {
+     proHtml += '<option value="' + areaData[i].provinceName + '">' +
+          areaData[i].provinceName + '</option>';
+   }
+  //初始化省数据
+     $form.find('select[name=province]').append(proHtml);
+     form.render();
+     form.on('select(province)', function(data) {
+       var value = data.value;
+    });
+  }
+
+
+  //分页
+   $(function () {
+        loadMallVagueData(1);
+    });
+
+    function loadMallVagueData(currentPageIndex) {
+        var param = {};
+        param.currentPageIndex = currentPageIndex;
+//      postUtil.call("/mallOrder/vagueDemand/vagueDemandListJson", param, function (result) {
+            var pages = 100;
+            laypage({
+                cont: 'paginationDiv',
+                pages: pages,
+                curr: currentPageIndex,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        loadMallVagueData(obj.curr);
+                    }
+                }
+            });
+//      });
+    }
+
+  </script>
+  </body>
+</html>

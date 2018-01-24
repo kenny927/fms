@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" >
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>" />
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/vue/dist/vue.min.js"></script>
+    <style type="text/css">
+        .form-css .dl-form dd input[type='text']{
+            width: 200px;
+        }
+        .dd-css{
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+<div class="yofc-body">
+    <form id ="visitForm" action="" class="jun-form-s form-css">
+        <dl class="dl-form mb10-i">
+            <dt class="flt fz12" style="width: 80px;" v-if="recordType=='VISITING_PLAN'">公司名称：</dt>
+            <dd class="flt dd-css"  v-if="recordType=='VISITING_PLAN'">
+                <input type="text"  name="title" :value="datas.accountName" readonly placeholder="--" autocomplete="off"
+                       class="layui-input">
+            </dd>
+            <dt v-if="recordType=='VISITING_PLAN'" class="flt" style="width:92px;">计划拜访时间：</dt>
+            <dt v-else class="flt" style="width:80px;">拜访时间：</dt>
+            <dd class="flt dd-css">
+                <input type="text"  name="title" :value="moment(datas.visitTime).format('YYYY-MM-DD')" readonly placeholder="--" autocomplete="off"
+                       class="layui-input"></dd>
+        </dl>
+        <dl class="dl-form mb10-i">
+            <dt class="flt fz12" style="width: 80px;">拜访方式：</dt>
+            <dd class="flt dd-css">
+                <input type="text" v-if="datas.visitType == 'PHONE'"  name="title" value="电话联系" readonly placeholder="--" autocomplete="off"
+                       class="layui-input">
+                <input v-if="datas.visitType == 'HOUSE'" type="text"  name="title" value="登门拜访" readonly placeholder="--" autocomplete="off"
+                       class="layui-input">
+                <input v-if="datas.visitType == 'MEETING_MARKET'"  type="text"  name="title" value="会议营销" readonly placeholder="--" autocomplete="off"
+                       class="layui-input">
+            </dd>
+            <dt class="flt fz12" style="width: 92px;">联系人：</dt>
+            <dd class="flt dd-css">
+                <input type="text"  name="title" :value="datas.linkmanName+'('+datas.linkmanTelephone+')'" readonly placeholder="--" autocomplete="off"
+                       class="layui-input">
+            </dd>
+        </dl>
+        <dl class="dl-form mb10-i" v-if="datas.visitType != 'PHONE'">
+            <dt class="flt"  style="width: 80px;">地址：</dt>
+            <dd class="flt  dd-css">
+                <input type="text"  name="title" :value="datas.province+datas.city+datas.address" readonly placeholder="--" autocomplete="off"
+                       class="layui-input">
+            </dd>
+        </dl>
+        <dl class="dl-form mb10-i">
+            <dt class="flt fz12" style="width: 80px;" v-if="recordType=='VISITING_RECORD'">拜访记录：</dt>
+            <dt class="flt fz12" style="width: 80px;" v-if="recordType=='VISITING_PLAN'">拜访主题：</dt>
+            <dd class="flt dd-css" style="width: 500px;height: auto">
+              {{datas.content}}
+            </dd>
+        </dl>
+        <dl class="dl-form mb10-i" v-show="datas.ATTACHMENTLIST&&recordType=='VISITING_RECORD'">
+            <dt class="flt" style="width: 80px;" >附件：</dt>
+            <dd class="flt dd-css"  style="width: 500px;height: auto"><a href="javascript:;" @click="download(item)" class="fz12 c-h mr20" v-for="item in datas.ATTACHMENTLIST">{{item.name}}</a></dd>
+        </dl>
+    <div class="t-c">
+        <span class="form-btn  layui-btn-primary layui-btn-big ml10" @click="closeLayer()">关闭</span>
+    </div>
+    </form>
+</div>
+<script type="text/javascript">
+    var parent_index = parent.layer.getFrameIndex(window.name),vm;
+    vm = new Vue({
+        el:'#visitForm'
+        ,data:{
+            visitRecordId:'${visitRecordId!}',
+            recordType:'${recordType}',
+            datas:{}
+        }
+        ,mounted:function () {
+            this.$nextTick(function () {
+                this.showData(this.visitRecordId);
+            })
+        }
+        ,methods:{
+            showData: function (visitRecordId) {
+                postUtil.call('/customer/relation/queryDetail',{'visitRecordId':visitRecordId},function (result) {
+                    if(result.STATUS == 'SUCCESS') {
+                        vm.datas =  result.DATA;
+                        vm.$nextTick(function () {
+                            parent.layer.iframeAuto(parent_index);
+                        })
+                    }
+                })
+            },
+            closeLayer: function () {
+                parent.layer.close(parent_index);
+            },
+            download: function (data) {
+                postUtil.submit("/file_server/download", {'id':data.id});
+            }
+        }
+    })
+</script>
+</body>
+</html>

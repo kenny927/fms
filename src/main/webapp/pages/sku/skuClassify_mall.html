@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css"
+          href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+
+    <!-- ztree v3.5 -->
+    <link rel="stylesheet" type="text/css"
+          href="/res/public/zTree_v3/css/zTreeStyle/zTreeStyle.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript"
+            src="/res/public/zTree_v3/js/jquery.ztree.core-3.5.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript"
+            src="/res/public/zTree_v3/js/jquery.ztree.excheck-3.5.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript"
+            src="/res/public/zTree_v3/js/jquery.ztree.exedit.js<@resVersionDirective>?</@>"></script>
+    <style>
+        .ztree_wd li span.button.add {
+            margin-left: 2px;
+            margin-right: -1px;
+            background-position: -144px 0;
+            vertical-align: top;
+            *vertical-align: middle
+        }
+
+        /*list_ztree表格*/
+        .list_ztree {
+            padding: 0;
+            border: 1px solid #CDD6D5;
+        }
+
+        .list_ztree li a {
+            vertical-align: middle;
+            height: 40px;
+        }
+
+        .list_ztree li > a {
+            width: 100%;
+        }
+
+        .list_ztree li > a,
+        .list_ztree li a.curSelectedNode {
+            padding-top: 0px;
+            background: none;
+            height: auto;
+            border: none;
+            cursor: default;
+            opacity: 1;
+        }
+
+        .list_ztree li ul {
+            padding-left: 0px
+        }
+
+        .list_ztree div.diy span {
+            line-height: 30px;
+            vertical-align: middle;
+        }
+
+        .list_ztree div.diy {
+            height: 100%;
+            width: 25%;
+            line-height: 30px;
+            border-top: 1px solid #dddddd;
+            border-left: 0px solid #dddddd;
+            text-align: center;
+            display: inline-block;
+            box-sizing: border-box;
+            /*color: #6c6c6c;*/
+            font-family: "SimSun";
+            font-size: 12px;
+            vertical-align: top;
+        }
+
+        .list_ztree div.diy:first-child {
+            text-align: left;
+            text-indent: 10px;
+            border-left: none;
+        }
+
+        .list_ztree .head {
+            background: #eaeaea;
+        }
+
+        .list_ztree .head div.diy {
+            border-top: none;
+            border-right: 0px solid #CDD2D4;
+            color: #000;
+            font-family: "Microsoft YaHei";
+            font-size: 14px;
+        }
+
+        /*end--ztree表格*/
+        .edit_skuClassify_ztree li span.button.add {
+            margin-left: 2px;
+            margin-right: -1px;
+            background-position: -144px 0;
+            vertical-align: top;
+            *vertical-align: middle
+        }
+
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <section class="flex setsku mt20 pl20 pr20">
+                <div class="left" style="flex: 1;height: 500px;">
+                    <ul id="tree" class="ztree edit_skuClassify_ztree"></ul>
+                </div>
+                <div class="right" style="flex: 3;height: 500px;">
+                    <div style="margin-top: 5px;margin-right: 5px;margin-bottom: 5px;float:right;">
+                        已选中：<span id="totalChoosedCount" style="color: red">0</span>
+                        商城：
+                        <select id="skuMallStatus" style="width: 100px;height: 35px;">
+                            <option value="">-请选择-</option>
+                            <option value="U">上架</option>
+                            <option value="D">下架</option>
+                        </select>
+                        订货系统：
+                        <select id="skuOrderStatus" style="width: 100px;height: 35px;">
+                            <option value="">-请选择-</option>
+                            <option value="U">上架</option>
+                            <option value="D">下架</option>
+                        </select>
+                        商品类型：
+                        <select id="skuType" style="width: 120px;height: 35px;">
+                            <option value="">-请选择-</option>
+                            <option value="NORMAL">订货商品</option>
+                            <option value="SPOT">现货商品</option>
+                        </select>
+                        <button id="batchRemoveSkuBtn" class="search-btn" style="cursor: pointer;">批量移除</button>
+                        <button id="addSkuBtn" class="search-btn" style="cursor: pointer;">添加SKU</button>
+                    </div>
+                    <div style="width:100%;box-sizing:border-box;padding:0 5px;margin-right:5px">
+                        <table class="layui-table" lay-skin="line">
+                            <thead>
+                            <tr>
+                                <th style="text-align:center;width:5%">
+                                    <input id="selectAllCheckBox" type="checkbox"/>
+                                </th>
+                                <th style="text-align:center;width:5%">ID</th>
+                                <th style="text-align:center;width:40%">名称</th>
+                                <th style="text-align:center;width:25%">类型</th>
+                                <th style="text-align:center;width:25%">型号</th>
+                            </tr>
+                            </thead>
+                            <tbody id="classifySkuTable">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+                </div>
+            </section>
+        </div>
+    </section>
+</section>
+
+
+<script type="text/javascript">
+
+    var PAGE_SIZE = 10;
+    //当前的外部分类ID
+    var currentSkuClassifyId = "";
+    var currentSkuClassifyType = "MALL_CLASSIFICATION";
+    var gloablChoosedSkuIdList = []; //已选择的选择的sku,支持跨页选取
+    var currentDataList = [];//当前页面的所有的sku
+
+    $(function () {
+        loadMallClassify();
+
+        $('#skuType').bind("change", function () {
+            doQuery();
+        });
+
+        $('#skuMallStatus').bind("change", function () {
+            doQuery();
+        });
+
+        $('#skuOrderStatus').bind("change", function () {
+            doQuery();
+        });
+
+        $('#selectAllCheckBox').bind("click", function () {
+            var selectAllChecked = document.getElementById("selectAllCheckBox").checked;
+            var skuChecks = document.getElementsByName("skuIdCheckBox");
+            if (skuChecks.length > 0) {
+                for (var i = 0; i < skuChecks.length; i++) {
+                    skuChecks[i].checked = selectAllChecked;
+                }
+            }
+            statisticsChoosedSkus();
+        });
+
+        $('#addSkuBtn').bind("click", function () {
+            layer.open({
+                title: "请选择SKU",
+                type: 2,
+                area: ['1000px', '500px'],
+                fixed: false, //不固定
+                maxmin: true,
+                content: '/reusable/skuCommodity/chooseSkuCommodityPage'
+            });
+        });
+
+
+        $('#batchRemoveSkuBtn').bind("click", function () {
+            if (gloablChoosedSkuIdList.length == 0) {
+                layer.msg("请选择想要移除分离的SKU", {icon: 5});
+                return;
+            }
+            if (currentSkuClassifyId == "") {
+                layer.msg("请选择具体的分类后再进行操作", {icon: 5});
+                return;
+            }
+            layer.load();
+            var deleteParam = {};
+            deleteParam.skuIdList = gloablChoosedSkuIdList;
+            deleteParam.classifyType = currentSkuClassifyType;
+            deleteParam.classifyId = currentSkuClassifyId;
+            postUtil.call("/skuClassify/deleteClassifySku", {jsonData: JSON.stringify(deleteParam)}, function (res) {
+                if (res.STATUS == "SUCCESS") {
+                    doQuery();
+                    layer.msg("移除成功");
+                } else {
+                    layer.msg("移除失败，错误信息如下:<br>" + res.MSG, {icon: 5});
+                }
+                layer.closeAll("loading");
+            });
+        });
+    });
+
+    //选择sku商品的回调方法,保存关联关系
+    function chooseSkuCommodityCallback(skuDataList) {
+        var skuIdList = [];
+        for (var i = 0; i < skuDataList.length; i++) {
+            skuIdList.push(skuDataList[i].skuId);
+        }
+        if (skuIdList.length > 0) {
+            var param = {};
+            param.skuIdList = skuIdList;
+            param.classifyType = currentSkuClassifyType;
+            param.classifyId = currentSkuClassifyId;
+            layer.load();
+            postUtil.call("/skuClassify/addClassifySku", {jsonData: JSON.stringify(param)}, function (res) {
+                if (res.STATUS == "SUCCESS") {
+                    doQuery();
+                    layer.msg("添加成功");
+                } else {
+                    layer.msg("添加失败，错误信息如下:<br>" + res.MSG, {icon: 5});
+                }
+                layer.closeAll("loading");
+            });
+        }
+        return true;
+    }
+
+    function statisticsChoosedSkus() {
+        var choosedSkuIds = getChoosedSkuIds();
+        var noChoosedSkuIds = getNoChoosedSkuIds();
+        if (noChoosedSkuIds.length > 0) {
+            for (var i = 0; i < noChoosedSkuIds.length; i++) {
+                for (var j = 0; j < gloablChoosedSkuIdList.length; j++) {
+                    if (noChoosedSkuIds[i] == gloablChoosedSkuIdList[j]) {
+                        gloablChoosedSkuIdList.splice(j, 1);
+                        break;
+                    }
+                }
+            }
+        }
+        if (choosedSkuIds.length > 0) {
+            for (var i = 0; i < choosedSkuIds.length; i++) {
+                gloablChoosedSkuIdList.push(choosedSkuIds[i]);
+            }
+        }
+        gloablChoosedSkuIdList = gloablChoosedSkuIdList.distinct();
+        $('#totalChoosedCount').text(gloablChoosedSkuIdList.length);
+
+        // 表格渲染完成之后判断全选是否需要勾选
+        var tempChoosedSkuIds = getChoosedSkuIds();
+        if(tempChoosedSkuIds.length == currentDataList.length && tempChoosedSkuIds.length > 0) {
+            document.getElementById("selectAllCheckBox").checked = true;
+        }else {
+            document.getElementById("selectAllCheckBox").checked = false;
+        }
+    }
+
+    function getChoosedSkuIds() {
+        var skuChecks = document.getElementsByName("skuIdCheckBox");
+        var checkedSkuIds = [];
+        if (skuChecks.length > 0) {
+            for (var i = 0; i < skuChecks.length; i++) {
+                if (skuChecks[i].checked == true) {
+                    checkedSkuIds.push(skuChecks[i].value);
+                }
+            }
+        }
+        return checkedSkuIds;
+    }
+
+    function getNoChoosedSkuIds() {
+        var skuChecks = document.getElementsByName("skuIdCheckBox");
+        var noCheckedSkuIds = [];
+        if (skuChecks.length > 0) {
+            for (var i = 0; i < skuChecks.length; i++) {
+                if (skuChecks[i].checked != true) {
+                    noCheckedSkuIds.push(skuChecks[i].value);
+                }
+            }
+        }
+        return noCheckedSkuIds;
+    }
+
+
+    function doQuery() {
+        var queryParam = {};
+        queryParam.pageSize = PAGE_SIZE;
+        queryParam.currentPageIndex = 1;
+        queryParam.classifyType = currentSkuClassifyType;
+        queryParam.classifyId = currentSkuClassifyId;
+        queryParam.skuType = $('#skuType').val();
+        queryParam.skuOrderStatus = $('#skuOrderStatus').val();
+        queryParam.skuMallStatus = $('#skuMallStatus').val();
+        loadSkuByMallClassify(queryParam);
+        //每次查询重置选中的sku
+        gloablChoosedSkuIdList = [];
+    }
+    //根据当前外部分类查询SKU
+    function loadSkuByMallClassify(queryParam) {
+        layer.load();
+        postUtil.call("/skuClassify/paginateSkuJsonData", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            currentDataList = dataList;
+            renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        tempParam.classifyType = currentSkuClassifyType;
+                        tempParam.classifyId = currentSkuClassifyId;
+                        tempParam.skuType = $('#skuType').val();
+                        tempParam.skuOrderStatus = $('#skuOrderStatus').val();
+                        tempParam.skuMallStatus = $('#skuMallStatus').val();
+                        loadSkuByMallClassify(tempParam);
+                    }
+                }
+            });
+            layer.closeAll("loading");
+        });
+    }
+
+    function renderTable(dataList) {
+        var length = dataList.length;
+        var table = document.getElementById("classifySkuTable");
+        table.innerHTML = "";
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var row = renderRow(data);
+                table.appendChild(row);
+            }
+        } else {
+            var html = '<tr><td colspan="10"><p class="t-c fz16 c-2" style="line-height: 76px;">没有查询到相应的SKU信息</p></td></tr>';
+            $(table).html(html);
+        }
+
+        //重新刷新已勾选的条数
+        $('#totalChoosedCount').text(gloablChoosedSkuIdList.length);
+        // 表格渲染完成之后判断全选是否需要勾选
+        var tempChoosedSkuIds = getChoosedSkuIds();
+        if(tempChoosedSkuIds.length == currentDataList.length && tempChoosedSkuIds.length > 0) {
+            document.getElementById("selectAllCheckBox").checked = true;
+        }else {
+            document.getElementById("selectAllCheckBox").checked = false;
+        }
+    }
+
+    function renderRow(rowData) {
+        var skuId = rowData.skuId;
+        var model = rowData.model;
+        var skuName = rowData.skuName;
+        var skuType = rowData.skuType;
+
+        var tr = document.createElement('tr');
+        tr.appendChild(renderCell("skuIdCheckBox", skuId, "width:5%;"));
+        tr.appendChild(renderCell(null, skuId, "width:5%;"));
+        tr.appendChild(renderCell(null, skuName, "width:40%;"));
+        tr.appendChild(renderCell(null, skuType, "width:25%;"));
+        tr.appendChild(renderCell(null, model, "width:25%;"));
+        return tr;
+    }
+
+    function renderCell(name, value, style) {
+        var td = document.createElement('td');
+        if ("operation" == name) {
+            td.innerHTML = '<a href="javascript:void(0);" onclick="preEditAuthorityEmployee(\'' + value.userId + '\')">编辑</a>';
+        } else if ("skuIdCheckBox" == name) {
+            var havenCurrentSkuId = false;
+            for (var i = 0; i < gloablChoosedSkuIdList.length; i++) {
+                if (gloablChoosedSkuIdList[i] == value) {
+                    havenCurrentSkuId = true;
+                    break;
+                }
+            }
+            if (havenCurrentSkuId) {
+                td.innerHTML = '<input type="checkbox" checked="checked" onclick="statisticsChoosedSkus()" name="skuIdCheckBox" value="' + value + '" />';
+            } else {
+                td.innerHTML = '<input type="checkbox" onclick="statisticsChoosedSkus()" name="skuIdCheckBox" value="' + value + '" />';
+            }
+
+        } else {
+            if (value) {
+                td.innerText = value;
+            } else {
+                td.innerText = "--";
+            }
+        }
+        return td;
+    }
+
+    /**
+     * Copy from roger on 2017/3/22.
+     */
+    var IDMark_Switch = "_switch",
+            IDMark_Icon = "_ico",
+            IDMark_Span = "_span",
+            IDMark_Input = "_input",
+            IDMark_Check = "_check",
+            IDMark_Edit = "_edit",
+            IDMark_Remove = "_remove",
+            IDMark_Ul = "_ul",
+            IDMark_A = "_a";
+    var skuClassify_modal_zTree;
+    var data_changeNodes = {};
+    var newCount = 1;
+    var log, className = "dark", max_department = 3, blHasSort = false;
+    var skuClassify_modal_setting = {
+        view: {
+            addHoverDom: addHoverDom,
+            removeHoverDom: removeHoverDom,
+            selectedMulti: false
+        },
+        edit: {
+            enable: true,
+            editNameSelectAll: true,
+            showRemoveBtn: false,
+            // removeTitle: "删除",
+            showRenameBtn: false,
+            // renameTitle: "修改"
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        },
+        callback: {
+            beforeDrag: beforeDrag,
+            beforeEditName: beforeEditName,
+            beforeRemove: beforeRemove,
+            beforeRename: beforeRename,
+            onRemove: onRemove,
+            onRename: onRename,
+            beforeDrop: beforeDrop,
+            beforeClick: beforeClick,
+            onClick: onClick
+        }
+    };
+
+    function beforeClick(treeId, treeNode, clickFlag) {
+
+    }
+
+    function onClick(event, treeId, treeNode, clickFlag) {
+        currentSkuClassifyId = treeNode.id;
+        doQuery();
+    }
+
+    function beforeEditName(treeId, treeNode) {
+        className = (className === "dark" ? "" : "dark");
+        // showLog("[ "+getTime()+" beforeEditName ]&nbsp;&nbsp;&nbsp;&nbsp; " + treeNode.name);
+        skuClassify_modal_zTree.selectNode(treeNode);
+        setTimeout(function () {
+            skuClassify_modal_zTree.editName(treeNode);
+        }, 0);
+        return false;
+    }
+
+
+    function beforeDrag(treeId, treeNodes) {
+        return false;
+//        for (var i=0,l=treeNodes.length; i<l; i++) {
+//            if (treeNodes[i].level == 0) {
+//                return false;
+//            }
+//        }
+//        return true;
+    }
+
+    function beforeDrop(treeId, treeNodes, targetNode, moveType) {
+        return false;
+//        if(targetNode.level == 0 && (moveType == "next" || moveType =="prev")){
+//            return false;
+//        }
+//        var treeNode = treeNodes[0];
+//        //拖到目标节点的前后位置
+//        if(moveType == "next" || moveType =="prev") {
+//            updateMallClassify(treeNode.id, treeNode.name, targetNode.pId);
+//        } else if(moveType == "inner") {
+//            //拖到目标节点里面
+//            updateMallClassify(treeNode.id, treeNode.name, targetNode.id);
+//        }
+//
+//        //切换当前节点为拖放的节点
+//        currentSkuClassifyId = treeNode.id;
+//        loadSkuByMallClassify();
+//
+//        return true;
+    }
+    function beforeRemove(treeId, treeNode) {
+        className = (className === "dark" ? "" : "dark");
+        //showLog("[ "+getTime()+" beforeRemove ]&nbsp;&nbsp;&nbsp;&nbsp; " + treeNode.name);
+        skuClassify_modal_zTree.selectNode(treeNode);
+
+        return true;
+    }
+
+    function onRemove(e, treeId, treeNode) {
+
+    }
+    function beforeRename(treeId, treeNode, newName, isCancel) {
+        className = (className === "dark" ? "" : "dark");
+        showLog((isCancel ? "<span style='color:red'>" : "") + "[ " + getTime() + " beforeRename ]&nbsp;&nbsp;&nbsp;&nbsp; " + treeNode.name + (isCancel ? "</span>" : ""));
+        if (newName.length == 0) {
+            setTimeout(function () {
+                skuClassify_modal_zTree.cancelEditName();
+                layer.msg("节点名称不能为空", {icon: 5});
+            }, 0);
+            return false;
+        } else if (treeNode.name == newName) {
+            setTimeout(function () {
+                skuClassify_modal_zTree.cancelEditName();
+            }, 0);
+            return false;
+        }
+        return true;
+    }
+
+    function onRename(e, treeId, treeNode, isCancel) {
+        updateMallClassify(treeNode.id, treeNode.name, treeNode.pId);
+        // showLog((isCancel ? "<span style='color:red'>":"") + "[ "+getTime()+" onRename ]&nbsp;&nbsp;&nbsp;&nbsp; " + treeNode.name + (isCancel ? "</span>":""));
+    }
+
+    function showRemoveBtn(treeId, treeNode) {
+        //是否显示删除按钮, 只能删除没有子节点的节点
+        // return !treeNode.isParent;
+        return treeNode.level != 0;
+    }
+    function showRenameBtn(treeId, treeNode) {
+        //是否显示修改节点按钮
+        return treeNode.level != 0;
+    }
+    function showLog(str) {
+        if (!log) log = $("#log");
+        log.append("<li class='" + className + "'>" + str + "</li>");
+        if (log.children("li").length > 8) {
+            log.get(0).removeChild(log.children("li")[0]);
+        }
+    }
+    function getTime() {
+        var now = new Date(),
+                h = now.getHours(),
+                m = now.getMinutes(),
+                s = now.getSeconds(),
+                ms = now.getMilliseconds();
+        return (h + ":" + m + ":" + s + " " + ms);
+    }
+
+    function addHoverDom(treeId, treeNode) {
+        var sObj = $("#" + treeNode.tId + "_a");
+        if ($("#addBtn_" + treeNode.tId).length > 0
+                || $("#editBtn_" + treeNode.tId).length > 0
+                || $("#delBtn_" + treeNode.tId).length > 0) return;
+        // if (treeNode.level == 0) return;
+        var addStr = "";
+
+        if (treeNode.level == 0) {
+            addStr = "<span class='button add' id='addBtn_" + treeNode.tId + "' title='新增' onfocus='this.blur();'></span>";
+        } else {
+            addStr = "<span class='button add' id='addBtn_" + treeNode.tId
+                    + "' title='新增' onfocus='this.blur();'></span>"
+                    + "<span class='button edit' id='editBtn_" + treeNode.tId
+                    + "' title='修改' onfocus='this.blur();'></span>"
+                    + "<span class='button remove' id='delBtn_" + treeNode.tId
+                    + "' title='删除' onfocus='this.blur();'></span>";
+        }
+
+        sObj.after(addStr);
+
+        var btn = $("#addBtn_" + treeNode.tId);
+        //新增
+        if (btn) btn.bind("click", function () {
+            var isLeaf = 0;
+            var dbLevel;
+            //检查分类级别，是否为最大级别
+            if (treeNode.level + 1 == max_department) {
+                isLeaf = 1;
+            }
+            var newNodeId = "temp" + 100 + newCount;
+            var newNodeName = "新增分类" + (newCount++);
+
+            //记录新增节点
+            addMallClassify(newNodeName, treeNode);
+            return false;
+        });
+
+
+        var btnEdit = $("#editBtn_" + treeNode.tId);
+
+        //修改
+        if (btnEdit) btnEdit.bind("click", function () {
+            var zTree = $.fn.zTree.getZTreeObj("tree"), nodes = zTree.getSelectedNodes(), treeNode = nodes[0];
+            if (nodes.length == 0) {
+                layer.msg("请先选择一个节点", {icon: 5});
+                return;
+            }
+            zTree.editName(treeNode);
+        });
+
+        var btnDel = $("#delBtn_" + treeNode.tId);
+
+        //删除
+        if (btnDel) btnDel.bind("click", function () {
+            var zTree = $.fn.zTree.getZTreeObj("tree"),
+                    nodes = zTree.getSelectedNodes(),
+                    treeNode = nodes[0];
+            if (nodes.length == 0) {
+                layer.msg("请先选择一个节点", {icon: 5});
+                return;
+            }
+            layer.confirm('确认删除 节点 -- <span class="fz14 c-f fw-b">[' + treeNode.name + ']</span>吗？', {
+                btn: ['确定', '取消']
+            }, function (index, layero) {
+                layer.load();
+                postUtil.call("/skuClassify/deleteMallClassify", {classifyId: treeNode.id}, function (res) {
+                    if (res.STATUS == "SUCCESS") {
+                        layer.msg("删除成功");
+                        zTree.removeNode(treeNode, true);
+                        currentSkuClassifyId = "";
+                    } else {
+                        layer.msg("删除失败，错误信息如下:<br>" + res.MSG, {icon: 5});
+                    }
+                    layer.closeAll("loading");
+                });
+                layer.close(index);
+            }, function (index) {
+                layer.close(index);
+            });
+        });
+
+    }
+    ;
+    function removeHoverDom(treeId, treeNode) {
+        $("#addBtn_" + treeNode.tId).unbind().remove();
+        $("#editBtn_" + treeNode.tId).unbind().remove();
+        $("#delBtn_" + treeNode.tId).unbind().remove();
+    }
+    ;
+
+
+    function loadMallClassify() {
+        resetChangeNodesList();
+        postUtil.call("/skuClassify/mallClassifyJsonForZTree", null, function (data) {
+            $.fn.zTree.init($("#tree"), skuClassify_modal_setting, data);
+            skuClassify_modal_zTree = $.fn.zTree.getZTreeObj("tree");
+            skuClassify_modal_zTree.setting.edit.drag = {};
+            skuClassify_modal_zTree.setting.edit.drag.prev = true;
+            skuClassify_modal_zTree.setting.edit.drag.next = true;
+            skuClassify_modal_zTree.setting.edit.drag.inner = true;
+            skuClassify_modal_zTree.setting.edit.drag.isMove = true;
+            doQuery();
+        });
+    }
+
+    function resetChangeNodesList() {
+        data_changeNodes.renameList = [];
+        data_changeNodes.removeList = [];
+        data_changeNodes.addList = [];
+        data_changeNodes.picData = [];
+        data_changeNodes.sortData = [];
+        blHasSort = false;
+    }
+
+    function addMallClassify(classifyName, treeNode) {
+        layer.load();
+        var param = {};
+        param.classifyName = classifyName;
+        param.classifyParentId = treeNode.id;
+        param.level = treeNode.level + 1;
+        postUtil.call("/skuClassify/addMallClassify", {jsonData: JSON.stringify(param)}, function (res) {
+            if (res.STATUS == "SUCCESS") {
+                layer.msg("新增成功");
+                var department = res.DATA;
+                skuClassify_modal_zTree.addNodes(treeNode, {
+                    id: department.classifyId,
+                    pId: treeNode.id,
+                    name: classifyName
+                });
+            } else {
+                layer.msg("新增失败，错误信息如下:<br>" + res.MSG, {icon: 5});
+            }
+            layer.closeAll("loading");
+        });
+    }
+
+    function updateMallClassify(classifyId, classifyName, classifyParentId) {
+        layer.load();
+        var param = {};
+        param.classifyId = classifyId;
+        param.classifyName = classifyName;
+        param.classifyParentId = classifyParentId;
+        postUtil.call("/skuClassify/updateMallClassify", {jsonData: JSON.stringify(param)}, function (res) {
+            if (res.STATUS == "SUCCESS") {
+                layer.msg("更新成功");
+            } else {
+                layer.msg("更新失败，错误信息如下:<br>" + res.MSG, {icon: 5});
+            }
+            layer.closeAll("loading");
+        });
+    }
+
+    function deleteMallClassify(classifyId) {
+        layer.load();
+        postUtil.call("/skuClassify/deleteMallClassify", {classifyId: classifyId}, function (res) {
+            if (res.STATUS == "SUCCESS") {
+                layer.msg("删除成功");
+            } else {
+                layer.msg("删除失败，错误信息如下:<br>" + res.MSG, {icon: 5});
+            }
+            currentSkuClassifyId = "";
+            layer.closeAll("loading");
+        });
+    }
+
+</script>
+
+<script type="text/javascript">
+
+    Array.prototype.distinct = function () {
+        var x = [], r = [];
+        for (var i = 0; i < this.length; i++) {
+            x['_' + this[i]] = this[i];
+        }
+        for (var b in x) {
+            if (typeof x[b] != 'function') {
+                r.push(x[b]);
+            }
+        }
+        return r;
+    }
+</script>
+</body>
+</html>

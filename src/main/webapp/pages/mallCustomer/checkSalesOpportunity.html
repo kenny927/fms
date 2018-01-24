@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_rcslf61orstyy14i.css<@resVersionDirective>?</@>"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/Area1.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui-mz-min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+    <style>
+        .layui-layedit{
+            width: 568px!important;
+        }
+        .layui-layedit iframe{
+            height: 157px!important;
+        }
+        input[type="file"]::-webkit-file-upload-button {
+	        width: 100px;
+	        height: 30px;
+	        overflow: hidden;
+	        line-height: 99em;
+	        background: #FFFFFF;
+	        content: "";
+	        cursor: pointer;
+	        background:url(/res/images/addfile.jpg) no-repeat 0 0;
+	        outline: none;
+	        border: 0 none;z-index: 2;
+    	}
+    </style>
+</head>
+<body>
+<div style="margin-top: 30px;padding-left:32px;">
+    <form action="" class="jun-form-s form-css">
+        <dl class="dl-form">
+            <dt class="flt fz12">联系人：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="linkman" lay-filter="aihao"  style="width: 240px;" id="linkman" disabled="disabled">
+                      <option value=""></option>
+                </select>
+            </dd>
+            <dt class="flt fz12">咨询类型：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="oppType" lay-filter="aihao"  style="width: 240px;" id="oppType" disabled="disabled">
+                      <option value=""></option>
+                </select>
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12">等级：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="level" lay-filter="aihao"  style="width: 240px;" id="level" disabled="disabled">
+                      <option value=""></option>
+                </select>
+            </dd>
+            <dt class="flt">采购地：</dt>
+            <dd class="flt layui-form dd-city">
+                <select name="province" lay-filter="province" id="province" disabled="disabled">
+                      <option value=""></option>
+                </select>
+            </dd>
+            <dd class="flt layui-form dd-city">
+                <select name="city" lay-filter="city" id="city" disabled="disabled">
+                      <option value=""></option>
+                </select>
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12">来源：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="oppSource" lay-filter="aihao"  style="width: 240px;" id="oppSource" disabled="disabled">
+                       <option value=""></option>
+                </select>
+            </dd>
+            <dt class="flt">期望交期：</dt>
+            <dd class="flt"><input name="expectDate" id="expectDate" value="" style="height: 32px;width: 240px;" placeholder="期望交期"  disabled="disabled"></dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12">产品类型：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="productType" lay-filter="productType"  style="width: 240px;" id="productType" disabled="disabled">
+                <option value=""></option>
+                </select>
+            </dd>
+            <dd class="flt productTypeDesc" style="display:none"><input name="productTypeDesc" id="productTypeDesc" placeholder="请输入产品类型描述" style="height: 32px;width: 330px;" class="layui-input" disabled="disabled" ></dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12"><span class="c-f">*</span>机会描述：</dt>
+            <dd class="flt layui-form" style="width: 571px;">
+                <textarea class="layui-textarea" name="content" lay-verify="content" id="remark" placeholder="最多1000个字符" maxlength="1000"  readonly="readonly"></textarea>
+            </dd>
+        </dl>
+        <dl class="dl-form  layuicss orderSalesOppAttachmentsDl">
+               <dt class="flt">&nbsp;</dt>
+               <dd class="flt need-list orderSalesOppAttachments">
+                   <ul>
+                      
+                   </ul>
+               </dd>
+         </dl>
+        <dl class="dl-form" style="margin-bottom: 0;">
+            <dt class="flt fz12">创建委托单：</dt>
+            <dd class="flt layui-form createVagueDemand">
+              <input type="radio" name="createVagueDemand" value="Y" title="是"  disabled="disabled">
+              <input type="radio" name="createVagueDemand" value="N" title="否"  disabled="disabled">
+            </dd>
+        </dl>
+        <dl class="dl-form layui-form" style="margin-bottom: 20px;">
+            <dt class="flt fz12">转交对象：</dt>
+            <dd class="flt layui-form pre existtransmitOpportunity">
+               <input class="inline" type="radio" lay-filter="isTransfer" name="isTransfer" value="manager" title="转交给销售代表"  disabled="disabled">
+               <input class="inline" type="radio" lay-filter="isTransfer" name="isTransfer" value="distributor" title="转交给分销商"  disabled="disabled">
+            </dd>
+        </dl>
+        <dl class="dl-form" style="margin-bottom: 0px;margin-top: -10px;">
+            <dd class="flt accountManagerList" style="margin-left: 20px;">
+                <table class="layui-table pop table-css" lay-skin="line">
+                    <colgroup>
+                        <col  width="170">
+                        <col  width="240">
+                        <col  width="230">
+                    </colgroup>
+                    <thead>
+                    <tr class="bor-no">
+                        <th >员工姓名</th>
+                        <th >电话</th>
+                        <th >部门</th>
+                    </tr>
+                    </thead>
+                    <tbody id="userTable_tbody">
+                    </tbody>
+                </table>
+            </dd>
+           <dd class="flt distributorList" style="margin-left: 20px;">
+                <table class="layui-table pop table-css" lay-skin="line">
+                    <colgroup>
+                        <col  width="250">
+                        <col  width="170">
+                        <col  width="120">
+                        <col  width="100">
+                    </colgroup>
+                    <thead>
+                    <tr class="bor-no">
+                        <th >公司名称</th>
+                        <th >销售代表/客户经理</th>
+                        <th >对接人</th>
+                        <th >省份</th>
+                    </tr>
+                    </thead>
+                    <tbody id="distributorTable_tbody">
+                    </tbody>
+                </table>
+            </dd>
+            <dd>
+                <div id="paginationDiv" style="margin-right: 142px;margin-top:10px;"></div>
+            </dd>
+        </dl>
+    </form>
+</div>
+<script type="text/javascript">
+    var _customerSalesOppId = '${_customerSalesOppId}';
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    var PAGE_SIZE = 5;
+    var layer;
+    var $form;
+    var form;
+    var $;
+    layui.use(['form','jquery','laydate','layer'], function(){
+        form = layui.form();
+        $form = $('form');
+        $ = layui.jquery;
+        layer = layui.layer;
+        initFormData();
+    })
+    
+     function initFormData() {
+    	var param = {};
+        param.customerSalesOppId = _customerSalesOppId;
+        var linkmanSel="";
+        var oppTypeSel="<option value=''>请选择</option>";
+        var productTypeSel="<option value=''>请选择</option>";
+        var levelSel="<option value=''>请选择</option>";
+        var oppSourceSel="<option value=''>请选择</option>";
+        var provinceSel="<option value=''>请选择</option>";
+        var citySel="<option value=''>请选择</option>";
+        var htmlFile="";
+        postUtil.call("/customer/salesOpportunity/detail", param, function (result) {
+            if (result.STATUS == "SUCCESS") {
+                var item = result.DATA;
+                var attachmentlist=item.attachmentlist;
+                 linkmanSel= '<option value="'+item.linkmanId+'" selected>'+item.linkmanName+'('+item.linkmanTelephone+')'+(item.linkmanPosition||'')+'</option>';
+                 oppTypeSel= '<option value="'+item.oppType+'" selected>'+item.oppTypeCname+'</option>';
+                 levelSel='<option value="'+item.levelCname+'" selected>'+item.levelCname+'</option>';
+                 oppSourceSel='<option value="'+item.source+'" selected>'+item.sourceCname+'</option>';
+                 productTypeSel= '<option value="'+item.productType+'" selected>'+item.productTypeCname+'</option>';
+                 provinceSel='<option value="'+item.province+'" selected>'+item.province+'</option>';
+                 citySel='<option value="'+item.city+'" selected>'+item.city+'</option>';
+                 $form.find('select[id=linkman]').html(linkmanSel);
+                 $form.find('select[id=oppType]').html(oppTypeSel);
+                 $form.find('select[id=level]').html(levelSel);
+                 $form.find('select[id=oppSource]').html(oppSourceSel);
+                 $form.find('select[id=productType]').html(productTypeSel);
+                 $form.find('select[id=province]').html(provinceSel);
+                 $form.find('select[id=city]').html(citySel);
+                 $form.find('#expectDate').val(item.expectDateStr);
+                 if('OTHERS'==item.productType){
+                	 $('.productTypeDesc').css('display','block');
+                	 $form.find('#productTypeDesc').val(item.productTypeDesc);
+                 }
+                 //$form.find('#expectDate').val();
+                 $form.find('#remark').val(item.remark);
+                 var vagueDemandId=item.vagueDemandId;
+                 var acceptUserId=item.acceptUserId;
+                 var transmitToSubject=item.transmitToSubject;
+                 var param={};
+       			param.currentPageIndex=1;
+                 if(vagueDemandId!=null&&vagueDemandId!=""){
+                	 $form.find("input[name=createVagueDemand][value=Y]").attr("checked",true);
+                 }else{
+                	 $form.find("input[name=createVagueDemand][value=N]").attr("checked",true);
+                 }
+                 if(!transmitToSubject || transmitToSubject==""||transmitToSubject=="manager"){
+                	 param.transmitToSubject ="manager" ;
+                	 $form.find("input[name=isTransfer][value=manager]").attr("checked",true);
+                	 param.userId =acceptUserId ;
+                 }else{
+                	 param.transmitToSubject ="distributor" ;
+                	 $form.find("input[name=isTransfer][value=distributor]").attr("checked",true);
+                	 param.userId =acceptUserId ;
+                 }
+                 loadDATA(param);
+                 form.render();
+                 if(attachmentlist!=null&&attachmentlist.length>=1){
+                	 for(var i=0; i< attachmentlist.length; i++){
+                         htmlFile+='<li><a href="/file_server/download?id='+attachmentlist[i].id+'" title="'+attachmentlist[i].name+'"><p class="one-row">'+attachmentlist[i].name+'</p></a></li>';
+                     }
+                	 $(".orderSalesOppAttachments ul").append(htmlFile);
+                 }else{
+                	 $(".orderSalesOppAttachmentsDl").remove();
+                 }
+            } else {
+                layer.msg("查询联系人失败:" + result.MSG, {icon: 5});
+            }
+        });
+    	
+    }
+    
+    //下载附件
+    function downLoadAttachment(attachmentId) {
+        var downLoadParam = {};
+        downLoadParam.id = attachmentId;
+        postUtil.submit("/file_server/download", downLoadParam);
+    }
+
+    
+    function loadDATA(param) {
+    	var transmitToSubject=$("input[name=isTransfer]:checked").val();
+    	if("manager"==transmitToSubject){
+    		$(".distributorList").css("display","none");
+    		$(".accountManagerList").css("display","block");
+    	}else{
+    		$(".distributorList").css("display","block");
+    		$(".accountManagerList").css("display","none");
+    	 }
+        postUtil.call("/mallCustomer/transmitRecordlist", param, function (result) {
+        	 var pageNumber = result.pageNumber;
+             var pageSize = result.pageSize;
+             var totalPage = result.totalPage;
+             var totalRow = result.totalRow;
+             var dataList = result.list;
+             renderTable(transmitToSubject,dataList);
+                laypage({
+                    cont: 'paginationDiv',
+                    pages: totalPage,
+                    curr: pageNumber,
+                    total: totalRow,
+                    skip: true,
+                    jump: function (obj, first) {
+                        if (!first) {
+                        	param.currentPageIndex=obj.curr;
+                        	loadDATA(param);
+                        }
+                    }
+                });
+     });
+    }
+
+    function renderTable(transmitToSubject,dataList) {
+    	 var length = dataList.length;
+     	if("manager"==transmitToSubject){
+     		var table = document.getElementById("userTable_tbody");
+             table.innerHTML = "";
+             userDataMap = {};
+             if (length > 0) {
+                 for (var i = 0; i < dataList.length; i++) {
+                     var data = dataList[i];
+                     var userId = data.userId;
+                     userDataMap[userId] = data;
+                     var row = renderRow(data);
+                     table.appendChild(row);
+                 }
+             }else {
+                 var html = '<tr><td colspan="4">暂无信息！</td></tr>';
+                 $(table).html(html);
+             }
+     		distributorTable_tbody
+     	}else{
+     		var table = document.getElementById("distributorTable_tbody");
+             table.innerHTML = "";
+             userDataMap = {};
+             if (length > 0) {
+                 for (var i = 0; i < dataList.length; i++) {
+                     var data = dataList[i];
+                     var userId = data.userId;
+                     userDataMap[userId] = data;
+                     var row = renderRowDistributor(data);
+                     table.appendChild(row);
+                 }
+             }else {
+                 var html = '<tr><td colspan="4">暂无信息！</td></tr>';
+                 $(table).html(html);
+             }
+     	}
+    }
+    
+    function isExitsVariable(variableName) {  
+        try {  
+            if (typeof (variableName) == "undefined") {  
+                return "--";  
+            } else {  
+                return variableName;  
+            }  
+        } catch (e) {  
+        }  
+        return "--";  
+    }
+
+    function renderRow(rowData) {
+
+        var userId = rowData.userId;
+        var userName = rowData.userName;
+        var userRealName = rowData.userRealName;
+        var pUserId = rowData.pUserId;
+        var pUserName = rowData.pUserName;
+        var sex = rowData.sex;
+        var mobile = rowData.mobile;
+        var email = rowData.email;
+        var accountId = rowData.accountId;
+        var accountName = rowData.accountName;
+        var mainObjectId = rowData.mainObjectId;
+        var mainObjectName = rowData.mainObjectName;
+        var departmentId = rowData.departmentId;
+        var departmentName = rowData.departmentName;
+        var ul = document.createElement('tr');
+        ul.appendChild(renderCell(null, userRealName,null, "width:10%;height:75px;"));
+        ul.appendChild(renderCell(null, mobile,null, "width:12%;height:75px;"));
+        ul.appendChild(renderCell(null, departmentName,null, "width:12%;height:75px;"));
+        return ul;
+    }
+    
+    function renderRowDistributor(rowData) {
+        var ul = document.createElement('tr');
+        ul.appendChild(renderCell(null, isExitsVariable(rowData.accountName),null, "width:20%;height:75px;"));
+        ul.appendChild(renderCell(null, (isExitsVariable(rowData.pltSalesUserRealName)+"/"+isExitsVariable(rowData.salesUserRealName)),null, "width:8%;height:75px;"));
+        ul.appendChild(renderCell(null, isExitsVariable(rowData.storeContact),null, "width:8%;height:75px;"));
+        ul.appendChild(renderCell(null, isExitsVariable(rowData.province),null, "width:8%;height:75px;"));
+        return ul;
+    }
+
+    function renderCell(name, value,acceptName, style) {
+        var li = document.createElement('td');
+            if(value) {
+                li.innerText = value;
+            }else {
+                li.innerText = "--";
+            }
+        return li;
+    }
+
+</script>
+</body>
+</html>

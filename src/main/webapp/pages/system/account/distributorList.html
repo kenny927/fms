@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+<link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+<script src="/res/js/jquery-3.1.1.min.js"></script>
+<script src="/res/public/layui/layui.js"></script>
+<script src="/res/public/layPage/laypage.js"></script>
+<script src="/res/js/vue.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+<style>
+    [v-cloak]{
+        display: none;
+    }
+</style>
+</head>
+<body>
+   <section class="bz-bb pl20 pr20 pt20 pb20" id="distributorList" v-cloak>
+      <div class="jun-form-s form-css ">  
+		     <dl class="dl-form">
+               <dt class="flt fz12" style="width:48px;">区域：</dt>
+               <dd class="flt layui-form jun-form-l">
+                 <select name="district" lay-filter="district" id="district" style="width: 240px;" lay-search>
+	                <option value="" selected="">全部</option>
+                    <option value="" >全部</option>
+	                <option value="1001">北区</option>
+	                <option value="1002">中区</option>
+	                <option value="1003">南区</option>
+                 </select>
+               </dd>
+               <dt class="flt fz12" >销售代表：</dt>
+               <dd class="flt layui-form jun-form-l">
+                 <select name="salesUser" lay-filter="salesUser"  id="salesUser" style="width: 240px;" lay-search>
+                     <option value="" selected="">全部</option>
+                 </select>
+               </dd>
+          </dl>
+          <dl class="dl-form">
+               <dt class="flt fz12" style="width:48px;">分销商：</dt>
+               <dd class="flt"><input type="text" name="accountName" id="accountName" placeholder="请输入公司名称/联系人/手机号码" autocomplete="off" class="layui-input pl10"></dd>
+               <dt class="flt fz12">客户经理：</dt>
+               <dd class="flt layui-form jun-form-l">
+                 <select name="accountManager" lay-filter="accountManager"  id="accountManager" style="width: 240px;" lay-search>
+                   <option value="" selected="">全部</option>
+                 </select>
+               </dd>
+               <button  @click="queryDistributor()" class="form-btn layui-btn-small2  ml20 ">查询</button>
+          </dl>
+          <button class="form-btn layui-btn-itoc layui-btn-small2 mb10 addDistributor">新增分销商</button>
+      </div>
+
+
+      <div class="content">
+         <table class="layui-table pop" lay-skin="line">
+              <colgroup>
+                <col  width="150">
+                <col  width="80">
+                <col  width="100">
+                <col  width="100">
+                <col  width="80">
+                <col  width="100">
+                <col  width="80">
+                <col  width="80">
+                <col  width="100">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>公司名称</th>
+                  <th>区域</th>
+                  <th>地址</th>
+                  <th>主要联系人</th>
+                  <th>联系方式</th>
+                  <th>销售代表</th>
+                  <th>平台客户经理</th>
+                  <th>开通店铺</th>
+                  <th>创建时间</th>
+                </tr> 
+              </thead>
+              <tbody>
+              <tr v-show="distributors.length==0">
+                  <td  colspan="9" height="50px"  align="center">
+                    <span class="fz16">暂无相关信息</span>
+                 </td>
+              </tr>
+              <tr v-for='item in distributors'>
+                  <td>
+                      <a class="c-h cs-p" href="javascript:openDetailTab('{{item.accountId}}')">{{item.accountName | nullValue}}</a>
+                      <br>{{item.inteSocialCreditNo | ''}}
+                  </td>
+                  <td>{{item.areaName | nullValue}}</td>
+                  <td>{{item.province | nullValue}}{{item.city | nullValue}}</td>
+                  <td>{{item.linkmanName | nullValue}}</td>
+                  <td>{{item.linkmanTelephone | nullValue}}</td>
+                  <td>{{item.pltSalesUserRealName | nullValue}}</td>
+                  <td>{{item.salesUserRealName | nullValue}}</td>
+                  <td>{{item.isStore | nullValue}}</td>
+                  <td>{{item.createDateStr | nullValue}}</td>
+              </tr>
+              </tbody>
+          </table>    
+
+        <div id="paginationDiv"></div>
+      </div> 
+   </section>
+   <script>
+   var form='';
+   var element='';
+   var queryParam={};
+   queryParam.accountName ='';//公司名称
+   queryParam.area ='';//区域ID
+   queryParam.pltSalesEmployId ='';//销售代表USERID
+   queryParam.distributorSalesUserId ='';//客户经理USERID
+   queryParam.currentPageIndex = 1;
+
+   //过滤器 显示--
+   Vue.filter('nullValue', function (input) {
+       if (input == "" || input == undefined) {
+           input = "--";
+       }
+       return input
+   });
+
+   var vm = new Vue({
+       el: "#distributorList",
+       data:{
+           distributors:[]
+       },
+       created:function(){
+           this.showData();
+       },
+       methods:{
+           showData:function(){
+
+               //获取分销商列表
+               loadDistributorlist(queryParam);
+
+           },
+           queryDistributor:function () {
+               queryParam.accountName = $('#accountName').val();//公司名称、联系人、联系电话
+               queryParam.currentPageIndex = 1;
+
+               loadDistributorlist(queryParam);
+           }
+
+       }
+   })
+
+   layui.use(['form','element'], function(){
+       form = layui.form();
+       element = layui.element();
+
+       form.on('select(district)',function (data) {
+           queryParam.area = data.value;//区域ID
+       })
+
+       form.on('select(salesUser)',function (data) {
+           queryParam.pltSalesEmployId = data.value;//销售代表USERID
+       })
+
+       form.on('select(accountManager)',function (data) {
+           queryParam.distributorSalesUserId = data.value;//客户经理USERID
+       })
+
+       postUtil.call("/systemAccount/distributor/getSearchUserId", null, function (result) {
+
+           if(result.listPltSalesEmployId && result.listPltSalesEmployId.length > 0) {
+               var initial = {'pltSalesEmployId':'','pltSalesUserRealName':'全部'};
+                    result.listPltSalesEmployId.unshift(initial);
+               var html = "";
+               $.each(result.listPltSalesEmployId, function (index, item) {
+                   html +='<option value="'+item.pltSalesEmployId+'">'+item.pltSalesUserRealName+'</option>';
+               })
+
+               $("#salesUser").append(html);
+           }
+
+
+           if(result.listPltSalesEmployId && result.listPltSalesEmployId.length > 0) {
+               var initial1 = {'distributorSalesUserId':'','distributorSalesUserRealName':'全部'};
+               result.listDistributorSalesEmployId.unshift(initial1);
+               var html1 = "";
+               $.each(result.listDistributorSalesEmployId, function (index, item) {
+                   html1 +='<option value="'+item.distributorSalesUserId+'">'+item.distributorSalesUserRealName+'</option>';
+               })
+
+               $("#accountManager").append(html1);
+           }
+
+           form.render();
+
+       })
+      
+   })
+
+   $(document).on('click','.addDistributor',function(){
+       cardUtil.openCard("新增分销商" ,"/systemAccount/distributor/preAddDistributor");
+       cardUtil.changeCard("新增分销商");
+   });
+
+   //加载分销商
+   function loadDistributorlist(param){
+       postUtil.call("/systemAccount/distributor/getDistributorList", param, function (result) {
+           if(result.STATUS == "SUCCESS"){
+               var pageNumber = result.DATA.pageNumber;
+               var totalPage = result.DATA.totalPage;
+               var totalRow = result.DATA.totalRow;
+               vm.distributors = result.DATA.list;
+//               console.log(vm.distributors);
+
+               laypage({
+                   cont: 'paginationDiv',
+                   pages: totalPage,
+                   curr: pageNumber,
+                   total: totalRow,
+                   skip: true,
+                   jump: function (obj, first) {
+                       if (!first) {
+                           param.currentPageIndex=obj.curr;
+                           loadDistributorlist(param);
+                       }
+                   }
+               });
+           }
+       })
+   }
+   
+   function openDetailTab(accountId){
+       //判断是否存在相应的tab，存在则直接跳转过去
+       cardUtil.closeCard("分销商详情-" + accountId);
+       cardUtil.openCard("分销商详情-" + accountId,"/systemAccount/distributor/preDistributorDetail?accountId="+accountId);
+       cardUtil.changeCard("分销商详情-" + accountId);
+   }
+
+
+   </script>
+</body>
+</html>

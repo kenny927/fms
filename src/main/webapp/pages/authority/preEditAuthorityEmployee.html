@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="/res/css/sku.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+
+    <style type="text/css">
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd .goodsName {
+            height: 40px;
+            line-height: 20px;
+            width: 400px;
+            text-overflow: ellipsis;
+            color: #222222;
+        }
+
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd p {
+            height: 20px;
+            line-height: 20px;
+            color: #999999;
+            width: 400px;
+            text-overflow: ellipsis;
+        }
+
+        button {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div class="addSku">
+                <input type="hidden" id="userId" value="${userId}">
+                <dl class="sku-list">
+                    <dt class="mt10"><span class="c-f">*</span>用户名：</dt>
+                    <dd class="inputContent"><input type="text" id="userName" placeholder="请输入用户名"></dd>
+                </dl>
+                <dl class="sku-list inline">
+                    <dt class="mt10"><span class="c-f">*</span>真实姓名：</dt>
+                    <dd class="inputContent"><input type="text" id="userRealName" placeholder="请输入真实姓名"></dd>
+                </dl>
+                <dl class="sku-list">
+                    <dt class="mt10"><span class="c-f">*</span>性别：</dt>
+                    <dd class="mt10">
+                        <label style="cursor: pointer;"><span class="pay_list_c1 on"><input type="radio" name="sex" class="radioclass" value="male"/></span>男</label>
+                        <label class="ml20" style="cursor: pointer;"><span class="pay_list_c1"><input type="radio" name="sex" class="radioclass" value="female"/></span>女</label>
+                    </dd>
+                </dl>
+                <dl class="sku-list">
+                    <dt class="mt10"><span class="c-f">*</span>手机号：</dt>
+                    <dd class="inputContent"><input type="text" id="mobile" placeholder="请输入手机号"></dd>
+                </dl>
+                <dl class="sku-list">
+                    <dt class="mt10"><span class="c-f">*</span>邮箱：</dt>
+                    <dd class="inputContent"><input type="text" id="email" placeholder="请输入邮箱"></dd>
+                </dl>
+                <dl class="sku-list">
+                    <dt class="mt10"><span class="c-f">*</span>账户：</dt>
+                    <dd class="inputContent">
+                        <input type="text" readonly="readonly" id="accountName">
+                        <input type="hidden" id="accountId">
+                    </dd>
+                    <button id="chooseAccountBtn" class="btn-click2" style="height: 37px;">选择账户</button>
+                </dl>
+                <dl class="sku-list">
+                    <dt class="mt10">部门-岗位：</dt>
+                    <dd class="inputContent">
+                        <input type="hidden" readonly="readonly" id="departmentId">
+                        <input type="text" readonly="readonly" id="departmentAllName">
+                    </dd>
+                    <button id="chooseDepartmentBtn" class="btn-click2" style="height: 37px;">选择部门-岗位</button>
+                </dl>
+                <dl class="sku-list">
+                    <dt class="mt10">直属上级：</dt>
+                    <dd class="inputContent">
+                        <input type="text" readonly="readonly" id="pUserName">
+                        <input type="hidden" id="pUserId">
+                    </dd>
+                    <button id="chooseEmployeeBtn" class="btn-click2" style="height: 37px;">选择员工</button>
+                </dl>
+            </div>
+            <div class="purchaseSearch ml10"
+                 style="padding-bottom: 10px;padding-right: 20px;text-align:left;margin-left: 140px;">
+                <button id="doEditAuthorityEmployee" class="btn-click2" style="height: 36px;width: 80px;">修改</button>
+                <button id="cancel" class="btn-click2" style="height: 36px;width: 80px;">取消</button>
+            </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript">
+
+    function initAuthorityUserInfo(){
+        var userId = $('#userId').val();
+        postUtil.call("/authorityUser/info/"+userId,{},function (user) {
+            if(user) {
+                $('#userName').val(user.userName);
+                $('#userRealName').val(user.userRealName);
+                $("input[name='sex'][value="+user.sex+"]").attr("checked",true);
+                $('input:radio[name="sex"]:checked').parent().addClass("on").parent().siblings().find("span").removeClass("on");
+                $('#mobile').val(user.mobile);
+                $('#email').val(user.email);
+                $('#accountId').val(user.accountId);
+                $('#accountName').val(user.accountName);
+                $('#departmentId').val(user.departmentId);
+                $('#departmentAllName').val(user.departmentAllName);
+                $('#pUserId').val(user.pUserId);
+                $('#pUserName').val(user.pUserName);
+
+            }
+        })
+    }
+
+    $(function () {
+
+        initAuthorityUserInfo();
+
+        //性别
+        $(".pay_list_c1").on("click",function(){
+            $(this).addClass("on").parent().siblings().find("span").removeClass("on");
+        });
+
+        $('#cancel').bind("click", function () {
+            jumpToAuthorityEmployeeList();
+        });
+
+        $('#chooseAccountBtn').bind("click",function () {
+            layer.open({
+                title:"请选择平台账户",
+                type: 2,
+                area: ['1000px', '650px'],
+                fixed: false, //不固定
+                maxmin: true,
+                content: '/reusable/systemAccount/choosePlatformPage'
+            });
+        });
+        
+        $('#chooseEmployeeBtn').bind("click",function () {
+            layer.open({
+                title:"请选择员工",
+                type: 2,
+                area: ['1000px', '650px'],
+                fixed: false, //不固定
+                maxmin: true,
+                content: '/reusable/user/chooseUserPage'
+            });
+        });
+
+        $('#chooseDepartmentBtn').bind("click",function () {
+            layer.open({
+                title:"请选择部门(岗位)",
+                type: 2,
+                area: ['1000px', '650px'],
+                fixed: false, //不固定
+                maxmin: true,
+                content: '/reusable/department/chooseDepartmentPage'
+            });
+        });
+
+        $('#doEditAuthorityEmployee').bind("click",function () {
+            var userName = $('#userName').val();
+            var userRealName = $('#userRealName').val();
+            var sex = $('input:radio[name="sex"]:checked').val();
+            var mobile = $('#mobile').val();
+            var email = $('#email').val();
+            var accountId = $('#accountId').val();
+            var departmentId = $('#departmentId').val();
+            var pUserId = $('#pUserId').val();
+
+            if(userName == null || userName == "") {
+                layer.msg("用户名不允许为空",{icon:5});
+                return;
+            }
+            if(userRealName == null || userRealName == "") {
+                layer.msg("用户真实姓名不允许为空",{icon:5});
+                return;
+            }
+            if(mobile == null || mobile == "") {
+                layer.msg("手机号不允许为空",{icon:5});
+                return;
+            }
+            if(email == null || email == "") {
+                layer.msg("邮箱不允许为空",{icon:5});
+                return;
+            }
+            if(accountId == null || accountId == "") {
+                layer.msg("账户信息不允许为空",{icon:5});
+                return;
+            }
+
+            var updateParam = {};
+            updateParam.userId = $('#userId').val();
+            updateParam.userName = userName;
+            updateParam.userRealName = userRealName;
+            updateParam.sex = sex;
+            updateParam.mobile = mobile;
+            updateParam.email = email;
+            updateParam.accountId = accountId;
+            updateParam.departmentId = departmentId;
+            updateParam.pUserId = pUserId;
+
+            var updateParamStr = JSON.stringify(updateParam);
+            postUtil.call("/authorityUser/updateEmployee",{"jsonStr":updateParamStr},function (result) {
+                if(result) {
+                    if(result.STATUS == "SUCCESS") {
+                        jumpToAuthorityEmployeeList();
+                    }else {
+                        layer.msg(result.MSG,{icon:5});
+                    }
+                }
+            })
+
+        });
+        
+    });
+
+    function jumpToAuthorityEmployeeList() {
+        postUtil.submit("/authorityUser/preAuthorityEmployeeList");
+    }
+
+    //选择平台账号回调方法
+    function choosePlatformCallback(platformList) {
+        if(platformList) {
+            if(platformList.length > 1) {
+                layer.msg("只允许选择一个平台账户",{icon:5});
+                return false;
+            }
+            var platform = platformList[0];
+            $('#accountId').val(platform.accountId);
+            $('#accountName').val(platform.accountName);
+            return true;
+        }else {
+            layer.msg("请选择平台账户后再进行操作",{icon:5});
+            return false;
+        }
+    }
+
+    //选择上级回调方法
+    function chooseUserCallback(authorityUserList) {
+        if(authorityUserList) {
+            if(authorityUserList.length > 1) {
+                layer.msg("只允许选择一个直属上级",{icon:5});
+                return false;
+            }
+            var authorityUser = authorityUserList[0];
+            $('#pUserId').val(authorityUser.userId);
+            $('#pUserName').val(authorityUser.userName);
+            return true;
+        }else {
+            layer.msg("请选择员工后再进行操作",{icon:5});
+            return false;
+        }
+    }
+
+    function chooseDepartmentCallback(departmentList) {
+        if(departmentList) {
+            if(departmentList.length > 1) {
+                layer.msg("只允许选择一个部门(岗位)",{icon:5});
+                return false;
+            }
+            var department = departmentList[0];
+            $('#departmentId').val(department.departmentId);
+            $('#departmentAllName').val(department.departmentAllName);
+            return true;
+        }else {
+            layer.msg("请选择岗位(员工)后再进行操作",{icon:5});
+            return false;
+        }
+    }
+
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>客户订单报表</title>
+    <link rel="stylesheet" href="/res/public/layui-v2.0.0/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/css/daterangepicker.css<@resVersionDirective>?</@>" />
+    <script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui-v2.0.0/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/echarts.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/moment.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/jquery.daterangepicker.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/vue.js<@resVersionDirective>?</@>"></script>
+    <style>
+        [v-cloak]{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<section class="bz-bb pl20 pr20 pt20 pb20 mb20" id="orderSalesStatistics" v-cloak>
+    <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="margin-bottom: 0;border-bottom: none">
+        <form action="" class="jun-form-s form-css">
+            <dl class="dl-form" style="margin-bottom: 0">
+                <dt class="flt fz12">时间范围：</dt>
+                <dd class="flt layui-form form-select150">
+                    <select name="interest" lay-filter="timeFrame" v-model="timeFrame">
+                        <option value="diy" selected="">自定义查询</option>
+                        <option value="week">按周查询</option>
+                        <option value="month">按月查询</option>
+                    </select>
+                </dd>
+                <!--日期范围参数参考网站http://www.htmleaf.com/Demo/201504251738.html-->
+                <dd class="flt ml10 layui-form" v-show="timeFrame == 'diy'">
+                    <input type="text" class="layui-input" id="diyDate"  placeholder="请选择自定义时间">
+                </dd>
+                <dd class="flt ml10" v-show="timeFrame == 'week'">
+                    <input class="picker-css fz12" id="date-range1"  placeholder="请选择周">
+                </dd>
+                <dd class="flt ml10 layui-form" v-show="timeFrame == 'month'">
+                    <input type="text" class="layui-input" id="monthDate"  placeholder="请选择月">
+                </dd>
+                <dt class="flt">订单类型：</dt>
+                <dd class="flt layui-form form-select150">
+                    <select name="brand" lay-filter="findType" v-model="queryParam.orderType">
+                        <option value='ALL' selected>全部</option>
+                        <option value='SPOT'>现货订单</option>
+                        <option value='NORMAL'>非现货订单</option>
+                    </select>
+                </dd>
+                <dd class="flt ml10"><span class="form-btn layui-btn-small2" @click="searchSkuList()">查询</span></dd>
+                <dd class="frt"><span class="form-btn layui-btn-itoc layui-btn-small2 fz12" @click="exportData()"><span class="iconfont icon-daochu"></span>导出</span></dd>
+            </dl>
+        </form>
+    </blockquote>
+    <div class="nav-echarts">
+        <p>订货单：{{sumData.orderSalesNum}}</p>
+        <p>订货客户数：{{sumData.accountNum}}</p>
+        <p>订单金额：{{sumData.totalAmount|formatQuantity "2"}}</p>
+    </div>
+    <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="margin-bottom: 0;border-bottom: none">
+        <p class="t-c fz16 mt20 c-2">客户下单金额占比</p>
+        <p class="mt10 fz12 t-c">全部分类</p>
+        <div id="main" style="width: 100%;height: 400px;" ></div>
+    </blockquote>
+    <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="margin-bottom: 0;border-bottom: none">
+        <table class="layui-table pop table-css" lay-skin="line">
+            <colgroup>
+                <col  width="200">
+                <col  width="200">
+                <col  width="200">
+                <col  width="300">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>序号</th>
+                <th >日期({{queryParam.fromDate}}~{{queryParam.toDate}})</th>
+                <th >订货单</th>
+                <th >订单金额</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-show="skuList.length==0">
+                <td  colspan="4" height="50px"  align="center">
+                    <span class="fz16">暂无相关信息</span>
+                </td>
+            </tr>
+            <tr v-for="(index, item) in skuList">
+                <td>{{index+1+addTen}}</td>
+                <td>{{item.accountName}}</td>
+                <td>{{item.orderSalesNum}}</td>
+                <td>¥{{item.totalAmount|formatQuantity "2"}}</td>
+            </tr>
+            </tbody>
+        </table>
+        <div id="paginationDiv"></div>
+    </blockquote>
+    <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+        <dl class="clr ml20">
+            <dt class="flt fw-b">统计说明：</dt>
+            <dd class="flt ml10">
+                <p>1、订货单提交订单后计入统计；</p>
+                <p>2、作废状态的订货单不计入统计；</p>
+            </dd>
+        </dl>
+    </blockquote>
+</section>
+<script src="/res/js/statistics/orderSalesStatistics.js<@resVersionDirective>?</@>"></script>
+</body>
+</html>

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css"/>
+    <script src="/res/js/jquery-3.1.1.min.js"></script>
+    <script src="/res/public/layui/Area1.js" type="text/javascript"></script>
+    <script src="/res/public/layui/layui.js"></script>
+    <script src="/res/public/layui/layui-mz-min.js"></script>
+    <script src="/res/js/MultiSelectDropList.js"></script>
+    <script src="/res/public/layPage/laypage.js"></script>
+    <script src="/res/public/layPage/laypage.js"></script>
+  </head>
+  <style>
+    body[contenteditable="true"]{
+      min-height: 160px!important;
+    }
+  </style>
+  <body>
+  <div style="width: 1200px;margin:50px auto;">
+
+   <button class="form-btn  layui-btn-normal test1" lay-filter="formDemo">新增拜访记录</button>
+   <button class="form-btn  layui-btn-normal test2" lay-filter="formDemo">修改联系人</button>
+   <button class="form-btn  layui-btn-normal test3" lay-filter="formDemo">全部客户详情,查看更多</button>
+   <button class="form-btn  layui-btn-normal test4" lay-filter="formDemo">新建销售机会</button>
+   <button class="form-btn  layui-btn-normal test5" lay-filter="formDemo">修改客户信息</button>
+      <button class="form-btn  layui-btn-normal test6" lay-filter="formDemo">转交客户</button>
+      <button class="form-btn  layui-btn-normal test7" lay-filter="formDemo">关闭销售订单</button>
+      <button class="form-btn  layui-btn-normal test8" lay-filter="formDemo">发货信息</button>
+
+      <button class="form-btn  layui-btn-normal test10" lay-filter="formDemo">审核提示</button>
+  </div>
+      <span style="background: silver;">内层span元素</span><br />
+
+  <div id="msg"></div>
+  <script type="text/javascript">
+
+      //    //多个附件上传
+//    var htmlFile="";
+//    function onc(){
+//        var files = document.getElementById("input").files;
+//        for(var i=0; i< files.length; i++){
+//
+//            console.log(input.files[i].name)
+//            htmlFile+='<li><a href="javascript:;"><p>'+input.files[i].name+'</p><span class="delete">删除</span></a></li>';
+//        }
+//        $(".need-list ul").append(htmlFile);
+//    }
+          
+      layui.use(['form','jquery','laydate','layedit','layer'], function(){
+        var form = layui.form();
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        layedit = layui.layedit;
+        var laydate = layui.laydate;
+        
+      $.get('msg/1.html', {}, function(str){
+            $(document).on('click','.test1',function(){
+          layer.open({
+              title: '新增拜访记录',
+              skin: 'msgskin',
+              area: ['700px', '490px'],
+              btnAlign: 'c',
+              content: str,
+              btn: ['保存', '关闭'],
+              yes: function(index, layero){
+
+              },btn2: function(index, layero){
+                  //取消的回调
+              },
+              cancel: function(){ 
+                  //右上角关闭回调
+              }
+          }) 
+        })
+      })
+      $.get('msg/2.html', {}, function(str){
+            $(document).on('click','.test2',function(){
+          layer.open({
+              title: '修改联系人',
+              skin: 'msgskin',
+              area: ['500px', '500px'],
+              btnAlign: 'c',
+              content: str,
+              btn: ['保存', '取消'],
+              yes: function(index, layero){
+
+              },btn2: function(index, layero){
+                  //取消的回调
+              },
+              cancel: function(){ 
+                  //右上角关闭回调
+              }
+          }) 
+        })
+      })
+      $.get('msg/3.html', {}, function(str){
+            $(document).on('click','.test3',function(){
+          layer.open({
+              title: '站点提示',
+              skin: 'msgskin',
+              area: '900px',
+              content: str,
+              btn:false
+          }) 
+        })
+      })
+      $.get('msg/4.html', {}, function(str){
+            $(document).on('click','.test4',function(){
+          layer.open({
+              title: '新建销售机会<span class="fz12">（客户所有者：<span>许风筝</span>）</span>',
+              skin: 'msgskin',
+              area: '700px',
+              btnAlign: 'c',
+              content: str,
+              btn: ['保存', '关闭'],
+              yes: function(index, layero){
+
+              },btn2: function(index, layero){
+                  //取消的回调
+              },
+              cancel: function(){ 
+                  //右上角关闭回调
+              }
+          }) 
+        })
+      })
+      $.get('msg/5.html', {}, function(str){
+            $(document).on('click','.test5',function(){
+          layer.open({
+              title: '修改客户信息',
+              skin: 'msgskin',
+              area: ['460px', '556px'],
+              btnAlign: 'c',
+              content: str,
+              btn: ['保存', '关闭'],
+              yes: function(index, layero){
+
+              },btn2: function(index, layero){
+                  //取消的回调
+              },
+              cancel: function(){ 
+                  //右上角关闭回调
+              }
+          }) 
+        })
+      })
+      $.get('msg/6.html', {}, function(str){
+            $(document).on('click','.test6',function(){
+          layer.open({
+              title: '修改客户信息',
+              skin: 'msgskin',
+              area: '728px',
+              btnAlign: 'c',
+              content: str,
+              btn: ['确定', '取消'],
+              yes: function(index, layero){
+
+              },btn2: function(index, layero){
+                  //取消的回调
+              },
+              cancel: function(){ 
+                  //右上角关闭回调
+              }
+          }) 
+        })
+      })
+          $.get('msg/7.html', {}, function(str){
+              $(document).on('click','.test7',function(){
+                  layer.open({
+                      title: '关闭销售订单',
+                      skin: 'msgskin',
+                      area: ["500px","490px"],
+                      btnAlign: 'c',
+                      content: str,
+                      btn: ['确定', '取消'],
+                      yes: function(index, layero){
+
+                      },btn2: function(index, layero){
+                          //取消的回调
+                      },
+                      cancel: function(){
+                          //右上角关闭回调
+                      }
+                  })
+              })
+          })
+          $.get('msg/8.html', {}, function(str){
+              $(document).on('click','.test8',function(){
+                  layer.open({
+                      title: '发货信息',
+                      skin: 'msgskin',
+                      area: ["460px","380px"],
+                      btnAlign: 'c',
+                      content: str,
+                      btn: ['确定', '取消'],
+                      yes: function(index, layero){
+
+                      },btn2: function(index, layero){
+                          //取消的回调
+                      },
+                      cancel: function(){
+                          //右上角关闭回调
+                      }
+                  })
+              })
+          })
+
+          $.get('msg/9.html', {}, function(str){
+              $(document).on('click','.test9',function(){
+                  layer.open({
+                      title: '新增任务信息',
+                      skin: 'msgskin',
+                      area: "850px",
+                      btnAlign: 'c',
+                      content: str,
+                      btn: ['确定', '取消'],
+                      yes: function(index, layero){
+
+                      },btn2: function(index, layero){
+                          //取消的回调
+                      },
+                      cancel: function(){
+                          //右上角关闭回调
+                      }
+                  })
+              })
+          })
+
+          $.get('msg/10.html', {}, function(str){
+              $(document).on('click','.test10',function(){
+                  layer.open({
+                      title: '审核提示',
+                      skin: 'msgskin',
+                      area: "400px",
+                      btnAlign: 'c',
+                      content: str,
+                      btn: ['确定', '取消'],
+                      yes: function(index, layero){
+
+                      },btn2: function(index, layero){
+                          //取消的回调
+                      },
+                      cancel: function(){
+                          //右上角关闭回调
+                      }
+                  })
+              })
+          })
+        //编辑器
+      var editIndex = layedit.build('LAY_demo_editor');
+         
+    //日期控件 star 
+        var start = {
+          min: laydate.now()
+          ,max: '2099-06-16 23:59:59'
+          ,istoday: false
+          ,choose: function(datas){
+            end.min = datas; //开始日选好后，重置结束日的最小日期
+            end.start = datas //将结束日的初始值设定为开始日
+          }
+        }
+        
+        var end = {
+          min: laydate.now()
+          ,max: '2099-06-16 23:59:59'
+          ,istoday: false
+          ,choose: function(datas){
+            start.max = datas; //结束日选好后，重置开始日的最大日期
+          }
+        }
+    })
+
+//省市联动  star
+    var areaData = Area; 
+    var $form;
+    var form;
+    var $;
+    layui.use('form', function() {
+    form = layui.form();
+    $form = $('form');
+        loadProvince();
+    });
+    function loadProvince() {
+      var proHtml = '';
+     for(var i = 0; i < areaData.length; i++) {
+       proHtml += '<option value="' + areaData[i].provinceCode + '_' + areaData[i].mallCityList.length + '_' + i + '">' +
+            areaData[i].provinceName + '</option>';
+                }
+    //初始化省数据
+       $form.find('select[name=province]').append(proHtml);
+       form.render();
+       form.on('select(province)', function(data) {
+       $form.find('select[name=area]').html('<option value="">请选择县/区</option>').parent().hide();
+       var value = data.value;
+      var d = value.split('_');
+       var code = d[0];
+       var count = d[1];
+       var index = d[2];
+       if(count > 0) {
+          loadCity(areaData[index].mallCityList);
+        } else {
+          $form.find('select[name=city]').parent().hide();
+        }
+      });
+    }
+ 
+    function loadCity(citys) {
+       var cityHtml = '';
+      for(var i = 0; i < citys.length; i++) {
+        cityHtml += '<option value="' + citys[i].cityCode + '_' + citys[i].mallAreaList.length + '_' + i + '">' +
+        citys[i].cityName + '</option>';
+      }
+     $form.find('select[name=city]').html(cityHtml).parent().show();
+     form.render();
+     form.on('select(city)', function(data) {
+     var value = data.value;
+     var d = value.split('_');
+     var code = d[0];
+     var count = d[1];
+     var index = d[2];
+     if(count > 0) {
+     loadArea(citys[index].mallAreaList);
+     } else {
+     $form.find('select[name=area]').parent().hide();
+     }
+     });
+ }
+ 
+     function loadArea(areas) {
+        var areaHtml = '';
+            for(var i = 0; i < areas.length; i++) {
+                areaHtml += '<option value="' + areas[i].areaCode + '">' +
+                 areas[i].areaName + '</option>';
+             }
+            $form.find('select[name=area]').html(areaHtml).parent().show();
+            form.render();
+            form.on('select(area)', function(data) {
+            });
+        }
+// 结束
+      $(function (){
+            $('#statusSelect').MSDL({
+                'width': '240',
+                'data': [{"text":"保护中","value":"PROTECTED"},{"text":"保护失效","value":"PROTECTED_INVALID"}],
+                'id': "status"
+            });
+        });
+
+//分页
+   $(function () {
+        loadMallVagueData(1);
+    });
+
+    function loadMallVagueData(currentPageIndex) {
+        var param = {};
+        param.currentPageIndex = currentPageIndex;
+//      postUtil.call("/mallOrder/vagueDemand/vagueDemandListJson", param, function (result) {
+            var pages = 100;
+            laypage({
+                cont: 'paginationDiv',
+                pages: pages,
+                curr: currentPageIndex,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        loadMallVagueData(obj.curr);
+                    }
+                }
+            });
+//      });
+    }
+
+    $(document).on('click','#itocTree',function(){
+       if($(this).find(".itocTree").css("display")=="none"){
+           $(this).find(".itocTree").show();
+           $(this).find("img").attr('src','/res/images/arrow4.png');
+       }else{
+           $(this).find(".itocTree").hide();
+           $(this).find("img").animate('slow').attr('src','/res/images/arrow3.png');
+       }       
+    })
+    $(document).on('click','.itocTree',function(e){
+           e.stopPropagation();
+    })
+  </script>
+  </body>
+</html>

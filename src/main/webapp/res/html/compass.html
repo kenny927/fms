@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/res/public/layui-v2.0.0/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <link rel="stylesheet" href="/res/public/css/daterangepicker.css" />
+    <script src="/res/js/jquery-3.1.1.min.js"></script>
+    <script src="/res/public/layui-v2.0.0/layui/layui.js"></script>
+    <script src="/res/js/echarts.min.js"></script>
+    <script src="/res/public/layPage/laypage.js"></script>
+    <script src="/res/public/layui/moment.min.js"></script>
+    <script src="/res/public/layui/jquery.daterangepicker.js"></script>
+    <script src="/res/js/vue.js"></script>
+</head>
+<body>
+    <section class="bz-bb pl20 pr20 pt20 pb20">
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="margin-bottom: 0;border-bottom: none">
+            <form action="" class="jun-form-s form-css">
+                <dl class="dl-form" style="margin-bottom: 0">
+                    <dt class="flt fz12">时间范围：</dt>
+                    <dd class="flt layui-form jun-form-l">
+                        <select name="interest" lay-filter="timeFrame"  style="width: 240px;">
+                            <option value=""></option>
+                            <option value="0">自定义查询</option>
+                            <option value="1" selected="">按周查询</option>
+                            <option value="2">按月查询</option>
+                        </select>
+                    </dd>
+                    <!--日期范围参数参考网站http://www.htmleaf.com/Demo/201504251738.html-->
+                    <dd class="flt ml10 layui-form">
+                        <input type="text" class="layui-input" id="diyDate" placeholder="1">
+                    </dd>
+                    <dd class="flt ml10">
+                        <input class="picker-css fz12" id="date-range1" value="" placeholder="2">
+                    </dd>
+                    <dd class="flt ml10 layui-form">
+                        <input type="text" class="layui-input" id="monthDate" placeholder="3">
+                    </dd>
+                    <dd class="flt ml10"><span class="form-btn layui-btn-small2">查询</span></dd>
+                    <dd class="frt"><span class="form-btn layui-btn-itoc layui-btn-small2 fz12"><span class="iconfont icon-daochu"></span>导出</span></dd>
+                </dl>
+            </form>
+        </blockquote>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="margin-bottom: 0;border-bottom: none">
+            <div id="main" style="width: 100%;height: 400px;" ></div>
+        </blockquote>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="margin-bottom: 0;border-bottom: none">
+            <table class="layui-table pop table-css" lay-skin="line">
+                <colgroup>
+                    <col  width="200">
+                    <col  width="200">
+                    <col  width="200">
+                    <col  width="300">
+                    <col  width="200">
+                    <col  width="300">
+                    <col  width="150">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>序号</th>
+                    <th >SKU</th>
+                    <th >商品型号</th>
+                    <th >销售次数</th>
+                    <th >购买数量</th>
+                    <th >购买金额</th>
+                    <th >平均销售价格</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>5</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>5</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>5</td>
+                    <td>5</td>
+                </tr>
+                </tbody>
+            </table>
+            <div id="paginationDiv"></div>
+        </blockquote>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <dl class="clr ml20">
+                <dt class="flt fw-b">统计说明：</dt>
+                <dd class="flt ml10">
+                    <p>1、订货单提交订单后计入统计；</p>
+                    <p>2、作废状态的订货单不计入统计；</p>
+                    <p>3、作废状态的商品不计入统计;</p>
+                </dd>
+            </dl>
+        </blockquote>
+    </section>
+</body>
+<script>
+    //按周查找
+    $('#date-range1').dateRangePicker({
+        batchMode: 'week',
+        showShortcuts: false,
+        separator:'至'
+    });
+    layui.use(['form','laydate'], function() {
+        var form = layui.form;
+        var laydate = layui.laydate;
+        //自定义查找
+        laydate.render({
+            elem: '#diyDate'
+            ,range: true
+        });
+        //按月查找
+        laydate.render({
+            elem: '#monthDate'
+            ,type: 'month'
+        });
+        //按月查找
+        laydate.render({
+            elem: '#weekDate'
+            ,range: true
+            ,type: 'week'
+        });
+        form.on('select(timeFrame)', function(data){
+            if(data.value==0){
+                console.log(000);
+            }else if(data.value==1) {
+                console.log(111);
+            }else if(data.value==2){
+                console.log(222);
+            }else {
+                console.log(333);
+            }
+        });
+    })
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+
+    // 指定图表的配置项和数据
+    option = {
+        title : {
+            text: '',
+//            subtext: '纯属虚构',
+//            x:'right'
+        },
+        tooltip : {
+//            show:false
+            trigger: 'item',
+            formatter: '{a} <br/>{b} : {c} ({d}%)'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left',
+            top:'20%',
+            data: ['YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色1','YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色2','YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色3','YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色4','YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色5','YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色6','YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色7','YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色8','YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色9','YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色10']
+        },
+        series : [
+            {
+                name: '访问来源',
+                type: 'pie',
+                radius : '75%',
+                center: ['70%', '50%'],
+                label: {
+                    normal: {
+                        show: false
+//                        position: 'outside'
+                    },
+                    emphasis: {
+                        show: false,
+                        textStyle: {
+                            fontSize: '12'
+                        }
+                    }
+                },
+                labelLine: {
+                    normal: {
+                        show: false
+                    }
+                },
+                data:[
+                    {value:335, name:'YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色1'},
+                    {value:310, name:'YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色2'},
+                    {value:234, name:'YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色3'},
+                    {value:135, name:'YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色4'},
+                    {value:1548, name:'YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色5'},
+                    {value:1548, name:'YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色6'},
+                    {value:1548, name:'YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色7'},
+                    {value:1548, name:'YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色8'},
+                    {value:1548, name:'YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色9'},
+                    {value:1548, name:'YOFC-MPC-G-VA-24M3 多用途布线光缆,24芯,A1a.2(OM3）,普通用途,PVC,水绿色10'}
+                ],
+                x:'right',
+                itemStyle: {
+                    emphasis: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
+            }
+        ]
+    };
+    //分页
+    $(function () {
+        loadMallVagueData(1);
+    });
+
+    function loadMallVagueData(currentPageIndex) {
+        var param = {};
+        param.currentPageIndex = currentPageIndex;
+//      postUtil.call("/mallOrder/vagueDemand/vagueDemandListJson", param, function (result) {
+        var pages = 100;
+        laypage({
+            cont: 'paginationDiv',
+            pages: pages,
+            curr: currentPageIndex,
+            skip: true,
+            jump: function (obj, first) {
+                if (!first) {
+                    loadMallVagueData(obj.curr);
+                }
+            }
+        });
+//      });
+    }
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+</script>
+</html>

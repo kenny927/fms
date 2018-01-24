@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/public/css/style.css<@resVersionDirective>?</@>" />
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_svvppt2njx9u23xr.css<@resVersionDirective>?</@>" />
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>" />
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>" />
+    <link rel="stylesheet" href="/res/css/project.css<@resVersionDirective>?</@>">
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/js/projectReport/projectDetail.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/js/rg.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/projectReport/projectOperationLog.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="main">
+            <div class="jun-base" style="padding-bottom:30px;">
+                <div class="base pt20">
+                    <article class="bor-e6 pt10" style="height:40px;">
+                        <div class="c-2 fz12 clr">
+                         <p class="c-9 fz12 mt5 flt ml20" id="bindSalesEmployee">销售代表：赵冠杰 13381153232</p>
+                         <button class="btn-click frt mr20" style="width:86px;" onclick="watchAttachments()">查看附件</button>
+                        </div>
+                    </article>
+                </div>
+                <div class="base mt5">
+                    <p class="pt20 mb10">
+                        <span class="c-2">分销商信息</span>
+                    </p>
+                    <article class="bor-e6 pt10 pb10">
+                        <div class="c-2 div" id="bindDistributorAccout">
+                        </div>
+                    </article>
+                </div>
+                <div class="base mt5">
+                    <p class="pt20 mb10">
+                        <span class="c-2">项目基本信息</span><span class="fz12" id="orderProjectBackup-head-2"></span>
+                    </p>
+                    <article class="bor-e6 pt10 pb10">
+                        <div class="div" id="orderProjectBackup-1">
+                        </div>
+                        <div class="mt10 div" id="orderProjectBackup-2"></div>
+                        <div class="mt10 div" id="orderProjectBackup-3"></div>
+                        <div class="mt10 fz12 jun-form-s clr" id="orderProjectBackup-4"></div>
+                        <div class="fz12 jun-form-s clr" id="orderProjectBackup-5"></div>
+                    </article>
+                </div>
+                <div class="base mt5">
+                    <p class="pt20 mb10">
+                        <span class="c-2">项目描述</span>
+                    </p>
+                    <article class="bor-e6 pt10 pb10">
+                        <div class="c-2 div" id="projectDecription">此项目我方已处于前期接触、预报价阶段，具体后期会及时跟进。需要厂家配合我方对项目做好保护。
+                        </div>
+                    </article>
+                </div>
+                <div class="base mt5">
+                    <p class="pt20" style="height: 15px;">
+                        <span class="c-2 flt">业主信息</span>
+                    </p>
+                    <table class="layui-table pop">
+                        <colgroup>
+                            <col width="300">
+                            <col width="300">
+                            <col width="200">
+                            <col width="200">
+                            <col width="200">
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th>业主名称</th>
+                            <th>统一社会信用代码</th>
+                            <th>联系人</th>
+                            <th>联系电话</th>
+                            <th>职位</th>
+                        </tr>
+                        </thead>
+                        <tbody id="orderProjectBackupProprietors">
+                        <tr>
+                            <td>HT-GYXTW-12A1a.2</td>
+                            <td>长飞</td>
+                            <td>室外多模中心管式轻铠装光缆,HT-GYXTW</td>
+                            <td>200</td>
+                            <td>千米</td>
+                        </tr>
+                        <tr>
+                            <td>HT-GYXTW-12A1a.2</td>
+                            <td>长飞</td>
+                            <td>室外多模中心管式轻铠装光缆,HT-GYXTW</td>
+                            <td>200</td>
+                            <td>千米</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="base mt5">
+                    <p class="pt20" style="height: 15px;">
+                        <span class="c-2 flt">集成商信息</span>
+                    </p>
+                    <table class="layui-table pop">
+                        <colgroup>
+                            <col width="300">
+                            <col width="300">
+                            <col width="200">
+                            <col width="200">
+                            <col width="200">
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th>公司名称</th>
+                            <th>统一社会信用代码</th>
+                            <th>联系人</th>
+                            <th>联系电话</th>
+                            <th>职位</th>
+                        </tr>
+                        </thead>
+                        <tbody id="orderProjectBackupIntegrators">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="base mt5">
+                    <p class="pt20" style="height: 15px;">
+                        <span class="c-2 flt">产品信息</span>
+                    </p>
+                    <table class="layui-table pop">
+                        <colgroup>
+                            <col width="200">
+                            <col width="100">
+                            <col width="350">
+                            <col width="100">
+                            <col width="100">
+                            <col width="200">
+                            <col>
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th>商品型号</th>
+                            <th>品牌</th>
+                            <th>商品名称</th>
+                            <th>数量</th>
+                            <th>计量单位</th>
+                            <th>希望厂家配合报出的价格</th>
+                        </tr>
+                        </thead>
+                        <tbody id="orderProjectBackupSkus">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="base mt5">
+                    <article class="bor-e6 pt10 pb10">
+                        <div class="div" id="predict">
+                        </div>
+                    </article>
+                </div>
+                <div class="base mt5">
+                    <p class="pt20 pb10" style="height: 15px;">
+                        <span class="c-2 flt">项目跟进情况</span>
+                    </p>
+                    <table class="layui-table pop" lay-skin="line" style="margin-bottom:0px;">
+                        <colgroup>
+                            <col width="100">
+                            <col width="100">
+                            <col width="100">
+                            <col width="100">
+                            <col width="200">
+                            <col width="100">
+                            <col width="100">
+                            <col width="300">
+                            <col>
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th>跟进人</th>
+                            <th>时间</th>
+                            <th>拜访方式</th>
+                            <th>拜访主体</th>
+                            <th>公司名称</th>
+                            <th>联系人</th>
+                            <th>联系电话</th>
+                            <th>跟进记录</th>
+                        </tr>
+                        </thead>
+                        <tbody id="orderProjectBackupFollows">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="base mt5" style="margin-bottom: 50px;">
+                    <p class="pt20 mb10"><span class="c-2">项目操作日志</span></p>
+                    <table id="operationPaginationTbl" class="layui-table pop">
+                        <colgroup>
+                            <col width="150">
+                            <col width="100">
+                            <col width="150">
+                            <col width="400">
+                            <col>
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th>操作时间</th>
+                            <th>操作人</th>
+                            <th>操作类型</th>
+                            <th>内容</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                    <div id="operationPaginationDiv"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
+
+<script>
+
+    var layer;
+    var  _backupId =  '${backupId}';
+    var backupId = "${backupId}";
+		//页面加载完后调用
+		$(function () {
+		    //获取项目报备详情数据
+		    queryProjectDetail(_backupId);
+		});
+
+     layui.use(['element','layer'], function(){
+         layer = layui.layer;
+         var element = layui.element();
+
+     })
+</script>
+
+</body>
+</html>

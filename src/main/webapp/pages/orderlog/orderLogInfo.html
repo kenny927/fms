@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+        <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+   <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+	<script src="/res/public/layui/layui-mz-min.js<@resVersionDirective>?</@>"></script>
+	<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+      <script type="text/javascript" src="/res/js/payCounter.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+    <div class="bz-bb pl20 pr20 pt20 jun-form-s form-css">
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+                   <dl class="dl-form mb0">
+                       <dt class="flt line-middle">订单号：</dt>
+                       <dd class="flt line-middle c-2 w240"><label>${orderLogPage.orderSaleDetail.orderSalesId!"--"}</label></dd>
+                       <dt class="flt line-middle">创建时间：</dt>
+                       <dd class="flt line-middle c-2 w240"><label>${orderLogPage.orderSaleDetail.createDateDisplay!"--"}</label></dd>
+                       <dt class="flt line-middle">订单状态：</dt>
+                       <dd class="flt line-middle c-f w240">${orderLogPage.orderSaleDetail.statusCname!"--"}</dd>
+                   </dl>
+                   <dl class="dl-form  mb0">
+                       <dt class="flt line-middle">付款状态：</dt>
+                       <dd class="flt line-middle c-f w240">${orderLogPage.orderSaleDetail.dealstatusCname!"--"}</dd>
+                       <dt class="flt line-middle">买方：</dt>
+                       <dd class="flt line-middle c-2 w240">${orderLogPage.orderSaleDetail.purchaseAccountName!"--"}</dd>
+                       <dt class="flt line-middle">卖方：</dt>
+                       <dd class="flt line-middle c-f w240">${orderLogPage.orderSaleDetail.supplierAccountName!"--"}</dd>
+                   </dl>
+                   <dl class="dl-form  mb0">
+                       <dt class="flt line-middle">内部合同号：</dt>
+                       <dd class="flt line-middle c-2 w240">${orderLogPage.orderSaleDetail.orderSalesContractId!"--"}</dd>
+                       <dt class="flt line-middle">外部合同号：</dt>
+                       <dd class="flt line-middle c-2 w240">${orderLogPage.orderSaleDetail.externalContractId!"--"}</dd>
+                       <dt class="flt line-middle">客户经理：</dt>
+                       <dd class="flt line-middle c-2 w240">${orderLogPage.orderSaleDetail.userRealName!""}  ${orderLogPage.orderSaleDetail.mobile!""}</dd>
+                   </dl>
+        </blockquote>
+        <#if ((orderLogPage.toDelivered)??)&&(((orderLogPage.toDelivered)?size)>0)>
+        <div class="toDeliveryed" style="margin-bottom:40px">
+	        <h3 class="mb5 mt20">待发货商品清单</h3>
+	        <table class="layui-table pop table-css">
+	            <colgroup>
+	                <col  width="200">
+	                <col  width="400">
+	                <col  width="200">
+	                <col  width="200">
+	                <col  width="200">
+	                <col  width="200">
+	            </colgroup>
+	            <thead>
+	            <tr>
+	                <th>商品编码</th>
+	                <th >商品名称</th>
+	                <th >型号</th>
+	                <th >订购数量</th>
+	                <th >单位</th>
+	                <th >待发货数量</th>
+	            </tr>
+	            </thead>
+	            <tbody>
+	             <#list orderLogPage.toDelivered! as toDeliveredItem>
+	             <tr>
+		       			<td>
+		       				${toDeliveredItem.skuId!"--"}
+		       			</td>
+		       			<td><p  title="${toDeliveredItem.skuName}">${toDeliveredItem.skuName!"--"}</p>
+		       			</td>
+		       			<td>
+		       				${toDeliveredItem.model!"--"}
+		       			</td>
+		       			<td ><label class="unitDisplay" unitName="${toDeliveredItem.unitName}" type="value">${toDeliveredItem.quantity}</label></td>
+		       			<td>
+		       				${toDeliveredItem.unitName!"--"}
+		       			</td>
+		       			<td>
+		       			<label class="unitDisplay" unitName="${toDeliveredItem.unitName}" type="value">${toDeliveredItem.toDeliverQty}</label>
+		       			</td>
+				  </tr>
+	             </#list>
+	            </tbody>
+	        </table>
+        </div>
+        </#if>
+        <#if ((orderLogPage.orderLogs)??)&&(((orderLogPage.orderLogs)?size)>0)>
+	        <h3 class="mb5 mt20">已发货商品清单</h3>
+	        <#list orderLogPage.orderLogs! as orderLogItem>
+	        <table class="layui-table pop table-css">
+	            <colgroup>
+	                <col  width="200">
+	                <col  width="400">
+	                <col  width="200">
+	                <col  width="200">
+	                <col  width="200">
+	                <col  width="200">
+	            </colgroup>
+	            <thead>
+	            <tr>
+	                <th>商品编码</th>
+	                <th >商品名称</th>
+	                <th >型号</th>
+	                <th >订购数量</th>
+	                <th >单位</th>
+	                <th >本次发货数量</th>
+	            </tr>
+	            </thead>
+	            <tbody>
+	             <#list orderLogItem.details! as detailItem>
+					       		<tr>
+					       			<td>
+					       				${detailItem.skuId!"--"}
+					       			</td>
+					       			<td>
+										<p  title="${detailItem.skuName!''}">${detailItem.skuName!"--"}</p>
+									</td>
+					       			<td>
+					       				${detailItem.model!"--"}
+					       			</td>
+					       			<td><label class="unitDisplay" unitName="${detailItem.unitName}" type="value">${detailItem.quantity}</label>
+					       			</td>
+					       			<td>
+					       				${detailItem.unitName!"--"}
+					       			</td>
+					       			<td><label class="unitDisplay" unitName="${detailItem.unitName}" type="value">${detailItem.deliveryQty}</label>
+					       			</td>
+					       		</tr>
+					       </#list>
+	            </tbody>
+	        </table>
+	        <dl class="dl-form mb0 fz12">
+	            <dt class="flt line-middle c-2" style="width: 80px;">【状&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;态】</dt>
+	            <dd class="flt line-middle c-f fw-b"><#switch orderLogItem.receiptStatus> 
+												<#case "NOT_SIGNED">
+												<span id="receiptStatus" style="font-weight: bolder;color: red;">  
+													${orderLogItem.receiptStatusName!"--"}
+												</span>
+												<#break> 
+												<#case "SIGNED">
+												<span id="receiptStatus" style="font-weight: bolder;color: green;">  
+													${orderLogItem.receiptStatusName!"--"}
+												</span>
+												<#break>
+ 											  </#switch>  </dd>
+	            <dd class="flt line-middle c-9 ml20">${(orderLogItem.updateDate?string("yyyy-MM-dd HH:mm:ss"))!}</dd>
+	        </dl>
+	        <dl class="dl-form mb0 fz12">
+	            <dt class="flt line-middle c-2" style="width: 80px;">【运&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;费】</dt>
+	            <dd class="flt line-middle c-2"> ￥${orderLogItem.transportFee?default(0.00)?string('0.00')}</dd>
+	        </dl>
+	        <dl class="dl-form mb0 fz12">
+	            <dt class="flt line-middle c-2" style="width: 80px;">【收货地址】</dt>
+	            <dd class="flt line-middle c-2 w240" style="width:600px;">${orderLogItem.receiptAddress!"--"}</dd>
+	            <dt class="flt line-middle c-2">收货人：</dt>
+	            <dd class="flt line-middle c-2 w100"  style="width:143px;">${orderLogItem.receiptMan!"--"}</dd>
+	            <dt class="flt line-middle c-2">联系电话：</dt>
+	            <dd class="flt line-middle c-2 w100">${orderLogItem.receiptManPhone!"--"}</dd>
+	        </dl>
+	        <dl class="dl-form mb0 fz12">
+	            <dt class="flt line-middle c-2" style="width: 80px;">【物流信息】</dt>
+	            <dd class="flt line-middle c-2 w240" style="width:300px;">发货日期：${orderLogItem.deliveryDate?string("yyyy-MM-dd")}</dd>
+	            <dt class="flt line-middle c-2">物流公司：</dt>
+	            <dd class="flt line-middle c-2 w100" style="width:223px;">${orderLogItem.transportComp!"--"}</dd>
+	            <dt class="flt line-middle c-2">物流单号：</dt>
+	            <dd class="flt line-middle c-2 w130" style="width:130px;">${orderLogItem.transportNo!"--"}</dd>
+	            <dt class="flt line-middle c-2">联系方式：</dt>
+	            <dd class="flt line-middle c-2 w100">${orderLogItem.transportContact!"--"}</dd>
+	        </dl>
+	         <#if orderLogItem_has_next>
+	          <div>
+	         <#else>
+	         <div style='height:30px;padding-bottom: 30px;'>
+	        </#if>
+	        <#if orderLogPage.orderSalesType == 'IN_STOCK_GROUP' && orderLogItem.receiptStatus =='NOT_SIGNED'>
+	           <div class="inline colockbox fz12 ml10 c-2" startTime="${orderLogItem.deliveryDate?string('yyyy-MM-dd HH:mm:ss')}" currentTime="${orderLogItem.currentTime?string('yyyy-MM-dd HH:mm:ss')}">
+									<span class="glyphicon glyphicon-time"></span>
+									<span class="counterDesc"></span>
+									<span class="time day c-f" hidden>00</span>
+									<span class="dayDesc c-f" hidden>天</span>
+									<span class="time hour c-f">00</span><label class="c-f">时</label>
+									<span class="time minute c-f">00</span><label class="c-f">分</label>
+									<span class="time second c-f" >00</span><label class="c-f">秒</label>；<#if SYSTEM_USER_SESSION.systemUser.mainObjectId=="10003">来确认收货，</#if>超时该发货批次将自动确认收货
+				</div>
+	            </#if>
+	        </div>
+	        </#list>
+        </#if>
+    </div>
+<script>
+function goProductPreview(skuId) {
+	cardUtil.closeCard("预览商品-" + skuId);
+	cardUtil.openCard("预览商品-" + skuId, "/sku/previewBySkuId?skuId=" + skuId);
+	cardUtil.changeCard("预览商品-" + skuId);
+}
+
+ $(function(){
+ 	$.each($('.colockbox'), function(n, item){
+ 		var startTime = $(item).attr("startTime");
+ 		var currentTime = $(item).attr("currentTime");
+		var tmpCurrentTime = Date.parse(currentTime.replace(/-/g,"/"));
+ 		var tmpTime = Date.parse(startTime.replace(/-/g,"/"));
+ 		var title;
+		if('${SYSTEM_USER_SESSION.systemUser.mainObjectId=="10003"}'){
+			title = '您还有';
+		}else{
+			title = '还剩';
+		}
+ 		countDown(new Date(tmpTime).getTime() + 15*24*3600*1000,new Date(tmpCurrentTime),$(item), '', '', title);
+ 	});
+ });
+</script>
+</body>
+</html>

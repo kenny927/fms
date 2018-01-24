@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>" />
+<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css<@resVersionDirective>?</@>" />
+<link rel="stylesheet" href="/res/public/css/daterangepicker.css<@resVersionDirective>?</@>" />
+<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui/Area1.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui/layui-mz-min.js<@resVersionDirective>?</@>"></script>
+<script src="/res/js/dateUtil.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/js/orderSale/orderSaleList.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui/moment.min.js<@resVersionDirective>?</@>"></script>
+<script src="/res/js/MultiSelectDropList.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui/jquery.daterangepicker.js<@resVersionDirective>?</@>"></script>
+ <script src="/res/js/payCounter.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+
+ <style type="text/css">
+ .productDes {
+   min-height: 32px;
+}
+ #itocCenter ::-webkit-scrollbar{
+	 width: 5px;
+ }
+</style>
+
+</head>
+
+
+<body>
+	<section id="itocCenter">
+		<section class="itocContent">
+			<div class="itocMain">
+				<div style="width: 100%; box-sizing: border-box; padding: 0 20px; margin-right: 20px; margin-top: 30px;">
+					<form action="" class="jun-form-s form-css">
+						<dl class="dl-form">
+							<dt class="flt fz12">状态：</dt>
+							<dd class="flt pre w240" style="height: 32px;">
+								<div class="multi_select" id="statusSelect" style="position: absolute; left: -2px; top: -1px; z-index: 1">
+									<!--<img class="cs-p" style="position: absolute; right: 3px; top: 12px;" src="/res/images/arrow3.png" />-->
+								</div>
+							</dd>
+							<dt class="flt fz12" >客户名称：</dt>
+							<dd class="flt">
+								<input type="text" id="accountName" name="title" placeholder="请输入客户名称" autocomplete="off" class="layui-input searchFiled">
+							</dd>
+
+							<dt class="flt fz12">区域：</dt>
+							<dd class="flt pre">
+								<select id="area" style="width: 240px; height: 30px; border: 1px solid #e6e6e6; padding-left: 10px;">
+									
+								</select>
+							</dd>
+
+						</dl>
+						<dl class="dl-form">
+					        <dt class="flt fz12">创建时间：</dt>
+					        <dd class="flt pre"  id="picker-css">
+					              <input class="picker-css" id="date-range0" value="">
+					              <img class="cs-p" style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" />
+					         </dd>
+                           	<dt class="flt fz12">单号：</dt>
+							<dd class="flt layui-form">
+<!-- 								<input type="text" id="orderSalesId" name="title" placeholder="请输入单号" autocomplete="off" class="layui-input searchFiled"> -->
+								<div class="test_box" contenteditable="true" id="orderSalesId" title="请输入单号，多个单号用回车或空格隔开"></div>
+							    <!--<textarea class="layui-textarea productDes" cols="29" rows="1" id="orderSalesId" onmouseover="this.title=this.value"  placeholder="请输入单号1，多个单号用回车或空格隔开" ></textarea>-->
+							</dd>
+							<dt class="flt fz12" style="width: 69px;margin-left: 18px;">SKU编码：</dt>
+							<dd class="flt" >
+							    <div class="test_box" contenteditable="true" id="skuId" title="请输入SKU编码，多个单号用回车或空格隔开"></div>
+<!-- 								<input type="text" id="skuId" name="title" placeholder="请输入SKU编码" autocomplete="off" class="layui-input searchFiled"> -->
+							</dd>
+
+						</dl>
+						<dl class="dl-form">
+							<dt class="flt fz12" >内部合同号：</dt>
+							<dd class="flt">
+								<input type="text" id="contractId" name="title"  class="layui-input searchFiled">
+							</dd>
+							<dt class="flt fz12" >订单来源：</dt>
+							<dd class="flt layui-form jun-form-l">
+								<select id="orderSource" name="orderSource">
+									<option value=""></option>
+									<option selected="selected" value="ALL">全部</option>
+									<option value="ORDER_SALES_FROM_ORDERPLATFORM">分销商手动创建</option>
+									<option value="ORDER_SALES_FROM_SHOP">商城订单驱动</option>
+								</select>
+							</dd>
+							<dd class="flt ml10">
+								<span class="form-btn layui-btn-small2" onclick="searchForDATA()">查询</span>
+							</dd>
+						</dl>
+                        <dl class="dl-form" style="margin-bottom: 0">
+                            <dd class="flt">
+                                <span class="form-btn layui-btn-itoc layui-btn-mini2" onclick ="sumForData()" lay-filter="formDemo">统计</span>
+                                <@havePermission resourceCode="operation:distributionorder:orderlist:export">
+					            <span class="form-btn layui-btn-itoc layui-btn-mini2 ml10" onclick ="exportOrderSalesList()" lay-filter="formDemo">导出订单</span>
+					            </@>
+					            <@havePermission resourceCode="operation:distributionorder:orderlist:exportDetail">
+					            <span class="form-btn layui-btn-itoc layui-btn-mini2 ml10" onclick ="exportOrderSalesDetail()" lay-filter="formDemo">导出明细</span>
+					            </@>
+                            </dd>
+							<dd class="frt fz12" id="tongji">
+							</dd>
+                        </dl>
+					</form>
+				</div>
+				<div style="width: 100%; box-sizing: border-box; padding: 0 20px; margin-right: 20px; margin-top: 10px;">
+					<table class="layui-table pop" lay-skin="line">
+						<colgroup>
+							<col width="50">
+							<col width="200">
+							<col width="200">
+							<col width="200">
+							<col width="250">
+							<col width="200">
+							<col width="200">
+							<col width="200">
+							<col width="200">
+							<col width="200">
+						</colgroup>
+						<thead>
+							<tr>
+								<th><input type="checkbox" name="allChoose"></th>
+								<th>订单号</th>
+								<th>内部合同号</th>
+								<th>区域</th>
+								<th>客户</th>
+								<th>金额</th>
+								<th>收货地址</th>
+								<th>订单状态</th>
+								<th>付款状态</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tbody>
+
+						</tbody>
+					</table>
+				</div>
+				<div id="paginationDiv" style="margin-right: 7px; margin-top: -10px"></div>
+			</div>
+		</section>
+	</section>
+
+	<script type="text/javascript">
+		var layer;
+		var form
+		var _currentPageIndex = 1;
+		
+		$('#date-range0').dateRangePicker();
+
+		layui.use([ 'form', 'laydate', 'layer' ], function() {
+			layer = layui.layer;
+			form = layui.form();
+			//日期控件 star
+			//         var start = {
+			//             min: laydate.now()
+			//             , max: '2099-06-16 23:59:59'
+			//             , istoday: false
+			//             , choose: function (datas) {
+			//                 end.min = datas; //开始日选好后，重置结束日的最小日期
+			//                 end.start = datas //将结束日的初始值设定为开始日
+			//             }
+			//         };
+
+			//         var end = {
+			//             min: laydate.now()
+			//             , max: '2099-06-16 23:59:59'
+			//             , istoday: false
+			//             , choose: function (datas) {
+			//                 start.max = datas; //结束日选好后，重置开始日的最大日期
+			//             }
+			//         };
+
+			searchDATA();
+		})
+
+		$("input[name=allChoose]").on("click", function() {
+			if ($(this).prop("checked")) {
+				$("input[name=primary]").prop("checked", true);
+				$("input[name=primary]").each(function(){
+					var obj=$(this).val();
+					if(_orderSalesIds.indexOf(obj)<0){
+						_orderSalesIds+=(obj+";");
+					}
+					
+				});
+			} else {
+				$("input[name=primary]").prop("checked", false);
+				$("input[name=primary]").each(function(){
+					var obj=$(this).val();
+					if(_orderSalesIds.indexOf(obj)>=0){
+						_orderSalesIds=_orderSalesIds.replace((obj+";"),"");
+					}
+				});
+			}
+		});
+		
+		$(function() {
+			$('#statusSelect').MSDL({
+				'width' : '240',
+				'data' : [   {
+					"text" : "已作废",
+					"value" : "CANCELLED"
+				},{
+					"text" : "已完成",
+					"value" : "COMPLETED"
+				},{
+					"text" : "待收货确认",
+					"value" : "RECEIPT_CONFIRM"
+				},{
+					"text" : "部分发货",
+					"value" : "PART_DELIVERY"
+				},{
+					"text" : "待发货确认",
+					"value" : "DELIVERY_CONFIRM"
+				},{
+					"text" : "待付款审核",
+					"value" : "PAYMENT_CONFIRM"
+				},{
+					"text" : "待订单审核",
+					"value" : "PLATFORM_SALES_APPROVE"
+				}],
+				'id' : "status"
+			});
+            //默认选取本周时间
+// 			var searchDate = getThisWeekBiginToToday();
+//            $('#date-range0').val(searchDate.fromDate+' to '+searchDate.toDate);
+// 			$("#fromDateByDay").val(searchDate.fromDate);
+// 			$("#toDateByDay").val(searchDate.toDate);
+			//查询出所有区域
+			postUtil.call("/order/getAreaList", {}, function(result) {
+            if(result.STATUS=="SUCCESS"){
+            	var areaList = result.areaList;
+            	$("#area").empty();
+            	var html2='<option value="ALL">全部</option>';
+            	for(var j=0;j<areaList.length;j++){
+            		html2+='<option value="'+areaList[j].areaId+'">'+areaList[j].areaName+'</option>';
+            	}
+            	$("#area").html(html2);
+            }else{
+            	layer.msg(result.MSG,{icon:5});
+            }
+	        });
+			
+
+		});
+	</script>
+</body>
+</html>
+

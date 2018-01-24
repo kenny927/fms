@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="/res/css/sku.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<!-- 新增楼层-->
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain" style="min-height: 100px;">
+            <div class="addSku" style="width:550px;">
+                <form id="markBannerFrm" role="form">
+                    <input type="hidden" id="displayId">
+                    <dl class="sku-list">
+                        <dt class="mt10">楼层说明：</dt>
+                        <dd class="inputContent">
+                            <input type="text" name="addDisplayDescribe" id="addDisplayDescribe" placeholder="请输入楼层说明">
+                        </dd>
+                    </dl>
+                    <dl class="sku-list">
+                        <dt class="mt10">排序号：</dt>
+                        <dd class="inputContent">
+                            <input type="text" name="addSort" id="addSort" placeholder="请输入排序号">
+                        </dd>
+                    </dl>
+                    <dl class="sku-list">
+                        <dt class="mt10">类型：</dt>
+                        <dd>
+                            <select id="addDisplayType" name="displayTypeSel" style="width: 120px;height: 33px;">
+                                <option value="PRODUCT" selected>产品楼层</option>
+                                <option value="PROMOTION">促销楼层</option>
+                            </select>
+                        </dd>
+                    </dl>
+                    <dl class="sku-list">
+                        <dt class="mt10">楼层图片：</dt>
+                        <dd>
+                            <input id="addDisplayPic" type="file" name="file">
+                            <div id="skuMainImagesDiv" imgUrl="" style="height:150px;width:150px"></div>
+                        </dd>
+                    </dl>
+                </form>
+                <dl class="sku-list" style="float:right;margin-right: 28px;">
+                    <dd>
+                        <button id="saveAddMallSkuConfigurationModalBtn" class="search-btn" style="cursor: pointer;">保&nbsp;存</button>
+                    </dd>
+                    <dd style="margin-left: 10px;">
+                        <button id="cancelMallSkuConfigurationModalBtn" class="search-btn" style="cursor: pointer;" >取&nbsp;消</button>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript">
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    layui.use('upload', function() {
+
+        layui.upload({
+            elem: '#addDisplayPic',
+            title: '选择图片',
+            skin: 'upload',
+            url: '/file_server/images/uploadForAjax', //上传接口
+            before: function (input) {
+                // //返回的参数item，即为当前的input DOM对象
+                // console.log('文件上传中');
+            },
+            success: function (res) { //上传成功后的回调
+                if(res.STATUS == "SUCCESS") {
+                    imgUrl=res.data;
+                    $("#skuMainImagesDiv").attr("imgUrl",imgUrl[0]);
+                    var imgHtml="<img class='img-thumbnail' width='150' src='" + imgUrl[0] + "'/>";
+                    $("#skuMainImagesDiv").html(imgHtml);
+                }else{
+                    layer.msg(res.MSG);
+                }
+            }
+        });
+    });
+    $(document).on("click", "#cancelMallSkuConfigurationModalBtn", function () {
+        parent.layer.close(index);//关闭当前窗口
+    });
+
+    $(document).on("click", '#saveAddMallSkuConfigurationModalBtn', function () {
+        var displayId = $("#displayId").val();
+        var displayDescribe =$("#addDisplayDescribe").val();
+        var sort = $("#addSort").val();
+        var displayType=$("#addDisplayType").val();
+        var displayPic=$("#skuMainImagesDiv").attr("imgUrl");
+
+        if(displayId) {
+            var param = {"displayId" :displayId,"displayDescribe" :displayDescribe,"displayType" :displayType,"displayPic":displayPic,"sort":sort};
+            postUtil.call("/homeSkuConfiguration/updateMallHomeSkuConfiguration",param,function(res){
+                if(res.STATUS == "SUCCESS") {
+                    layer.msg("修改楼层成功", {icon:6});
+                    parent.refresh();
+                } else {
+                    layer.msg(res.MSG);
+                }
+            });
+        } else {
+            var param = {"displayDescribe" :displayDescribe,"displayType":displayType,"displayPic":displayPic,"sort":sort};
+            postUtil.call("/homeSkuConfiguration/insertMallHomeSkuConfiguration",param,function(res){
+                if(res.STATUS == "SUCCESS") {
+                    layer.msg("新增楼层成功", {icon:6});
+                    parent.refresh();
+                } else {
+                    layer.msg(res.MSG);
+                }
+            });
+        }
+
+    });
+</script>
+</body>
+</html>

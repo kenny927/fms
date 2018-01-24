@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <script src="/res/js/jquery-3.1.1.min.js"></script>
+    <script src="/res/public/layui/layui.js"></script>
+    <script src="/res/public/layPage/laypage.js"></script>
+    <style type="text/css">
+        .first-row{
+            background-color: #f0f0f0;
+        }
+        .sku-pic{
+           position: relative;
+        }
+        .sku-pic img{
+            width: 60px;
+            height: 60px;
+        }
+        .sku-pic span{
+            position: absolute;
+            display: block;
+            width: 50px;
+            height: 50px;
+            top: 50%;
+            left: 50%;
+            margin-left: -25px;
+            margin-top: -25px;
+        }
+        .sku-pic .sell-out{
+            background: url(/res/images/sell-out.png) no-repeat;
+        }
+        .sku-pic .off-shelf{
+            background: url(/res/images/off-shelf.png) no-repeat;
+        }
+        .secKillGoods{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<section class="bz-bb pl20 pr20 pt20 pb20">
+    <div class="tab-nav">
+        <ul class="tab-title">
+            <li class="tab-this" value="0">现货</li>
+            <li value="1">秒杀</li>
+        </ul>
+    </div>
+    <div class="jun-form-s form-css ">
+        <dl class="dl-form">
+            <dt class="flt fz12" style="width:36px;">查询：</dt>
+            <dd class="flt"><input type="text" name="title" placeholder="商品名称/型号/编号" autocomplete="off" class="layui-input pl10"></dd>
+            <dt class="flt fz12">状态：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="manager" lay-filter="manager"  style="width: 240px;">
+                    <option value="0" selected="">全部</option>
+                    <option value="1">上架</option>
+                    <option value="2">下架</option>
+                </select>
+            </dd>
+            <dt class="flt fz12" style="width: 70px;">库存：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="source" lay-filter="source"  style="width: 240px;">
+                    <option value="0" selected="">全部</option>
+                    <option value="1">有货</option>
+                    <option value="2">无货</option>
+                </select>
+            </dd>
+            <button class="form-btn layui-btn-small2  ml20 ">搜索</button>
+        </dl>
+    </div>
+    <div class="mark-read mb10 ml10">
+        <span class="cs-p">
+          <input type="checkbox" class="allChoose fz12">
+          <span class="fz12 c-2">全选</span>
+        </span>
+        <span class="c-2 cs-p ml10 fz12">批量上架</span>
+        <span class="c-2 cs-p ml10 fz12">批量下架</span>
+    </div>
+    <div class="content">
+         <div class="spotGoods">
+            <table class="layui-table pop no-margin" lay-skin="line">
+                <colgroup>
+                    <col  width="10">
+                    <col  width="100">
+                    <col  width="150">
+                    <col  width="250">
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="150">
+                    <col  width="150">
+                    <col  width="150">
+                    <col  width="800">
+                    <col  width="100">
+                    <col  width="150">
+                </colgroup>
+                <thead>
+                    <th></th>
+                    <th>商品图片</th>
+                    <th>商品编码</th>
+                    <th>商品名称</th> 
+                    <th>商品属性</th>  
+                    <th>品牌</th>
+                    <th>单位</th>
+                    <th>库存</th>
+                    <th>起订量</th>
+                    <th>促销内容</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </thead>
+                <tbody>
+                <!--  <tr class="first-row" style="border-top:10px solid #fff;">
+                    <td colspan="8" align="left" style="text-align: left;">
+                      <input type="checkbox">
+                      <span class="c-2 ml5">未设置秒杀的[现货]商品</span>
+                    </td>
+                    <td class="c-h cs-p" align="right" colspan="4" 
+                    style="text-align: right;">设置促销</td>
+                 </tr> -->
+                 <tr>
+                     <td><input class="choose" type="checkbox"></td>
+                     <td class="sku-pic"> 
+
+                        <span class="sell-out"></span>
+                        <img src="/res/images/location.png">
+                     </td>
+                     <td>c-0126558422</td>
+                     <td>室外多模中心管式轻铠装光 缆,HT-GYXTW-12A1a.2</td>
+                     <td>芯数：12芯 光纤类型：A1a.2</td>
+                     <td>长飞</td>
+                     <td>千米</td>
+                     <td>1000000</td>
+                     <td>1000</td>
+                     <td>
+                        <img src="/res/images/spots-1.png">
+                        <span class="c-9">市场参考价：￥1980.00</span>
+                        <span class="c-2 fw-b">促销价：￥1000.00</span>
+                     </td>
+                     <td class="c-2 fw-b">上架</td>
+                     <td>
+                        <dl>
+                          <dt class="c-h mb5">下架</dt>
+                          <dt class="c-h">删除</dt>    
+                        </dl>      
+                      </td>
+                 </tr>
+                 <tr>
+                     <td><input class="choose" type="checkbox"></td>
+                     <td class="sku-pic"> 
+                        <img src="/res/images/location.png">
+                     </td>
+                     <td>c-0126558422</td>
+                     <td>室外多模中心管式轻铠装光 缆,HT-GYXTW-12A1a.2</td>
+                     <td>芯数：12芯 光纤类型：A1a.2</td>
+                     <td>长飞</td>
+                     <td>千米</td>
+                     <td>1000000</td>
+                     <td>1000</td>
+                     <td>
+                        <img src="/res/images/spots-1.png">
+                        <span class="c-9">市场参考价：￥1980.00</span>
+                        <span class="c-2 fw-b">促销价：￥1000.00</span>
+                     </td>
+                     <td class="c-2 fw-b">上架</td>
+                     <td>
+                        <dl>
+                          <dt class="c-h mb5">下架</dt>
+                          <dt class="c-h">删除</dt>    
+                        </dl>      
+                      </td>
+                 </tr>
+
+                <tr>
+                     <td><input class="choose" type="checkbox"></td>
+                     <td class="sku-pic"> 
+                        <span class="off-shelf"></span>
+                        <img src="/res/images/location.png">
+                     </td>
+                     <td>c-0126558422</td>
+                     <td>室外多模中心管式轻铠装光 缆,室外多模中心管式轻铠装光室外多模中心管式轻铠装光HT-GYXTW-12A1a.2</td>
+                     <td>芯数：12芯 光纤类型：A1a.2</td>
+                     <td>长飞</td>
+                     <td>千米</td>
+                     <td>1000000</td>
+                     <td>1000</td>
+                     <td>
+                        <img src="/res/images/spots-1.png">
+                        <span class="c-9">市场参考价：￥1980.00</span>
+                        <span class="c-2 fw-b">促销价：￥1000.00</span>
+                     </td>
+                     <td class="c-2 fw-b">下架</td>
+                     <td>
+                        <dl>
+                          <dt class="c-h mb5">上架</dt>
+                          <dt class="c-h">删除</dt>    
+                        </dl>      
+                      </td>
+                 </tr>
+                </tbody>
+            </table>
+         </div>
+         <div class="secKillGoods">
+            <table class="layui-table pop no-margin" lay-skin="line">
+                <colgroup>
+                    <col  width="10">
+                    <col  width="100">
+                    <col  width="150">
+                    <col  width="250">
+                    <col  width="220">
+                    <col  width="100">
+                    <col  width="150">
+                    <col  width="150">
+                    <col  width="150">
+                    <col  width="800">
+                    <col  width="100">
+                    <col  width="130">
+                </colgroup>
+                <thead style="border-bottom:10px solid #fff;">
+                    <th></th>
+                    <th>商品图片</th>
+                    <th>商品编码</th>
+                    <th>商品名称</th> 
+                    <th>商品属性</th>  
+                    <th>品牌</th>
+                    <th>单位</th>
+                    <th>库存</th>
+                    <th>起订量</th>
+                    <th>促销内容</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </thead>
+                <tbody>
+                 <tr class="first-row">
+                    <td colspan="8" align="left" style="text-align: left;">
+                      <input type="checkbox">
+                      <span class="c-f ml5">[秒杀]2015-02-02 00:00至2019-08-19 00:00</span>
+                    </td>
+                    <td class="c-h cs-p" align="right" colspan="4" 
+                    style="text-align: right;">修改促销</td>
+                 </tr>
+                 <tr class="">
+                     <td><input type="checkbox"></td>
+                     <td class="sku-pic"> 
+                        <img src="/res/images/location.png">
+                     </td>
+                     <td>c-0126558422</td>
+                     <td>室外多模中心管式轻铠装光 缆,HT-GYXTW-12A1a.2</td>
+                     <td>芯数：12芯 光纤类型：A1a.2</td>
+                     <td>长飞</td>
+                     <td>千米</td>
+                     <td>1000000</td>
+                     <td>1000</td>
+                     <td>
+                        <dl>
+                         <dt class="flt pt15">
+                           <img src="/res/images/spots-1.png">   
+                         </dt>
+                         <div class="flt ml10" style="text-align: left;">
+                            <dt>
+                                <span class="c-9">市场参考价：￥1980.00</span>
+                                <span class="c-2 fw-b">促销价：￥1000.00</span>
+                            </dt>
+                            <dt class="c-f">2015-02-02 00:00至2019-08-19 00:00</dt>
+                            <dt>
+                             <span class="c-2">秒杀价：￥</span>
+                             <span class="c-f fz14 fw-b">789.00</span>
+                            </dt>
+                         </div>
+                        
+                        </dl>
+                     </td>
+                     <td class="c-2 fw-b">上架</td>
+                     <td>
+                        <dl>
+                          <dt class="c-h mb5">下架</dt>
+                          <dt class="c-h">删除</dt>    
+                        </dl>      
+                      </td>
+                 </tr>
+                 <tr class="">
+                     <td><input type="checkbox"></td>
+                     <td class="sku-pic"> 
+                        <img src="/res/images/location.png">
+                     </td>
+                     <td>c-0126558422</td>
+                     <td>室外多模中心管式轻铠装光 缆,HT-GYXTW-12A1a.2</td>
+                     <td>芯数：12芯 光纤类型：A1a.2</td>
+                     <td>长飞</td>
+                     <td>千米</td>
+                     <td>1000000</td>
+                     <td>1000</td>
+                     <td>
+                        <dl>
+                         <dt class="flt pt15">
+                           <img src="/res/images/spots-1.png">   
+                         </dt>
+                         <div class="flt ml10" style="text-align: left;">
+                            <dt>
+                                <span class="c-9">市场参考价：￥1980.00</span>
+                                <span class="c-2 fw-b">促销价：￥1000.00</span>
+                            </dt>
+                            <dt class="c-f">2015-02-02 00:00至2019-08-19 00:00</dt>
+                            <dt>
+                             <span class="c-2">秒杀价：￥</span>
+                             <span class="c-f fz14 fw-b">789.00</span>
+                            </dt>
+                         </div>
+                        
+                        </dl>
+                     </td>
+                     <td class="c-2 fw-b">上架</td>
+                     <td>
+                        <dl>
+                          <dt class="c-h mb5">下架</dt>
+                          <dt class="c-h">删除</dt>    
+                        </dl>      
+                      </td>
+                 </tr>
+                </tbody>
+            </table>
+         </div>
+
+         <div id="paginationDiv" class="mt20"></div>
+    </div>
+</section>
+<script>
+    //分页
+    $(function(){
+        loadMallVagueData(1);
+    });
+
+    layui.use(['form','element'], function(){
+        var form = layui.form();
+        var element = layui.element();
+
+    })
+
+    function loadMallVagueData(currentPageIndex) {
+        var param = {};
+        param.currentPageIndex = currentPageIndex;
+        var pages = 100;
+        laypage({
+            cont: 'paginationDiv',
+            pages: pages,
+            curr: currentPageIndex,
+            skip: true,
+            jump: function (obj, first) {
+                if (!first) {
+                    loadMallVagueData(obj.curr);
+                }
+            }
+        });
+    }
+    //单选checkbox
+    $('.choose').click(function(){
+        var checked = this.checked ;
+        var choose = document.getElementsByClassName("choose");
+        var allChoose = document.getElementsByClassName("allChoose");
+        var checked_num=0;
+        for(var i=0;i<choose.length;i++){
+            if(choose[i].checked){
+                checked_num = checked_num + 1 ;
+            }
+        }
+        if(checked){
+
+            $(this).parent().parent().css('background-color','#FFFDF1');
+
+            if(!allChoose[0].checked&choose.length == checked_num){
+                allChoose[0].checked = true;
+            }
+        }else{
+
+            $(this).parent().parent().css('background-color','transparent');
+
+            if (allChoose[0].checked) {
+                allChoose[0].checked = false;
+            }
+        }
+    })
+    //全选checkbox
+    $('.allChoose').click(function(){
+        var checked = this.checked;
+        var inputs = document.getElementsByClassName("choose");
+
+        if(checked){
+            $(".choose").parent().parent().css('background-color','#FFFDF1');
+            for(var input in inputs){
+                inputs[input].checked = true;
+            }
+        }else{
+            $(".choose").parent().parent().css('background-color','transparent');
+            for(var input in inputs){
+                inputs[input].checked = false;
+            }
+        }
+    })
+    $(document).on('click','.tab-nav li',function () {
+        $(this).addClass("tab-this").siblings().removeClass("tab-this");
+        var val = $(this).val();
+        if(val==0){
+            $('.secKillGoods').hide();
+            $('.spotGoods').show();
+        }else if(val==1){
+            $('.secKillGoods').show();
+            $('.spotGoods').hide();
+        }
+    })
+</script>
+</body>
+</html>

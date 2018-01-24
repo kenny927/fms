@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <link rel="stylesheet" type="text/css"
+          href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <style>
+        .btn {
+            display: block;
+            width: 86px;
+            height: 36px;
+            font: 12px/36px "microsoft yahei";
+            text-align: center;
+            text-decoration: none;
+            border-radius: 0;
+            background: #035a9d;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div class="purchaseSearch">
+                <form>
+                    <dl class="form-list flt">
+                        <dt>中心名称：</dt>
+                        <dd><input type="text" id="distributionCenterName" style="width: 150px;" placeholder="请输入中心名称"/>
+                        </dd>
+                    </dl>
+                    <dl class="form-list flt">
+                        <dt>覆盖省份：</dt>
+                        <dd><input type="text" id="scopeProvince" style="width: 150px;" placeholder="请输入省份名称"/>
+                        </dd>
+                    </dl>
+                    <dl class="form-list flt">
+                        <dt>覆盖城市：</dt>
+                        <dd><input type="text" id="scopeCity" style="width: 150px;" placeholder="请输入城市名称"/>
+                        </dd>
+                    </dl>
+                    <dl class="form-list flt">
+                        <dd><span class="btn ml10" style="cursor: pointer;" id="searchBtn">查询</span></dd>
+                    </dl>
+                </form>
+            </div>
+            <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px">
+                <table class="layui-table" lay-skin="line">
+                    <thead>
+                    <tr>
+                        <th style="text-align:center;width:10%">中心编码</th>
+                        <th style="text-align:center;width:30%">中心名称</th>
+                        <th style="text-align:center;width:30%">覆盖省份</th>
+                        <th style="text-align:center;width:30%">覆盖城市</th>
+                    </tr>
+                    </thead>
+                    <tbody id="distributionCenterScopeTable">
+                    </tbody>
+                </table>
+            </div>
+            <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+        </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript">
+    var layer = null;
+    layui.use(['layer', 'upload'], function () {
+        layer = layui.layer;
+        distributionCenterScopeTableInit();
+    });
+
+
+    var PAGE_SIZE = 8;
+
+    function distributionCenterScopeTableInit() {
+        var distributionCenterName = $('#distributionCenterName').val();
+        var scopeProvince = $('#scopeProvince').val();
+        var scopeCity = $('#scopeCity').val();
+
+        var queryParam = {};
+        queryParam.currentPageIndex = 1;
+        queryParam.pageSize = PAGE_SIZE;
+
+        queryParam.distributionCenterName = distributionCenterName;
+        queryParam.scopeProvince = scopeProvince;
+        queryParam.scopeCity = scopeCity;
+
+        loadDistributionCenterScopeData(queryParam);
+    }
+
+
+    $(function () {
+
+        $("#searchBtn").bind("click", function () {
+            distributionCenterScopeTableInit();
+        });
+
+        document.onkeydown = function (e) {
+            var ev = document.all ? window.event : e;
+            if (ev.keyCode == 13) {
+                distributionCenterScopeTableInit();
+            }
+        };
+
+    });
+
+    var currentDataList = null;
+
+    function loadDistributionCenterScopeData(queryParam) {
+        layer.load();
+        postUtil.call("/distributionCenter/scope/listJson", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            currentDataList = dataList;
+            renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var distributionCenterName = $('#distributionCenterName').val();
+                        var scopeProvince = $('#scopeProvince').val();
+                        var scopeCity = $('#scopeCity').val();
+
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        tempParam.distributionCenterName = distributionCenterName;
+                        tempParam.scopeProvince = scopeProvince;
+                        tempParam.scopeCity = scopeCity;
+                        loadDistributionCenterScopeData(tempParam);
+                    }
+                }
+            });
+            layer.closeAll("loading");
+        });
+    }
+
+    function renderTable(dataList) {
+        var length = dataList.length;
+        var table = document.getElementById("distributionCenterScopeTable");
+        table.innerHTML = "";
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var row = renderRow(data);
+                table.appendChild(row);
+            }
+        } else {
+            var html = '<tr><td colspan="4"><p class="t-c fz16 c-2" style="line-height: 76px;">未查询到配送中心覆盖范围数据！</p></td></tr>';
+            $(table).html(html);
+        }
+    }
+
+
+    function renderRow(rowData) {
+        var distributionCenterId = rowData.distributionCenterId;
+        var distributionCenterName = rowData.distributionCenterName;
+        var scopeProvince = rowData.scopeProvince;
+        var scopeCity = rowData.scopeCity;
+        var tr = document.createElement('tr');
+        tr.appendChild(renderCell(null, distributionCenterId, "width:10%;"));
+        tr.appendChild(renderCell(null, distributionCenterName, "width:30%;"));
+        tr.appendChild(renderCell(null, scopeProvince, "width:30%;"));
+        tr.appendChild(renderCell(null, scopeCity, "width:30%;"));
+        return tr;
+    }
+
+    function renderCell(name, value, style) {
+        var td = document.createElement('td');
+        td.setAttribute("style", style);
+        //个性化差异-操作区域
+        if (value) {
+            td.innerText = value;
+        } else {
+            td.innerText = "--";
+        }
+        return td;
+    }
+
+</script>
+</body>
+</html>

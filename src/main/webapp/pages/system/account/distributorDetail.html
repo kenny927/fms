@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+<link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+<script src="/res/js/jquery-3.1.1.min.js"></script>
+<script src="/res/public/layui/layui.js"></script>
+<script src="/res/public/layPage/laypage.js"></script>
+<script src="/res/js/vue.js<@resVersionDirective>?</@>"></script>
+<script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript">
+	var _accountId='${accountId}';
+</script>
+</head>
+<style>
+    [v-cloak]{
+        display: none;
+    }
+</style>
+<body>
+   <section class="bz-bb pl20 pr20 pt20 pb20" id="distributorDetail" v-cloak>
+     <div class="clr" style="padding:0 20px;">
+          <div class="flt" style="width: 64%;margin-right:2%;">
+              <h3 class="mb5">{{distriInfo.accountName | nullValue}}<span v-show="distriInfo.salesUserRealName">（{{distriInfo.salesUserRealName}}）</span>
+                <@havePermission resourceCode="operation:customer:distributor:account:detail:updateAccountDetail">
+                  <span class="c-h frt fz12 cs-p" id="editSystemAccountBtn">编辑</span>
+                </@>
+              </h3>
+            <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="height: 50px;">
+               <div class="flex">
+                <span style="flex: 1">座机：<span class="c-2">{{distriInfo.telephone | nullValue }}</span></span>
+                <span style="flex: 1">销售代表：<span class="c-2">{{distriInfo.pltSalesUserRealName | nullValue }}</span></span>
+               </div>
+               <div class="flex">
+                <span style="flex: 1">区域：<span class="c-2">{{distriInfo.areaName | nullValue}}</span></span>
+                <span style="flex: 1">地址：<span class="c-2">{{distriInfo.province | nullValue}}{{distriInfo.city | nullValue}}{{distriInfo.address | nullValue }}</span></span>
+               </div>
+            </blockquote>
+          </div>
+          <div class="flt" style="width: 34%;">
+            <h3 class="mb5">公司介绍(长度限制为500)<span class="c-h frt fz12 cs-p "><span class="accountIntroduceBtn" onclick="updateAccountIntroduce()">编辑</span></span></h3>
+            <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor edit_back" id="accountIntroduceEdit" style="line-height: 15px;height: 50px;">
+              <div contenteditable="false" class="accountIntroduceContent" style="height:50px;overflow-y:auto;">{{distriInfo.accountIntroduce}}</div>
+            </blockquote>
+          </div>
+      </div>
+
+      <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+          <h3 class="mb5 mt10">店铺合同信息
+              <@havePermission resourceCode="operation:customer:distributor:account:detail:brandAuth">
+               <span v-if="distriInfo.storeId" class="frt fz12 cs-p"><span class="fz12 c-h" onclick="addBrandAuth('{{distriInfo.storeId}}')">新增</span></span>
+              </@>
+          </h3>
+          <!--<h3 class="bg-f0 h3-tittle pl20 fz12" style="border-bottom:1px solid #e2e2e2;">-->
+              <!--<div class="flex">-->
+                <!--<span style="flex: 1">合同编号：<span class="c-2"> 201708009</span></span>-->
+                <!--<span style="flex: 1">创建时间：<span class="c-2"> 2017-8-15 14:00:00</span></span>-->
+                <!--<span style="flex: 1">合同生效周期：<span class="c-2"> 2017-8-14  -  2018-8-14</span></span>-->
+                <!--<span style="flex: 1">合同附件：<a class="c-h cs-p">明祥合同.pdf</a></span>-->
+               <!--</div>-->
+          <!--</h3>-->
+          <table lay-skin="line" class="layui-table pop table-css mallOrderTable" >
+              <colgroup>
+                <col  width="200">
+                <col  width="200">
+                <!--<col  width="100">-->
+                <col  width="100">
+              </colgroup>
+                <thead>
+                  <tr class="bor-no">
+                    <th >授权经营品牌</th>
+                    <th >授权经营类目</th>
+                    <!--<th >操作人</th>-->
+                    <th >操作</th>
+                  </tr> 
+                </thead>
+              <tbody>
+                  <tr v-show="contractInfo.length==0">
+                      <td  colspan="4" height="50px"  align="center">
+                          <span class="fz16">暂无合同信息和店铺经营授权信息！</span>
+                      </td>
+                  </tr>
+                  <tr v-for="item in contractInfo">
+                      <td>{{item.brandChineseName | nullValue}}</td>
+                      <td>{{item.className | nullValue}}</td>
+                      <!--<td>{{item.userRealName | nullValue}}</td>-->
+                      <td>
+                          <@havePermission resourceCode="operation:customer:distributor:account:detail:brandAuth">
+                              <!--<a class="c-h fz12 cs-p" href="javascript:updateAuth('{{distriInfo.storeId}}','{{item.brandId}}');">修改</a>-->
+                              <a class="c-h fz12 ml10 cs-p" href="javascript:cancelAuth('{{distriInfo.storeId}}','{{item.brandId}}');">取消授权</a>
+                          </@>
+                      </td>
+                  </tr>
+              </tbody>
+              </table>
+              <div id="paginationDivContractInfo" style="margin-right:-13px;margin-top:-10px"></div>
+      </div>
+
+
+      <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+        <h3 class="mb5 mt10">财务信息</h3>
+        <h3 class="bg-f0 h3-tittle pl20 fz12" style="border-bottom:1px solid #e2e2e2;">
+            <div class="flex">
+                <span style="flex: 1"><span class="fw-b c-2 mr20">【对私账号】</span>收款人姓名：<span class="c-2">{{financialInfo.privateBankUserName | nullValue}}</span></span>
+                <span style="flex: 1">开户银行：<span class="c-2">{{financialInfo.privateBankName | nullValue}}</span></span>
+                <span style="flex: 1">银行账号：<span class="c-2">{{financialInfo.privateBankNum | nullValue}}</span></span>
+            </div>
+        </h3>
+        <table lay-skin="line" class="layui-table pop table-css orderProjectTable" >
+            <colgroup>
+              <col  width="150">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+            </colgroup>
+              <thead>
+                <tr class="bor-no">
+                  <th >税号</th>
+                  <th >注册地址</th>
+                  <th >开户银行</th>
+                  <th >银行账号</th>
+                </tr> 
+              </thead>
+            <tbody>
+                <td>{{financialInfo.taxNum | nullValue}}</td>
+                <td>{{financialInfo.registerAddress | nullValue}}</td>
+                <td>{{financialInfo.publicBankName | nullValue}}</td>
+                <td>{{financialInfo.publicBankNum | nullValue}}</td>
+            </tbody>
+            </table>
+      </div>
+
+      <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+          <h3 class="mb5">员工账号
+              <@havePermission resourceCode="operation:customer:distributor:account:detail:emplyee">
+              <span class="frt fz12 cs-p"><a class="fz12 c-h" href="javascript:addDistributorUser();">新增员工</a></span>
+              </@>
+          </h3>
+          <table lay-skin="line" class="layui-table pop table-css mallOrderTable" >
+              <colgroup>
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="140">
+              </colgroup>
+                <thead>
+                  <tr class="bor-no">
+                    <th >创建时间</th>
+                    <th >登录名</th>
+                    <th >姓名</th>
+                    <th >性别</th>
+                    <th >手机</th>
+                    <th >座机</th>
+                    <th >邮箱</th>
+                    <th >职位</th>
+                    <th >部门</th>
+                    <th >角色岗位</th>
+                    <th >操作</th>
+                  </tr> 
+                </thead>
+              <tbody>
+              <tr v-show="employees.length==0">
+                  <td  colspan="10" height="50px"  align="center">
+                      <span class="fz16">暂无相关信息</span>
+                  </td>
+              </tr>
+              <tr v-for="item in employees">
+                  <td>{{item.createTimeStr | nullValue}}</td>
+                  <td>{{item.userName | nullValue}}</td>
+                  <td>{{item.userRealName | nullValue}}</td>
+                  <td>{{item.sex | sexStr}}</td>
+                  <td>{{item.mobile | nullValue}}</td>
+                  <td>{{item.telephone | nullValue}}</td>
+                  <td>{{item.email | nullValue}}</td>
+                  <td>{{item.selfPosition | nullValue }}</td>
+                  <td>{{item.selfDepartmentName | nullValue}}</td>
+                  <td>{{item.departmentName | nullValue}}</td>
+                  <td>
+                      <@havePermission resourceCode="operation:customer:distributor:account:detail:emplyee">
+                      <a class="c-h fz12 cs-p" href="javascript:editDistributorUser('{{item.userId}}');">修改</a><a class="c-h fz12 ml10 cs-p" href="javascript:resetDistributorUserPassword('{{item.userId}}');">重置密码</a>
+                      </@>
+                  </td>
+              </tr>
+              </tbody>
+              </table>
+              <div id="paginationEmployees" style="margin-right:-13px;margin-top:-10px"></div>
+      </div>
+
+      <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+        <h3 class="mb5">客户信息</h3>
+        <table lay-skin="line" class="layui-table pop table-css orderProjectTable" >
+            <colgroup>
+              <col  width="150">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+              <col  width="150">
+            </colgroup>
+              <thead>
+                <tr class="bor-no">
+                  <th >注册时间</th>
+                  <th >用户名</th>
+                  <th >性别</th>
+                  <th >手机</th>
+                  <th >邮箱</th>
+                  <th >终端来源</th>
+                  <th >邀请人</th>
+                </tr>
+              </thead>
+            <tbody>
+            <tr v-show="customerInfo.length==0">
+                <td  colspan="7" height="50px"  align="center">
+                    <span class="fz16">暂无相关信息</span>
+                </td>
+            </tr>
+            <tr v-for="item in customerInfo">
+                <td>{{item.createTime | date}}</td>
+                <td>{{item.userRealName | nullValue}}</td>
+                <td>{{item.sex | sexStr}}</td>
+                <td>{{item.mobile | nullValue}}</td>
+                <td>{{item.email | nullValue}}</td>
+                <td>{{item.customerSourceName | nullValue}}</td>
+                <td>{{item.inviteMan | nullValue }}</td>
+            </tr>
+            </tbody>
+            </table>
+            <div id="paginationDivCustomer" style="margin-right:-13px;margin-top:-10px"></div>
+        </div>
+
+        <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+          <h3 class="mb5">拜访记录
+              <@havePermission resourceCode="operation:customer:distributor:account:detail:visitRecord">
+              <span class="frt fz12 cs-p"><a class="fz12 c-h " href="javascript:addVisitRecord(_accountId);">新建拜访记录</a></span>
+             </@>
+          </h3>
+          <table lay-skin="line" class="layui-table pop table-css mallOrderTable" >
+              <colgroup>
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="200">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+              </colgroup>
+                <thead>
+                  <tr class="bor-no">
+                    <th >时间</th>
+                    <th >方式</th>
+                    <th >联系人</th>
+                    <th >职务</th>
+                    <th >内容</th>
+                    <th >附件</th>
+                    <th >跟进人</th>
+                    <th >操作</th>
+                  </tr> 
+                </thead>
+              <tbody>
+                  <tr v-show="visitRecords.length==0">
+                      <td  colspan="8" height="50px"  align="center">
+                          <span class="fz16">暂无相关信息!</span>
+                      </td>
+                  </tr>
+                  <tr v-for="item in visitRecords">
+                      <td>{{item.visitTime | nullValue}}</td>
+                      <td>{{item.visitType | nullValue}}</td>
+                      <td>{{item.linkUserRealName  | nullValue}}</td>
+                      <td>{{item.selfPosition  | nullValue}}</td>
+                      <td>{{item.content | nullValue}}</td>
+                      <!--<td v-show="item.attachments.length==0">{{item.attachments  | nullValue}}</td>-->
+                      <td><a class="ml5" v-for="attach in item.attachments" href="/file_server/download?id={{attach.id}}">{{attach.name}}</a></td>
+                      <td>{{item.userName | nullValue}}</td>
+                      <td>
+                          <@havePermission resourceCode="operation:customer:distributor:account:detail:visitRecord">
+                          <a class="fz12 c-h " href="javascript:updateVisitRecord('{{item.visitRecordId}}');">修改拜访记录</a>
+                          </@>
+                      </td>
+                  </tr>
+              </tbody>
+              </table>
+              <div id="paginationDivVistRecords" style="margin-right:-13px;margin-top:-10px"></div>
+      </div>
+
+      <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+        <h3 class="mb5">订货单</h3>
+        <table lay-skin="line" class="layui-table pop table-css orderProjectTable" >
+            <colgroup>
+              <col  width="150">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+              <col  width="200">
+            </colgroup>
+              <thead>
+                <tr class="bor-no">
+                  <th >下单时间</th>
+                  <th >创建人</th>
+                  <th >订单编号</th>
+                  <th >订单金额</th>
+                  <th >订单状态</th>
+                  <th >商品型号</th>
+                </tr> 
+              </thead>
+            <tbody>
+                <tr v-show="orderList.length==0">
+                    <td  colspan="6" height="50px"  align="center">
+                        <span class="fz16">暂无相关信息!</span>
+                    </td>
+                </tr>
+                <tr v-for="item in orderList">
+                    <td>{{item.createDateDisplay | nullValue}}</td>
+                    <td>{{item.userRealName | nullValue}}</td>
+                    <td>{{item.orderSalesId | nullValue}}</td>
+                    <td>{{item.settlementAmount | currency '' '2'}}</td>
+                    <td>{{item.statusCname | nullValue}}</td>
+                    <td>{{item.model | nullValue}}</td>
+                </tr>
+            </tbody>
+            </table>
+            <div id="paginationDivOrderList" style="margin-right:-13px;margin-top:-10px"></div>
+      </div>
+
+      <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+        <h3 class="mb5">商城订单</h3>
+        <table lay-skin="line" class="layui-table pop table-css orderProjectTable" >
+            <colgroup>
+              <col  width="150">
+              <col  width="150">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+            </colgroup>
+              <thead>
+                <tr class="bor-no">
+                  <th >下单时间</th>
+                  <th >客户名称</th>
+                  <th >订单编号</th>
+                  <th >订单金额</th>
+                  <th >订单状态</th>
+                </tr> 
+              </thead>
+            <tbody>
+                <tr v-show="shopOrders.length==0">
+                    <td  colspan="5" height="50px"  align="center">
+                        <span class="fz16">暂无相关信息</span>
+                    </td>
+                </tr>
+                <tr v-for="item in shopOrders">
+                    <td>{{item.createTime | nullValue}}</td>
+                    <td>{{item.buyerAccountName | nullValue}}</td>
+                    <td><a class="fz12 cs-p" href="javascript:openOrderDetail('{{item.orderId}}');">{{item.orderId | nullValue}}</a></td>
+                    <td>{{item.totalOrderAmount | nullValue}}</td>
+                    <td>{{item.statusCname | nullValue}}</td>
+                </tr>
+            </tbody>
+            </table>
+            <div id="paginationDivShopOrder" style="margin-right:-13px;margin-top:-10px"></div>
+        </div>
+
+      <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+        <h3 class="mb5">项目信息</h3>
+        <table lay-skin="line" class="layui-table pop table-css orderProjectTable" >
+            <colgroup>
+              <col  width="150">
+              <col  width="150">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+            </colgroup>
+              <thead>
+                <tr class="bor-no">
+                  <th >报备时间</th>
+                  <th >项目名称</th>
+                  <th >等级</th>
+                  <th >业主方</th>
+                  <th >项目地</th>
+                  <th >报备状态</th>
+                </tr> 
+              </thead>
+            <tbody>
+                <tr v-show="programInfo.length==0">
+                    <td  colspan="6" height="50px"  align="center">
+                        <span class="fz16">暂无相关信息</span>
+                    </td>
+                </tr>
+                <tr v-for="item in programInfo">
+                    <td>{{item.createDate | nullValue}}</td>
+                    <td><a class="fz12 cs-p" href="javascript:openProjectDetail('{{item.backupId}}');">{{item.projectName | nullValue}}</a></td>
+                    <td>{{item.projectLevel | nullValue}}</td>
+                    <td>{{item.proprietorCompanyName | nullValue}}</td>
+                    <td>{{item.projectProvince | nullValue}}{{item.projectCity | nullValue}}</td>
+                    <td>{{item.statusCname | nullValue}}</td>
+                </tr>
+            </tbody>
+          </table>
+            <div id="paginationDivProgramInfo" style="margin-right:-13px;margin-top:-10px;margin-bottom: 30px;"></div>
+        </div>
+      
+   </section>
+   <script>
+   var param = {};
+       param.accountId = "${accountId}"; //分销商账户ID
+       param.currentPageIndex = 1;
+       param.pageSize = 5;
+
+   var layer;
+   layui.use(['form','element'], function(){
+       var form = layui.form();
+       layer = layui.layer;
+       var element = layui.element();
+
+      
+   })
+
+   //编辑分销商基本信息
+   $('#editSystemAccountBtn').bind("click", function () {
+       layer.open({
+           title: '修改分销商信息',
+           skin: 'msgskin',
+           area: ['460px', '558px'],
+           type: 2,
+           btn: false,
+           content: ['/systemAccount/distributor/preDistributorAccountDetail?accountId='+_accountId,'no'],
+       })
+   });
+
+   //过滤器 显示--
+   Vue.filter('nullValue', function (input) {
+       if (input == "" || input == undefined) {
+           input = "--";
+       }
+       return input
+   });
+
+   //过滤器 显示--
+   Vue.filter('sexStr', function (input) {
+       if (input == "" || input == undefined) {
+           input = "--";
+       }
+       if(input == "male"){
+           input = "男";
+       }
+       if(input == "female"){
+           input = "女";
+       }
+       return input
+   });
+
+   Vue.filter('date',{
+       read:function(input){ //model-view
+           return (Number(input) ? moment(Number(input)).format("YYYY-MM-DD HH:mm:ss") : '--');
+       },
+       write:function(val){ //view -> model
+           return val;
+       }
+   });
+
+   var vm = new Vue({
+       el: "#distributorDetail",
+       data:{
+           distriInfo:[],
+           contractInfo:[],
+           customerInfo:[],
+           financialInfo:[],
+           employees:[],
+           shopOrders:[],
+           visitRecords:[],
+           orderList:[],
+           programInfo:[]
+       },
+       created:function(){
+           this.showData();
+       },
+       methods:{
+           showData:function(){
+               //获取分销商基本信息
+               postUtil.call("/systemAccount/distributor/getDetailByAccountId",param, function (result) {
+                   if(result.STATUS == "SUCCESS"){
+                          vm.distriInfo = result.DATA.account;
+                   }
+               })
+
+               //获取财务信息
+               postUtil.call("/systemAccount/distributor/finance",param, function (result) {
+                   if(result.STATUS == "SUCCESS"){
+                       vm.financialInfo = result.DATA;
+                   }
+               })
+
+               loadContractInfo(param);
+
+               loadCustomerList(param);
+
+               loadEmployeeslist(param);
+
+               loadOrderList(param);
+
+               loadShopOrders(param);
+
+               loadVistRecords(param);
+
+               loadProgramList(param);
+
+
+           },
+       }
+   })
+
+   //店铺合同信息
+   function loadContractInfo(param){
+       postUtil.call("/store/distributor/getStoreBusinessList", param, function (result) {
+           if(result.STATUS == "SUCCESS"){
+               var pageNumber = result.DATA.pageNumber;
+               var totalPage = result.DATA.totalPage;
+               var totalRow = result.DATA.totalRow;
+               vm.contractInfo = result.DATA.list;
+//               console.log(result);
+
+               laypage({
+                   cont: 'paginationDivContractInfo',
+                   pages: totalPage,
+                   curr: pageNumber,
+                   total: totalRow,
+                   skip: true,
+                   jump: function (obj, first) {
+                       if (!first) {
+                           param.currentPageIndex=obj.curr;
+                           loadContractInfo(param);
+                       }
+                   }
+               });
+           }
+       })
+   }
+
+   //加载客户信息
+   function loadCustomerList(param){
+       postUtil.call("/distributor/user/integrators", param, function (result) {
+           if(result.STATUS == "SUCCESS"){
+               var pageNumber = result.DATA.pageNumber;
+               var totalPage = result.DATA.totalPage;
+               var totalRow = result.DATA.totalRow;
+               vm.customerInfo = result.DATA.list;
+               console.log(result);
+
+               laypage({
+                   cont: 'paginationDivCustomer',
+                   pages: totalPage,
+                   curr: pageNumber,
+                   total: totalRow,
+                   skip: true,
+                   jump: function (obj, first) {
+                       if (!first) {
+                           param.currentPageIndex=obj.curr;
+                           loadCustomerList(param);
+                       }
+                   }
+               });
+           }
+       })
+   }
+
+   //加载员工
+   function loadEmployeeslist(param){
+	   param.pageSize=5;
+       postUtil.call("/distributor/user/listData", param, function (result) {
+           if(result.STATUS == "SUCCESS"){
+               var pageNumber = result.DATA.pageNumber;
+               var totalPage = result.DATA.totalPage;
+               var totalRow = result.DATA.totalRow;
+               vm.employees = result.DATA.list;
+
+               laypage({
+                   cont: 'paginationEmployees',
+                   pages: totalPage,
+                   curr: pageNumber,
+                   total: totalRow,
+                   skip: true,
+                   jump: function (obj, first) {
+                       if (!first) {
+                           param.currentPageIndex = obj.curr;
+                           loadEmployeeslist(param);
+                       }
+                   }
+               });
+           }
+       })
+   }
+
+   //加载订货单
+   function loadOrderList(param){
+       postUtil.call("/order/distributor/getorderlist", param,function (result){
+//           console.log(result.MSG);
+           if(result.STATUS == "SUCCESS"){
+               var pageNumber = result.DATA.pageNumber;
+               var totalPage = result.DATA.totalPage;
+               var totalRow = result.DATA.totalRow;
+               vm.orderList = result.DATA.list;
+//               console.log(result);
+
+               laypage({
+                   cont: 'paginationDivOrderList',
+                   pages: totalPage,
+                   curr: pageNumber,
+                   total: totalRow,
+                   skip: true,
+                   jump: function (obj, first) {
+                       if (!first) {
+                           param.currentPageIndex = obj.curr;
+                           loadOrderList(param);
+                       }
+                   }
+               });
+           }
+       })
+   }
+
+   //加载商城订单
+   function loadShopOrders(param){
+       postUtil.call("/mallOrder/api/distributor/detail/list", param,function (result){
+           if(result.STATUS == "SUCCESS"){
+               var pageNumber = result.DATA.pageNumber;
+               var totalPage = result.DATA.totalPage;
+               var totalRow = result.DATA.totalRow;
+               vm.shopOrders = result.DATA.list;
+
+               laypage({
+                   cont: 'paginationDivShopOrder',
+                   pages: totalPage,
+                   curr: pageNumber,
+                   total: totalRow,
+                   skip: true,
+                   jump: function (obj, first) {
+                       if (!first) {
+                           param.currentPageIndex = obj.curr;
+                           loadShopOrders(param);
+                       }
+                   }
+               });
+           }
+       })
+   }
+
+   //加载项目信息
+   function loadProgramList(param){
+       postUtil.call("/projectReport/distributor/getBackUpList", param,function (result){
+           if(result.STATUS == "SUCCESS"){
+               var pageNumber = result.DATA.pageNumber;
+               var totalPage = result.DATA.totalPage;
+               var totalRow = result.DATA.totalRow;
+               vm.programInfo = result.DATA.list;
+//               console.log(result);
+
+               laypage({
+                   cont: 'paginationDivProgramInfo',
+                   pages: totalPage,
+                   curr: pageNumber,
+                   total: totalRow,
+                   skip: true,
+                   jump: function (obj, first) {
+                       if (!first) {
+                           param.currentPageIndex = obj.curr;
+                           loadProgramList(param);
+                       }
+                   }
+               });
+           }
+       })
+   }
+
+   function loadVistRecords(param) {
+	   param.pageSize=5;
+       postUtil.call("/distributor/user/visitRecordData", param,function (result){
+           if(result.STATUS == "SUCCESS"){
+               var pageNumber = result.DATA.pageNumber;
+               var totalPage = result.DATA.totalPage;
+               var totalRow = result.DATA.totalRow;
+               vm.visitRecords = result.DATA.list;
+//               console.log(result);
+
+               laypage({
+                   cont: 'paginationDivVistRecords',
+                   pages: totalPage,
+                   curr: pageNumber,
+                   total: totalRow,
+                   skip: true,
+                   jump: function (obj, first) {
+                       if (!first) {
+                           param.currentPageIndex = obj.curr;
+                           loadVistRecords(param);
+                       }
+                   }
+               });
+           }
+       })
+   }
+
+   function editAccount(){
+       postUtil.call("/systemAccount/distributor/getDetailByAccountId",param, function (result) {
+           if(result.STATUS == "SUCCESS"){
+               vm.distriInfo = result.DATA.account;
+           }
+       })
+       return true;
+   }
+
+   function addDistributorUser(){
+	    layer.open({
+	        title:"新增员工",
+	        type: 2,
+	        area: ['750px', '420px'],
+	        fixed: false, //不固定
+	        maxmin: true,
+	        content:'/distributor/user/addUserPage?accountId='+_accountId
+	    });
+   }
+   
+   function editDistributorUser(userId){
+	    layer.open({
+	        title:"修改员工信息",
+	        type: 2,
+	        area: ['750px', '420px'],
+	        fixed: false, //不固定
+	        maxmin: true,
+	        content:'/distributor/user/addUserPage?accountId='+_accountId+'&userId='+userId
+	    });
+   }
+   
+   function resetDistributorUserPassword(userId){
+	    layer.open({
+	        title:"密码重置",
+	        type: 2,
+	        area: ['420px', '220px'],
+	        fixed: false, //不固定
+	        maxmin: true,
+	        content:'/distributor/user/resetPasswordPage?userId='+userId
+	    });
+  }
+
+   function updateAccountIntroduce(){
+       $('.accountIntroduceBtn').html('<span onclick="saveAccountIntroduce()">保存</span>');
+       $(".accountIntroduceContent").attr("contenteditable","true");
+       $("#accountIntroduceEdit").removeClass("edit_back");
+
+   }
+   function saveAccountIntroduce(){
+       var accountIntroduce=$(".accountIntroduceContent").text();
+       if(accountIntroduce!=null&&accountIntroduce!=""&&accountIntroduce.length>500){
+           layer.msg("公司介绍超过长度限制！");
+           return;
+       }
+       var param={};
+       param.accountId=_accountId;
+       param.accountIntroduce=accountIntroduce;
+       postUtil.call("/mallCustomer/updateSystemAccount", param,function(data){
+           var status=data.STATUS;
+           if("SUCCESS"==status){
+               $(".accountIntroduceContent").attr("contenteditable","false");
+               $("#accountIntroduceEdit").addClass("edit_back");
+               $('.accountIntroduceBtn').html('<span class="accountIntroduceBtn" onclick="updateAccountIntroduce()">编辑</span>');
+           }
+       })
+
+   }
+
+   function addVisitRecord(){
+	    layer.open({
+	        title: '新增拜访记录',
+	        type: 2,
+	        skin: 'msgskin',
+	        area: ['700px', '520px'],
+	        content: "/distributor/user/addVisitRecordPage?accountId="+_accountId,
+	    });
+	}
+
+	function updateVisitRecord(visitRecordId){
+	    layer.open({
+	        title: '修改拜访记录',
+	        type: 2,
+	        skin: 'msgskin',
+	        area: ['700px', '520px'],
+	        content: "/distributor/user/addVisitRecordPage?accountId="+_accountId+"&visitRecordId="+visitRecordId,
+	    });
+	}
+
+	function cancelAuth(storeId,brandId) {
+	    var param1 ={};
+	    param1.storeId = storeId;
+        param1.brandId = brandId;
+        postUtil.call("/store/cancle/storeAuthorization", param1,function(result){
+//            console.log(result);
+            if(result.STATUS == "SUCCESS"){
+                layer.msg("取消成功！", {icon: 6});
+                loadContractInfo(param);
+            }else{
+                layer.msg(result.MSG, {icon: 3});
+            }
+        })
+
+    }
+
+   function addBrandAuth(storeId){
+       layer.open({
+           title: '新增品牌授权',
+           type: 2,
+           skin: 'msgskin',
+           area: ['600px', '300px'],
+           content: "/store/preAddStoreAuthorization?storeId="+storeId,
+       });
+   }
+
+   function openOrderDetail(orderId){
+	    cardUtil.openCard("订单详情-" + orderId,"/mallOrder/api/preDetail?orderId=" + orderId);
+	    cardUtil.changeCard("订单详情-" + orderId);
+   }
+   
+   function openProjectDetail(backupId) {
+	    cardUtil.openCard("项目详情-" + backupId,"/projectReport/projectDetail?backupId=" + backupId);
+	    cardUtil.changeCard("项目详情-" + backupId);
+   }
+
+   </script>
+</body>
+</html>

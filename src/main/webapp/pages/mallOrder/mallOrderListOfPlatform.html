@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+		<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+		<link rel="stylesheet" href="/res/public/css/daterangepicker.css<@resVersionDirective>?</@>" />
+		<script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+		<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+		<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+		<script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+        <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+		<script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+         <script type="text/javascript" src="/res/js/mallorder/mallOrderListOfPlatform.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+		<script src="/res/common/numCheck.js<@resVersionDirective>?</@>"></script>
+		<script src="/res/js/MultiSelectDropList.js"></script>
+		<script src="/res/public/layui/jquery.daterangepicker.js<@resVersionDirective>?</@>"></script>
+		<script src="/res/js/payCounter.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+	</head>
+	<body>
+		<section class="bz-bb pl20 pr20 pt20 pb20">
+      <div class="tab-nav">
+    		 <ul class="tab-title">
+    		   <li class="tab-this ALLNUM" tabname="" >全部</li>
+				<li tabname="IN_CONFORMING_PURCHASE,IN_CONFORMING_PLATFORM,IN_CONFORMING_VENDOR">待确认</li>
+    		   <li tabname="DELIVERY_WAITING">待发货</li>
+    		   <li tabname="RECEIVE_WAITING">待收货</li>
+    		   <li tabname="COMPLETED">交易完成</li>
+    		   <li tabname="CLOSED">已关闭</li>
+    		 </ul>
+      </div> 
+      <div class="jun-form-s form-css ">
+		  <dl class="dl-form">
+			  <dt class="flt fz12" style="text-align:left;width:148px;">查询：</dt>
+			  <dd class="flt"><input type="text" name="searchObject" id="searchObject" placeholder="订单号/sku编码/商品名称" autocomplete="off" class="layui-input pl10"></dd>
+			  <dt class="flt fz12 ml20" style="text-align:left;width:148px;">专属客户经理：</dt>
+			  <dd class="flt pre w240">
+				  <div class="multi_select" id="accountManagersSelect" style="position:absolute;left:-2px;top:0;z-index:2">
+				  </div>
+			  </dd>
+		  </dl>
+		  <dl class="dl-form">
+			  <dt class="flt fz12" style="text-align:left;width:148px;">工程商联系人／联系电话：</dt>
+			  <dd class="flt"><input type="text" name="integrationContact" id="searchObject2" placeholder="联系人/联系电话" autocomplete="off" class="layui-input pl10"></dd>
+			  <dt class="flt fz12 ml20" style="text-align:left;width:148px;">工程商公司名称：</dt>
+			  <dd class="flt layui-form">
+				  <input type="text" name="integrationLike"  placeholder="工程商名称" autocomplete="off" class="layui-input pl10">
+				  <form class="layui-form" hidden>
+					  <select name="integration"  lay-filter="integration" id="s_integrations" style="width: 268px;" lay-search>
+						  <option value="">请选择</option>
+						  <option value="ALL">全部</option>
+					  </select>
+				  </form>
+			  </dd>
+		  </dl>
+		  <dl class="dl-form">
+			  <dt class="flt fz12" style="text-align: left;width: 148px;">创建时间：</dt>
+			  <dd class="flt pre"  id="picker-css">
+				  <input class="picker-css searchFiled" style="width: 224px;" id="date-range0" value="" >
+				  <img class="cs-p" style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" />
+			  </dd>
+			  <button class="form-btn layui-btn-small2  ml20  mallOrderlistSearch">搜索</button>
+		  </dl>
+      </div>
+      <div class="mark-read mb10 ml10">
+        <span class="cs-p">
+          <input type="checkbox" class="allChoose fz12" name="chooseAll">
+          <span class="fz12 c-2">全选</span>
+        </span>
+        <span class="c-2 cs-p ml10 fz12 readSet">设为已读</span>
+        <span class="c-2 cs-p ml10 fz12 noReadSet">设为未读</span>
+      </div>
+      <div class="content pb10 mb20 mallOrderBaselist">
+  
+
+      </div>
+      <div id="paginationDiv" class="mb20"></div>
+   </section>
+		<script type="text/javascript">
+		$('#date-range0').dateRangePicker();
+		var mainObjectId='${mainObjectId}';
+		var accountManagers = ${accountManagersJson};
+		var _userId='${userId}';
+		var deliveryWaitingNum=0;
+		var receivingWaitingNum=0;
+		var completedNum=0;
+		var closedNum=0;
+		var totalNum=0;
+		var $form;
+		var form;
+		 layui.use(['form', 'layer'], function(){
+	         var layer = layui.layer;
+			 $form = $('form');
+			 form = layui.form();
+			 loadMultiSelect("#s_integrations", "/mallOrder/api/integrator/list", {orderType:"PLATFORM_OFFER"});
+			 loadAccountManagerSelect();
+			    $(document).on('click','.tips',function(){
+			    	var closeRemark=$(this).attr('closeRemark');
+			    	layer.tips(closeRemark, '.tips', {
+					      skin:"tipskin",
+						  tips: [3, '#fefef4'],
+						  time: 4000
+						});
+			    })
+			    param.currentPageIndex=1;
+				param.mainObjectId=mainObjectId;
+				loadMallOrderList(param);
+			  })
+	$("input[name=chooseAll]").on("click",function(){
+			if($(this).prop("checked")){
+				$("input[name=single]").prop("checked",true);
+			}else{
+				$("input[name=single]").prop("checked", false);
+			}
+		});
+
+		function loadMultiSelect(el, url, param){
+			postUtil.call(url, param, function (result) {
+				if (result.STATUS == 'SUCCESS') {
+					var ctHtml = '';
+					for(var i = 0; i < result.DATA.length; i++) {
+						if(result.DATA[i]){
+							ctHtml += '<option value="' + result.DATA[i].code + '">' +
+									result.DATA[i].name + '</option>';
+						}
+					}
+					$(el).append(ctHtml);
+					form.render();
+				} else {
+					layer.msg('系统发生未知错误(加载数据失败)' + result.MSG, {icon: 5});
+				}
+			});
+		}
+
+		function loadAccountManagerSelect() {
+			var accountManagerOption = [];
+			if(accountManagers) {
+				for(var i = accountManagers.length-1;i>-1;i--) {
+					var item = accountManagers[i];
+					var option = {};
+					option.text = item.userRealName;
+					option.value = item.userId;
+					accountManagerOption.push(option);
+				}
+			}
+			$('#accountManagersSelect').MSDL({
+				'width': '240',
+				'data': accountManagerOption,
+				'id': "accountManagerId"
+			});
+		}
+		</script>
+		<#include "/res/freemarkerTpl/unitConfig.html" />
+		<@unitConfig/>
+	</body>
+</html>

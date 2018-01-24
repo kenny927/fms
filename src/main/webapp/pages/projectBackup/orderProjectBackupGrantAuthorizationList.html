@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/js/MultiSelectDropList.js<@resVersionDirective>?</@>"></script>
+
+    <style>
+        .btn {
+            display: block;
+            width: 70px;
+            height: 28px;
+            line-height: 28px !important;
+            font: 12px/36px "microsoft yahei";
+            text-align: center;
+            text-decoration: none;
+            color: #035a9d;
+            border-radius: 0;
+            border: 1px solid #035a9d;
+            background: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div class="purchaseSearch">
+                <form style="width:800px;">
+                    <dl class="form-list flt mb20" style="width:340px;">
+                        <dt>区域：</dt>
+                        <dd class="pre">
+                            <div class="multi_select" id="distributorAreaIdSelect"
+                                 style="position:absolute;left:0;top:0;"><img
+                                    style="position: absolute;right: 3px;top: 12px;cursor: pointer;"
+                                    src="/res/images/arrow3.png"/></div>
+                        </dd>
+                    </dl>
+                    <dl class="form-list flt mb20" style="width:340px;">
+                        <dt>授权状态：</dt>
+                        <dd class="pre">
+                            <div class="multi_select" id="statusSelect" style="position:absolute;left:0;top:0;"><img
+                                    style="position: absolute;right: 3px;top: 12px;cursor: pointer;"
+                                    src="/res/images/arrow3.png"/></div>
+                        </dd>
+                    </dl>
+                    <dl class="form-list flt">
+                        <dt>项目名称：</dt>
+                        <dd><input type="text" id="projectName" style="width: 228px;height:33px;"
+                                   placeholder="请输入项目名称/项目编号"/></dd>
+                    </dl>
+
+                    <dl class="form-list flt">
+                        <dt>分销商：</dt>
+                        <dd><input type="text" style="width: 228px;height:33px;" id="distributorName"
+                                   placeholder="请输入分销商名称"/>
+                        </dd>
+                        <dd><span class="btn ml10" style="cursor: pointer;height:30px;line-height:33px;" id="searchBtn">查询</span>
+                        </dd>
+                    </dl>
+                </form>
+            </div>
+            <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px">
+                <table class="layui-table pop" lay-skin="line">
+                    <colgroup>
+                        <col width="30">
+                        <col width="300">
+                        <col width="100">
+<!--                         <col width="150"> -->
+                        <col width="300">
+                        <col width="150">
+                        <col width="150">
+                        <col width="100">
+                        <col width="100">
+<!--                         <col width="150"> -->
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <td colspan="10" style="background: #ffffff;">
+                            <span class="btn frt" id="batchRefuseBtn" style="cursor: pointer;">拒绝</span>
+                            <span class="btn frt mr10" id="batchApproveBtn" style="cursor: pointer;">通过</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="text-align:center;width:3%">
+                            <input type="checkbox" onchange="changeChecked(this)">
+                        </th>
+                        <th>项目名称</th>
+                        <th>所在地</th>
+<!--                         <th>报备等级</th> -->
+                        <th>授权集成商</th>
+                        <th>业主名称</th>
+                        <th>项目提报人</th>
+                        <th>授权状态</th>
+                        <th>申请时间</th>
+<!--                         <th>操作</th> -->
+                    </tr>
+                    </thead>
+                    <tbody id="grantAuthorityTable">
+                    </tbody>
+                </table>
+            </div>
+            <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+        </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript">
+
+    //初始化区域
+    initDistributorArea();
+    //初始化状态区域
+    initStatusSelect();
+
+    function initDistributorArea() {
+        postUtil.call("/systemAccountArea/listJson", null, function (result) {
+//            if (result) {
+//                $('#distributorAreaId').append('<option value="ALL">请选择</option>');
+//                for (var i = 0; i < result.length; i++) {
+//                    $('#distributorAreaId').append('<option value=\"' + result[i].areaId + '\">' + result[i].areaName + '</option>');
+//                }
+//            }
+            if (result) {
+                for (var i = 0; i < result.length; i++) {
+                    result[i].text = result[i].areaName;
+                    result[i].value = result[i].areaId;
+                }
+                $('#distributorAreaIdSelect').MSDL({
+                    'width': '240',
+                    'data': result,
+                    'id': "distributorAreaId"
+                });
+            }
+        });
+    }
+
+    function initStatusSelect() {
+        $('#statusSelect').MSDL({
+            'width': '240',
+            'data': [{"text": "待审核", "value": "WAIT"}, {"text": "已授权", "value": "OK"}, {"text": "拒绝授权","value": "REFUSE"}],
+            'id': "status"
+        });
+    }
+
+    var PAGE_SIZE = 5;
+
+    function grantAuthorityTableInit() {
+
+        var distributorAreaId = $('#distributorAreaId_hidden').val();
+        var status = $('#status_hidden').val();
+        var projectName = $('#projectName').val();
+        var distributorName = $('#distributorName').val();
+
+        var queryParam = {};
+        queryParam.currentPageIndex = 1;
+        queryParam.pageSize = PAGE_SIZE;
+        if (distributorAreaId && distributorAreaId != "") {
+            queryParam.distributorAreaId = distributorAreaId;
+        }
+        if (status && status != "") {
+            queryParam.status = status;
+        }
+        queryParam.projectName = projectName;
+        queryParam.distributorName = distributorName;
+
+        loadGrantAuthorityData(queryParam);
+    }
+
+
+    $(function () {
+
+        grantAuthorityTableInit();
+
+        $("#searchBtn").bind("click", function () {
+            grantAuthorityTableInit();
+        });
+
+        document.onkeydown = function (e) {
+            var ev = document.all ? window.event : e;
+            if (ev.keyCode == 13) {
+                grantAuthorityTableInit();
+            }
+        };
+
+        $('#batchApproveBtn').bind("click", function () {
+            var checkedApplyIds = getCheckedApplyIds();
+            if (checkedApplyIds.length == 0) {
+                layer.msg("请勾选需要进行操作的项目", {icon: 5});
+                return;
+            }
+
+            //检查项状态，判断是否允许进行批量通过或者拒绝
+            for (var i = 0; i < checkedApplyIds.length; i++) {
+                var applyId = checkedApplyIds[i];
+                for (var j = 0; j < currentDataList.length; j++) {
+                    var tempApplyId = currentDataList[j].applyId;
+                    if (applyId == tempApplyId) {
+                        var tempStatus = currentDataList[j].status;
+                        if (tempStatus != "WAIT") {
+                            layer.msg("当前项目[" + currentDataList[j].projectName + "]的状态无法进行批量审核操作");
+                            return;
+                        }
+                    }
+                }
+            }
+
+            var layerContent = '<div class="t-c c-2" style="padding-top:30px;"><p style="margin-top: 25px;">确定要通过选中的项目吗？</p></div>';
+            layer.open({
+                title: false,
+                skin: 'myskin3',
+                area: ['400px', '180px'],
+                btnAlign: 'c',
+                content: layerContent,
+                btn: ['确定', '取消'],
+                yes: function (index, layero) {
+                    var applyIds = transArrayToString(checkedApplyIds)
+                    var param = {};
+                    param.applyIds = applyIds;
+                    postUtil.call("/orderProjectBackupGrantAuthorization/approve", param, function (result) {
+                        if (result.STATUS == "SUCCESS") {
+                            layer.close(index);
+                            layer.msg("审批成功~", {icon: 6});
+                            setTimeout(function () {
+                                grantAuthorityTableInit();
+                            }, 1000);
+                        } else {
+                            layer.msg(result.MSG + "", {icon: 5});
+                        }
+                    });
+                }, btn2: function (index, layero) {
+                    layer.close(index);
+                },
+                cancel: function () {
+
+                }
+            });
+        });
+
+        $('#batchRefuseBtn').bind("click", function () {
+            var checkedApplyIds = getCheckedApplyIds();
+            if (checkedApplyIds.length == 0) {
+                layer.msg("请勾选需要进行操作的项目", {icon: 5});
+                return;
+            }
+
+            //检查项状态，判断是否允许进行批量通过或者拒绝
+            for (var i = 0; i < checkedApplyIds.length; i++) {
+                var applyId = checkedApplyIds[i];
+                for (var j = 0; j < currentDataList.length; j++) {
+                    var tempApplyId = currentDataList[j].applyId;
+                    if (applyId == tempApplyId) {
+                        var tempStatus = currentDataList[j].status;
+                        if (tempStatus != "WAIT") {
+                            layer.msg("当前项目[" + currentDataList[j].projectName + "]的状态无法进行批量审核操作");
+                            return;
+                        }
+                    }
+                }
+            }
+
+            var layerContent = '<div class="t-c c-2" style="padding-top:10px;">' +
+                    '<p>是否确认拒绝所选中的项目授权,如确认，请填写拒绝原因</p>' +
+                    '<textarea maxlength="200" style="width: 300px;height: 80px;margin-top: 30px;" id="refuseReason"></textarea>' +
+                    '</div>';
+            layer.open({
+                title: "拒绝授权",
+                skin: 'myskin3',
+                area: ['400px', '280px'],
+                btnAlign: 'c',
+                content: layerContent,
+                btn: ['确定', '取消'],
+                yes: function (index, layero) {
+                    var refuseReason = $('#refuseReason').val();
+                    if (refuseReason == null || refuseReason == "") {
+                        layer.msg("拒绝原因不允许为空");
+                    } else {
+                        var param = {};
+                        param.applyIds = transArrayToString(checkedApplyIds);
+                        param.reason = refuseReason;
+                        postUtil.call("/orderProjectBackupGrantAuthorization/refuse", param, function (result) {
+                            if (result.STATUS == "SUCCESS") {
+                                layer.msg("审核成功~", {icon: 6});
+                                layer.close(index);
+                                grantAuthorityTableInit();
+                            } else {
+                                layer.msg(result.MSG + "", {icon: 5});
+                            }
+                        });
+                        layer.close(index);
+                    }
+                }, btn2: function (index, layero) {
+                    layer.close(index);
+                },
+                cancel: function () {
+
+                }
+            });
+        });
+
+    });
+
+    var currentDataList = null;
+
+    function loadGrantAuthorityData(queryParam) {
+        layer.load();
+        postUtil.call("/orderProjectBackupGrantAuthorization/listJson", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            currentDataList = dataList;
+            renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var distributorAreaId = $('#distributorAreaId_hidden').val();
+                        var status = $('#status_hidden').val();
+                        var projectName = $('#projectName').val();
+                        var distributorName = $('#distributorName').val();
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        if (distributorAreaId && distributorAreaId != "") {
+                            tempParam.distributorAreaId = distributorAreaId;
+                        }
+                        if (status && status != "") {
+                            tempParam.status = status;
+                        }
+                        tempParam.projectName = projectName;
+                        tempParam.distributorName = distributorName;
+                        loadGrantAuthorityData(tempParam);
+                    }
+                }
+            });
+            layer.closeAll("loading");
+        });
+    }
+
+    function renderTable(dataList) {
+        var length = dataList.length;
+        var table = document.getElementById("grantAuthorityTable");
+        table.innerHTML = "";
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var row = renderRow(data);
+                table.appendChild(row);
+            }
+        } else {
+            var html = '<tr><td colspan="10"><p class="t-c fz16 c-2" style="line-height: 76px;">暂无项目授权数据！</p></td></tr>';
+            $(table).html(html);
+        }
+    }
+
+
+    function renderRow(rowData) {
+        var projectName = rowData.projectName+"("+rowData.projectLevel+")";
+        rowData.projectName = projectName;
+        var projectLevel = rowData.projectLevel;
+        var projectProvince = rowData.projectProvince;
+        var projectCity = rowData.projectCity;
+        var proprietorCompanyName = rowData.proprietorCompanyName;
+        var pltSalesEmployId = rowData.pltSalesEmployId;
+        var pltSalesEmployName = rowData.pltSalesEmployName;
+        var projectCreateTime = rowData.projectCreateTime;
+        var projectCreateTimeStr = rowData.projectCreateTimeStr;
+        var distributorAreaId = rowData.distributorAreaId;
+        var distributorName = rowData.distributorName;
+        var distributorAccountId = rowData.distributorAccountId;
+        var backupFrom = rowData.backupFrom;
+        var projectCreateUserRealName = rowData.projectCreateUserRealName;
+        var applyId = rowData.applyId;
+        var applyTime = rowData.applyTime;
+        var applyTimeStr = rowData.applyTimeStr;
+        var backupId = rowData.backupId;
+        var status = rowData.status;
+        var statusName = rowData.statusName;
+        var reason = rowData.reason;
+        var integratorCompanyName = rowData.integratorCompanyName;
+        var tr = document.createElement('tr');
+        tr.appendChild(renderCell("check", applyId, "width:5%;"));
+        tr.appendChild(renderCell("projectName", rowData, "width:10%;"));
+        tr.appendChild(renderCell("address", rowData, "width:10%;"));
+//         tr.appendChild(renderCell(null, projectLevel, "width:10%;"));
+        tr.appendChild(renderCell("integratorCompanyName", rowData, "width:15%;"));
+        tr.appendChild(renderCell(null, proprietorCompanyName, "width:10%;"));
+        tr.appendChild(renderCell("backupFrom", rowData, "width:10%;"));
+        tr.appendChild(renderCell(null, statusName, "width:10%;"));
+        tr.appendChild(renderCell(null, applyTimeStr, "width:8%;"));
+//         tr.appendChild(renderCell("operation", rowData, "width:22%;"));
+        return tr;
+    }
+
+    function renderCell(name, value, style) {
+        var td = document.createElement('td');
+//         td.setAttribute("style", style);
+        //个性化差异-操作区域
+        if (name == "operation") {
+            if (value.status == "WAIT") {
+                td.innerHTML = '<p>' +
+                        '<a class="c-h fz12" href="javascript:void(0);" onclick="approveSingle(\'' + value.applyId + '\',\'' + value.projectName + '\')">通过</a>&nbsp;' +
+                        '<a class="c-h fz12" href="javascript:void(0);" onclick="refuseSingle(\'' + value.applyId + '\',\'' + value.projectName + '\')">拒绝</a>' +
+                        '</p>';
+            } else if (value.status == "REFUSE") {
+                td.innerHTML = '<p>' + '<a class="c-h fz12" href="javascript:void(0);" onclick="checkRefuseReason(\'' + value.reason + '\')">查看拒绝原因</a></p>';
+            } else if (value.status == "OK") {
+                td.innerHTML = '--';
+            }
+        } else if (name == "check") {
+            td.innerHTML = '<input type="checkbox" name="checkbox_applyId" value="' + value + '">';
+        } else if (name == "address") {
+            var projectProvince = value.projectProvince;
+            var projectCity = value.projectCity;
+            if (projectProvince && projectCity) {
+                td.innerText = projectProvince + "/" + projectCity;
+            } else {
+                td.innerText = "--";
+            }
+        } else if (name == "projectName") {
+            td.innerHTML = "<a class=\"fz12 jun-a c-2\" href=\"javascript:void(0);\" onclick='openDetailTab(\"" + value.backupId + "\")'>" + value.projectName + "</a>";
+        } else if (name == "integratorCompanyName") {
+            var integratorCompanyName = value.integratorCompanyName;
+            if (integratorCompanyName) {
+                var arrs = integratorCompanyName.split(",");
+                var content = "";
+                for (var i = 0; i < arrs.length; i++) {
+                    content = content + "<p>" + arrs[i] + "</p>";
+                }
+                td.innerHTML = content;
+            } else {
+                td.innerText = "--";
+            }
+        } else if (name == "backupFrom") {
+            var backupFrom = value.backupFrom;
+            if (backupFrom == "PLATFORM") {
+                td.innerText = value.projectCreateUserRealName;
+            } else if (backupFrom == "DISTRIBUTOR") {
+                td.innerText = value.distributorName;
+            } else {
+                td.innerText = "--";
+            }
+        } else {
+            if (value) {
+                td.innerText = value;
+            } else {
+                td.innerText = "--";
+            }
+        }
+        return td;
+    }
+
+    function approveSingle(applyId, projectName) {
+        var layerContent = '<div class="t-c c-2" style="padding-top:30px;"><p style="margin-top: 25px;">确定要通过项目：<span class="fz18 c-f fw-b">[' + projectName + ']</span>吗？</p></div>';
+        layer.open({
+            title: false,
+            skin: 'myskin3',
+            area: ['400px', '180px'],
+            btnAlign: 'c',
+            content: layerContent,
+            btn: ['确定', '取消'],
+            yes: function (index, layero) {
+                var param = {};
+                param.applyIds = applyId;
+                postUtil.call("/orderProjectBackupGrantAuthorization/approve", param, function (result) {
+                    if (result.STATUS == "SUCCESS") {
+                        grantAuthorityTableInit();
+                        layer.close(index);
+                    } else {
+                        layer.msg(result.MSG + "", {icon: 5});
+                    }
+                });
+            }, btn2: function (index, layero) {
+                layer.close(index);
+            },
+            cancel: function () {
+
+            }
+        });
+    }
+
+    function refuseSingle(applyId, projectName) {
+        var layerContent = '<div class="t-c c-2" style="padding-top:10px;">' +
+                '<p>是否确认拒绝该项目授权,如确认，请填写拒绝原因</p>' +
+                '<textarea maxlength="200" style="width: 300px;height: 80px;margin-top: 30px;" id="refuseReason"></textarea>' +
+                '</div>';
+        layer.open({
+            title: "拒绝授权",
+            type:1,
+            skin: 'myskin3',
+            area: ['400px', '280px'],
+            btnAlign: 'c',
+            content: layerContent,
+            btn: ['确定', '取消'],
+            yes: function (index, layero) {
+                var refuseReason = $('#refuseReason').val();
+                if (refuseReason == null || refuseReason == "") {
+                    layer.msg("拒绝原因不允许为空");
+                } else {
+                    var param = {};
+                    param.applyIds = applyId;
+                    param.reason = refuseReason;
+                    postUtil.call("/orderProjectBackupGrantAuthorization/refuse", param, function (result) {
+                        if (result.STATUS == "SUCCESS") {
+                            layer.msg("审核成功~", {icon: 6});
+                            layer.close(index);
+                            grantAuthorityTableInit();
+                        } else {
+                            layer.msg(result.MSG + "", {icon: 5});
+                        }
+                    });
+                    layer.close(index);
+                }
+            }, btn2: function (index, layero) {
+                layer.close(index);
+            },
+            cancel: function () {
+
+            }
+        });
+    }
+
+    function changeChecked(obj) {
+        $("input[name='checkbox_applyId']").attr("checked", obj.checked);
+    }
+
+    function getCheckedApplyIds() {
+        var checkedApplyIds = [];
+        $("input[name='checkbox_applyId']:checkbox:checked").each(function () {
+            checkedApplyIds.push($(this).val());
+        });
+        return checkedApplyIds;
+    }
+
+    function transArrayToString(checkedApplyIds) {
+        var result = "";
+        for (var i = 0; i < checkedApplyIds.length; i++) {
+            if (i != (checkedApplyIds.length - 1)) {
+                result = result + checkedApplyIds[i] + ",";
+            } else {
+                result = result + checkedApplyIds[i];
+            }
+        }
+        return result;
+    }
+
+    function checkRefuseReason(reason) {
+        var layerContent = '<div class="t-c c-2" style="padding-top:10px;">' +
+                '<textarea maxlength="200" readonly="readonly" style="width: 300px;height: 120px;margin-top: 10px;" id="refuseReason">' + reason + '</textarea>' +
+                '</div>';
+        layer.open({
+            title: "拒绝原因",
+            skin: 'myskin3',
+            area: ['400px', '280px'],
+            btnAlign: 'c',
+            content: layerContent,
+            btn: ['确定'],
+            yes: function (index, layero) {
+                layer.close(index);
+            },
+            cancel: function () {
+
+            }
+        });
+    }
+
+    function openDetailTab(backupId) {
+        cardUtil.openCard("项目详情-" + backupId, "/projectReport/projectDetail?backupId=" + backupId);
+        cardUtil.changeCard("项目详情-" + backupId);
+    }
+</script>
+</body>
+</html>

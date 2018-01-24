@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/MultiSelectDropList.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/vue.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/numCheck.js<@resVersionDirective>?</@>"></script>
+    <style>
+        [v-cloak]{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<section class="bz-bb pl20 pr20 pt20 pb20" id="newSkuList"  v-cloak>
+    <!--搜索star-->
+    <div class="jun-form-s form-css" @click="bodyClick()">
+        <dl class="dl-form">
+            <dt class="flt" style="width: 60px;">查询：</dt>
+            <dd class="flt"><input type="text" class="layui-input" v-model="queryParam.skuName" placeholder="商品名称/型号/编号" @keyup.enter="enterBtn(queryParam.skuName)" /></dd>
+            <dt class="flt" style="width: 110px;">订货系统上下架：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="manager" lay-filter="findFxStatus" v-model="queryParam.skuOrderStatus"  style="width: 240px;">
+                    <option value="0" selected="">全部</option>
+                    <option value="U">上架</option>
+                    <option value="D">下架</option>
+                </select>
+            </dd>
+            <dt class="flt">商城上下架：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="manager" lay-filter="findMallStatus" v-model="queryParam.skuMallStatus"  style="width: 240px;">
+                    <option value="0" selected="">全部</option>
+                    <option value="U">上架</option>
+                    <option value="D">下架</option>
+                </select>
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt" style="width: 60px;">品牌：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="brand" lay-filter="findBrand" v-model="queryParam.brandId"   style="width: 240px;">
+                    <option value='' selected>全部</option>
+                </select>
+            </dd>
+            <dt class="flt" style="width: 110px;">内部分类：</dt>
+            <dd class="flt pre w240">
+                <input type="hidden" v-model="queryParam.skuClassifyId">
+                <input type="text" readonly="readonly" v-model="queryParam.classifyDisplayName" @click.stop="dropDown('treeShow')" placeholder="请选择内部分类" style="width:228px;height:30px;padding-left: 10px">
+                <div id="fxTree" class="layui-tree-css" style="top:32px;" v-show="treeShow" @click.stop="treeClick('treeShow')"></div>
+            </dd>
+            <dt class="flt">商城分类：</dt>
+            <dd class="flt pre w240">
+                <input type="hidden" v-model="queryParam.mallSkuClassifyId">
+                <input type="text" readonly="readonly" v-model="queryParam.mallClassifyDisplayName" @click.stop="dropDown('treeShowMall')" placeholder="请选择内部分类" style="width:228px;height:30px;padding-left: 10px">
+                <div id="mallTree" class="layui-tree-css" style="top:32px;" v-show="treeShowMall" @click.stop="treeClick('treeShowMall')"></div>
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12" style="width: 60px;">SKU编码：</dt>
+            <dd class="flt" >
+                <div class="test_box" contenteditable="true" id="skuIdLists" title="请输入SKU编码，多个单号用回车或空格隔开"></div>
+                <!-- 								<input type="text" id="skuId" name="title" placeholder="请输入SKU编码" autocomplete="off" class="layui-input searchFiled"> -->
+            </dd>
+            <dd class="flt ml10">
+                <span class="form-btn layui-btn-small2" @click="searchSkuList()">查询</span>
+            </dd>
+        </dl>
+        <div class="mark-read mb10 ml10 clr">
+            <span class="cs-p">
+               <input type="checkbox"  @click="chooseAllGoods()" class="allChoose fz12" v-bind:checked="allChecked">
+            <span class="fz12 c-2">全选</span></span>
+            <span  class="c-h cs-p ml10 fz12" @click="setAllStatus('U','skuOrderStatus')">批量上架(订货系统)</span>
+            <span  class="c-h cs-p ml10 fz12" @click="setAllStatus('D','skuOrderStatus')">批量下架(订货系统)</span>
+            <span  class="c-h cs-p ml10 fz12" @click="setAllStatus('U','skuMallStatus')">批量上架(商城)</span>
+            <span  class="c-h cs-p ml10 fz12" @click="setAllStatus('D','skuMallStatus')">批量下架(商城)</span>
+
+            <span  class="c-h cs-p ml10 fz12" @click="exportData()">导出excel</span>
+            <span  class="c-h cs-p ml10 fz12" @click="addSkuDetail()">新增sku</span>
+
+            <span  class="c-h cs-p ml10 fz12" @click="batchUpdataIndex()">批量更新索引</span>
+            <span  class="c-h cs-p ml10 fz12" @click="allUpdataIndex()">全量更新索引</span>
+            <span  class="ml10 fz12 frt">已选择 <span class="c-f ml5 mr5">{{chooseNum}}</span>个商品</span>
+        </div>
+    </div>
+    <div>
+        <table class="layui-table pop no-margin" lay-skin="line">
+            <colgroup>
+                <col  width="10">
+                <col  width="200">
+                <col  width="150">
+                <col  width="150">
+                <col  width="200">
+                <col  width="100">
+                <col  width="200">
+                <col  width="100">
+                <col  width="200">
+                <col  width="100">
+            </colgroup>
+            <thead>
+            <th></th>
+            <th>商品信息</th>
+            <th>内部分类</th>
+            <th>商城分类</th>
+            <th>售价</th>
+            <th>起订量</th>
+            <th>采购价(元)</th>
+            <th>计量单位</th>
+            <th>状态</th>
+            <th>操作</th>
+            </thead>
+            <tbody>
+            <tr v-for="(index, item) in skuList" :class="{bgf0:item.status == 'D'||item.salableQuantity==0}">
+                <td><input class="choose" name="selectSku" type="checkbox"  @click="choose($event,$index)" v-bind:checked="item.checked" /></td>
+                <td class="goods-detail">
+                    <dl>
+                        <dt  class="sku-pic"><img class="mt15" :src="item.orginImgPath"  alt="">
+                        </dt>
+                        <dd class="t-l ml10" style="max-width: 375px;">
+                            <div class="one-row c-2 pre" style="padding-right: 36px" @click="goodDetail(item.skuId)" title="{{item.skuName}}">{{item.skuName}}<div v-if="item.skuMallStatus == 'U'" class="good-icon good-icon-up"></div><div v-if="item.skuOrderStatus == 'U'" class="good-icon fx-icon-up"></div></div>
+                            <p class="mt10 one-row" title="{{item.skuPropertyValue}}">商品属性:{{item.skuPropertyValue}}</p>
+                            <p>品牌:{{item.brandName}}</p>
+                            <p>商品编码:{{item.skuId}}</p>
+                        </dd>
+                    </dl>
+                </td>
+                <td>{{item.classifyParentName}}</td>
+                <td>{{item.mallClassifyAllParentName}}</td>
+                <td>
+                    <p class="c-f" >订货价：¥{{item.basePrice | formatQuantity "2"}}</p>
+                    <p >目录价：¥{{item.directoryPrice | formatQuantity "2"}}</p>
+                </td>
+                 <td>{{item.minNum}}</td>
+                <td>
+                    <div class="supplier-purchase-price-tips" v-for="lis in item.costPriceList" v-if="lis.isDefaultVendor=='Y'">
+                        <p v-if="lis.isDefaultVendor=='Y'">{{lis.accountName}}</p>
+                        <p v-if="lis.isDefaultVendor=='Y'">采购价：<span class="c-f">{{lis.purchasePrice | formatQuantity "2"}}</span></p>
+                        <div class="supplier-purchase-price-list">
+                            <!--<div class="flex supplier-purchase-price-list-top">-->
+                                <!--<p style="flex: 2">全国</p>-->
+                                <!--<p style="flex: 1">全国</p>-->
+                                <!--<p style="flex: 1">1</p>-->
+                            <!--</div>-->
+                            <ul>
+                                <li class="flex bor-first-no" v-for="items in item.costPriceList">
+                                    <p style="flex: 2" class="one-row">{{items.accountName}}</p>
+                                    <p style="flex: 1" class="c-f">{{items.purchasePrice | formatQuantity "2"}}</p>
+                                    <p style="flex: 1" v-if="items.isDefaultVendor=='Y'">默认</p>
+                                    <p style="flex: 1" v-if="items.isDefaultVendor!='Y'">-</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </td>
+                <td>{{item.unitName}}</td>
+                <td class="c-2 fw-b">
+                    <p>订货系统：<span v-if="item.skuOrderStatus == 'U'">上架</span><span v-if="item.skuOrderStatus == 'D'">下架</span></p>
+                    <p>商城：<span v-if="item.skuMallStatus == 'U'">上架</span><span v-if="item.skuMallStatus == 'D'">下架</span></p>
+                </td>
+                <td>
+                    <p><a class="c-h cs-p" @click="goEdit($index,item.skuId,item.classifyParentName,item.orderSkuClassifyId,item.mallClassifyAllParentName,item.mallSkuClassifyId,item.basePrice,item.directoryPrice,item.skuOrderStatus,item.skuMallStatus);" herf="javascript:;" >修改</a></p>
+                    <p><a class="c-h cs-p" @click="goEditDetail(item.skuId)" herf="javascript:;" >修改详情</a></p>
+                    <p><a class="c-h cs-p" @click="goCopyDetail(item.skuId)" herf="javascript:;" >复制SKU</a></p>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <!--搜索end-->
+    <div id="paginationDiv" class="mt20"></div>
+    <div id="edit" class="bz-bb pl20 pr20 pt20 jun-form-s form-css dom-hide" @click="bodyClick()">
+        <dl class="dl-form">
+            <dt class="flt" style="width: 120px;">内部分类：</dt>
+            <dd class="flt pre w240">
+                <input type="hidden" v-model="queryParam.skuClassifyIdEdit">
+                <input type="text" readonly="readonly" v-model="queryParam.classifyDisplayNameEdit" @click.stop="dropDown('treeShowEdit')" placeholder="请选择内部分类" style="width:228px;height:30px;padding-left: 10px">
+                <div id="fxTreeEdit" class="layui-tree-css" style="top:35px;" v-show="treeShowEdit" @click.stop="treeClick('treeShowEdit')"></div>
+            </dd>
+            <dt class="flt" style="width: 120px;">商城分类：</dt>
+            <dd class="flt pre w240">
+                <input type="hidden" v-model="queryParam.mallSkuClassifyIdEdit">
+                <input type="text" readonly="readonly" v-model="queryParam.mallClassifyDisplayNameEdit" @click.stop="dropDown('treeShowMallEdit')" placeholder="请选择商城分类" style="width:228px;height:30px;padding-left: 10px">
+                <div id="mallTreeEdit" class="layui-tree-css" style="top:35px;" v-show="treeShowMallEdit" @click.stop="treeClick('treeShowMallEdit')"></div>
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt" style="width: 120px;">订货价：</dt>
+            <dd class="flt"><input type="text" class="layui-input num2" v-model="basePrice" placeholder="请输入订货价" /></dd>
+            <dt class="flt" style="width: 120px;">目录价：</dt>
+            <dd class="flt"><input type="text" class="layui-input num2" v-model="directoryPrice" placeholder="请输入目录价" /></dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt" style="width: 120px;">订货系统上下架：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="fxStatus" lay-filter="fxStatus" style="width: 240px;">
+                    <option value="U" selected>上架</option>
+                </select>
+            </dd>
+            <dt class="flt" style="width: 120px;">商城上下架：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="mallStatus" lay-filter="mallStatus"  style="width: 240px;">
+                    <option value="U" selected>上架</option>
+                </select>
+            </dd>
+        </dl>
+    </div>
+</section>
+<script src="/res/js/sku/newSkuList.js<@resVersionDirective>?</@>"></script>
+</body>
+</html>

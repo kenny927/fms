@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		   <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+	    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+	    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css"/>
+	    <link rel="stylesheet" href="/res/public/css/daterangepicker.css" />
+	    <script src="/res/js/jquery-3.1.1.min.js"></script>
+	    <script src="/res/public/layui/Area1.js" type="text/javascript"></script>
+	    <script src="/res/public/layui/layui.js"></script>
+	    <script src="/res/public/layui/layui-mz-min.js"></script>
+	    <script src="/res/js/MultiSelectDropList.js"></script>
+	    <script src="/res/public/layPage/laypage.js"></script>
+        <script type="text/javascript" src="/res/common/post.js"></script>
+        <script type="text/javascript" src="/res/js/customerOpportunity/list.js"></script>
+         <script src="/res/public/layui/moment.min.js"></script>
+    	<script src="/res/public/layui/jquery.daterangepicker.js"></script>
+	</head>
+	<body>
+	<section id="itocCenter">
+         <section class="itocContent">
+          <div class="itocMain">
+          <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px; margin-top:10px;">
+           <form action="" class="jun-form-s form-css">
+              <dl class="dl-form">
+                 <dt class="flt fz12" style="width:70px;">客户名称：</dt>
+                 <dd class="flt"><input type="text" name="title" id="accountName"  placeholder="请输入客户名称" autocomplete="off" class="layui-input"></dd>
+             	 <dt class="flt fz12" style="width:80px;">录入人：</dt>
+                 <dd class="flt"><input type="text" name="title" id="createUser"  placeholder="请输入姓名" autocomplete="off" class="layui-input"></dd>
+              </dl>
+               <dl class="dl-form">
+                   <dt class="flt fz12" style="width: 70px;">创建时间：</dt>
+                   <dd class="flt pre"  id="picker-css">
+                       <input class="picker-css" id="date-range0" value="">
+                       <img class="cs-p" style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" />
+                   </dd>
+                   <!--<br>-->
+                   <dt class="flt fz12" style="width: 80px;">类型：</dt>
+                   <dd class="flt pre">
+                       <div class="multi_select" id="oppTypeSelect1" style="position:absolute;left:-2px;top:0;z-index:1"></div>
+                   </dd>
+
+                   <dd class="flt">
+                   <dd><span class="btn" onclick="searchData()" style="margin-left:250px;height: 32px;cursor:pointer;width: 70px;background-color: #035a9d;color: #ffffff;display: inline-block;text-align: center;line-height: 32px;cursor: pointer;">查询</span></dd>
+                   </dd>
+               </dl>
+           </form>
+          </div>
+          <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px; margin-top:10px;">
+         <h3 class="mb5"><@havePermission resourceCode="operation:customer:engineer:salesopportunity:list:export"><button class="form-btn layui-btn-itoc layui-btn-mini2" onclick="exportData()">导出</button></@></h3>
+          <table class="layui-table pop customerOpportunityTable" lay-skin="line">
+              <colgroup>
+                <col  width="150">
+                <col  width="200">
+                <col  width="80">
+                <col  width="80">
+                <col  width="100">
+                <col  width="100">
+                <col  width="120">
+                <col  width="120">
+                <col  width="100">
+                <col  width="80">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>创建时间</th>
+                  <th>客户名称</th>
+                  <th>类型</th>
+                  <th>来源</th>
+                  <th>录入人</th>
+                  <th>联系人</th>
+                  <th>内容</th>
+                  <th>转询单</th>
+                  <th>转交</th>
+                  <th>地区</th>
+                </tr> 
+              </thead>
+              <tbody>
+              
+              </tbody>
+              </table>
+              </div>
+                <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+          </div>
+         </section>
+    </section>
+
+<script type="text/javascript">
+$('#date-range0').dateRangePicker();
+
+var _province="";
+var _city="";
+var _menuType="";
+      layui.use(['form','jquery','laydate'], function(){
+        var form = layui.form();
+        var $ = layui.jquery;
+        var laydate = layui.laydate;
+        
+        //下拉多选
+        layui.selMeltiple($);
+
+    //日期控件 star 
+        var start = {
+          min: laydate.now()
+          ,max: '2099-06-16 23:59:59'
+          ,istoday: false
+          ,choose: function(datas){
+            end.min = datas; //开始日选好后，重置结束日的最小日期
+            end.start = datas //将结束日的初始值设定为开始日
+          }
+        };
+        
+        var end = {
+          min: laydate.now()
+          ,max: '2099-06-16 23:59:59'
+          ,istoday: false
+          ,choose: function(datas){
+            start.max = datas; //结束日选好后，重置开始日的最大日期
+          }
+        };
+
+        })
+      $(function (){
+            $('#oppTypeSelect1').MSDL({
+                'width': '240',
+                'maxheight':'250',
+                'data': [{"text":"店铺询价","value":"SHOP_MALL_ASK"},{"text":"商城询价","value":"SHOP_ASK"},{"text":"销售机会","value":"SALES_OPP"},{"text":"售后咨询","value":"AFTER_SALES"},{"text":"技术咨询","value":"TECH"},{"text":"客户投诉","value":"COMPLAIN"},{"text":"项目型商机","value":"PROJECT"},{"text":"零售型采购","value":"RETAIL_PURCHASE"},{"text":"零售型比价","value":"RETAIL_PRICE_COMPARE"},{"text":"零售型预算","value":"RETAIL_BUDGET"}],
+                'id': "status"
+            });            
+        });
+
+
+</script>
+	</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_lw1dd7vgljjug14i.css<@resVersionDirective>?</@>"/>
+  <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+  <link rel="stylesheet" href="/res/css/project.css<@resVersionDirective>?</@>">
+  <style type="text/css" media="screen">
+    .jun-form-s .layui-form-radio span{
+      font-size: 14px!important;
+    }
+  </style>
+</head>
+<body>
+     <div class="jun-close fz14 c-2" style="padding: 20px;">
+         <p><span class="c-f ml10">是否确认将该项目驳回？</span>如确认，请选择驳回原因</p>
+         <form id="conflictForm" class="layui-form layui-form-pane jun-form-s" action="">
+            <div class="layui-form-item inline mb10" >
+              <div class="layui-input-block" style="margin-left: 0px; height: 30px; margin-top: -2px;">
+                <input name="rejectRs"  type="radio" name="sex" value="业主公司名称和统一社会信用代码信息不准确" title="业主公司名称和统一社会信用代码信息不准确" checked="">
+                <input name="rejectRs" type="radio" name="sex" value="集成商公司名称和统一社会信用代码信息不准确" title="集成商公司名称和统一社会信用代码信息不准确">
+                <input name="rejectRs" type="radio" name="sex" value="业主、集成商公司名称和统一社会信用代码信息不准确" title="业主、集成商公司名称和统一社会信用代码信息不准确"><br />
+                <input name="rejectRs" type="radio" name="sex" value="其他" title="其他">
+                <textarea style="margin-top: -23px;width: 80%;margin-left: 65px;" placeholder="请输入内容" class="layui-textarea"></textarea>
+              </div>
+            </div>
+         </form>
+     </div>
+<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<script type="text/javascript">
+      layui.use('form', function(){
+        var form = layui.form();
+        })
+</script>
+</body>
+</html>

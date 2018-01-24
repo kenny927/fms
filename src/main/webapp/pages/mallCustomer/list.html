@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		   <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+	    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+	    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css<@resVersionDirective>?</@>"/>
+	    <link rel="stylesheet" href="/res/public/css/daterangepicker.css<@resVersionDirective>?</@>" />
+	    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+	    <script src="/res/public/layui/Area1.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+	    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+	    <script src="/res/public/layui/layui-mz-min.js<@resVersionDirective>?</@>"></script>
+	    <script src="/res/js/MultiSelectDropList.js<@resVersionDirective>?</@>"></script>
+	    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+        <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+        <script type="text/javascript" src="/res/js/mallCustomer/mallCustomerList.js<@resVersionDirective>?</@>"></script>
+         <script src="/res/public/layui/moment.min.js<@resVersionDirective>?</@>"></script>
+         <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    	<script src="/res/public/layui/jquery.daterangepicker.js<@resVersionDirective>?</@>"></script>
+	</head>
+	<body>
+	<section id="itocCenter">
+         <section class="itocContent">
+          <div class="itocMain">
+          <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px; margin-top:30px;">
+           <form action="" class="jun-form-s form-css">
+              <dl class="dl-form">
+                 <dt class="flt fz12" style="width: 68px;">客户主体：</dt>
+                 <dd class="flt layui-form jun-form-l">
+		               <select name="mainObjectOption" id="mainObjectOption" lay-filter="aihao"  style="width: 240px;">
+		                <option value="0">全部</option>
+		                <option value="10004">工程商</option>
+		                <option value="10005">业主方</option>
+		              </select>
+           		</dd>
+                 <dt class="flt fz12 ml10">客户名称：</dt>
+                 <dd class="flt"><input type="text" name="title" id="accountName"  placeholder="请输入客户名称" autocomplete="off" class="layui-input searchFiled"></dd>
+                  <dt class="flt fz12" style="width: 100px;">客户来源：</dt>
+                  <dd class="flt pre">
+                      <div class="multi_select" id="statusSelect2" style="position:absolute;left:1px;top:0;z-index:2"></div>
+                  </dd>
+              </dl>
+               <dl class="dl-form">
+                 <dt class="flt fz12" style="width: 68px;" >状态：</dt>
+                 <dd class="flt pre">
+                    <div class="multi_select" id="statusSelect3" style="position:absolute;left:1px;top:0;z-index:2"></div>
+                 </dd>
+                   <dt class="flt fz12" style="margin-left: 250px;" >创建时间：</dt>
+                   <dd class="flt pre"  id="picker-css">
+                       <input class="picker-css searchFiled" id="date-range0" value="">
+                       <img class="cs-p" style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" />
+                   </dd>
+                   <dt class="flt fz12 ml10">地址：</dt>
+                   <dd class="flt layui-form dd-city provinceSel dd-city2" style="margin-left:2px;">
+                       <select name="province" lay-filter="province" id="s_province" lay-search>
+                           <option value="">请选择省</option>
+                       </select>
+                   </dd>
+                   <dd class="flt layui-form dd-city citySel ml10 dd-city2">
+                       <select name="city" lay-filter="city" lay-search>
+                           <option value="">请选择市</option>
+                       </select>
+                   </dd>
+               </dl>
+               <dl class="dl-form">
+                   <dt class="flt fz12" style="width: 68px;">客户经理：</dt>
+                   <dd class="flt"><input type="text" id="accountManagerName"  name="title"  placeholder="请输入客户经理" autocomplete="off" class="layui-input searchFiled"></dd>
+                   <dt class="flt fz12" style="width: 100px;">创建人：</dt>
+                 <dd class="flt"><input type="text" id="createUser"  name="title"  placeholder="请输入创建人" autocomplete="off" class="layui-input searchFiled"></dd>
+                 <dt class="flt fz12" style="width: 100px;">联系方式：</dt>
+                 <dd class="flt"><input type="text" id="linkPhone"  name="title"  placeholder="请输入客户座机或联系人手机" autocomplete="off" class="layui-input searchFiled"></dd>
+              </dl>
+              <dl class="dl-form">
+                 <dt class="flt fz12" style="width: 68px;">终端来源：</dt>
+                 <dd class="flt pre w240" style="height:32px;">
+                     <div class="multi_select" id="registerType" style="position:absolute;left:-2px;top:0;z-index:1">
+                     </div>
+                  </dd>
+                  <dt class="flt fz12" style="width: 100px;">是否被邀请：</dt>
+                  <dd class="flt pre w240" style="height:32px;">
+					<select id="hasInviter" style="height: 35px;width: 240px;border: 1px solid #d6d6d6; padding-left:10px;">
+						<option value="ALL">全部</option>
+						<option value="Y">有</option>
+						<option value="N">无</option>
+					</select>
+                 </dd>
+                 <dt class="flt fz12" style="width: 100px;">邀请人：</dt>
+                  <dd class="flt pre w240" style="height:32px;">
+                     <div class="multi_select" id="accountId" style="position:absolute;left:-1px;top:0;z-index:1">
+                     </div>
+                 </dd>
+                  <dd class="flt ml10">
+                 <span class="form-btn layui-btn-small2" onclick="searchCustomer()" >查询</span>
+                 </dd>
+              </dl>
+           </form>
+          </div>
+          <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px; margin-top:10px;">
+         <h3 class="mb5"><@havePermission resourceCode="operation:customer:engineer:all:list:insert"><button class="form-btn layui-btn-itoc layui-btn-small2" onclick="addCustomer()">新增</button></@><@havePermission resourceCode="operation:customer:engineer:all:list:transmit"><button class="form-btn layui-btn-itoc layui-btn-small2 ml10 " onclick="transmitCustomer()">转交</button></@><@havePermission resourceCode="operation:customer:engineer:all:list:export"><button class="form-btn layui-btn-itoc layui-btn-small2 ml10" onclick="exportCustomer()">导出</button></@></h3>
+          <table class="layui-table pop" lay-skin="line">
+              <colgroup>
+                <col  width="40">
+                <col  width="300">
+                <col  width="120">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="80">
+                <col  width="100">
+                <col  width="120">
+                <col  width="120">
+                <col  width="120">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th><input type="checkbox" name="chooseAll" /></th>
+                  <th>客户名称</th>
+                  <th>用户名</th>
+                  <th>联系电话</th>
+                  <th>地址</th>
+                  <th>客户状态</th>
+                  <th>询价单</th>
+                  <th>客户来源</th>
+                  <th>客户经理</th>
+                  <th>创建人</th>
+                  <th>创建时间</th>
+                </tr> 
+              </thead>
+              <tbody>
+              
+              </tbody>
+              </table>
+              </div>
+                <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+          </div>
+         </section>
+    </section>
+
+<script type="text/javascript">
+$('#date-range0').dateRangePicker();
+var _province="";
+var _city="";
+var _menuType="";
+var layer;
+var _signedType="";
+var $form;
+var form;
+var $;
+layui.use(['form','jquery','laydate','layer'], function(){
+         form = layui.form();
+         $ = layui.jquery;
+        var laydate = layui.laydate;
+        $form = $('form');
+        //下拉多选
+        layui.selMeltiple($);
+        loadProvince();
+    //日期控件 star 
+        var start = {
+          min: laydate.now()
+          ,max: '2099-06-16 23:59:59'
+          ,istoday: false
+          ,choose: function(datas){
+            end.min = datas; //开始日选好后，重置结束日的最小日期
+            end.start = datas //将结束日的初始值设定为开始日
+          }
+        };
+        
+        var end = {
+          min: laydate.now()
+          ,max: '2099-06-16 23:59:59'
+          ,istoday: false
+          ,choose: function(datas){
+            start.max = datas; //结束日选好后，重置开始日的最大日期
+          }
+        };
+
+        })
+      $(function (){
+            $('#statusSelect1').MSDL({
+                'width': '240',
+                'data': [{"text":"全部","value":"1"},{"text":"工程方","value":"10004"},{"text":"业主方","value":"10005"}],
+                'id': "status"
+            });            
+            $('#statusSelect2').MSDL({
+                'width': '240',
+                'data': [{"text":"手动新增","value":"MANUAL"},{"text":"商城个人注册","value":"MALL_PERSONAGE_REGIST"},{"text":"商城企业注册","value":"MALL_ENTERPRISE_REGISTION"},{"text":"分销商项目报备","value":"DISTRIBUTOR_PROJECT_BACKUP"},{"text":"销售员项目报备","value":"SALES_PROJECT_BACKUP"},{"text":"快捷委托单","value":"RAPID_DEMAND"}],
+                'id': "status"
+            });            
+            $('#statusSelect3').MSDL({
+                'width': '240',
+                'data': [{"text":"未签约","value":"NO_SIGNED"},{"text":"已签约","value":"SIGNED"},{"text":"断约","value":"TEMINATED"}],
+                'id': "status"
+            });
+            
+            $('#registerType').MSDL({
+                'width': '240',
+                'data': [{"text":"PC端注册","value":"PC_REGISTER"},{"text":"WAP端注册","value":"WAP_REGISTER"},{"text":"后台协助注册","value":"ASSIST_REGISTER"}],
+                'id': "status"
+            });
+            
+            postUtil.call("/mallCustomer/getInviterAccountId",{},function(result){
+          	  if(result.success==true){
+          		  var arrayTemp =[];
+          		  var list = result.data;
+//           		  var array = arrayTemp.concat(list,[{"text":"无","value":"NO_INVITER"}]);
+          		  var array = arrayTemp.concat(list,[]);
+                    $('#accountId').MSDL({
+                        'width': '240',
+                        'data': array,
+                        'id': "status"
+                    });
+          	  }
+            });
+            
+        });
+
+//省市联动  star
+    var areaData = Area; 
+    //省市联动  star
+    function loadProvince() {
+        var proHtml = '';
+           var proHtml1 = '<option class="option1" value="' +"" + '" selected>' +
+         "全部" + '</option>';
+         var proHtml2 = '<option class="option2" value="' +"" + '" selected>' +
+         "全部" + '</option>';
+        for(var i = 0; i < areaData.length; i++) {
+            if(_province != '' && _province == areaData[i].provinceName) {
+                proHtml1 += '<option class="option1" value="' + areaData[i].provinceName + '" selected='+'"selected">' +
+                    areaData[i].provinceName + '</option>';
+            } else {
+                proHtml1 += '<option class="option1" value="' + areaData[i].provinceName + '">' +
+                    areaData[i].provinceName + '</option>';
+            }
+        }
+        if(_province != '') {
+            var cities = getCityByProvince(areaData, _province);
+            loadCity(cities, _city);
+        }
+        $form.find('select[name=province]').append(proHtml1);
+        form.render();
+        form.on('select(province)', function(data) {
+             _province = data.value;
+             if(_province==""){
+             }else{
+            	 $(".option2").attr("selected",false);
+             }
+            var cities = getCityByProvince(areaData, _province);
+            if(cities.length > 0) {
+                loadCity(cities);
+
+            } else {
+                $form.find('select[name=city]').parent().hide();
+            }
+        });
+        var param={};
+    	param.currentPageIndex=1;
+    	loadMallCustomerList(param);
+    }
+    function getCityByProvince(areaData, provinceName) {
+        var cities = [];
+        $.each(areaData, function (index, item) {
+            if(item.provinceName == provinceName) {
+                cities = item.mallCityList;
+                return false;
+            }
+        });
+        return cities;
+    }
+    function loadCity(citys, selCity) {
+        var cityHtml = '';
+//         if(citys.length>=1){
+//        	_city=citys[0].cityName;
+//        }
+        cityHtml = '<option value="' +"" + '" selected>' +
+        "全部" + '</option>';
+        	 for(var i = 0; i < citys.length; i++) {
+                 if(selCity != '' && selCity == citys[i].cityName) {
+                     cityHtml += '<option value="' + citys[i].cityName + '">' +
+                         citys[i].cityName + '</option>';
+                 } else {
+                     cityHtml += '<option value="' + citys[i].cityName + '">' +
+                         citys[i].cityName + '</option>';
+                 }
+             }
+        $form.find('select[name=city]').html(cityHtml).parent().show();
+        form.render();
+        form.on('select(city)', function(data) {
+            var value = data.value;
+            _city=value;
+       });
+
+    }
+     $("input[name=chooseAll]").on("click",function(){
+			if($(this).prop("checked")){
+				$("input[name=single]").prop("checked",true);
+				$("input[name=single]").each(function(){
+					var obj=$(this).attr("accountId");
+					if(seletedItems.indexOf(obj)<0){
+						seletedItems+=(obj+",");
+					}
+					
+				})
+			}else{
+				$("input[name=single]").prop("checked", false);
+				$("input[name=single]").each(function(){
+					var obj=$(this).attr("accountId");
+					if(seletedItems.indexOf(obj)>=0){
+						seletedItems=seletedItems.replace((obj+","),"");
+					}
+				})
+			}
+		});
+
+$(document).on("keydown", ".searchFiled", function (e) {
+    var ev = document.all ? window.event : e;
+    if(ev.keyCode==13) {
+        searchCustomer();
+    }
+});
+</script>
+	</body>
+</html>

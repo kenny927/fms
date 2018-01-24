@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css"
+          href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css"
+          href="http://at.alicdn.com/t/font_svvppt2njx9u23xr.css<@resVersionDirective>?</@>"/>
+    <style type="text/css">
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd .goodsName {
+            height: 35px;
+            line-height: 35px;
+            overflow: hidden;
+            width: 300px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            color: #222222;
+        }
+
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd p {
+            height: 20px;
+            line-height: 20px;
+            color: #999999;
+            overflow: hidden;
+            width: 300px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .jun-form-wa input[type='text'] {
+            width: 250px !important;
+        }
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd{
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter" style="padding-left: 0px;">
+    <section class="itocContent">
+        <div class="itocMain" style="border: 0px;">
+            <div id="addInquiry">
+                <div class="treeSearch mb20">
+                    商品名称：<input type="text" id="skuName" placeholder="请输入商品名称" class="mr20"/>
+                    内部分类：<input type="text" readonly="readonly" id="skuClassifyName" placeholder="请选择分类"/>
+                    <input type="hidden" id="skuClassifyId">
+                    <button id="searchBtn" class="search-btn" style="cursor: pointer;">搜索</button>
+                    <button id="chooseBtn" class="search-btn" style="cursor: pointer;">添加商品</button>
+                    <span class="iconfont icon-xiala1"></span>
+                    <ol id="treeNav" style="height: 200px;overflow: scroll;left: 436px;"></ol>
+                </div>
+                <div class="treeSearch jun-form-s" style="padding-top: 0px;min-height：30px;">
+                    <span class="flt line-middle">商品编码：</span>
+                    <!--<input type="text" id="skuId" placeholder="请输入商品编码" cl;ass="mr20"/>-->
+                    <div class="test_box flt" style="width: 243px;margin-bottom: 20px;" contenteditable="true"
+                         id="skuId" title="请输入SKU编码，多个单号用回车或空格隔开"></div>
+                    <span class="flt line-middle" style="margin-left: 24px;">商品类型：</span>
+                    <div class="layui-form flt mr20 jun-form-wa">
+                        <select id="skuType" name="skuType" lay-filter="aihao" style="width: 240px;">
+                            <option value="ALL" selected="">全部</option>
+                            <option value="NORMAL">订货商品</option>
+                            <option value="SPOT">现货商品</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table inquiry">
+                    <ul class="th th-border">
+                        <li style="width: 6%;">
+                            <div class="mida">
+                                <div class="midb"><input id="selectAllCheckBox" type="checkbox"/></div>
+                                已选中：<span id="totalChoosedCount" style="color: red;">0</span>
+                            </div>
+                        </li>
+                        <li style="width: 42%;">
+                            <div class="mida">
+                                <div class="midb">商品名称</div>
+                            </div>
+                        </li>
+                        <li style="width: 15%;">
+                            <div class="mida">
+                                <div class="midb">分类</div>
+                            </div>
+                        </li>
+                        <li style="width: 15%;">
+                            <div class="mida">
+                                <div class="midb">状态</div>
+                            </div>
+                        </li>
+                        <li style="width: 6%">
+                            <div class="mida">
+                                <div class="midb">起订量</div>
+                            </div>
+                        </li>
+                        <li style="width: 8%">
+                            <div class="mida">
+                                <div class="midb">基本售价</div>
+                            </div>
+                        </li>
+                        <li style="width: 8%">
+                            <div class="mida">
+                                <div class="midb">计量单位</div>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="information-list wait" id="skuCommodityTable_tbody">
+                    </div>
+                    <div id="paginationDiv"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#addInquiry').show();
+    });
+
+
+    layui.use(['tree', 'layer'], function () {
+        var layer = layui.layer;
+        var treeOption = {};
+        treeOption.skin = "shihuang";
+        treeOption.elem = "#treeNav";
+        treeOption.click = function (node) {
+            var classifyIsLeaf = node.classifyIsLeaf;
+            var classifyId = node.classifyId;
+            var classifyName = node.classifyName;
+            var allParentName = node.allParentName;
+            if (classifyId == "0") {
+                classifyName = "全部";
+                allParentName = "全部";
+            }
+            $('#skuClassifyId').val(classifyId);
+            $('#skuClassifyName').val(allParentName);
+            $('#treeNav').hide();
+        };
+
+        postUtil.call("/reusable/skuClassificatory/getAllSkuClassificatoryJsonForLayuiTree", null, function (result) {
+            treeOption.nodes = result;
+            layui.tree(treeOption);
+        });
+
+    });
+
+    $(document).on("click", ".icon-xiala1", function () {
+        if ($(this).next().css("display") == "none") {
+            $(this).next().show();
+        } else {
+            $(this).next().hide();
+        }
+    });
+
+    var PAGE_SIZE = 3;
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    var skuDataMap = {};
+    var gloablChoosedSkuIdList = []; //已选择的选择的sku,支持跨页选取
+    var currentDataList = [];//当前页面的所有的sku
+
+    //获取当前页面已选中的skuIDs
+    function getChoosedSkuIds() {
+        var skuChecks = document.getElementsByName("skuIdCheckBox");
+        var checkedSkuIds = [];
+        if (skuChecks.length > 0) {
+            for (var i = 0; i < skuChecks.length; i++) {
+                if (skuChecks[i].checked == true) {
+                    checkedSkuIds.push(skuChecks[i].value);
+                }
+            }
+        }
+        return checkedSkuIds;
+    }
+
+    //获取当前页面没有选中的skuIDs
+    function getNoChoosedSkuIds() {
+        var skuChecks = document.getElementsByName("skuIdCheckBox");
+        var noCheckedSkuIds = [];
+        if (skuChecks.length > 0) {
+            for (var i = 0; i < skuChecks.length; i++) {
+                if (skuChecks[i].checked != true) {
+                    noCheckedSkuIds.push(skuChecks[i].value);
+                }
+            }
+        }
+        return noCheckedSkuIds;
+    }
+
+    function statisticsChoosedSkus() {
+        var choosedSkuIds = getChoosedSkuIds();
+        var noChoosedSkuIds = getNoChoosedSkuIds();
+        if (noChoosedSkuIds.length > 0) {
+            for (var i = 0; i < noChoosedSkuIds.length; i++) {
+                for (var j = 0; j < gloablChoosedSkuIdList.length; j++) {
+                    if (noChoosedSkuIds[i] == gloablChoosedSkuIdList[j]) {
+                        gloablChoosedSkuIdList.splice(j, 1);
+                        break;
+                    }
+                }
+            }
+        }
+        if (choosedSkuIds.length > 0) {
+            for (var i = 0; i < choosedSkuIds.length; i++) {
+                gloablChoosedSkuIdList.push(choosedSkuIds[i]);
+            }
+        }
+
+        //初始化skuDataMap 数据 skuDataMap永远都保存已经选中的所有的sku数据
+        //思路 将当前页所有勾选的数据加到skuDataMap未选中的从skuDataMap中剔除
+        for (i = 0; i < noChoosedSkuIds.length; i++) {
+            skuDataMap[noChoosedSkuIds[i]] = null;
+        }
+        for (i = 0; i < choosedSkuIds.length; i++) {
+            for (j = 0; j < currentDataList.length; j++) {
+                if (choosedSkuIds[i] == currentDataList[j].skuId) {
+                    skuDataMap[choosedSkuIds[i]] = currentDataList[j];
+                    break;
+                }
+            }
+        }
+
+
+        gloablChoosedSkuIdList = gloablChoosedSkuIdList.distinct();
+        $('#totalChoosedCount').text(gloablChoosedSkuIdList.length);
+
+        // 表格渲染完成之后判断全选是否需要勾选
+        var tempChoosedSkuIds = getChoosedSkuIds();
+        if (tempChoosedSkuIds.length == currentDataList.length && tempChoosedSkuIds.length > 0) {
+            document.getElementById("selectAllCheckBox").checked = true;
+        } else {
+            document.getElementById("selectAllCheckBox").checked = false;
+        }
+    }
+
+    function doQuery() {
+        var skuIdTemp = $("#skuId").html();
+        var skuIdArray = skuIdTemp.split(/[;；,，\n <br>&nbsp]/);
+        var skuId = '';
+        for (var i = 0; i < skuIdArray.length; i++) {
+            skuId += skuIdArray[i] + ';';
+        }
+        var skuName = $('#skuName').val();
+        var skuClassifyName = $('#skuClassifyName').val();
+        var skuClassifyId = $('#skuClassifyId').val();
+        var queryParam = {};
+        queryParam.currentPageIndex = 1;
+        queryParam.pageSize = PAGE_SIZE;
+        queryParam.skuId = skuId;
+        queryParam.skuName = skuName;
+        queryParam.skuClassifyName = skuClassifyName;
+        queryParam.skuClassifyId = skuClassifyId;
+        queryParam.statusList = "U";
+        queryParam.skuType=$('#skuType').val();
+        loadSkuCommodityData(queryParam);
+
+        //每次查询重置选中的sku
+        gloablChoosedSkuIdList = [];
+    }
+
+
+    var layer = null;
+    layui.use(['layer', 'form'], function () {
+        layer = layui.layer;
+        var form = layui.form();
+
+        doQuery();
+
+        $("#searchBtn").bind("click", function () {
+            doQuery();
+        });
+
+        $('#chooseBtn').bind("click", function () {
+//            var skuChecks = document.getElementsByName("skuIdCheckBox");
+//            var checkedSkuIds = [];
+//            if (skuChecks.length > 0) {
+//                for (var i = 0; i < skuChecks.length; i++) {
+//                    if (skuChecks[i].checked == true) {
+//                        checkedSkuIds.push(skuChecks[i].value);
+//                    }
+//                }
+//
+//                if (checkedSkuIds.length == 0) {
+//                    layer.msg("请查询数据勾选后再进行操作", {"icon": "5"});
+//                } else {
+//                    for (var j = 0; j < checkedSkuIds.length; j++) {
+//                        var tempSkuData = skuDataMap[checkedSkuIds[j]];
+//                        choosedSkuDataArray.push(tempSkuData);
+//                    }
+//                    var success = parent.chooseSkuCommodityCallback(choosedSkuDataArray);//调用父页面的渲染方法
+//                    if (success) {
+//                        parent.layer.close(index);//关闭当前窗口
+//                    }
+//                }
+//            } else {
+//                layer.msg("请查询数据勾选后再进行操作", {"icon": "5"});
+//            }
+
+            var choosedSkuDataArray = [];
+            for (index in skuDataMap) {
+                if (skuDataMap[index] != null) {
+                    choosedSkuDataArray.push(skuDataMap[index]);
+                }
+            }
+            if (choosedSkuDataArray.length == 0) {
+                layer.msg("请查询数据勾选后再进行操作", {"icon": "5"});
+                return;
+            }else {
+                var success = parent.chooseSkuCommodityCallback(choosedSkuDataArray);//调用父页面的渲染方法
+                if (success) {
+                    parent.layer.close(index);//关闭当前窗口
+                }
+            }
+
+        });
+
+        $('#selectAllCheckBox').bind("click", function () {
+            var selectAllChecked = document.getElementById("selectAllCheckBox").checked;
+            var skuChecks = document.getElementsByName("skuIdCheckBox");
+            if (skuChecks.length > 0) {
+                for (var i = 0; i < skuChecks.length; i++) {
+                    skuChecks[i].checked = selectAllChecked;
+                }
+            }
+            statisticsChoosedSkus();
+        });
+    });
+
+    function loadSkuCommodityData(queryParam) {
+        layer.load();
+        postUtil.call("/reusable/skuCommodity/skuCommodityBasicInfoJsonData", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            currentDataList = dataList;
+            renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                skip: true,
+                total: totalRow,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var skuId = $('#skuId').val();
+                        var skuName = $('#skuName').val();
+                        var skuClassifyName = $('#skuClassifyName').val();
+                        var skuClassifyId = $('#skuClassifyId').val();
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        tempParam.skuId = skuId;
+                        tempParam.skuName = skuName;
+                        tempParam.skuClassifyName = skuClassifyName;
+                        tempParam.skuClassifyId = skuClassifyId;
+                        tempParam.statusList = "U";
+                        loadSkuCommodityData(tempParam);
+                    }
+                }
+            });
+            layer.closeAll("loading");
+        });
+    }
+
+    function renderTable(dataList) {
+        var length = dataList.length;
+        var table = document.getElementById("skuCommodityTable_tbody");
+        table.innerHTML = "";
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var skuId = data.skuId;
+                var row = renderRow(data);
+                table.appendChild(row);
+            }
+        } else {
+            var html = '<p class="t-c fz16 c-2" style="line-height: 76px;">暂无商品SKU数据！</p>';
+            $(table).html(html);
+        }
+        //渲染单位控制小数位数
+        renderUnitDisplay();
+
+        //重新刷新已勾选的条数
+        $('#totalChoosedCount').text(gloablChoosedSkuIdList.length);
+        // 表格渲染完成之后判断全选是否需要勾选
+        var tempChoosedSkuIds = getChoosedSkuIds();
+        if (tempChoosedSkuIds.length == currentDataList.length && tempChoosedSkuIds.length > 0) {
+            document.getElementById("selectAllCheckBox").checked = true;
+        } else {
+            document.getElementById("selectAllCheckBox").checked = false;
+        }
+    }
+
+    function renderRow(rowData) {
+
+        var skuId = rowData.skuId;
+        var skuName = rowData.skuName;
+        var minnum = rowData.minNum;
+        var model = rowData.model;
+        var classifyId = rowData.classifyId;
+        var classifyName = rowData.classifyName;
+        var classifyAllParentName = rowData.classifyAllParentName;
+        var brandId = rowData.brandId;
+        var brandName = rowData.brandName;
+        var unitId = rowData.unitId;
+        var unitName = rowData.unitName;
+        var basePrice = rowData.basePrice;
+
+        var ul = document.createElement('ul');
+        ul.setAttribute("class", "information");
+
+
+        ul.appendChild(renderCell("skuIdcheckBox", skuId, "width:6%;"));
+        ul.appendChild(renderCell("baseInfo", rowData, "width:42%;"));
+        ul.appendChild(renderCell("classifyAllParentName", classifyAllParentName, "width:15%;"));
+        var showStatus='<td class="c-2 fw-b"><p>订货系统：<span>'+(rowData.skuOrderStatus=='U'?"上架":"下架")+'</span></p><p>商城：<span>'+(rowData.skuMallStatus=='U'?"上架":"下架")+'</span></p></td>';
+        ul.appendChild(renderCell("status", showStatus, "width:15%;"));
+        ul.appendChild(renderCell("minnum", rowData, "width:6%;"));
+        ul.appendChild(renderCell("basePrice", basePrice, "width:8%;"));
+        ul.appendChild(renderCell(null, unitName, "width:8%;"));
+        return ul;
+    }
+
+    function renderCell(name, value, style) {
+
+        var li = document.createElement('li');
+        li.setAttribute("style", style);
+        var div_mida = document.createElement('div');
+        div_mida.setAttribute("class", "mida");
+        var div_midb = document.createElement('div');
+        div_midb.setAttribute("class", "midb");
+        if ("skuIdcheckBox" == name) {
+
+            var havenCurrentSkuId = false;
+            for (var i = 0; i < gloablChoosedSkuIdList.length; i++) {
+                if (gloablChoosedSkuIdList[i] == value) {
+                    havenCurrentSkuId = true;
+                    break;
+                }
+            }
+            if (havenCurrentSkuId) {
+                div_midb.innerHTML = '<input type="checkbox" checked="checked" onclick="statisticsChoosedSkus()" name="skuIdCheckBox" value="' + value + '" />';
+            } else {
+                div_midb.innerHTML = '<input type="checkbox" onclick="statisticsChoosedSkus()" name="skuIdCheckBox" value="' + value + '" />';
+            }
+
+//            div_midb.innerHTML = '<input type="checkbox" name="skuIdCheckBox" value="' + value + '" />';
+        } else if ("baseInfo" == name) {
+            var skuPropertyList = value.skuPropertyList;
+            var skuPropertyInfo = "";
+            if (skuPropertyList.length == 0) {
+                skuPropertyInfo = "暂无属性信息";
+            } else {
+                for (var i = 0; i < skuPropertyList.length; i++) {
+                    var property = skuPropertyList[i];
+                    var propertyName = property.propertyName;
+                    var propertyValue = property.propertyValue;
+                    if (i != skuPropertyList.length - 1) {
+                        skuPropertyInfo = skuPropertyInfo + propertyName + ":" + propertyValue + "|";
+                    } else {
+                        skuPropertyInfo = skuPropertyInfo + propertyName + ":" + propertyValue;
+                    }
+                }
+            }
+
+            var smallImgPath = value.orginImgPath;
+            if (smallImgPath == undefined || smallImgPath == null || smallImgPath == "") {
+                smallImgPath = "/res/images/nopic.png";
+            }
+
+            div_midb.innerHTML = "<dl>" +
+                    "<dt>" +
+                    "<img width='70' height='70' src=\"" + smallImgPath + "\" alt=\"\"/>" +
+                    "<span>" + value.brandName + "</span>" +
+                    "</dt>" +
+                    "<dd>" +
+                    "<p class=\"goodsName\" title=\"" + value.skuName + "\">" + value.skuName + "</p>" +
+                    "<p title=\"" + value.model + "\">" + "产品型号：" + value.model + "</p>" +
+                    "<p title=\"" + value.skuId + "\">" + "商品编码：" + value.skuId + "</p>" +
+                    "<p title=\"" + skuPropertyInfo + "\">" + "商品属性：" + skuPropertyInfo + "</p>" +
+                    "</dd>" +
+                    "</dl>";
+        } else if ("basePrice" == name) {
+            div_midb.innerText = "￥" + value;
+        } else if ("classifyAllParentName" == name) {
+            if (value) {
+                var vals = value.split(",");
+                var allParentName = "";
+                var notNullVals = [];
+                for (var i = 0; i < vals.length; i++) {
+                    var temp = vals[i];
+                    if (null != temp && (temp.replace(/(^s*)|(s*$)/g, "").length != 0)) {
+                        notNullVals.push(temp);
+                    }
+                }
+                for (var i = 0; i < notNullVals.length; i++) {
+                    if (i != notNullVals.length - 1) {
+                        allParentName = allParentName + notNullVals[i] + ">";
+                    } else {
+                        allParentName = allParentName + notNullVals[i];
+                    }
+                }
+                div_midb.innerText = allParentName;
+            } else {
+                div_midb.innerText = "--";
+            }
+        } else if ("minnum" == name) {
+            div_midb.setAttribute("class", "midb unitDisplay");
+            div_midb.setAttribute("unitName", value.unitName);
+            div_midb.innerText = value.minNum;
+        }
+        else if("status"==name){
+            div_midb.innerHTML = value;
+        }
+        else {
+            div_midb.innerText = value;
+        }
+
+
+        div_mida.appendChild(div_midb);
+        li.appendChild(div_mida);
+        return li;
+    }
+</script>
+<script type="text/javascript">
+
+    Array.prototype.distinct = function () {
+        var x = [], r = [];
+        for (var i = 0; i < this.length; i++) {
+            x['_' + this[i]] = this[i];
+        }
+        for (var b in x) {
+            if (typeof x[b] != 'function') {
+                r.push(x[b]);
+            }
+        }
+        return r;
+    }
+</script>
+<#include "/res/freemarkerTpl/unitConfig.html" />
+<@unitConfig/>
+</body>
+</html>

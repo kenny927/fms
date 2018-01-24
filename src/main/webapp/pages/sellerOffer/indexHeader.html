@@ -1,0 +1,34 @@
+<#macro header crumbs=[]>
+	<header>
+		<#include "/res/freemarkerTpl/header.html" />
+		<#if (SYSTEM_USER_SESSION != null)>
+			<@header currentUser=SYSTEM_USER_SESSION.systemUser/>
+			<#else>
+				<@header currentUser=""/>
+		</#if>
+		<div class="search">
+			<div class="crumbs flt">
+				<#list crumbs as order>
+					<#if (item_index== crumbs?size-1) >
+						<a href="javascript:;">crumb</a>>
+					<#else>
+						<a class="c-b-i" href="javascript:;">crumb</a>
+					</#if>
+				</#list>
+			</div>
+<!-- 			<div class="searchInput frt"> -->
+<!-- 				<form> -->
+<!-- 					<select class="flt"> -->
+<!-- 						<option style="height: 50px;">搜商品</option> -->
+<!-- 						<option>搜编号</option> -->
+<!-- 						<option>搜型号</option> -->
+<!-- 						<option>搜关键词</option> -->
+<!-- 					</select> -->
+<!-- 					<input class="flt" type="search" placeholder="请输入商品名称/商品编号/型号/关键词"/> -->
+<!-- 					<span class="flt">搜索</span> -->
+<!-- 					<a href="javascript:;">高级搜索</a> -->
+<!-- 				</form> -->
+<!-- 			</div> -->
+		</div>
+	</header>
+</#macro>

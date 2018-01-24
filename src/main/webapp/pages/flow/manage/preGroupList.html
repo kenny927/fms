@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+
+    <style>
+        #itocCenter .itocContent .itocMain .purchaseSearch form {width:99%}
+        .choosedGroup{
+            background-color: #e2e2e2;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain" style="height:486px">
+            <div class="purchaseSearch" style="padding-top:0px;padding-bottom:10px">
+                <form style="width:100%">
+                    <dl class="form-list flt mt20">
+                        <dt>群组名称：</dt>
+                        <dd><input type="text" name="definitionName" placeholder="请输入群组名称"/></dd>
+                        <dd><span class="btn ml20" onclick="searchDefinition()" style="height:35px;cursor: pointer;">查询</span></dd>
+                        <dd><span class="btn ml20" onclick="newGroup()" style="height:35px;cursor: pointer;">新增</span></dd>
+                    </dl>
+                </form>
+            </div>
+            <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px">
+                <table id="flowGroupTable" class="layui-table pop" lay-skin="line">
+                    <colgroup>
+                        <col width="200">
+                        <col width="300">
+                        <col width="100">
+                        <col width="100">
+                        <col width="100">
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th style="text-align:center;width:23%">群组标识</th>
+                        <th style="text-align:center;width:7%">名称</th>
+                        <th style="text-align:center;width:8%">批次</th>
+                        <th style="text-align:center;width:10%">类型</th>
+                        <th style="text-align:center;width:8%">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+            <div class="purchaseSearch" style="padding-top:0px;padding-bottom:10px">
+                <form style="width:100%">
+                    <dl class="form-list flt mt20">
+                        <dt>用户名称：</dt>
+                        <dd><input type="text" name="groupUserNameLike" placeholder="请输入用户名称"/></dd>
+                        <dd><span class="btn ml20" onclick="searchGroupUser()" style="height:35px;cursor: pointer;">查询</span></dd>
+                        <dd><span class="btn ml20" onclick="chooseGroupUser()" style="width:106px;height:35px;cursor: pointer;">添加群组用户</span></dd>
+                    </dl>
+                </form>
+            </div>
+            <div style="box-sizing:border-box;padding:0 20px;margin-right:20px">
+                <table id="flowGroupUserTable" class="layui-table pop" lay-skin="line">
+                    <colgroup>
+                        <col width="100">
+                        <col width="200">
+                        <col width="300">
+                        <col width="100">
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th style="text-align:center;width:23%">用户ID</th>
+                        <th style="text-align:center;width:7%">用户姓名</th>
+                        <th style="text-align:center;width:8%">用户邮箱</th>
+                        <th style="text-align:center;width:8%">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div id="paginationDiv1" style="margin-right:7px;margin-top:-10px"></div>
+        </div>
+    </section>
+</section>
+<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+<script>
+    var currentGroupId = '${currentGroupId}';
+    var layer = '';
+    layui.use('layer', function(){
+        layer = layui.layer;
+    });
+    function isExitsVariable(variableName) {
+        try {
+            if (typeof (variableName) == "undefined") {
+                return "";
+            } else if (variableName == null){
+                return "";
+            }else {
+                return variableName;
+            }
+        } catch (e) {
+        }
+        return "";
+    }
+
+    $(function(){
+        loadMallCustomerList(1);
+    })
+
+    function loadMallCustomerList(currentPageIndex, groupNameLike) {
+        var param = {};
+        param.currentPage = currentPageIndex;
+        if(groupNameLike){
+            param.groupNameLike = groupNameLike;
+        }
+        postUtil.call("/flow/groupUser/queryGroup", param, function (result) {
+            //alert(JSON.stringify(result.DATA.list));
+            var pageNumber = result.pageNumber;
+            var pageSize = result.pageSize;
+            var totalPage = result.totalPage;
+            var totalRow = result.totalRow;
+            renderTable(result.DATA.list);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        loadMallCustomerList(obj.curr, groupNameLike);
+                    }
+                }
+            });
+
+            $('#flowGroupTable tbody tr').bind('click',function () {
+                currentGroupId = $(this).find("input[name=groupId]").val();
+                $(this).parent().find("tr").removeClass("choosedGroup");
+                $(this).addClass("choosedGroup");
+                loadGroupUser(currentGroupId, 1);
+            });
+        });
+    }
+
+    function loadGroupUser(group, currentPageIndex, userNameLike) {
+        var param = {};
+        param.currentPage = currentPageIndex;
+        if(userNameLike){
+            param.userNameLike = userNameLike;
+        }
+        if(group == ''){
+            return;
+        }
+        postUtil.call("/flow/groupUser/queryMemberShip/" + group, param, function (result) {
+            //alert(JSON.stringify(result.DATA.list));
+            var pageNumber = result.DATA.pageNumber;
+            var pageSize = result.DATA.pageSize;
+            var totalPage = result.DATA.totalPage;
+            var totalRow = result.DATA.totalRow;
+            renderGroupUserTable(result.DATA.list);
+            laypage({
+                cont: 'paginationDiv1',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        loadGroupUser(group, obj.curr, userNameLike);
+                    }
+                }
+            });
+        });
+    }
+
+    function renderTable(dataList) {
+        var html="";
+        var length = dataList.length;
+        if (length > 0) {
+            for (var i1 = 0; i1 < dataList.length; i1++) {
+                var data = dataList[i1];
+                var operationHtml  = '<a class="c-h fz12"  href="javascript:newGroup(\'' + isExitsVariable(data.id) + '\')">修改</a>';
+                operationHtml += '<a class="c-h fz12 ml10"  href="javascript:deleteGroup(\'' + isExitsVariable(data.id) + '\')">删除</a>';
+                html+='  <tr>'+
+                        '   <td>'+isExitsVariable(data.id) + '<input type="hidden" name="groupId" value="' + isExitsVariable(data.id) + '">' +'</td>'+
+                        '   <td>'+isExitsVariable(data.name)+'</td>'+
+                        '   <td>'+isExitsVariable(data.rev)+'</td>'+
+                        '   <td>'+isExitsVariable(data.type)+'</td>'+
+                        '   <td>'+ operationHtml +'</td>'+
+                        '  </tr>'
+            }
+        }
+        $("#flowGroupTable tbody").html(html);
+    }
+    
+    function renderGroupUserTable(dataList) {
+        var html="";
+        var length = dataList.length;
+        if (length > 0) {
+            for (var i1 = 0; i1 < dataList.length; i1++) {
+                var data = dataList[i1];
+                var operationHtml  = '<a class="c-h fz12"  href="javascript:deleteGroupUser(\'' + isExitsVariable(data.id) + '\')">删除</a>';
+                html+='  <tr>'+
+                        '   <td>'+isExitsVariable(data.id)+'</td>'+
+                        '   <td>'+isExitsVariable(data.firstName)+'</td>'+
+                        '   <td>'+isExitsVariable(data.email)+'</td>'+
+                        '   <td>'+ operationHtml +'</td>'+
+                        '  </tr>'
+            }
+        }
+        $("#flowGroupUserTable tbody").html(html);
+    }
+
+    function chooseGroupUser() {
+        layer.open({
+            title:"请选择员工",
+            type: 2,
+            area: ['1000px', '650px'],
+            fixed: false, //不固定
+            maxmin: true,
+            content: ['/reusable/user/chooseUserPage','no']
+        });
+    }
+
+    function chooseUserCallback(authorityUserList){
+        if(authorityUserList) {
+            var param = {};
+            param.groupId = currentGroupId;
+            param.data = JSON.stringify(authorityUserList);
+            postUtil.call("/flow/groupUser/addMemberShip", param, function (result) {
+                if(data.STATUS == 'SUCCESS'){
+                    postUtil.submit('/flow/groupUser/list', null);
+                }else{
+                    layer.alert(data.MSG, {icon: 5});
+                }
+            });
+            return true;
+        }else {
+            layer.msg("请选择员工后再进行操作",{icon:5});
+            return false;
+        }
+    }
+
+    function deleteGroup(id){
+        postUtil.call('/flow/groupUser/group/del/' + id,{},function(data){
+            if(data.STATUS == 'SUCCESS'){
+                layer.alert(data.MSG, {icon: 5});
+                postUtil.submit('/flow/groupUser/list', null);
+                //cardUtil.refreshCard("群组与用户");
+            }else{
+                layer.alert(data.MSG, {icon: 5});
+            }
+        })
+    }
+
+    function newGroup(id) {
+        layer.open({
+            title: '新增群组',
+            type: 2,
+            skin:'myskin',
+            scrollbar: false,
+            area: ['600px', '400px'],
+            fixed: false, //不固定
+            maxmin: true,
+            content: '/flow/groupUser/newGroupMsg?id=' + id ,
+            btn: ['确定','取消'],
+            btnAlign: 'c',
+            yes: function(index, layero){
+                var body = layer.getChildFrame('body', index);
+                var group = body.find("input[name=group]");
+                var groupDesc = body.find("input[name=groupDesc]");
+                if(group){
+                    if($(group).val().length < 1){
+                        layer.msg('请输入群组标识！', {icon: 5});
+                        return;
+                    }
+                    var groupReg = /^[a-zA-Z]\w{4,19}$/;
+                    if(!groupReg.test($(group).val())){
+                        layer.msg('群组标识有字母开头，数组和下划线组成！', {icon: 5});
+                        return;
+                    }
+                }else{
+                    return;
+                }
+                if(groupDesc){
+                    if($(groupDesc).val().length < 1){
+                        layer.msg('请输入群组名称！', {icon: 5});
+                        return;
+                    }
+                }else{
+                    return;
+                }
+                var data = {};
+                data.group = $(group).val();
+                data.groupDesc = $(groupDesc).val();
+                data.type = $(body.find("input[name=type]")).val()
+                postUtil.call('/flow/groupUser/group',data,function(data){
+                    if(data.STATUS == 'SUCCESS'){
+                        layer.alert(data.MSG, {icon: 5});
+                        postUtil.submit('/flow/groupUser/list', null);
+                        //cardUtil.refreshCard("群组与用户");
+                    }else{
+                        layer.alert(data.MSG, {icon: 5});
+                    }
+                })
+            }
+            ,btn2: function(index, layero){
+
+            }
+        });
+    }
+
+    function deleteGroupUser(id) {
+        postUtil.call('/flow/groupUser/deleteMemberShip' ,{userId:id, group:currentGroupId},function(data){
+            if(data.STATUS == 'SUCCESS'){
+                layer.alert(data.MSG, {icon: 5});
+                postUtil.submit('/flow/groupUser/list?currentGroupId=' + currentGroupId, null);
+                //cardUtil.refreshCard("群组与用户");
+            }else{
+                layer.alert(data.MSG, {icon: 5});
+            }
+        })
+    }
+
+    function searchDefinition() {
+        loadMallCustomerList(1, $("input[name=definitionName]").val());
+    }
+
+    function searchGroupUser() {
+        loadGroupUser(currentGroupId , 1, $("input[name=groupUserNameLike]").val());
+    }
+
+</script>
+</body>
+</html>

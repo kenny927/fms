@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_lw1dd7vgljjug14i.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <link rel="stylesheet" href="/res/css/project.css<@resVersionDirective>?</@>">
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <style type="text/css" media="screen">
+        .jun-form-s .layui-form-radio span{
+            font-size: 14px!important;
+        }
+    </style>
+</head>
+<body>
+<div class="jun-close fz14 c-2" style="padding: 20px;min-height:200px;">
+    <p><span class="c-f ml10">请确认授权集成商：</span></p>
+    <div >
+        <form id="integratorsFrm">
+        <table class="layui-table pop" id="chooseIntegratorsTb">
+            <colgroup>
+                <col width="50">
+                <col width="300">
+                <col width="200">
+                <col>
+            </colgroup>
+            <thead>
+            <tr>
+                <th><input  type="checkbox" name="chooseIntegratorsAllCb"></th>
+                <th  style="font-weight:500;text-align:center;font-size:12px;">集成商名称</th>
+                <th  style="font-weight:500;text-align:center;font-size:12px;">统一社会信用代码</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        </form>
+    </div>
+</div>
+<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript">
+    layui.use('form', function(){
+        var form = layui.form();
+    })
+
+    $(function() {
+        loadIntegrators();
+
+    $("input[name=chooseIntegratorsAllCb]").on("click",function(){
+        if($(this).prop("checked")){
+            $("input[name=chooseIntegratorsCb]").prop("checked",true);
+            $("input[name=chooseIntegratorsAllCb]").prop("checked",true);
+        }else{
+            $("input[name=chooseIntegratorsCb]").prop("checked", false);
+            $("input[name=chooseIntegratorsAllCb]").prop("checked",false);
+        }
+    });
+    });
+
+    function loadIntegrators() {
+        var param = {
+            backupId:'${backupId}'
+        };
+        postUtil.call("/orderProjectBackupGrantAuthorization/queryIntegratorsSigle", param, function (result) {
+            renderData(result.data);
+        });
+    }
+
+    function renderData(data) {
+        //alert(JSON.stringify(data));
+        var htm = '';
+        for(var i = 0; i<data.length; i++){
+            htm = htm + '<tr>';
+            htm = htm + '<td><input type="checkbox" name="chooseIntegratorsCb">' +
+            	    '<input type="hidden" name="integratorId" value="'+ data[i].integratorId +'">' +
+                    '<input type="hidden" name="integratorCompanyName" value="'+  data[i].integratorCompanyName +'">' +
+                    '<input type="hidden" name="integratorCreditId" value="'+ data[i].integratorCreditId +'">' +
+                    '</td>';
+            htm = htm + '<td>' + data[i].integratorCompanyName + '</td>';
+            htm = htm + '<td>' + data[i].integratorCreditId + '</td>';
+            htm = htm + '</tr>';
+        }
+        $("#chooseIntegratorsTb").find("tbody").html(htm);
+    }
+
+</script>
+</body>
+</html>

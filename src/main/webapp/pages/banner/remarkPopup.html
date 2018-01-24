@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="/res/css/sku.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain" style="min-height: 100px;">
+            <div class="addSku" style="width:550px;">
+                <form id="markBannerFrm" class="form-horizontal" role="form">
+                <input type="hidden" name="bannerId">
+                <dl class="sku-list">
+                    <dt class="mt10">描述：</dt>
+                    <dd class="inputContent">
+                        <input type="text" name="bannerDescribe" id="bannerDescribe" placeholder="请输入图片描述">
+                    </dd>
+                </dl>
+                <dl class="sku-list">
+                    <dt class="mt10">链接：</dt>
+                    <dd class="inputContent">
+                        <input type="text" name="bannerPicDestination" id="bannerPicDestination" placeholder="请输入链接地址">
+                    </dd>
+                </dl>
+                </form>
+                <dl class="sku-list" style="float:right;margin-right: 28px;">
+                    <dd>
+                        <button id="doSaveBannerBtn" class="search-btn" style="cursor: pointer;" onclick="doSaveMarkBanner()">确&nbsp;认</button>
+                    </dd>
+                    <dd style="margin-left: 10px;">
+                        <button id="doCancelSaveBannerBtn" class="search-btn" style="cursor: pointer;">关&nbsp;闭</button>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </section>
+</section>
+
+<script type="text/javascript">
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    $(document).on("click", "#doCancelSaveBannerBtn", function () {
+        parent.layer.close(index);//关闭当前窗口
+    });
+    function doSaveMarkBanner(){
+        postUtil.call("/mall/banner/saveMarkBanner", $('#markBannerFrm').serialize(), function (result) {
+            if (result.STATUS == "SUCCESS") {
+                layer.msg("修改备注成功");
+//                $('#markBannerFrm').reset();
+                parent.layer.close(index);//关闭当前窗口
+            } else {
+                layer.msg(result.MSG);
+            }
+        });
+    }
+</script>
+</body>
+</html>

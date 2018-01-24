@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="/res/public/layui-v2.0.0/layui/css/layui.css"/>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <style>
+        select[name='accountDealStatus']+div.layui-form-selected dl {
+            min-height: 100px;
+        }
+         select[name='businessGroup']+div.layui-form-selected dl{
+             min-height: 200px;
+         }
+        .bor-dash {
+            padding-top: 0;
+            padding-bottom: 0;
+            border: 1px dashed #fff;
+            max-width: 100px;
+            min-width: 80px;
+        }
+
+        .bor-dash .abs-r {
+            top: 0;
+        }
+
+        .bor-dash:hover {
+            border: 1px dashed #999;
+            padding-right: 20px;
+        }
+
+        .bor-dash:hover .abs-r {
+            display: block !important;
+        }
+
+        .jun-form-s input[type='text'].layui-form-danger {
+            border: 1px solid #ff4800;
+        }
+
+        .similar-mark {
+            color: #ff4800 !important;
+        }
+
+        .form-css .dl-form dd input[type='text'] {
+                     width: 200px;
+                 }
+
+        .form-css .dl-form dd.w180 {
+            width: 200px;
+        }
+
+        .add-css .layui-addLabel {
+            display: none;
+        }
+
+        .add-css:hover .layui-addLabel {
+            display: block;
+        }
+        ::selection{
+            background: #407FE7;
+        }
+    </style>
+</head>
+<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+<!--[if lt IE 9]>
+<script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+<script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<body>
+<div class="yofc-body" id="newCustomer" v-cloak>
+    <form action="" class="layui-form jun-form-s form-css">
+        <h3 class="mb5 fz16">公司信息</h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <div style="padding-left: 40px;">
+                <dl class="dl-form">
+                    <dt class="flt fz12"><span class="c-f">*</span>公司名称：</dt>
+                    <dd class="flt pre"><input type="text" name="accountName" lay-verify="accountName"
+                                           v-model="queryParam.accountName" placeholder="请输入公司名称" autocomplete="off"
+                                           class="layui-input">
+                    <div class="abs-r line-middle" v-show="viewTheConflictFlg" style="top: 27px;width: 240px;left: -10px;">
+                        <span  class="flt c-h ml10">与客户库其他客户存在冲突</span>
+                        <a @click="lookConflict()" class="c-f ml10 cs-p fz12">查看冲突</a>
+                    </div>
+                    </dd>
+                    <dt class="flt"><span class="c-f">*</span>地址：</dt>
+                    <dd class="flt dd-city">
+                        <select name="province" lay-filter="province" lay-verify="province" lay-search>
+                            <option value="">请选择省</option>
+                        </select>
+                    </dd>
+                    <dd class="flt dd-city ml10">
+                        <select name="city" lay-filter="city" lay-verify="city" lay-search>
+                            <option value="">请选择市</option>
+                        </select>
+                    </dd>
+                    <dd class="flt ml10"><input style="width: 175px;" lay-verify="address" type="text" name="address"
+                                                autocomplete="off" class="layui-input"></dd>
+                </dl>
+                <dl class="dl-form">
+                </dl>
+                <dl class="dl-form">
+                    <dt class="flt fz12" style="width: 130px;margin-left:-40px;">统一社会信用代码：</dt>
+                    <dd class="flt"><input type="text" name="inteSocialCreditNo" lay-verify="inteSocialCreditNo"
+                                           placeholder="请输入统一社会信用代码" autocomplete="off" class="layui-input"></dd>
+                    <dt class="flt fz12" style="width: 115px;margin-left:-25px;"><span class="c-f">*</span>座机：</dt>
+                    <dd class="flt"><input style="width: 50px;" type="text" lay-verify="telephone_1" name="telephone_1"
+                                           autocomplete="off" class="layui-input"></dd>
+                    <dd class="flt ml5 mr5" style="line-height: 32px;">-</dd>
+                    <dd class="flt"><input style="width: 175px;" type="text" lay-verify="telephone_2" name="telephone_2"
+                                           autocomplete="off" class="layui-input"></dd>
+                </dl>
+                <dl class="dl-form pre">
+                    <dt v-show="queryParam.mainObjectId == '10007'" class="flt fz12"><span class="c-f">*</span>所属行业：</dt>
+                    <!-- 双击有bug -->
+                    <dd v-show="queryParam.mainObjectId == '10007'" class="flt">
+                        <select name="businessGroup" lay-filter="businessGroup" lay-verify="businessGroup"
+                                style="width: 240px;">
+                            <option value="">请选择行业</option>
+                            <option v-for="item in industriallist" v-bind:value="item.cName">{{item.cName}}</option>
+                        </select>
+                    </dd>
+                    <dt class="flt fz12">客户状态：</dt>
+                    <!-- 双击有bug -->
+                    <dd class="flt">
+                        <select name="accountDealStatus" lay-filter="accountDealStatus" style="width: 240px;">
+                            <option value=""></option>
+                            <option value="DEAL">成交</option>
+                            <option value="NODEAl" selected>未成交</option>
+                        </select>
+                    </dd>
+                    </dl>
+                    <dl class="dl-form" style="margin-bottom: 0">
+                    <dt class="flt fz12" style="width: 115px;margin-left:-25px;">客户标签：</dt>
+                    <dd class="flt li fz12  line-middle pre">
+                        <div class="layui-row layui-col-space10"
+                             style="padding-bottom: 5px;margin-top: -1px;width: 470px;">
+                            <div class="layui-col-md4 layui-elip pre c-2 bor-dash"
+                                 v-for="(item,index) in newCustomerLabelList"><a href="javascript:;"
+                                                                                 class="a-hover2 fz12" v-bind:title="item.labelName">{{item.labelName}}</a><a
+                                    @click="deleteLabel(index,item,true)" href="javascript:;"
+                                    class="abs-r iconfont icon-chuyidong a-hover1 layui-hide"></a></div>
+                            <div class="layui-col-md4 pre add-css" style="line-height: 23px;min-width: 100px;"><a
+                                    href="javascript:;" class="fz12" style="color: #035a9d;">+添加标签</a>
+                                <div class="layui-addLabel">
+                                    <div class="layui-row layui-col-space10">
+                                        <div class="layui-col-md4 layui-elip pre pr20 c-2"
+                                             v-for="(item,index) in customerLabelList"><a
+                                                @click="newAddLabelmethod(item)" href="javascript:;"
+                                                class="a-hover2 fz12">{{item.labelName}}</a><a
+                                                @click="deleteLabel(index,item,false)" href="javascript:;"
+                                                class="abs-r iconfont icon-chuyidong a-hover1"></a></div>
+                                        <div class="layui-col-md12" style="border-top:1px solid #e6e6e6;">
+                                            <input type="text" name="title" v-model="labelName" placeholder="请输入自定义标签名"
+                                                   autocomplete="off" class="layui-input inline mt5">
+                                            <a href="javascript:;" class="inline" @click="newAddLabel()" style="color: #035a9d;">新增</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </dd>
+                </dl>
+            <!--</div>-->
+            <div class="mt20" v-show="viewTheConflictList.length>0&&lookConflictFlg" id="lookConflict">
+                <hr class="hr-bor"/>
+                <span class="iconfont icon-icon13 frt fz12 c-9 mb10 cs-p" @click="lookConflict()"></span>
+                <table class="layui-table pop" lay-skin="line" style="margin-bottom: 0">
+                    <colgroup>
+                        <col width="200">
+                        <col width="200">
+                        <col width="200">
+                        <col width="300">
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>公司名称</th>
+                        <th>地址</th>
+                        <th>客户经理</th>
+                        <th>创建时间</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="item in viewTheConflictList">
+                        <td v-html="item.accountName"></td>
+                        <td class="c-f">{{item.area}}</td>
+                        <td>{{item.accountManagerName}}</td>
+                        <td>{{moment(item.createDate).format('YYYY-MM-DD HH:mm:ss')}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </blockquote>
+        <h3 class="mb5 pt15 fz16">联系人</h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <div style="padding-left: 40px;">
+                <dl class="dl-form">
+                    <dt class="flt fz12"><span class="c-f">*</span>姓名：</dt>
+                    <dd class="flt"><input type="text" name="linkmanName" lay-verify="linkmanName" placeholder="请输入姓名"
+                                           autocomplete="off" class="layui-input"></dd>
+                    <dt class="flt fz12"><span class="c-f">*</span>性别：</dt>
+                    <dd class="flt w180">
+                        <input type="radio" name="sex" value="male" title="先生" checked="">
+                        <input type="radio" name="sex" value="female" title="女士">
+                    </dd>
+                    <dt class="flt fz12"><span class="c-f">*</span>手机：</dt>
+                    <dd class="flt"><input type="text" name="linkmanTelephone" lay-verify="linkmanTelephone"
+                                           placeholder="请输入手机" autocomplete="off" class="layui-input"></dd>
+                </dl>
+                <dl class="dl-form">
+                    <dt class="flt fz12"><span class="c-f">*</span>邮箱：</dt>
+                    <dd class="flt"><input type="text" name="email" lay-verify="email" placeholder="请输入邮箱"
+                                           autocomplete="off" class="layui-input"></dd>
+                    <dt class="flt fz12">座机：</dt>
+                    <dd class="flt"><input type="text" name="linkmanFixedTelephone" placeholder="请输入座机"
+                                           autocomplete="off" class="layui-input"></dd>
+                    <dt class="flt fz12">QQ：</dt>
+                    <dd class="flt"><input type="text" name="qq" placeholder="请输入QQ" autocomplete="off"
+                                           class="layui-input"></dd>
+                </dl>
+                <dl class="dl-form" style="margin-bottom: 0">
+                    <dt class="flt fz12">部门：</dt>
+                    <dd class="flt"><input type="text" name="department" placeholder="请输入部门" autocomplete="off"
+                                           class="layui-input"></dd>
+                    <dt class="flt fz12">职务：</dt>
+                    <dd class="flt"><input type="text" name="duty" placeholder="请输入职务" autocomplete="off"
+                                           class="layui-input"></dd>
+                </dl>
+            </div>
+        </blockquote>
+        <div class="t-c pb20">
+            <button class="form-btn layui-btn-small2" lay-filter="demo1" lay-submit="">提交</button>
+        </div>
+    </form>
+</div>
+<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui/Area1.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui-v2.0.0/layui/layui.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/vue/dist/vue.min.js<@resVersionDirective>?</@>"></script>
+<script>
+    var form, $form, laydate, areaData = Area, vm;
+    vm = new Vue({
+        el: '#newCustomer'
+        , data: {
+            labelName: '',       //新增标签输入值
+            industriallist: [],  //   行业数据
+            viewTheConflictList: [],       //冲突数据
+            customerLabelList: [],        //数据库标签
+            newCustomerLabelList: [],    //页面标签
+            viewTheConflictFlg: false,   //  显示冲突查看
+            lookConflictFlg: false,   //冲突查看内容
+            queryParam: {
+                accountName: '',   //公司名称
+                province: '',      //省
+                city: '',          //市
+                mainObjectId: '${mainObjectId}',       //类型id
+                accountType: '${mainObjectId}' == '10007' ? 'INDUSTRIAL' : 'ENTERPRISE'   //行业//企业
+            }
+        }
+        , mounted: function () {
+            this.$nextTick(function () {  //确保vue执行完毕
+                this.showData();  //页面加载初始化方法
+                this.getCustomerLabelList();
+            })
+        }
+        , methods: {
+            showData: function () {
+                layui.use('form', function () {
+                    form = layui.form;
+                    $form = $('form');
+                    vm.loadProvince();   //初始化省市
+                    vm.loadIndustry();     // 初始化行业
+                    var reg = /^\s*$/g;   //为空正则
+                    form.verify({           //页面校验规则
+                        accountName: function (value) {
+                            if (value == "" || reg.test(value)) {
+                                return '公司名称不能为空';
+                            }
+                        }
+                        , province: function (value) {
+                            if (value == "" || reg.test(value)) {
+                                return '请选择省';
+                            }
+                        }
+                        , city: function (value) {
+                            if (value == "" || reg.test(value)) {
+                                return '请选择省';
+                            }
+                        }
+                        , businessGroup: function (value) {
+                            if ((value == "" || reg.test(value))&&vm.queryParam.mainObjectId == '10007') {
+                                return '请选择行业';
+                            }
+                        }
+                        , linkmanName: function (value) {
+                            if (value == "" || reg.test(value)) {
+                                return '请填写联系人姓名';
+                            }
+                        }
+                        , telephone_2: function (value) {
+                            if (value == "" || reg.test(value)) {
+                                return '座机不能为空';
+                            }
+                        }
+                        , telephone_1: function (value) {
+                            if (value == "" || reg.test(value)) {
+                                return '座机不能为空';
+                            }
+                        }
+                        , email: function (value) {
+                            var reg1 = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+                            if (value == "" || reg.test(value)) {
+                                return '邮箱不能为空';
+                            } else if (!reg1.test(value)) {
+                                return '邮箱格式不正确';
+                            }
+                        }
+                        , linkmanTelephone: function (value) {
+                            var reg2 = /(^0?1[3|4|5|7|8][0-9]\d{8}$)|(^0[\d]{2,3}-[\d]{7,8}$)/;
+                            if (value == "" || reg.test(value)) {
+                                return '手机号不能为空';
+                            } else if (!reg2.test(value)) {
+                                return '手机号格式不正确';
+                            }
+                        }
+                        , inteSocialCreditNo: function (value) {
+                            if (value != null && value != '') {
+                                var reg1 = /(^[0-9A-Z]{18}$)|(^[0-9A-Z]{15}$)|(^无$)/;
+                                if (!reg1.test(value)) {
+                                    return '统一社会信用代码格式不正确';
+                                }
+                            }
+                        }
+                        , content: function (value) {
+                            layedit.sync(editIndex);
+                        }
+                    });
+                    //监听提交
+                    form.on('submit(demo1)', function (result) {   //页面提交方法
+                        var param = result.field;
+                        var data = {};
+                        data.mainObjectId = vm.queryParam.mainObjectId;
+                        data.accountName = param.accountName;
+                        data.inteSocialCreditNo = param.inteSocialCreditNo;
+                        data.address = param.address;
+                        data.accountDealStatus = param.accountDealStatus;
+                        data.city = vm.queryParam.city;
+                        data.province = vm.queryParam.province;
+                        data.businessGroup = param.businessGroup;
+                        data.linkmanName = param.linkmanName;
+                        data.qq = param.qq;
+                        data.telephone = param.telephone_1 + "-" + param.telephone_2;
+                        data.linkmanTelephone = param.linkmanTelephone;
+                        data.linkmanFixedTelephone = param.linkmanFixedTelephone;
+                        data.sex = param.sex;
+                        data.email = param.email;
+                        data.department = param.department;
+                        data.duty = param.duty;
+                        data.accountType = vm.queryParam.accountType;
+                        var labelIds = "";
+                        vm.newCustomerLabelList.forEach(function (item, index) {
+                            labelIds += item.labelId + ',';
+                        })
+                        data.labelIds = labelIds;
+                        postUtil.call("/customerManagement/addOrUpdate", {data: JSON.stringify(data)}, function (res) {
+                            if (res.STATUS == 'SUCCESS') {
+                                var html = "";
+                                if (res.conflict == 'Yes') {
+                                    html = '<span class="c-f">客户信息存在冲突，</span>已提交至冲突裁判员处进行审核。请耐心等待审核结果！';
+
+                                } else {
+                                    html = '<p class="t-c">恭喜您，客户信息提交成功！<p>'
+                                }
+                                layer.open({
+                                    title: '操作提示',
+                                    type: 1,
+                                    skin: 'msgskin3',
+                                    btnAlign: 'c',
+                                    area: ['400px', '250px'],
+                                    btn: ['关闭'],
+                                    content: '<div style="padding: 25px 50px;font-size: 16px!important;" class="fz12 line-middle">' + html + '</div>',
+                                    yes: function (index) {
+                                        layer.close(index)
+                                        cardUtil.openCard("我的客户", "/customerManagement/preListPrv");
+                                        cardUtil.changeCard("我的客户");
+                                        cardUtil.refreshCard("我的客户");
+                                        if (vm.queryParam.mainObjectId == '10007') {
+                                            cardUtil.closeCard("新增行业客户");
+                                        } else {
+                                            cardUtil.closeCard("新增企业客户");
+                                        }
+                                    }
+                                });
+                            } else {
+                                layer.msg(res.MSG, {icon: 6})
+                            }
+                        })
+                        return false;
+                    });
+                })
+            },
+            lookConflict: function () {        //查看内容展示或者隐藏
+                $('html,body').animate({scrollTop:'300px'},500);
+                this.lookConflictFlg = !this.lookConflictFlg;
+            },
+            deleteLabel: function (index2, obj, flg) {   //删除标签(数据库)的方法
+                if (flg) {
+                    vm.newCustomerLabelList.splice(index2, 1);
+                } else {
+                    layer.open({
+                        title: '操作提示',
+                        type: 1,
+                        skin: 'msgskin',
+                        btnAlign: 'c',
+                        area: ['400px', '250px'],
+                        btn: ['确认', '取消'],
+                        content: '<div style="padding: 30px 50px;" class="fz12 clr"><div class="iconfont icon-jinggao1 fz18 c-f flt" style="width: 50px;font-size: 45px!important;"></div><div class="c-2 flt" style="width: 230px;font-size: 14px;line-height: 26px;">删除该标签将导致拥有该标签的所有客户丢失该标签信息，是否确认删除？</div></div>',
+                        yes: function (index) {
+                            var param = {};
+                            param.labelId = obj.labelId;
+                            vm.deleteCustomLabel(param, index2, obj);
+                            layer.close(index)
+                        }
+                        , btn2: function (index) {
+                            layer.close(index)
+                        }
+                    });
+                }
+            },
+            newAddLabel: function () {    //添加自定义标签
+                if (this.labelName) {
+                    var param = {};
+                    param.labelName = this.labelName;
+                    this.addCustomLabel(param);
+                } else {
+                    layer.msg('请输入自定义标签名')
+                }
+            },
+            deleteCustomLabel: function (param, index2, obj) {      //删除自定义标签
+                postUtil.call('/customerLabel/deleteCustomLabel', param, function (result) {
+                    if (result.STATUS == 'SUCCESS') {
+                        vm.customerLabelList.splice(index2, 1);
+                        vm.newCustomerLabelList.forEach(function (item, index) {
+                            if (item.labelId == obj.labelId) {
+                                vm.newCustomerLabelList.splice(index, 1);
+                            }
+                        })
+                        layer.msg('删除自定义标签成功')
+
+                    }
+                })
+            },
+            addCustomLabel: function (param) {       //新增自定义标签
+                postUtil.call('/customerLabel/addCustomLabel', param, function (result) {
+                    if (result.STATUS == 'SUCCESS') {
+                        vm.customerLabelList.push(result.DATA);
+                        layer.msg('新增自定义标签成功')
+                        vm.labelName = "";
+                    }
+                })
+            },
+            newAddLabelmethod: function (obj) {       //添加数据库标签到页面
+                if (vm.newCustomerLabelList.indexOf(obj) == -1) {
+                    vm.newCustomerLabelList.push(obj);
+                } else {
+                    layer.msg('请不要重复添加!')
+                }
+            },
+            getCustomerLabelList: function () {      //获取数据库标签
+                postUtil.call('/customerLabel/getCustomerLabelList', {}, function (result) {
+                    if (result.STATUS == 'SUCCESS') {
+                        vm.customerLabelList = result.DATA;
+                    }
+                })
+            },
+            loadIndustry: function () {            //获取行业下拉列表数据
+                postUtil.call('/customerManagement/getIndustrialInfo', {}, function (result) {
+                    if (result.STATUS == 'SUCCESS') {
+                        vm.industriallist = result.industrial;
+                        vm.$nextTick(function () {
+                            form.render();
+                        })
+                    }
+                })
+
+            },
+            loadProvince: function () {          //初始化省
+                var proHtml = '';
+                for (var i = 0; i < areaData.length; i++) {
+                    if (this.queryParam.province != undefined && this.queryParam.province != '' && areaData[i].provinceName == this.queryParam.province) {
+                        proHtml += '<option value="' + areaData[i].provinceCode + '_' + areaData[i].mallCityList.length + '_' + i + '_' + areaData[i].provinceName + '" selected>' +
+                            areaData[i].provinceName + '</option>';
+                        vm.loadCity(areaData[i].mallCityList);
+                    } else {
+                        proHtml += '<option value="' + areaData[i].provinceCode + '_' + areaData[i].mallCityList.length + '_' + i + '_' + areaData[i].provinceName + '">' +
+                            areaData[i].provinceName + '</option>';
+                    }
+                }
+                $form.find('select[name=province]').append(proHtml).parent().show();
+                form.render();
+                form.on('select(province)', function (data) {
+                    vm.queryParam.city = "";
+                    var value = data.value;
+                    var d = value.split('_');
+                    var code = d[0];
+                    var count = d[1];
+                    var index = d[2];
+                    vm.queryParam.province = d[3];
+                    if (count > 0) {
+                        vm.loadCity(areaData[index].mallCityList);
+                    } else {
+                        vm.queryParam.province = "";
+                        vm.queryParam.city = "";
+                    }
+                });
+
+            },
+            viewTheConflict: function () {          //校验是否存在冲突
+                postUtil.call('/customerManagement/checkConflictAccountName', this.queryParam, function (result) {
+                    if (result.success == true) {
+                        if (result.data) {
+                            if (!vm.viewTheConflictList.length) {
+                                vm.$set(vm.viewTheConflictList, 'length', result.data.length);
+                            }
+                            vm.viewTheConflictList = result.data;
+                            vm.viewTheConflictFlg = true;
+                        } else {
+                            vm.$set(vm.viewTheConflictList, 'length', 0);
+                            vm.viewTheConflictFlg = false;
+                        }
+                    } else {
+                        layer.msg(result.msg, {icon: 6});
+                    }
+                })
+            },
+            loadCity: function (citys) {          //初始化市
+                var cityHtml = '';
+                for (var i = 0; i < citys.length; i++){
+                    if (this.queryParam.city != undefined && this.queryParam.city != '' && citys[i].cityName == this.queryParam.city) {
+                          if(citys[i].mallAreaList){
+                             cityHtml += '<option value="' + citys[i].cityCode + '_' + citys[i].mallAreaList.length + '_' + i + '_' + citys[i].cityName + '" selected>' +
+                                citys[i].cityName + '</option>';
+                             vm.loadArea(citys[i].mallAreaList);
+                          }else{
+                             cityHtml += '<option value="' + citys[i].cityCode + '_0' + '_' + i + '_' + citys[i].cityName + '" selected>' + citys[i].cityName + '</option>';
+                          }
+                           
+                    }else{
+                       if(citys[i].mallAreaList){  
+                         cityHtml += '<option value="' + citys[i].cityCode + '_' + citys[i].mallAreaList.length + '_' + i + '_' + citys[i].cityName + '">' +
+                            citys[i].cityName + '</option>';
+                       }else{
+                           cityHtml += '<option value="' + citys[i].cityCode + '_0' + '_' + i + '_' + citys[i].cityName + '">' +
+                            citys[i].cityName + '</option>';
+                       }
+                    }
+                }
+                if (!this.queryParam.city) {
+                    vm.queryParam.city = citys[0].cityName;
+                }
+                $form.find('select[name=city]').html(cityHtml)
+                form.render();
+                form.on('select(city)', function (data) {
+                    var value = data.value;
+                    var d = value.split('_');
+                    var code = d[0];
+                    var count = d[1];
+                    var index = d[2];
+                    vm.queryParam.city = d[3];
+                });
+            }
+        },
+        watch: {        //实时监控页面省市及公司名称,来校验是否存在冲突
+            'queryParam.province': function (newVal, oldVal) {
+                if (newVal && this.queryParam.city && this.queryParam.accountName) {
+                    this.viewTheConflict();
+                }
+            },
+            'queryParam.city': function (newVal, oldVal) {
+                if (newVal && newVal && this.queryParam.accountName) {
+                    this.viewTheConflict();
+                }
+            },
+            'queryParam.accountName': function (newVal, oldVal) {
+                if (newVal && this.queryParam.city && newVal) {
+                    this.viewTheConflict();
+                }
+            }
+        }
+    })
+    // 单个失去焦点的校验
+    $("input[name='inteSocialCreditNo']").on('blur', blurV);
+    $("input[name='linkmanTelephone']").on('blur', blurV);
+    $("input[name='email']").on('blur', blurV);
+    function blurV() {
+        var DANGER = 'layui-form-danger',
+            stop = null,
+            verify = form.config.verify,   //校验方法
+            device = layui.device()   //获取设备
+        var othis = $(this), ver = othis.attr('lay-verify'), tips = '';
+        var value = othis.val(), isFn = typeof verify[ver] === 'function';
+        othis.removeClass(DANGER);
+        if (verify[ver] && (isFn ? tips = verify[ver](value, this) : !verify[ver][0].test(value))) {
+            layer.msg(tips || verify[ver][1], {
+                icon: 5
+                , shift: 6
+            });
+            //非移动设备自动定位焦点
+            if (!device.android && !device.ios) {
+                this.focus();
+            }
+            othis.addClass(DANGER);
+            return stop = true;
+        }
+    }
+</script>
+</body>
+</html>

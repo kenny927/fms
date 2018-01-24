@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <script src="/res/js/jquery-3.1.1.min.js"></script>
+    <script src="/res/public/layui/layui.js"></script>
+    <script src="/res/common/globalVar.js"></script>
+    <script src="/res/common/post.js"></script>
+    <script src="/res/js/vue.js"></script>
+</head>
+<body>
+<div>
+    <div class="bz-bb pl20 pr20 pt20 jun-form-s form-css">
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+           <dl class="dl-form mb0">
+               <dt class="flt line-middle">订单号：</dt>
+               <dd class="flt line-middle c-2 w240">PO2017071414342632993</dd>
+               <dt class="flt line-middle">创建时间：</dt>
+               <dd class="flt line-middle c-2 w240">2017-3-31-16:00:00</dd>
+               <dt class="flt line-middle">订单状态：</dt>
+               <dd class="flt line-middle c-f w240">代发货</dd>
+               <dt class="flt line-middle">销售订单客户：</dt>
+               <dd class="flt line-middle c-2 w240">郑州锐康科技有限公司</dd>
+           </dl>
+           <dl class="dl-form  mb0">
+               <dt class="flt line-middle">买方</dt>
+               <dd class="flt line-middle c-f w240">长飞光纤光缆股份有限公司</dd>          
+               <dt class="flt line-middle">卖方：</dt>
+               <dd class="flt line-middle w240">长飞光纤光缆（上海）有限公司</dd>
+               <dt class="flt line-middle">合同号：</dt>
+               <dd class="flt line-middle c-2 w240">C001</dd>
+               <dt class="flt line-middle">关联销售单号：</dt>
+               <dd class="flt line-middle c-2 w240">SO2017071915212764926</dd>
+           </dl>
+        </blockquote>
+    </div>
+
+    <div class="bz-bb pl20 pr20  mb20 pb20 jun-form-s form-css">
+        <h3 class="mt20 fz16 h3-tittle pl10 c-2">订单明细信息</h3>
+        <blockquote >          
+            <table class="layui-table pop">
+                <colgroup>
+                    <col  width="100">
+                    <col  width="200">
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>商品编码</th>
+                    <th>商品名称</th>
+                    <th>型号</th>
+                    <th>出库地</th>
+                    <th>数量</th>
+                    <th>单位</th>
+                    <th>采购价</th>
+                    <th>小计</th>
+                    <th>采购运费</th>
+                    <th>商品要求</th>
+                    <th>备注</th>
+                </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                      <td>0010001</td>
+                      <td>YOFC-GYTA-8B1.3 室外松套层绞式非铠装光缆8芯</td>
+                      <td>YOFC-GYTA-8B1.3</td>
+                      <td>上海</td>
+                      <td>1</td>
+                      <td>千米</td>
+                      <td>2700</td>
+                      <td>2700</td>
+                      <td>100</td>
+                      <td>1KM*盘</td>
+                      <td></td>
+                  </tr>
+                  <tr>
+                      <td>0010001</td>
+                      <td>YOFC-GYTA-8B1.3 室外松套层绞式非铠装光缆8芯</td>
+                      <td>YOFC-GYTA-8B1.3</td>
+                      <td>上海</td>
+                      <td>1</td>
+                      <td>千米</td>
+                      <td>2700</td>
+                      <td>2700</td>
+                      <td>100</td>
+                      <td>1KM*盘</td>
+                      <td></td>
+                  </tr>
+                </tbody>
+            </table>
+            <div class="mt20">
+                <form action="" class="clr">
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">商品总金额：</dt>
+                        <dd class="frt line-middle w100 txtR">￥23000</dd>
+                    </dl>
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">运费：</dt>
+                        <dd class="frt line-middle w100 txtR">￥2400</dd>
+                    </dl>
+                    <dl class="dl-form frt mb5-i" >
+                        <dt class="flt">订单总金额：</dt>
+                        <dd class="frt line-middle w100 txtR">￥<span class="c-f fz18 fw-b">25400</span></dd>
+                    </dl>
+                </form>
+            </div>
+            <h3 class="mt20 fz12 bg-f0 h3-tittle pl10 c-2 ">
+                <span class="fw-b ml10">收货人信息：</span>
+                <span>江苏 南京 秦淮区 XX  </span>
+                <span class="ml5">收货人：夏英峰</span>
+                <span class="ml5">联系电话：15951760328</span>
+            </h3>
+        </blockquote>
+
+        <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">订单合同信息<span class="c-h frt fz12 cs-p under-l mr5">收起></span></h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <h3 class="mb5">订单信息</h3>
+            <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="padding-left: 40px;">
+                <dl class="dl-form">
+                   <dt class="flt fz12">填写备注：</dt>
+                   <dd class="flt layui-form">
+                      <input disabled type="text" name="title"  placeholder="请输入" autocomplete="off" class="layui-input c-9-i" value="武大医院院项目">
+                   </dd>
+                   <dt class="flt fz12">合同号：</dt>
+                   <dd class="flt layui-form">
+                      <input disabled type="text" name="title"  placeholder="请输入" autocomplete="off" class="layui-input c-9-i" value="c121212">
+                   </dd>
+                   <dt class="flt fz12">期望交期：</dt>
+                   <dd class="flt layui-form">
+                     <input disabled verify="normalString" id="expectDeliveryTime" value="2017-7-30" type="text" name="followDate" style="height: 32px;width: 240px;" class="layui-input laydate-icon c-9-i" placeholder="期望交期" onclick="layui.laydate({elem: this,min: laydate.now(), istime: false, format: 'YYYY-MM-DD'})" validate="true">
+                   </dd>
+                </dl>
+                <dl class="dl-form">
+                   <dt class="flt fz12">项目名称：</dt>
+                   <dd class="flt layui-form">
+                      <input disabled type="text" name="title"  placeholder="请输入" autocomplete="off" class="layui-input c-9-i" value="武大医院院项目">
+                   </dd>
+                   <dt class="flt fz12">所属行业：</dt>
+                   <dd class="flt layui-form">
+                      <input disabled type="text" name="title"  placeholder="请输入" autocomplete="off" class="layui-input c-9-i" value="28">
+                   </dd>
+                </dl>
+                <dl class="dl-form">
+                   <dt class="flt fz12">订单签约人：</dt>
+                   <dd class="flt layui-form">
+                      <input disabled type="text" name="title"  placeholder="请输入" autocomplete="off" class="layui-input c-9-i" value="刘彩云">
+                   </dd>
+                   <dt class="flt fz12">联系电话：</dt>
+                   <dd class="flt layui-form">
+                      <input disabled type="text" name="title"  placeholder="请输入" autocomplete="off" class="layui-input c-9-i" value="18982763132">
+                   </dd>
+                </dl>
+                <dl class="dl-form" style="margin-bottom: 0">
+                   <dt class="flt fz12">销售版本合同：</dt>
+                   <dd class="flt layui-form">
+                      <input disabled type="radio" name="sex" value="公司标准销售合同" title="公司标准销售合同" checked="">
+                      <input disabled type="radio" name="sex" value="客户合同格式" title="客户合同格式" disabled>
+                   </dd>
+                </dl>
+            </blockquote>
+
+            <h3 class="mt15 mb5">物流信息</h3>
+            <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="padding-left: 40px;">
+                <dl class="dl-form" style="margin-bottom: 0">
+                   <dt class="flt fz12">运输方式：</dt>
+                   <dd class="flt layui-form">
+                      <input type="radio" name="sex1" value="汽车" title="汽车" checked="" disabled class="c-9-i">
+                      <input type="radio" name="sex1" value="铁路" title="铁路" disabled>
+                      <input type="radio" name="sex1" value="空运" title="空运" disabled>
+                      <input type="radio" name="sex1" value="快递" title="快递" disabled>
+                      <input type="radio" name="sex1" value="客户自提" title="客户自提" disabled>
+                      <input type="radio" name="sex1" value="其他" title="其他" disabled>
+                   </dd>
+                </dl>
+            </blockquote>
+
+            <h3 class="mt15 mb5">付款信息</h3>
+            <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="padding-left: 40px;">
+                <dl class="dl-form" style="margin-bottom: 0">
+                   <dt class="flt fz12">付款方式：</dt>
+                   <dd class="flt layui-form">
+                      <input type="radio" name="sex2" value="付款提货" title="付款提货" checked="" disabled>
+                      <input type="radio" name="sex2" value="货到30天付全款" title="货到30天付全款" disabled>
+                      <input type="radio" name="sex2" value="货到60天付全款" title="货到60天付全款" disabled>
+                      <input type="radio" name="sex2" value="其他" title="其他" disabled>
+                   </dd>
+                   <dd class="flt"><input disabled type="text" name="title" id="deliveryModeRemark" placeholder=""  autocomplete="off" class="layui-input"></dd>
+                </dl>
+                <dl class="dl-form" style="margin-bottom: 0">
+                   <dt class="flt fz12">发票类型：</dt>
+                   <dd class="flt layui-form">
+                      <input type="radio" name="invoice" value="增值税发票" title="增值税发票" checked="" disabled>
+                      <input type="radio" name="invoice" value="普通发票" title="普通发票" disabled>
+                   </dd>
+                </dl>
+                <dl class="dl-form" style="margin-bottom: 0">
+                   <dt class="flt fz12">发票要求：</dt>
+                   <dd class="flt layui-form">
+                      <input type="radio" name="invoiceNeed" value="发货后直接开票" title="发货后直接开票" checked="" disabled>
+                      <input type="radio" name="invoiceNeed" value="等客户通知开票" title="等客户通知开票" disabled>
+                   </dd>
+                </dl>
+            </blockquote>
+        </blockquote>
+
+        
+        
+    </div>
+</div>
+<script>
+     layui.use(['form','laydate'], function() {
+        var form = layui.form();
+        var laydate = layui.laydate;
+        var start = {
+            min: laydate.now()
+            ,max: '2099-06-16 23:59:59'
+            ,istoday: false
+            ,choose: function(datas){
+                end.min = datas; //开始日选好后，重置结束日的最小日期
+                end.start = datas //将结束日的初始值设定为开始日
+            }
+        };
+
+        var end = {
+            min: laydate.now()
+            ,max: '2099-06-16 23:59:59'
+            ,istoday: false
+            ,choose: function(datas){
+                start.max = datas; //结束日选好后，重置开始日的最大日期
+            }
+        };
+    })
+</script>
+</body>
+</html>

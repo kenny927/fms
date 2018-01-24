@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+
+    <!-- ztree v3.5 -->
+    <link rel="stylesheet" type="text/css" href="/res/public/zTree_v3/css/zTreeStyle/zTreeStyle.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/public/zTree_v3/js/jquery.ztree.core-3.5.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/zTree_v3/js/jquery.ztree.excheck-3.5.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/zTree_v3/js/jquery.ztree.exedit.js<@resVersionDirective>?</@>"></script>
+
+    <script src="/res/js/classify/chooseSkuClassify.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript">
+        var classifyId = "${classifyId}";
+    </script>
+</head>
+<body>
+<!-- 选择商品内部分类层 -->
+<div style="height: 300px;overflow: auto;">
+    <label>内部分类</label>
+    <div class="content_wrap">
+        <div class="zTreeDemoBackground left">
+            <ul id="treeSkuList" class="ztree"></ul>
+        </div>
+    </div>
+</div>
+<div style="height: 100px;overflow: auto;">
+    <label>勾选筛选属性</label>
+    <div id="propertiesDilterDiv">
+    </div>
+</div>
+<div style="float:right;margin-right:10px;">
+    <button id="doChooseSkuClassfyBtn" class="search-btn" style="cursor: pointer;">确&nbsp;认</button>
+    <button id="cancelChooseSkuClassfyBtn" class="search-btn" style="cursor: pointer;">关&nbsp;闭</button>
+</div>
+
+</body>
+</html>

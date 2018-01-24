@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/Area1.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui-mz-min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/MultiSelectDropList.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <style>
+        .layui-table[lay-skin=line]{
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="yofc-body layui-form jun-form-s form-css">
+    <!--<form action="" class="layui-form jun-form-s form-css">-->
+        <dl class="dl-form mb10-i">
+            <dd class="flt layui-form">
+                <input class="inline line-middle pl10" type="text" name="title"  id="searchObject" placeholder="请输入公司名称" autocomplete="off" class="layui-input" style="width:220px;margin-bottom:5px;">
+            </dd>
+            <dd class="flt ml10"><span class="form-btn layui-btn-small2" onclick="search()">查询</span></dd>
+        </dl>
+        <table class="layui-table pop table-css" lay-skin="line">
+            <colgroup>
+                <col  width="50">
+                <col  width="150">
+                <col  width="150">
+                <col  width="150">
+            </colgroup>
+            <thead>
+            <tr class="bor-no">
+                <th ></th>
+                <th >公司名称</th>
+                <th >地址</th>
+                <th >主要联系人</th>
+                <th >电话</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+        <div id="paginationDiv" class="mt10" style="padding: 0"></div>
+        <div class="t-c">
+            <span class="form-btn layui-btn-small2" lay-submit="" lay-filter="saveBtn" id="saveBtn">确定</span>
+            <span class="form-btn layui-btn-itoc layui-btn-small2" id="cancelBtn">取消</span>
+        </div>
+    <!--</form>-->
+</div>
+<script type="text/javascript">
+    var parent_index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    var $form;
+    var form;
+    $(document).on('click','.pay_list_c1',function(){
+        $(this).addClass("on").parent().parent().siblings().find("span").removeClass("on");
+    })
+    layui.use(['form'], function(){
+        form = layui.form();
+        $form = $('form');
+        form.on('submit(saveBtn)', function(data){
+            if( $("#saveBtn").hasClass("layui-btn-disabled")){
+                return;
+            }
+            if($(".layui-table tbody").find(".on").length==0){
+                layer.msg("请选择客户!",{icon: 5});
+                return false;
+            }
+            var accountId= $(".on>input[name=status]").attr("accountId");
+            var linkmanName= $(".on>input[name=status]").attr("linkmanName");
+            $("#saveBtn").addClass("layui-btn-disabled");
+            var param = {};
+            param.linkmanName =linkmanName;
+            param.accountId =accountId;
+            parent.saveTransmitRecordCallback(param);//调用父页面的渲染方法
+            setTimeout(function () {
+                parent.layer.close(parent_index);//关闭当前窗口
+            }, 1000);
+
+            return false;
+        });
+    })
+    $('#cancelBtn').bind("click", function () {
+        parent.layer.close(parent_index);//关闭当前窗口
+    });
+
+    function isExitsVariable(variableName) {
+        try {
+            if (typeof (variableName) == "undefined") {
+                return "";
+            } else {
+                return variableName;
+            }
+        } catch (e) {
+        }
+        return "";
+    }
+
+    $(function(){
+        var param={};
+        param.currentPageIndex=1;
+        param.pageSize = 3;
+        param.transmitToSubject = 'manager';
+        loadDATA(param);
+    
+    });
+
+
+    function loadDATA(param) {
+        postUtil.call("/reusable/systemAccount/getCustomerList", param, function (result) {
+            var pageNumber = result.DATA.pageNumber;
+            var pageSize = result.DATA.pageSize;
+            var totalPage = result.DATA.totalPage;
+            var totalRow = result.DATA.totalRow;
+            var dataList = result.DATA.list;
+            renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        param.currentPageIndex=obj.curr;
+                        loadDATA(param);
+                    }
+                }
+            });
+        });
+    }
+    function renderTable(dataList) {
+        var html="";
+        var length = dataList.length;
+        if (length > 0) {
+            for (var i1 = 0; i1 < dataList.length; i1++) {
+                var data = dataList[i1];
+                html+='  <tr>'+
+                    '   <td><span class="pay_list_c1"><input type="radio" name="status"  class="radioclass" linkmanName="'+isExitsVariable(data.accountName)+'" accountId="'+isExitsVariable(data.accountId)+'"/></span></td>'+
+                    '   <td>'+isExitsVariable(data.accountName)+'</td>'+
+                    '   <td>'+isExitsVariable(data.province)+isExitsVariable(data.city)+'</td>'+
+                    '   <td>'+isExitsVariable(data.linkmanName)+'</td>'+
+                    '   <td>'+isExitsVariable(data.linkmanTelephone)+'</td>'+
+                    '  </tr>'
+            }
+        }else{
+            html+='<tr>'+
+                '<td  colspan="4" height="50px"  align="center">'+
+                '<span class="fz16">暂无相关信息</span> '+
+                '</td>'+
+                '</tr>'
+        }
+        $(".layui-table tbody").html(html);
+    }
+    function search(){
+        var accountName =$('#searchObject').val();
+        var param={};
+        param.accountName =accountName;
+        param.currentPageIndex=1;
+        param.pageSize = 3;
+        param.transmitToSubject = 'manager';
+        loadDATA(param);
+    parent.layer.iframeAuto(parent_index);
+    }
+
+    document.onkeydown = function(e){
+        var ev = document.all ? window.event : e;
+        if(ev.keyCode==13&&document.activeElement.id == "searchObject") {
+            search();
+        }
+    }
+</script>
+</body>
+</html>

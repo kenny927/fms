@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>商品预览</title>
+    <link rel="stylesheet" type="text/css" href="/res/public/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_nw3n40oqhr9c0udi.css<@resVersionDirective>?</@>"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript">
+        var previewData = ${previewData};
+    </script>
+    <style type="text/css">
+        .fenlist{
+            display: none;
+        }
+        .fenlei:hover .fenlist{
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<section id="detailContent">
+    <div class="w1200">
+        <div class="xq-content" id="descContent">
+            <nav class="nav1">
+                <ul id="descTabs">
+                    <!--<li><a class="active" href="#Introduction">商品介绍</a></li>-->
+                    <!--<li><a href="#Specifications">规格参数</a></li>-->
+                    <!--
+                    <li><a href="#answer">商品问答</a></li>
+                    <li><a href="#description">采购说明</a></li>
+                    <li><a href="#support">售后保障</a></li>
+                    <li><a href="#download">相关资料下载</a></li> -->
+                </ul>
+            </nav>
+            <!--<section class="xq-list" id="Introduction">-->
+            <!--<div class="xq">-->
+            <!--<h3>商品介绍</h3>-->
+            <!--<div class="good-detail">-->
+            <!--<div class="productDescribe">-->
+            <!--</div>-->
+
+            <!--</div>-->
+            <!--</div>-->
+            <!--</section>-->
+            <!--<section class="xq-list" id="Specifications">-->
+            <!--<div class="xq">-->
+            <!--<h3>规格参数</h3>-->
+            <!--<div class="good-detail">-->
+            <!--<div class="canshu">-->
+
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</section>-->
+            <!---->
+            <!--<section class="xq-list" id="answer">-->
+            <!--<div class="xq">-->
+            <!--<h3>商品问答</h3>-->
+            <!--<div class="good-detail">-->
+            <!--<div class="wenda">-->
+            <!---->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</section>-->
+            <!--<section class="xq-list" id="description">-->
+            <!--<div class="xq">-->
+            <!--<h3>采购说明</h3>-->
+            <!--<div class="good-detail">-->
+            <!--<div class="caigou">-->
+            <!--</div>-->
+            <!--</div> -->
+            <!--</div>-->
+            <!--</section>-->
+            <!--<section class="xq-list" id="support">-->
+            <!--<div class="xq">-->
+            <!--<h3>售后保障</h3>-->
+            <!--<div class="good-detail">-->
+            <!--<div class="baozhang">-->
+            <!--</div>-->
+            <!--</div> -->
+            <!--</div>-->
+            <!--</section>-->
+            <!--<section class="xq-list" id="download">-->
+            <!--<div class="xq">-->
+            <!--<h3>相关资料下载</h3>-->
+            <!--<div class="good-detail">-->
+            <!--<div class="xiazai">-->
+            <!--<dl class="xiazai-list toubu">-->
+            <!--<dd class="xiazai-name">资料名称</dd>-->
+            <!--<dd class="xiazai-detail">描述</dd>-->
+            <!--<dt class="xiazai-icon">下载</dt>-->
+            <!--</dl>-->
+
+            <!--</div>-->
+            <!--</div> -->
+            <!--</div>-->
+            <!--</section>-->
+
+        </div>
+    </div>
+</section>
+<footer>
+
+</footer>
+<script>
+    $(function () {
+        //加载获取数据
+        if(previewData) {
+            var templateId = previewData.templateId;
+            if(templateId) {
+                postUtil.call("/sku/template/getSkuDetailTemplateById",{templateId: templateId}, function (res) {
+                    layer.load();
+                    if(res.STATUS == "SUCCESS") {
+                        var data = res.DATA;
+                        rendDesc(data);
+                    } else {
+                        layer.msg(res.MSG, {icon:5});
+                    }
+                    layer.closeAll("loading");
+                });
+            } else {
+                var data = {};
+                data.templateType = previewData.templateType;
+                data.templateContent = previewData.templateContent;
+                data.otherContent = previewData.otherContent;
+                rendDesc(data);
+            }
+        }
+    });
+    function rendDesc(data){
+        var templateType = data.templateType;
+        var content = data.templateContent;
+        var html="";
+        var describe = "";
+        var parameter = "";
+        var qa = "";
+        var purchase = "";
+        var afterSale = "";
+        var download = "";
+        $("#descContent section").remove();
+        if(templateType == "DESCRIBE") {
+            html += '<li><a href="#Introduction">商品描述</a></li>';
+            describe += '<section class="xq-list" id="Introduction">';
+            describe += '   <div class="xq">';
+            describe += '   <h3>商品描述</h3>';
+            describe += '   <div class="good-detail">';
+            describe += '   <div class="productDescribe">';
+            describe += content;
+            describe += '   </div>';
+            describe += '  </div>';
+            describe += '  </div>';
+            describe += '  </section>';
+            $("#descContent").append(describe);
+        }
+
+        if(templateType == "QA") {
+            html += '<li><a href="#answer">商品问答</a></li>';
+            qa += '<section class="xq-list" id="answer">';
+            qa += '   <div class="xq">';
+            qa += '    <h3>商品问答</h3>';
+            qa += '   <div class="good-detail">';
+            qa += '  <div>';
+            qa +=  content;
+            qa += '   </div>';
+            qa += '   </div>';
+            qa += '   </div>';
+            qa += '   </section>';
+            $("#descContent").append(qa);
+        }
+        if(templateType == "PURCHASE") {
+            html += '<li><a href="#description">采购说明</a></li>';
+            purchase += '<section class="xq-list" id="description">';
+            purchase += '  <div class="xq">';
+            purchase += '  <h3>采购说明</h3>';
+            purchase += '  <div class="good-detail">';
+            purchase += '  <div>';
+            purchase += content;
+            purchase += ' </div>';
+            purchase += ' </div>';
+            purchase += '  </div>';
+            purchase += '  </section>';
+            $("#descContent").append(purchase);
+        }
+        if(templateType == "AFTER_SALE") {
+            html += '<li><a href="#support">售后保障</a></li>';
+            afterSale += '<section class="xq-list" id="support">';
+            afterSale += '  <div class="xq">';
+            afterSale += '  <h3>售后保障</h3>';
+            afterSale += ' <div class="good-detail">';
+            afterSale += ' <div>';
+            afterSale += content;
+            afterSale += '  </div>';
+            afterSale += '  </div>';
+            afterSale += '  </div>';
+            afterSale += '  </section>';
+            $("#descContent").append(afterSale);
+        }
+        if(templateType == "DOWNLOAD") {
+            html += '<li><a href="#download">相关资料下载</a></li>';
+            download += '<section class="xq-list" id="download">';
+            download += '  <div class="xq">';
+            download += '  <h3>相关资料下载</h3>';
+            download += '  <div class="good-detail">';
+            download += '  <div class="xiazai">';
+            download += '  <dl class="xiazai-list toubu">';
+            download += '  <dd class="xiazai-name" style="width:920px;">资料名称</dd>';
+            download += '  <dt class="xiazai-icon">下载</dt>';
+            download += '  </dl>';
+            var downloadHtml = "";
+            if(data.otherContent) {
+                var downloadArr = JSON.parse(data.otherContent);
+                if(downloadArr && downloadArr.length > 0) {
+                    $.each(downloadArr, function (index, item) {
+                        downloadHtml += '<dl class="xiazai-list">';
+                        downloadHtml += '    <dd class="xiazai-name" style="width:920px;">'+item.MALL_FILE_NAME+'</dd>';
+                        downloadHtml += ' <dt class="xiazai-icon"><span class="iconfont icon-xiazai" style="cursor: pointer;" ></span></dt>';
+                        downloadHtml += '</dl>';
+                    });
+                }
+            }
+            download += downloadHtml;
+            download += '  </div>';
+            download += '  </div>';
+            download += '  </div>';
+            download += '  </section>';
+            $("#descContent").append(download);
+        }
+        $("#descTabs").empty("")
+        $("#descTabs").html(html);
+        $("#descTabs li:first").find("a").addClass("active");
+        //     }
+        // });
+    }
+</script>
+</body>
+</html>

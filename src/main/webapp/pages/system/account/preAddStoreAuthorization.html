@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <script src="/res/js/jquery-3.1.1.min.js"></script>
+    <script src="/res/public/layui/layui.js"></script>
+    <script src="/res/public/layPage/laypage.js"></script>
+    <script src="/res/public/layui/Area1.js" type="text/javascript"></script>
+    <script src="/res/js/rg-validator-1.1.js"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <style>
+        #itocCenter{
+            height: 257px;
+            overflow-y: hidden;
+        }
+        #itocCenter .itocContent .itocMain  #treeNav {
+            display: none;
+            position: absolute;
+            left: 0px;
+            top: 42px;
+            width: 245px;
+            border: 1px solid #e6e6e6;
+            border-top: none;
+            background: #ffffff;
+            z-index: 2;
+        }
+        .xiala{
+            position: absolute;
+            right: 8px;
+            top: 1px;
+        }
+        .inputContent{
+            position: relative;
+        }
+        .thead,.tbody{
+            width: 100%;
+            display:flex;
+            background: #f0f0f0;
+            height: 40px;
+            line-height: 40px;
+            border:1px solid #dedede;
+            border-bottom: 0px;
+        }
+        .tbody{
+            background: #fff;
+            height: 50px;
+            line-height: 50px;
+            border-top:0px;
+            border-bottom:1px solid #dcdcdc;
+        }
+        .thead div{
+            text-align: center;
+            flex:1;
+        }
+        .jun-form-l .layui-form-select .layui-select-title input{
+            width: 180px;
+        }
+        .layui-form-select dl{
+            max-height:120px;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter" style="padding:10px 20px;">
+    <section class="itocContent">
+        <div class="itocMain" style="border: 0px;">
+                <div class="layui-form jun-form-s form-css" >
+                    <div class="jun-form-s form-css " id="allContent">
+                        <!--<button class="form-btn layui-btn-big frt  mb10-i" onclick="addIem()">新增</button>-->
+                        <div class="thead">
+                            <div>授权品牌</div>
+                            <div style="padding: 0px 30px;"">类目</div>
+                            <!--<div>操作</div>-->
+                        </div>
+                        <div id="fixedItem" class="tbody" >
+                            <div style="flex: 1;border-right: 1px solid #dedede;">
+                                <dd class="flt layui-form jun-form-l" style="margin: 10px 25px;">
+                                    <select name="brand" lay-filter="brand" id="brandId">
+                                        <option value='' selected>全部</option>
+                                    </select>
+                                </dd>
+                            </div>
+                            <div class="addSku" style="flex: 1;padding: 0px 30px;">
+                                <dd class="inputContent">
+                                    <input type="hidden" id="skuClassifyId">
+                                    <input type="hidden" id="skuClassifyName">
+                                    <input type="hidden" id="classifyLevel">
+                                    <input type="text" readonly="readonly" id="classifyDisplayName" placeholder="请选择内部分类" style="width:240px;height:30px;padding-left: 5px;">
+                                    <div class="xiala">
+                                        <img src="/res/images/arrow2.png" alt="">
+                                    </div>
+                                    <div id="treeNav" class="layui-tree"></div>
+                                </dd>
+                            </div>
+                            <!--<div style="flex: 1;text-align: center;"><a class="cs-p c-h fz12 delete">删除</a></div>-->
+                        </div>
+                    </div>
+                    <div class="pb20 t-c pt20">
+                        <button class="form-btn layui-btn-big" lay-submit lay-filter="save" onclick="addStoreAuthorization()">确定</button>
+                        <button class="form-btn layui-btn-primary layui-btn-big ml10" lay-submit lay-filter="cancel">取消</button>
+                    </div>
+                </div>
+            </div>
+    </section>
+</section>
+<script>
+    var form;
+    var element;
+    var storeId = '${storeId}';
+    var accountId =  parent.param.accountId;
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    var param1 = {};
+        param1.storeId = storeId;
+        param1.brandId = "";
+        param1.classifyLevel = "";
+        param1.classifyId = "";
+
+
+    $(function () {
+
+        layui.use(['form','element'], function(){
+            form = layui.form();
+            element = layui.element();
+            form.on('submit(cancel)', function(data){
+                parent.layer.close(index);//关闭当前窗口
+                return false;
+            });
+
+            form.on('select(brand)',function (data) {
+                param1.brandId = data.value;
+            })
+
+            postUtil.call("/reusable/skuBrand/allBrandJsonData", null, function (result) {
+                if(result && result.length > 0) {
+                    var html = "";
+                    $.each(result, function (index, item) {
+                        html +='<option value="'+item.brandId+'">'+item.brandChineseName+'</option>';
+                    })
+                    $("#brandId").append(html);
+
+                    form.render();
+                }
+            });
+
+        });
+    });
+
+
+    layui.use(['tree','layer'], function () {
+        var layer = layui.layer;
+        var treeOption = {};
+        treeOption.skin = "shihuang";
+        treeOption.elem = "#treeNav";
+        treeOption.click = function (node) {
+            var classifyIsLeaf = node.classifyIsLeaf;
+            var classifyId = node.classifyId;
+            var classifyName = node.classifyName;
+            var allParentName = node.allParentName;
+            var classifyLevel = node.level;
+            if(classifyId == "0") {
+                classifyName = "全部";
+                allParentName = "全部";
+            }
+            $('#skuClassifyId').val(classifyId);
+            $('#classifyLevel').val(classifyLevel);
+            $('#classifyDisplayName').val(allParentName);
+            $('#treeNav').hide();
+        };
+
+        postUtil.call("/reusable/mallClassificatory/getAllMallClassificatoryJsonForLayuiTree", null, function (result) {
+            console.log(result);
+            treeOption.nodes = result;
+            layui.tree(treeOption);
+        });
+
+    });
+
+    $(document).on("click", ".xiala", function () {
+        if ($(this).next().css("display") == "none") {
+            $(this).next().show();
+        } else {
+            $(this).next().hide();
+        }
+    });
+
+    $(document).on("click","#classifyDisplayName",function(){
+        if($(".xiala").next().css("display")=="none"){
+            $(".xiala").next().show();
+        }else{
+            $(".xiala").next().hide();
+        }
+    })
+
+    function addStoreAuthorization() {
+         if(!param1.brandId){
+             layer.msg("请选择品牌", {icon: 5});
+             return false;
+         }
+
+        param1.classifyLevel =  $('#classifyLevel').val();
+        if(!param1.classifyLevel || param1.classifyLevel == "0"){
+            layer.msg("请选择分类", {icon: 5});
+            return false;
+        }
+
+        param1.classifyId =  $('#skuClassifyId').val();
+        if(!param1.classifyId || param1.classifyId == "0"){
+            layer.msg("请选择分类", {icon: 5});
+            return false;
+        }
+
+       var detailList = [];
+           detailList.push(param1);
+           postUtil.call('/store/add/storeAuthorization',{detailList:JSON.stringify(detailList)}, function(result) {
+               console.log(result);
+              if(result.STATUS == "SUCCESS"){
+                  layer.msg("新增成功", {icon: 1});
+                  parent.loadContractInfo({accountId:accountId});
+                  parent.layer.close(index);//关闭当前窗口
+              }else{
+    //              layer.msg(result.MSG, {icon: 5});
+                  console.log(result.MSG);
+              }
+       })
+    }
+    
+
+</script>
+
+</body>
+</html>

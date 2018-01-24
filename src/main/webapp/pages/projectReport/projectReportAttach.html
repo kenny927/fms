@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_lw1dd7vgljjug14i.css<@resVersionDirective>?</@>"/>
+  <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+  <link rel="stylesheet" href="/res/css/project.css<@resVersionDirective>?</@>">
+  <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+  <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+  <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+  <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+  <style type="text/css" media="screen">
+    .jun-form-s .layui-form-radio span{
+      font-size: 14px!important;
+    }
+    .table2 thead tr{
+      border-right: 2px solid #f0f0f0;
+    }
+    .table2 tbody tr{
+        border: 1px solid #e6e6e6!important;
+      }
+
+  </style>
+</head>
+<body>
+     <div class="jun-close fz14 c-2" style="max-height: 800px;min-height: 120px; padding-left:20px;padding-right:20px;">
+          <table lay-skin="nob" class="layui-table pop table2" >
+            <colgroup>
+              <col width="300">
+              <col width="150">
+              <col width="250">
+              <col width="100">                        
+              <col>
+            </colgroup>
+            <thead>
+              <tr class="c-6">
+                <th>文件名</th>
+                <th>上传人员</th>
+                <th>上传时间</th>
+                <th>操作</th>
+              </tr> 
+            </thead>
+            <tbody id="attachReport">
+            </tbody>
+          </table>
+            <div id="paginationDiv" style="margin-right: -12px;"></div>
+     </div>
+
+<script type="text/javascript">
+
+    var  _backupId =  '${backupId}';
+    //var  _backupId =  window.location.href.split("=")[1];
+   $(function () {
+	   loadProjectReportFileList(1);
+    });
+
+    function loadProjectReportFileList(currentPageIndex) {
+        var param = {};
+        param.currentPageIndex = currentPageIndex;
+        param.businessKey = _backupId;
+        param.type = "PROJECT_BACKUP_FILE_TYPE";
+        postUtil.call("/file_server/pagelist", param, function (result) {
+       	 var data =result.DATA;
+    	 _currentPage =data.pageNumber;
+    	 var pageNumber = data.pageNumber;
+         var pageSize = data.pageSize;
+         var totalPage = data.totalPage;
+         var totalRow = data.totalRow;
+         var dataList = data.list;
+         renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                    	param.currentPage=obj.curr;
+                    	loadProjectReportFileList(param);
+                    }
+                }
+            });
+     });
+    }
+
+ 
+    function renderTable(dataList) {
+		var html="";
+        var length = dataList.length;
+        if (length > 0) {
+            for (var i1 = 0; i1 < dataList.length; i1++) {
+                var data = dataList[i1]; 
+                html+='  <tr>'+
+			             '   <td>'+isExitsVariable(data.name)+'</td>'+
+// 			             '   <td>'+isExitsVariable(data.fullname)+'</td>'+
+// 			             '   <td>'+isExitsVariable(data.uploadBy)+'</td>'+
+						 '   <td>'+isExitsVariable(data.userRealName)+'</td>'+
+			             '   <td>'+isExitsVariable(data.uploadDate)+'</td>'+
+			             '   <td><a href="/file_server/download?id='+data.id+'" style="color:#428bca">下载</a></td>'+
+			             '  </tr>'
+           }
+        }
+        $("#attachReport").html(html);
+    }
+    
+    function isExitsVariable(variableName) {  
+        try {  
+            if (typeof (variableName) == "undefined") {  
+                return "";  
+            } else {  
+                return variableName;  
+            }  
+        } catch (e) {  
+        }  
+        return "";  
+    }
+    
+</script>
+</body>
+</html>

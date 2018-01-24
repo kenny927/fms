@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" >
+		<title></title>
+		<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+		<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>" />
+		<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css<@resVersionDirective>?</@>" />
+		<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+		<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/js/mallCustomer/customer_visit_record.js<@resVersionDirective>?</@>"></script>
+		<style>
+			.layui-layedit {
+				width: 568px !important;
+			}
+			
+			.layui-layedit iframe {
+				height: 157px !important;
+			}	
+		</style>
+		<script type="text/javascript">
+			var startDate= '${startDate!}';
+			var accountId = '${accountId!}';
+			var linkMan = '${record.linkmanId!}';
+			var visitRecordId = '${record.visitRecordId!}';
+			
+			var form;
+			var layedit;
+			var edit_index;
+			var laydate;
+			var layer;
+			layui.use(['layer','form','laydate','layedit'], function(){
+				layer = layui.layer;
+				form = layui.form();
+				//编辑器
+				layedit = layui.layedit;
+				edit_index = layedit.build('LAY_demo_editor',{
+					tool: [
+					  'strong','italic','underline','del','|',
+					  'left' ,'center','right','link' ,'unlink',
+					  'face'
+					]
+				});
+				laydate = layui.laydate;
+				
+				loadVisitTime();
+				loadLinkMan(accountId);
+		  	});
+
+			function  getLayedit(){
+				return layedit;
+			}
+		</script>
+	</head>
+	<body>
+		<div style="margin-top: 30px;">
+			<form id ="visitForm" action="" class="jun-form-s form-css">
+				<dl class="dl-form">
+					<dt class="flt" style="width: 80px;">拜访时间：</dt>
+					<dd class="flt">
+						<input name="visitTime" value="<#if (record.visitTime??) >${record.visitTime?string('yyyy-MM-dd HH:mm')}</#if>" id="visitTime" 
+							style="height: 32px; width: 240px;"
+							class="layui-input laydate-icon" placeholder="自定义日期格式">
+					</dd>
+					<dt class="flt fz12">拜访方式：</dt>
+					<dd class="flt layui-form jun-form-l">
+						<select name="visitType" style="width: 240px;">
+							<option value="">请选择拜访方式</option>
+							<option value="PHONE" ${(record.visitType==null || record.visitType=='PHONE')?string('selected','')}>电话联系</option>
+							<option value="HOUSE" ${(record.visitType!=null && record.visitType=='HOUSE')?string('selected','')}>登门拜访</option>
+							<option value="EMAIL" ${(record.visitType!=null && record.visitType=='EMAIL')?string('selected','')}>邮件</option>
+							<option value="SMS" ${(record.visitType!=null && record.visitType=='SMS')?string('selected','')}>短信</option>
+							<option value="ONLINE_CHAT" ${(record.visitType!=null && record.visitType=='ONLINE_CHAT')?string('selected','')}>在线沟通</option>
+						</select>
+					</dd>
+				</dl>
+				<dl class="dl-form">
+					<dt class="flt fz12" style="width: 80px;">联系人：</dt>
+					<dd class="flt layui-form jun-form-l">
+						<select id="linkman" name="linkman" style="width: 240px;">
+							<option value="">请选择联系人</option>
+						</select>
+					</dd>
+					<dd class="flt line-middle ml10"><a class="fz12 c-h" href="javascript:addLinkMan()">增加</a></dd>
+				</dl>
+				<dl class="dl-form">
+					<dt class="flt fz12" style="width: 80px;">拜访记录：</dt>
+					<dd class="flt layui-form">
+						<textarea class="layui-textarea layui-hide" name="content"
+							lay-verify="content" id="LAY_demo_editor">${record.content!}</textarea>
+					</dd>
+				</dl>
+			</form>
+			<div class="pb20 t-c" style="margin-top: 40px;">
+	      		<button class="form-btn layui-btn-big"  onclick="saveVisitRecord()">提交</button>
+				<button class="form-btn  layui-btn-primary layui-btn-big ml10" onclick="closeLayer()">取消</button>
+			</div>
+		</div>
+	</body>
+</html>

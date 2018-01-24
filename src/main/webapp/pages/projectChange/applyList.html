@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css<@resVersionDirective>?</@>"/>
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/flow/rgWorkFlow.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <form class="layui-form jun-form-s form-css" action="">
+                <div class="layui-form-item inline mb5 mt20 ml20">
+                    <div class="layui-inline">
+                        <label class="layui-form-label fz12" style="margin-left: 20px;width: 70px;">项目名称：</label>
+                        <div class="layui-input-block" style="margin-left: 90px;">
+                            <input style="width: 240px;" type="text" name="projectNameLike" placeholder="请输入项目名称/项目编码" autocomplete="off"
+                                   class="layui-input bor-e6  fz12">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item inline mb5 ml20">
+                    <div class="layui-inline">
+                        <label class="layui-form-label  fz12 t-r-i" style="width:60px;">分销商：</label>
+                        <div class="layui-input-block" style="margin-left: 60px;">
+                            <input style="width: 240px;" type="text" name="distributorAccountNameLike" placeholder="请输入分销商公司名称" autocomplete="off"
+                                   class="layui-input bor-e6  fz12">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item inline mb10 jun-form-l">
+                    <div class="layui-inline">
+                        <label class="layui-form-label  fz12 t-r-i" style="width:60px;">等级：</label>
+                        <div class="layui-input-block jun-form-l" style="margin-left: 63px;height: 30px;margin-top: -2px;">
+                            <select class="fz12" name="projectLevel" lay-filter="aihao" style="width: 240px;">
+                                <option value=""></option>
+                                <option value="ALL" selected="">全部</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item inline" style="margin-left: -105px;">
+                    <div class="layui-input-block" style="line-height: 30px;">
+                        <button class="layui-btn bg-03  fz12" style="margin-top: -15px;height: 30px;line-height: 30px;"
+                                lay-submit="" lay-filter="demo1">查询
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="table" id="applyList">
+                <ul class="th">
+                    <li style="width:3%;"><div class="mida"><div class="midb"></div></div></li>
+                    <li style="width:21%;"><div class="mida"><div class="midb">项目名称</div></div></li>
+                    <li style="width:9%;"><div class="mida"><div class="midb">所在地</div></div></li>
+                    <li style="width:17%;"><div class="mida"><div class="midb">集成商名称</div></div></li>
+                    <li style="width:16%;"><div class="mida"><div class="midb">业主名称</div></div></li>
+                    <li style="width:7%"><div class="mida"><div class="midb">提报人</div></div></li>
+                    <li style="width:10%"><div class="mida"><div class="midb">项目变更状态</div></div></li>
+                    <li style="width:10%"><div class="mida"><div class="midb">状态</div></div></li>
+                    <li style="width:7%"><div class="mida"><div class="midb">报备时间</div></div></li>
+                </ul>
+                <div class="information-list" style="border-right: none">
+
+                </div>
+            </div>
+            <div id="paginationDiv"></div>
+        </div>
+    </section>
+</section>
+<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+<script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+<style type="text/css">
+.similar-mark{
+    color:red;
+}
+</style>
+<script>
+
+    $(function () {
+        var param = {};
+        param.currentPage = 1;
+        initDatatable(param);
+    })
+
+    function isExitsVariable(variableName) {
+        try {
+            if (typeof (variableName) == "undefined") {
+                return "";
+            } else if ( variableName == null) {
+                return "";
+            }else {
+                return variableName;
+            }
+        } catch (e) {
+        }
+        return "";
+    }
+
+    function initDatatable(param) {
+        postUtil.call("/projectChange/queryApplyList", param, function (result) {
+            //alert(JSON.stringify(result));
+            var pageNumber = result.DATA.pageNumber;
+            var pageSize = result.DATA.pageSize;
+            var totalPage = result.DATA.totalPage;
+            var totalRow = result.DATA.totalRow;
+            var dataList = result.DATA.list;
+            renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        param.currentPage = obj.curr;
+                        initDatatable(param);
+                    }
+                }
+            });
+        });
+    }
+
+    function renderTable(dataList) {
+        var html="";
+        var length = dataList.length;
+        if (length > 0) {
+            for (var i1 = 0; i1 < dataList.length; i1++) {
+                var data = dataList[i1];
+                var operationHtml = "";
+                //查看审核的按钮
+                operationHtml  = '<a class="c-h fz12" href="javascript:openFinishTaskTab(' + data.taskId + ',' + data.backupId + ')" >' + (data.status == 'FAILED'?'查看':'审核') + '</a>';
+                var conflicts = dataList[i1].conflicts;
+                if(conflicts.length > 0){
+                    //销售经理看不到展开的按钮
+                    var limitHtml = (data.changeStatus == 'WAITING_SALES_MANAGER_APPROVE' || data.changeStatus == 'WAITING_AREA_MANAGER_APPROVE')?
+                            '<li style="width:3%;"><div class="mida"><div class="midb"></div></div></li>':
+                            '<li style="width:3%;"><div class="mida"><div class="midb"><span class="iconfont icon-jiahao jun-spread"></span></div></div></li>';
+                    html+=  '<ul class="information informationList">'+
+                                limitHtml +
+                                renderTableTd(data ,1) +
+                            '</ul>';
+                    html+='<div style="background: #fefdb4;display: none;">';
+                    if(data.changeStatus != 'WAITING_SALES_MANAGER_APPROVE' && data.changeStatus != 'WAITING_AREA_MANAGER_APPROVE') {
+                        //销售经理审核，没有权限查看冲突
+                        for (var m = 0; m < conflicts.length; m++) {
+                            operationHtml = '<a class="c-h fz12" href="javascript:openDetailTab(' + isExitsVariable(conflicts[m].backupId) + ')">查看</a>';
+                            html += '<ul class="information informationList">' +
+                                    '   <li style="width:3%;"><div class="mida"><div class="midb"></div></div></li>' +
+                                    renderTableTd(conflicts[m], 2) +
+                                    '</ul>';
+                        }
+                    }
+                    html+='</div>';
+                }else{
+                    //项目不存在冲突
+                    html+='  <ul class="information informationList">'+
+                            '   <li style="width:3%;"><div class="mida"><div class="midb"></div></div></li>'+
+                            renderTableTd(data, 1) +
+                            '  </ul>';
+                }
+
+
+            }
+        }
+        $("div .table .information-list").html(html);
+    }
+
+    function getStatusDisplayName(status, statusName){
+    	if(status == 'SUBMITTED' || status == 'WAITING_SALES_MANAGER_APPROVE' || status == 'WAITING_CONFLICTMANAGER_APPRVE'){
+    		return '待审核';
+    	}else{
+    		return statusName;
+    	}
+    }
+
+    function renderTableTd(data, type){
+        var location='';
+        if(isExitsVariable(data.projectProvince)==isExitsVariable(data.projectCity)){
+        	location=isExitsVariable(data.projectProvince);
+        }else{
+        	location=isExitsVariable(data.projectProvince)+isExitsVariable(data.projectCity);
+        }
+        var html = '';
+        if(type == 1){
+            html = '<a class="fz12 jun-a" href="javascript:openFinishTaskTab(' + data.taskId + ',' + data.backupId + ')" >' + isExitsVariable(data.projectName) +"(" +isExitsVariable(data.projectLevel)+")"+  '</a>';
+        }else{
+            html = '<a class="fz12 jun-a" href="javascript:openDetailTab(' + isExitsVariable(data.backupId) + ')">' + isExitsVariable(data.projectName) +"(" +isExitsVariable(data.projectLevel)+")"+  '</a>';
+            location = '<span class="similar-mark">'+location+'</span>';
+        }
+        var salesManager =  "";
+        if(data.backupFrom == 'DISTRIBUTOR'){
+            salesManager = data.distributorAccountName;
+        }else{
+            salesManager =  isExitsVariable(data.salesManager);
+        }
+        return '   <li style="width:21%;"><div class="mida"><div class="midb">'
+                + html +'</div></div></li>'+
+                '   <li style="width:9%;"><div class="mida"><div class="midb">'+location+'</div></div></li>'+
+                '   <li style="width:17%;"><div class="mida"><div class="midb">'+isExitsVariable(data.integratorCompanyName) + '<br>' + isExitsVariable(data.integratorCreditId) + '</div></div></li>'+
+                '   <li style="width:16%;"><div class="mida"><div class="midb">'+isExitsVariable(data.proprietorCompanyName)+'<br>' + isExitsVariable(data.proprietorCreditId) + '</div></div></li>'+
+                '   <li style="width:7%;"><div class="mida"><div class="midb">'+ salesManager +'</div></div></li>'+
+                '   <li style="width:10%;"><div class="mida"><div class="midb">'+isExitsVariable(data.changeStatusName)+'</div></div></li>'+
+                '   <li style="width:10%;"><div class="mida"><div class="midb">'+isExitsVariable(data.statusName)+'</div></div></li>'+
+                '   <li style="width:7%;"><div class="mida"><div class="midb">'+isExitsVariable(data.reportTime)+'</div></div></li>';
+    }
+
+    layui.use(['form', 'layedit', 'laydate'], function () {
+        var form = layui.form();
+        //监听提交
+        form.on('submit(demo1)', function(data) {
+            data.field.currentPage  = 1;
+            initDatatable(data.field);
+            return false;
+        });
+    })
+
+    function openDetailTab(backupId){
+        cardUtil.openCard("项目详情-" + backupId,"/projectReport/projectDetail?backupId=" + backupId);
+        cardUtil.changeCard("项目详情-" + backupId);
+    }
+
+    $(document).on("click",".jun-spread",function(){
+
+        if($(this).parent().parent().parent().parent().next().css("display")=="none"){
+            $(this).parent().parent().parent().parent().next().show();
+            $(this).removeClass('icon-jiahao').addClass('icon-jianhao');
+        }else{
+            $(this).parent().parent().parent().parent().next().hide();
+            $(this).removeClass('icon-jianhao').addClass('icon-jiahao');
+        }
+    })
+</script>
+</body>
+</html>

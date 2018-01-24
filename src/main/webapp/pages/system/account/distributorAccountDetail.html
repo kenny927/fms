@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/Area1.js" type="text/javascript"></script>
+    <script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/MultiSelectDropList.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/rg-validator-1.1.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/user/chooseUser.js"></script>
+    <style>
+        .layui-form-select dl{
+            max-height: 260px;
+        }
+    </style>
+</head>
+<body>
+<div style="margin-left:60px;margin-top: 20px;">
+    <form action="" class="layui-form jun-form-s form-css" id="mem_basic_frm">
+        <dl class="dl-form">
+            <dt class="flt fz12"  style="width:128px;margin-left:-44px"><span class="c-f">*</span>公司名称：</dt><!-- 不能编辑 加背景颜色  bg-f0-->
+            <dd class="flt"><input name="accountName" type="text"  placeholder="请输入公司名称" autocomplete="off" class="layui-input bg-f0"  disabled="disabled" value="${detail.account.accountName}"></dd>
+            <#if detail.verify.status=='UNVERIFIED' || detail.verify.status=='VERIFY_FAILED'>
+                <@havePermission resourceCode="operation:customer:distributor:account:detail:editAccountName">
+                 <dd class="flt line-middle"><a style="margin-left: 4px" href="javascript:;" class="c-h cs-p fz12" onclick="enableAccountName()">修改</a></dd>
+                </@>
+            </#if>
+        </dl>
+        <dl class="dl-form" id="inteSocialCreditNo_dl" <#if detail.account.accountType == 'Individual'>hidden</#if>>
+            <dt class="flt fz12" style="width: 128px;margin-left:-44px"><span class="c-f">*</span>统一社会信用代码：</dt>
+            <dd class="flt"><input name="inteSocialCreditNo" type="text"  placeholder="请输入统一社会信用代码" autocomplete="off" class="layui-input bg-f0" disabled="disabled" value="${detail.account.inteSocialCreditNo}"></dd>
+            <#if detail.verify.status=='UNVERIFIED' || detail.verify.status=='VERIFY_FAILED'>
+                <@havePermission resourceCode="operation:customer:distributor:account:detail:editCode">
+                <dd class="flt line-middle"><a style="margin-left: 4px" href="javascript:;" class="c-h cs-p fz12" onclick="enableInteSocialCreditNo()">修改</a></dd>
+                </@>
+            </#if>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12" style="width: 128px;margin-left:-44px">座机：</dt>
+            <dd class="flt rg_group"><input type="text" name="telephone" rg-validate-field="telephone" placeholder="格式：027-8888888" autocomplete="off" class="layui-input" value="${detail.account.telephone}"></dd>
+        </dl>
+        <dl class="dl-form" style="margin-bottom:10px;">
+            <dt class="flt"  style="width:128px;margin-left:-44px"><span class="c-f">*</span>地址：</dt>
+            <dd class="flt layui-form dd-city rg_group">
+                <select name="province" rg-validate-field="province" lay-filter="province" id="s_province" lay-search>
+                    <option value="">请选择省</option>
+                </select>
+            </dd>
+            <dd class="flt layui-form dd-city rg_group">
+                <select name="city" rg-validate-field="city"  id="s_city" lay-filter="city" lay-search>
+                    <option value="">请选择市</option>
+                </select>
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt"  style="width:128px;margin-left:-44px">&nbsp;</dt>
+            <dd class="flt">
+                <input type="text" name="address" autocomplete="off" class="layui-input" value="${detail.account.address}" filter="address">
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12" style="width:128px;margin-left:-44px"><span class="c-f">*</span>区域：</dt>
+            <dd class="flt rg_group ">
+                <select name="accountAreaId" rg-validate-field="accountAreaId" lay-filter="accountAreaId" id="accountAreaId" lay-search>
+                    <option value="" selected="">请选区域</option>
+                    <!--<option value="1001">北区</option>-->
+                    <!--<option value="1002">中区</option>-->
+                    <!--<option value="1003">南区</option>-->
+                </select>
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12" style="width:128px;margin-left:-44px"><span class="c-f">*</span>客户经理：</dt>
+            <dd class="flt rg_group ">
+                <input type="text" name="accountManager" rg-validate-field="accountManager" lay-filter="accountManager" id="accountManager" placeholder="请选择"  autocomplete="off" class="layui-input" value="${detail.account.salesUserRealName}">
+            </dd>
+            <dd class="flt line-middle"><a style="margin-left: 4px" href="javascript:;" class="c-h cs-p fz12" onclick="newSelectAccountManager()">重新选择</a></dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12" style="width:128px;margin-left:-44px"><span class="c-f">*</span>销售代表：</dt>
+            <dd class="flt rg_group">
+                <input type="text" name="pltSalesEmploy"  rg-validate-field="pltSalesEmploy" lay-filter="pltSalesEmploy" id="pltSalesEmploy" placeholder="请选择"  autocomplete="off" class="layui-input" value="${detail.account.pltSalesUserRealName}">
+            </dd>
+            <dd class="flt line-middle"><a style="margin-left: 4px" href="javascript:;" class="c-h cs-p fz12" onclick="newSelectPltSalesEmploy()">重新选择</a></dd>
+        </dl>
+        <div class="pb20 t-c mt20">
+            <button class="form-btn layui-btn-big ml15" lay-submit="" lay-filter="formDemo">确定</button>
+            <button class="form-btn layui-btn-big" lay-filter="formDemo1" style="background-color: #cccccc;" id="cancelEditSystemAccountBtn">取消</button>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+
+    var _accountId = '${accountId}';
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    var areaData = Area;
+    var $form;
+    var form;
+    var layer;
+    var _province = '${detail.account.province}';
+    var _city = '${detail.account.city}';
+    var _accountAreaId =  '${detail.account.accountAreaId}';
+    var rgValidator;
+    //销售代表
+    var pltSalesEmployId = '${detail.account.pltSalesEmployId}';
+    //平台客户经理
+    var salesUserId = '${detail.account.salesUserId}';
+
+    var ops = {
+        form: "mem_basic_frm",
+        valid: "",
+        invalidMessageClass : ' iconfont c-f jun-ch fz12 ',
+        invalidMessageStyle : '',
+        invalidIconOnlyWhileRequired : true,
+        invalidIcon : "",
+        fieldInType: "dd",
+        fields:{
+            accountName : {
+                message : '公司名称验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请填写公司名称！"
+                    },
+                }
+            },
+            inteSocialCreditNo : {
+                message : '统一社会信用代码验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请填写统一社会信用代码！"
+                    },
+                    regexp : {
+                        message : "统一社会信用代码格式不正确",
+                        regexp : /(^[0-9A-Z]{18}$)|(^[0-9A-Z]{15}$)|(^无$)/
+                    },
+                }
+            },
+            telephone: {
+                message : '所选客户座机验证失败',
+                validators : {
+                    regexp : {
+                        message : "输入的电话格式不正确(由数字或-组成)",
+                        regexp : /^0[\d]{2,3}-[\d]{7,8}$/
+                    }
+                }
+            },
+            province : {
+                message : '所选身份验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请选择省份！"
+                    }
+                }
+            },
+            city : {
+                message : '所选城市验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请选择城市！"
+                    }
+                }
+            },
+            accountManager : {
+                message : '所选客户经理验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请选择客户经理！"
+                    }
+                }
+            },
+            pltSalesEmploy : {
+                message : '所选销售代表验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请选择销售代表！"
+                    }
+                }
+            },
+        }
+    };
+
+    layui.use(['form','element','layer'], function() {
+        layer = layui.layer;
+        form = layui.form();
+        element = layui.element();
+        $form = $('form');
+
+        loadAccountArea();
+        loadProvince();
+
+        $('#cancelEditSystemAccountBtn').bind("click", function () {
+            parent.layer.close(index);//关闭当前窗口
+        });
+
+        rgValidator = new RgValidator(ops);
+        rgValidator.bindValidator();
+
+        //提交按钮
+        form.on('submit(formDemo)', function(data) {
+            console.log(data.field);
+            if(rgValidator.validateOnSubmit(ops) != ''){
+                return false;
+            }
+
+            //信用代码和公司名称检查有效性
+//            var isValid = checkCorrectness4InteSocialCreditNo();
+//            if(!isValid){
+//                layer.msg("公司名称与信用代码不符，操作不会生效！" , {icon: 5});
+//                return false;
+//            }
+
+            //信用代码和公司名称查重
+            var isRepeat = checkConflictInteSocialCreditNo();
+            if(!isRepeat){
+                layer.msg("公司名称或信用代码与现有分销商库中存在冲突，操作不会生效！" , {icon: 5});
+                return false;
+            }
+
+            data.field.pltSalesEmployId = pltSalesEmployId;
+            data.field.salesUserId = salesUserId;
+            data.field.accountId = _accountId;
+            var param = {};
+            param.data = JSON.stringify(data.field);
+            postUtil.call("/systemAccount/distributor/updateDistributorDetail", param, function (result) {
+                if(result.STATUS == 'SUCCESS'){
+                    layer.msg("分销商信息修改成功", {icon: 6});
+                }else{
+                    layer.msg("分销商信息修改失败", {icon: 5});
+                }
+                var success = parent.editAccount();//调用父页面的渲染方法
+                if (success) {
+                    setTimeout(function () {
+                        parent.layer.close(index);//关闭当前窗口
+                    },1500);
+                }
+            });
+            return false;
+        });
+    });
+
+    function loadProvince() {
+        var proHtml = '';
+        for(var i = 0; i < areaData.length; i++) {
+            if(_province != '' && _province == areaData[i].provinceName) {
+                proHtml += '<option value="' + areaData[i].provinceName + '" selected>' +
+                    areaData[i].provinceName + '</option>';
+            } else {
+                proHtml += '<option value="' + areaData[i].provinceName + '">' +
+                    areaData[i].provinceName + '</option>';
+            }
+        }
+        if(_province != '') {
+            var cities = getCityByProvince(areaData, _province);
+            loadCity(cities, _city);
+        }
+        $form.find('select[name=province]').append(proHtml);
+        form.render();
+        form.on('select(province)', function(data) {
+            var value = data.value;
+            var cities = getCityByProvince(areaData, value);
+            if(cities.length > 0) {
+                loadCity(cities);
+            } else {
+                $form.find('select[name=city]').parent().hide();
+            }
+        });
+    }
+
+    function getCityByProvince(areaData, provinceName) {
+        var cities = [];
+        $.each(areaData, function (index, item) {
+            if(item.provinceName == provinceName) {
+                cities = item.mallCityList;
+                return false;
+            }
+        });
+        return cities;
+    }
+
+    function loadCity(citys, selCity) {
+        var cityHtml = '';
+        for(var i = 0; i < citys.length; i++) {
+            if(selCity != '' && selCity == citys[i].cityName) {
+                cityHtml += '<option value="' + citys[i].cityName + '" selected>' +
+                    citys[i].cityName + '</option>';
+            } else {
+                cityHtml += '<option value="' + citys[i].cityName + '">' +
+                    citys[i].cityName + '</option>';
+            }
+        }
+        $form.find('select[name=city]').html(cityHtml).parent().show();
+        form.render();
+
+    }
+
+    function loadAccountArea() {
+        var optionsHtm = "";
+        var optionArr = [
+            {value:'1001',text:'北区'},
+            {value:'1002',text:'中区'},
+            {value:'1003',text:'南区'}
+        ];
+
+        for(var i=0;i<optionArr.length;i++){
+            if(_accountAreaId!=''&&_accountAreaId == optionArr[i].value){
+                optionsHtm +=  '<option value="' + optionArr[i].value + '" selected>' +
+                    optionArr[i].text + '</option>';
+            } else {
+                optionsHtm += '<option value="' + optionArr[i].value + '">' +
+                    optionArr[i].text  + '</option>';
+            }
+        }
+
+        $form.find('select[name=accountAreaId]').append(optionsHtm);
+        form.render();
+    }
+
+    function enableAccountName(){
+        var obj = $form.find('input[name=accountName]');
+        obj.removeAttr("disabled");
+        obj.removeClass('bg-f0');
+        obj.attr("rg-validate-field", "accountName");
+        obj.parent().addClass("rg_group");
+        rgValidator.bindValidator();
+    }
+
+    function enableInteSocialCreditNo() {
+        var obj = $form.find('input[name=inteSocialCreditNo]');
+        obj.removeAttr("disabled");
+        obj.removeClass('bg-f0');
+        obj.attr("rg-validate-field", "inteSocialCreditNo");
+        obj.parent().addClass("rg_group");
+        rgValidator.bindValidator();
+    }
+
+    //客户经理
+    var opt = {
+        layerTitle:"选择客户经理",
+        layerArea:['700px', '410px'],
+        layer:parent.layer,
+        dialogDef:{
+            pageSize:5,
+            showSelectAllButton:false,
+            searchCondition:[
+                {
+                    title:'真实姓名',
+                    placeholder:'',
+                    type:'input',
+                    name:'userRealName'
+                }
+            ],
+            dataHeaders:[
+                {
+                    itemTitle:'姓名',
+                    width:150
+                },{
+                    itemTitle:'手机号',
+                    width:100
+                },{
+                    itemTitle:'邮箱',
+                    width:100
+                },{
+                    itemTitle:'岗位',
+                    width:100
+                }
+            ],
+            dataRowsDef:[
+                {name:'userId', type:'radio'},
+                {name:'userRealName'},
+                {name:'mobile'},
+                {name:'email'},
+                {name:'departmentName'}
+            ],
+            selectedCallBack: function(data){
+                if(data[0]){
+                    $('#accountManager').val(data[0].userRealName);
+                    salesUserId = data[0].userId;
+                }
+                return true;
+            }
+        }
+    };
+    var chooseAccountManagerDialog = new ChooseUserComponent(opt);
+
+    function newSelectAccountManager(){
+        chooseAccountManagerDialog.openDialog();
+    }
+
+    //销售代表
+    var opt1 = {
+        layerTitle:"选择销售代表",
+        layerArea:['700px', '410px'],
+        layer:parent.layer,
+        dialogDef:{
+            pageSize:5,
+            showSelectAllButton:false,
+            searchCondition:[
+                {
+                    title:'真实姓名',
+                    placeholder:'',
+                    type:'input',
+                    name:'userRealName'
+                }
+            ],
+            dataHeaders:[
+                {
+                    itemTitle:'姓名',
+                    width:200
+                },{
+                    itemTitle:'手机号',
+                    width:200
+                },{
+                    itemTitle:'邮箱',
+                    width:250
+                },{
+                    itemTitle:'岗位',
+                    width:200
+                }
+            ],
+            dataRowsDef:[
+                {name:'userId', type:'radio'},
+                {name:'userRealName'},
+                {name:'mobile'},
+                {name:'email'},
+                {name:'departmentName'}
+            ],
+            selectedCallBack: function(data){
+                if(data[0]){
+                    $('#pltSalesEmploy').val(data[0].userRealName);
+                    pltSalesEmployId = data[0].userId;
+                }
+                return true;
+            }
+        }
+    };
+    var choosePltSalesEmployDialog = new ChooseUserComponent(opt1);
+
+    function newSelectPltSalesEmploy(){
+        choosePltSalesEmployDialog.openDialog();
+    }
+
+    //公司名称和社会信用代码都有值，后才进行校验
+    function needCheckRepeat(){
+        var inteSocialCreditNo = $('input[name=inteSocialCreditNo]').val() || '';
+        var accountName = $('input[name=accountName]').val() || '';
+        //公司名称和社会信用代码都有值，后才进行校验
+        if(inteSocialCreditNo&&accountName){
+            return true;
+        }
+        return false;
+    }
+
+    //信用代码和公司名称检查有效性
+    function checkCorrectness4InteSocialCreditNo () {
+        var blresult = true;
+        var param = {};
+        param.inteSocialCreditNo = $('input[name=inteSocialCreditNo]').val() || '';
+        param.accountName = $('input[name=accountName]').val() || '';
+        if(needCheckRepeat()){
+            $.ajax({
+                url: '/systemAccount/management/distributor/checkCorrectness4InteSocialCreditNo',
+                type: 'post',
+                dataType: 'json',
+                data: param,
+                timeout: 10000,
+                async: false,
+                success: function (result) {
+                    if(result.STATUS == "SUCCESS"){
+                        blresult =  result.DATA;
+                    }else{
+                        console.log(result.MSG);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert(errorThrown);
+                }
+            });
+        }
+
+        return blresult;
+    }
+
+    //信用代码查重
+    function checkConflictInteSocialCreditNo(){
+        var blresult = true;
+        var param = {};
+        param.accountId = _accountId;
+        param.inteSocialCreditNo = $('input[name=inteSocialCreditNo]').val() || '';
+        param.accountName = $('input[name=accountName]').val() || '';
+        if(needCheckRepeat()){
+            $.ajax({
+                url: '/systemAccount/management/distributor/checkConflictInteSocialCreditNo',
+                type: 'post',
+                dataType: 'json',
+                data: param,
+                timeout: 10000,
+                async: false,
+                success: function (result) {
+                    if(result.STATUS == "SUCCESS"){
+                        blresult =  result.DATA;
+                    }else{
+                        console.log(result.MSG);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert(errorThrown);
+                }
+            });
+        }
+        return blresult;
+    }
+
+
+
+
+
+
+</script>
+</body>
+</html>

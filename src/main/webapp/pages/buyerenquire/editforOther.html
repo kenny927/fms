@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/css/daterangepicker.css<@resVersionDirective>?</@>" />
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/Area1.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+    <script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/buyerenquire/buyerEnquireDetailForOther.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/jquery.daterangepicker.js<@resVersionDirective>?</@>"></script>
+      <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+      <script src="/res/common/numCheck.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+    <script type="text/javascript">
+        var edit = true;
+//        <#if (edit)>
+//            edit = true;
+//        </#if>
+    </script>
+    <style type="text/css">
+        textarea {
+            font-family: "Microsoft Yahei", "Droid Sans Fallback", "Arial", "Helvetica", "sans-serif", "宋体" !important;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div class="bz-bb pl20 pr20 pt20 ">
+	            <div class="roleDescription mb10 fz16">工程商 </div>
+	            
+	             <button class="form-btn layui-btn-itoc layui-btn-big chooseSystemAccount" lay-filter="formDemo">请选择工程商</button>
+	             <div id="accountInfo"></div>
+<!-- 		            <h3 class="mb5 mt10">客户介绍</h3>
+		            <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+                         <h3 class="mb5"><a href="javascript:addProduct();" class="c-h frt fz12 cs-p td-ud">+添加商城商品</a></h3>
+
+		            </blockquote> -->
+            </div>
+            <div class="usermsg1">
+                <div class="table inquiry">
+                <h3 class="mb5 mt10 fz16">商品信息</h3>
+                 <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">  
+                    <div class="roleDescription mb10 fz12"><a  class="c-h frt fz12 cs-p td-ud" href="javascript:addProduct();">+添加商城商品</a></div>
+                    <ul class="th compact">
+                        <li style="width: 6%;"><div class="mida"><div class="midb">商品编码</div></div></li>
+                        <li style="width: 15%;"><div class="mida"><div class="midb">商品型号</div></div></li>
+                        <li style="width: 7%;"><div class="mida"><div class="midb">品牌</div></div></li>
+                        <li style="width: 26%;"><div class="mida"><div class="midb">商品名称</div></div></li>
+                        <li style="width: 26%;"><div class="mida"><div class="midb">商品描述</div></div></li>
+                        <li style="width: 8%;"><div class="mida"><div class="midb"><span class="c-f">*</span>数量</div></div></li>
+                        <li style="width: 7%;"><div class="mida"><div class="midb">计量单位</div></div></li>
+                        <li style="width: 5%; border-right: none;"><div class="mida"><div class="midb">操作</div></div></li>
+                    </ul>
+                    <div class="information-list" id="enquireProductList">
+
+                    </div>
+                    <div class="roleDescription mb10 fz12 mt20" ><a class="c-h frt fz12 cs-p td-ud" href="javascript:addCustomProduct();">+添加自定义商品</a></div>
+                    <ul class="th compact">
+                        <li style="width: 18%;"><div class="mida"><div class="midb">商品型号</div></div></li>
+                        <li style="width: 10%;"><div class="mida"><div class="midb"><span class="c-f">*</span>品牌</div></div></li>
+                        <li style="width: 23%;"><div class="mida"><div class="midb"><span class="c-f">*</span>商品名称</div></div></li>
+                        <li style="width: 21%;"><div class="mida"><div class="midb">描述</div></div></li>
+                        <li style="width: 8%;"><div class="mida"><div class="midb"><span class="c-f">*</span>数量</div></div></li>
+                        <li style="width: 11%;"><div class="mida"><div class="midb"><span class="c-f">*</span>计量单位</div></div></li>
+                        <li style="width: 9%; border-right: none;"><div class="mida"><div class="midb">操作</div></div></li>
+                    </ul>
+                    <div class="information-list" id="enquireCustomProductList">
+
+                    </div>
+                    </blockquote>
+	                <h3 class="mb5 mt20 fz16">其他信息</h3>
+	                <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">  
+                    <form action="" class="jun-form-s form-css">
+                        <dl class="dl-form mb10-i pt10">
+                            <dt class="flt"><span class="c-f">*</span>报价方式：</dt>
+                            <dd class="flt line-middle fz12">委托平台报价</dd>
+                        </dl>
+                         <dl class="dl-form mb10-i">
+                            <dt class="flt"><span class="c-f">*</span>期望交期：</dt>
+                            <dd class="flt"><input type="text" id="enquire_expectDeliveryTime" name="followDate"  style="height: 32px;width: 240px;" class="layui-input laydate-icon" placeholder="请选择期望交期" onclick="layui.laydate({elem: this, istime: true, format: 'YYYY-MM-DD'})" validate="true"></dd>
+                        </dl>
+                        <dl class="dl-form">
+                           <dt class="flt"><span class="c-f">*</span>项目地：</dt>
+                           <dd class="flt layui-form dd-city dd-city2">
+                              <select name="province" lay-filter="province" id="enquire_projectProvince">
+                                  <option value="">请选择省</option>
+                              </select>
+                           </dd>
+                           <dd class="flt layui-form dd-city dd-city2 ml10">
+                              <select name="city" lay-filter="city"  id="enquire_projectCity">
+                                  <option value="">请选择市</option>
+                              </select>
+                           </dd>
+                        </dl>
+                         <dl class="dl-form mb10-i">
+                            <dt class="flt"><span class="c-f">*</span>配送方式：</dt>
+                            <dd class="flt layui-form">
+                               <input type="radio" name="deliveryMode" value="LORRY" title="汽车" checked="true">
+                               <input type="radio" name="deliveryMode" value="RAILWAY" title="铁路">
+                               <input type="radio" name="deliveryMode" value="AIRLIFT" title="空运">
+                               <input type="radio" name="deliveryMode" value="EXPRESS" title="快递">
+                               <input type="radio" name="deliveryMode" value="SELF_PICK" title="客户自提">
+                               <input type="radio" name="deliveryMode" value="OTHER" title="其他">
+                            </dd>
+                            <dd class="flt"><input type="text" name="title" id="deliveryModeRemark" placeholder="请输入其他配送方式"  autocomplete="off" class="layui-input"></dd>
+                        </dl>
+                        
+                        
+                        <dl class="dl-form mb10-i">
+                            <dt class="flt">收货地址：</dt>
+                            <dd class="flt"><input type="text" name="title" id="consignee" placeholder="详细地址" autocomplete="off" class="layui-input" style="width: 360px;"></dd>
+                            <dd class="flt ml10"><input type="text" name="title" id="consigneeAddress"   placeholder="收货人" autocomplete="off" class="layui-input" style="width: 150px;"></dd>
+                            <dd class="flt ml10"><input type="text" name="title"  id="consigneeMobile"  placeholder="收货人电话" autocomplete="off" class="layui-input" style="width: 150px;"></dd>
+                        </dl>
+                        <dl class="dl-form mb10-i layui-form">
+                            <dt class="flt"><span class="c-f">*</span>支付方式：</dt>
+                            <dd class="flt"><input type="radio" name="payMode" value="CASH_BEFORE_DELIVERY" title="先款后货" checked="true"><input type="radio" name="payMode"  value="DEPOSIT" title="订金支付"></dd>
+                            <dd class="flt"><input type="text" name="title" id="payModeRemark1" autocomplete="off" class="layui-input" style="width: 40px;margin-left:-18px;" value="30"></dd>
+                            <dd class="flt line-middle">%</dd>
+                            <dd class="flt ml20"><input type="radio" name="payMode" value="CASH_ON_DELIVERY" title="账期支付(货到"></dd>
+                            <dd class="flt"><input type="text" name="payModeRemark2" id="payModeRemark2" placeholder="输入天数" autocomplete="off" class="layui-input" style="width: 80px;margin-left:-18px;"></dd>
+                            <dd class="flt  line-middle fz12">付款)</dd>
+                        </dl>
+                        <dl class="dl-form mb10-i">
+                            <dt class="flt"><span class="c-f">*</span>是否开票：</dt>
+                            <dd class="flt layui-form">
+                               <input type="radio" name="isNeedInvoice" value="Y" title="开票（增值税专用发票）" checked="true">
+                               <input type="radio" name="isNeedInvoice" value="N" title="不开票">
+                            </dd>
+                        </dl>
+                        <dl class="dl-form">
+                            <dt class="flt fz12">备注：</dt>
+                            <dd class="flt layui-form">
+                                <textarea cols="130" id="remark"  placeholder="输入您对商品的其他要求,200以内" class="layui-textarea"></textarea>  
+                            </dd>
+                        </dl>
+                    </form>
+                    </blockquote>
+                    <div class="pb20 t-c">
+                        <button class="form-btn layui-btn-small2" id="submitBtn" lay-filter="formDemo">生成询单</button>
+                        <button class="form-btn  layui-btn-primary layui-btn-small2 ml10" id="backBtn" lay-filter="formDemo">返回</button>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+</section>
+
+<script type="text/javascript">
+var _province="";
+var _city="";
+var $form;
+var form;
+var $;
+layui.use(['form','jquery','laydate','layer'], function(){
+    form = layui.form();
+    $form = $('form');
+    $ = layui.jquery;
+    layer = layui.layer;
+    var laydate = layui.laydate;
+})
+
+ var areaData = Area; 
+    var $form;
+    var form;
+    var $;
+    layui.use('form', function() {
+    form = layui.form();
+    $form = $('form');
+        loadProvince();
+    });
+    
+    function loadProvince() {
+      var proHtml = '';
+     for(var i = 0; i < areaData.length; i++) {
+       proHtml += '<option value="' + areaData[i].provinceCode + '_' + areaData[i].mallCityList.length + '_' + i + '">' +
+            areaData[i].provinceName + '</option>';
+                }
+    //初始化省数据
+       $form.find('select[name=province]').append(proHtml);
+       form.render();
+       form.on('select(province)', function(data) {
+       $form.find('select[name=area]').html('<option value="">请选择县/区</option>').parent().hide();
+       var value = data.value;
+      var d = value.split('_');
+       var code = d[0];
+       var count = d[1];
+       var index = d[2];
+       if(count > 0) {
+    	   _province=areaData[index].provinceName;
+    	   _city=areaData[index].mallCityList[0].cityName;
+          loadCity(areaData[index].mallCityList);
+        } else {
+          $form.find('select[name=city]').parent().hide();
+        }
+      });
+    }
+ 
+    function loadCity(citys) {
+       var cityHtml = '';
+      for(var i = 0; i < citys.length; i++) {
+        cityHtml += '<option value="' + citys[i].cityCode + '_' + citys[i].mallAreaList.length + '_' + i + '">' +
+        citys[i].cityName + '</option>';
+      }
+     $form.find('select[name=city]').html(cityHtml).parent().show();
+     form.render();
+     form.on('select(city)', function(data) {
+     var value = data.value;
+     var d = value.split('_');
+     var code = d[0];
+     var count = d[1];
+     var index = d[2];
+     if(count > 0) {
+     _city=citys[index].cityName;
+     loadArea(citys[index].mallAreaList);
+     } else {
+     $form.find('select[name=area]').parent().hide();
+     }
+     });
+ }
+ 
+     function loadArea(areas) {
+        var areaHtml = '';
+            for(var i = 0; i < areas.length; i++) {
+                areaHtml += '<option value="' + areas[i].areaCode + '">' +
+                 areas[i].areaName + '</option>';
+             }
+            $form.find('select[name=area]').html(areaHtml).parent().show();
+            form.render();
+            form.on('select(area)', function(data) {
+            });
+        }
+     $("input[name=chooseAll]").on("click",function(){
+			if($(this).prop("checked")){
+				$("input[name=single]").prop("checked",true);
+			}else{
+				$("input[name=single]").prop("checked", false);
+			}
+		});
+</script>
+
+</body>
+<#include "/res/freemarkerTpl/unitConfig.html" />
+<@unitConfig/>
+</html>

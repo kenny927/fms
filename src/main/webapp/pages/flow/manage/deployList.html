@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/js/mallCustomer/mallCustomerList.js<@resVersionDirective>?</@>"></script>
+
+    <style>
+        #itocCenter .itocContent .itocMain .purchaseSearch form {width:99%}
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain" style="height:486px">
+            <div class="purchaseSearch" style="padding-top:0px;padding-bottom:10px">
+                <form method="post" class="layui-form" action="" style="width:100%">
+                    <dl class="form-list flt mt20">
+                        <dt>流程定义名称：</dt>
+                        <dd><input type="text" name="definitionName" placeholder="请输入流程名称"/></dd>
+                        <dd><span class="btn ml20" onclick="searchDefinition()" style="height:35px;cursor: pointer;">查询</span></dd>
+                    </dl>
+                    <dl class="form-list flt mt20"  style="width: 100%">
+                        <dt>流程部署：</dt>
+                        <dd>
+                            <input id="deployFileIp" type="file" lay-type="file" name="file" class="layui-upload-file" lay-title="选择文件并部署"/>
+                        </dd>
+                    </dl>
+                </form>
+            </div>
+            <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px">
+                <table class="layui-table pop" lay-skin="line">
+                    <colgroup>
+                        <col>
+                        <col>
+                        <col>
+                        <col>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th style="text-align:center;width:10%">编号</th>
+                        <th style="text-align:center;width:50%">流程文件</th>
+                        <th style="text-align:center;width:20%">部署时间</th>
+                        <th style="text-align:center;width:20%">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+        </div>
+    </section>
+</section>
+<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+<script>
+    var html2="";
+    function isExitsVariable(variableName) {
+        try {
+            if (typeof (variableName) == "undefined") {
+                return "";
+            } else {
+                return variableName;
+            }
+        } catch (e) {
+        }
+        return "";
+    }
+
+    $(function(){
+        loadMallCustomerList(1);
+    });
+    function loadMallCustomerList(currentPageIndex, processNameLike) {
+        var param = {};
+        param.currentPage = currentPageIndex;
+        if(processNameLike){
+            param.processNameLike = processNameLike;
+        }
+        //alert(JSON.stringify(param));
+        postUtil.call("/flow/deploy/queryList", param, function (result) {
+            //alert(JSON.stringify(result));
+            var pageNumber = result.pageNumber;
+            var pageSize = result.pageSize;
+            var totalPage = result.totalPage;
+            var totalRow = result.totalRow;
+            var dataList = JSON.parse(result.DATA);
+            renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        loadMallCustomerList(obj.curr, status);
+                    }
+                }
+            });
+        });
+    }
+
+    function renderTable(dataList) {
+        var html="";
+        var length = dataList.length;
+        if (length > 0) {
+            for (var i1 = 0; i1 < dataList.length; i1++) {
+                var data = dataList[i1];
+                var operationHtml  = '<a class="c-h fz12"  href="javascript:deleteDeploy(' + isExitsVariable(data.id) + ')">删除</a>';
+                html+='  <tr>'+
+                        '   <td  width="10%">'+isExitsVariable(data.id)+'</td>'+
+                        '   <td  width="50%">'+isExitsVariable(data.name)+'</td>'+
+                        '   <td  width="20%">'+isExitsVariable(data.deploymentTime)+'</td>'+
+                        '   <td  width="20%">'+ operationHtml +'</td>'+
+                        '  </tr>'
+            }
+        }
+        $(".layui-table tbody").html(html);
+    }
+
+    function searchDefinition() {
+        loadMallCustomerList(1, $("input[name=definitionName]").val());
+    }
+    
+    function deleteDeploy(id) {
+        var param = {};
+        postUtil.call("/flow/deploy/delete/" + id, param, function (result) {
+            if(result.STATUS == 'SUCCESS'){
+                layer.msg("删除部署成功！", {icon: 5});
+                loadMallCustomerList(1);
+            }else {
+                layer.msg("删除部署失败！失败原因：" + result.MSG, {icon: 5});
+            }
+        });
+    }
+
+    layui.use(['element','layer'], function(){
+        var layer = layui.layer;
+        var element = layui.element();
+
+    })
+
+    layui.use('upload', function(){
+        layui.upload({
+            url: '/flow/deploy/deploy'
+            ,elem: '#deployFileIp'
+            ,success: function(res){
+                if(res.STATUS == "SUCCESS"){
+                    layer.msg("部署成功！", {icon: 6});
+                    loadMallCustomerList(1);
+                }else {
+                    layer.msg("部署失败！失败原因：" + res.MSG, {icon: 5});
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

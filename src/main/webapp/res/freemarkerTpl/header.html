@@ -1,0 +1,13 @@
+<#macro header currentUser>
+    <div class="corporateName">长飞光纤光缆(上海)有限公司
+        <#if currentUser>
+            <span class="iconfont icon-gerenzhongxin frt" onclick="doLoginOut()">登出</span>
+            <span class="iconfont icon-gerenzhongxin frt">${currentUser.realName}</span>
+        </#if>
+    </div>
+    <script>
+        function doLoginOut() {
+            postUtil.submit("/login/doLoginOut");
+        }
+    </script>
+</#macro>

@@ -1,0 +1,134 @@
+{
+    "MSG": "",
+    "DATA": {
+        "buyerSellerInfo": {
+            "accountName": "郑州市金冠同利电子科技有限公司",
+            "province": "上海市",
+            "offerAccountName": "长飞光纤光缆股份有限公司",
+            "entrustOrderContactMobile": "18802707295",
+            "city": "上海",
+            "entrustOrderContact": "柯老板",
+            "buyerAccountId": "3116"
+        },
+
+        "expectDeliveryDate":"2017/08/30-期望交期",
+        "offerValidUntil":"2017/08/30",
+        "accountManagerName":"朱舟",
+        "mobile":"13000000000",
+        "offerType":"平台报价",
+        "email":"客户经理邮箱",
+        "qq":"客户经理qq",
+        "replyDeliveryDate":"回复交期",
+        "inquiryOrderStatus":"IN_PROCESSING_MANAGER",
+        "inquiryOrderStatusName":"已报价",
+        "operationTime":"2017/02/30 12:00",
+        "inquiryOrderProvince": "浙江省",
+        "invoiceType": "发票类型",
+        "deliveryMode": "配送方式",
+        "skuList": [
+            {
+                "skuId":"1234567890",
+                "skuName":"光纤",
+                "skuMode":"BT-007",
+                "skuBrandName":"阿迪",
+                "skuProperty":
+                {
+                    "name":"芯数/颜色",
+                    "value":"24芯/黑色"
+                },
+                "skuProductImage":"http://www.yofc.com/wcs/Tpl/home/default/images/logo.png",
+                "skuClassifyName":"光纤",
+                "mallClassifyName":"光纤2",
+                "skuUnitName":"米",
+                "skubasePrice":0,
+                "skuQuantity":"35123.87",
+                "skuOfferPrice":0,
+                "skuOfferAmount":0
+            }
+        ,
+            {
+                "skuId": "0987654321",
+                "skuName": "光缆",
+                "skuMode": "BT-008",
+                "skuBrandName": "耐克",
+                "skuProperty": {
+                    "name": "芯数/颜色",
+                    "value": "24芯/黑色"
+                },
+                "skuProductImage": "http://www.yofc.com/wcs/Tpl/home/default/images/logo.png",
+                "skuClassifyName": "光纤",
+                "mallClassifyName": "光纤2",
+                "skuUnitName": "米",
+                "skuQuantity": "5000.00",
+                "skuOfferPrice": "25.00",
+                "skuOfferAmount": 125000.00
+            }
+        ],
+        "customSkuList":
+        [
+            {
+                "skuName":"自定义光纤1",
+                "skuBrandName":"阿迪王",
+                "skuMode":"BT-999",
+                "skuClassifyName":"阿迪王中王",
+                "mallClassifyName":"王中王",
+                "skuUnitName":"米",
+                "skuQuantity":"30000",
+                "skuPrice":"50",
+                "skuAmount":"1500000",
+                "remark":"这个是阿迪王中王"
+            },
+            {
+                "skuName":"自定义光纤2",
+                "skuBrandName":"阿迪王",
+                "skuMode":"BT-999",
+                "skuClassifyName":"阿迪王中王",
+                "mallClassifyName":"王中王",
+                "skuUnitName":"米",
+                "skuQuantity":"30000",
+                "skuPrice":"50",
+                "skuAmount":"1500000",
+                "remark":"这个是阿迪王中王"
+            }
+        ],
+        "operationLog": [
+            {
+                "orderLogId": "1004",
+                "offerId": "BE20170607762357",
+                "offerHistoryId": "1006",
+                "offerStatus": "NO_FLLOW",
+                "operationContent": "商城用户新增SKU询单",
+                "operationMainObjectId": "10004",
+                "operationUserId": "",
+                "operationUserName": "",
+                "operationAccountId": "",
+                "operationAccountName": "",
+                "operationTime": 1496798611000
+            }
+        ],
+        "purchasingRequisitionDesc": "需求描述-我想买光纤",
+        "accountManagerId": "",
+        "payMode": "结算方式",
+        "deliveryModeRemark": "配送方式备注",
+        "isNeedInvoice": "Y",
+        "payModeRemark": "结算方式备注",
+        "inquiryOrderCity": "嘉兴市",
+        "offerId": "BE20170607762357",
+        "offerTotalPrice": 2001,
+        "offerOtherFeesDesc": "熔纤费用",
+        "offerOtherFees": 0.5,
+        "offerSkuTotalPrice": 1000,
+        "offerFreight": 1000.5,
+        "attachmentList": [{
+            "offerId": "BE20170608815795",
+            "attachmentId": "10001",
+            "attachmentName": "asdf"
+        },
+            {
+                "offerId": "BE20170608815795",
+                "attachmentId": "10002",
+                "attachmentName": "asdfasfasdfasdfsdafsda"
+            }]
+    },
+    "STATUS": "SUCCESS"
+}

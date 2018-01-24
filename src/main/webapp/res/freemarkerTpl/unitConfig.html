@@ -1,0 +1,17 @@
+<#macro unitConfig>
+    <script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script>
+        var unitConfig = {};
+        postUtil.call("/sku/getUnitConfig", null, function (result) {
+            if (result.STATUS == "SUCCESS") {
+                var data = result.DATA;
+                $.each(data, function (index, item) {
+                    unitConfig[item.name]=item.precisionNum;
+                });
+            } else {
+                console.log("获取单位配置错误："+result.MSG)
+            }
+        });
+    </script>
+    <script src="/res/common/unitCheck.js<@resVersionDirective>?</@>"></script>
+</#macro>

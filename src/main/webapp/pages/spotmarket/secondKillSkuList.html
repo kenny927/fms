@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/vue.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <style type="text/css">
+        .first-row{
+            background-color: #f0f0f0;
+        }
+        .sku-pic img{
+            width: 60px;
+            height: 60px;
+        }
+        .secKillGoods{
+            display: none;
+        }
+        [v-cloak]{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<section class="bz-bb pl20 pr20 pt20 pb20" id="querySpotMarketList"  v-cloak>
+    <div class="tab-nav">
+        <ul class="tab-title">
+            <li value="0">现货</li>
+            <li class="tab-this" value="1">秒杀</li>
+        </ul>
+    </div>
+    <div class="jun-form-s form-css ">
+        <dl class="dl-form">
+            <dt class="flt fz12" style="width:56px;">查询：</dt>
+            <dd class="flt"><input type="text" name="title" id="skuName" placeholder="商品名称/型号/编号" autocomplete="off" class="layui-input pl10"></dd>
+            <dt class="flt fz12">状态：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="manager" lay-filter="manager" id="skuStatus"  style="width: 240px;">
+                    <option value="" selected="">全部</option>
+                    <option value="U">上架</option>
+                    <option value="D">下架</option>
+                </select>
+            </dd>
+            <dt class="flt fz12" style="width: 70px;">库存：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="source" lay-filter="source"  id="skuStore" style="width: 240px;">
+                    <option value="" selected="">全部</option>
+                    <option value="Y">有货</option>
+                    <option value="N">无货</option>
+                </select>
+            </dd>
+            <button id="searchBtn" class="form-btn layui-btn-small2  ml20 ">搜索</button>
+        </dl>
+    </div>
+    <div class="mark-read mb10 ml10">
+        <span class="cs-p">
+          <input type="checkbox" class="allChoose fz12">
+          <span class="fz12 c-2">全选</span>
+        </span>
+        <span class="c-2 cs-p ml10 fz12" onclick="batchSetUpStatus('U')">批量上架</span>
+        <span class="c-2 cs-p ml10 fz12" onclick="batchSetUpStatus('D')">批量下架</span>
+        <span class="c-2 cs-p ml10 fz12" onclick="setPromotions()">设置促销11111</span>
+    </div>
+    <div class="content">
+        <div class="secKillGoods">
+            <table class="layui-table pop no-margin" lay-skin="line">
+                <colgroup>
+                    <col  width="10">
+                    <col  width="100">
+                    <col  width="150">
+                    <col  width="250">
+                    <col  width="220">
+                    <col  width="100">
+                    <col  width="150">
+                    <col  width="150">
+                    <col  width="150">
+                    <col  width="800">
+                    <col  width="100">
+                    <col  width="130">
+                </colgroup>
+                <thead style="border-bottom:10px solid #fff;">
+                <th></th>
+                <th>商品图片</th>
+                <th>商品编码</th>
+                <th>商品名称</th>
+                <th>商品属性</th>
+                <th>品牌</th>
+                <th>单位</th>
+                <th>库存</th>
+                <th>起订量</th>
+                <th>促销内容</th>
+                <th>状态</th>
+                <th>操作</th>
+                </thead>
+                <tbody>
+                <tr class="first-row">
+                    <td colspan="8" align="left" style="text-align: left;">
+                        <input type="checkbox">
+                        <span class="c-f ml5">[秒杀]2015-02-02 00:00至2019-08-19 00:00</span>
+                    </td>
+                    <td class="c-h cs-p" align="right" colspan="4"
+                        style="text-align: right;">修改促销</td>
+                </tr>
+                <tr class="">
+                    <td><input type="checkbox"></td>
+                    <td class="sku-pic">
+                        <img src="/res/images/location.png">
+                    </td>
+                    <td>c-0126558422</td>
+                    <td>室外多模中心管式轻铠装光 缆,HT-GYXTW-12A1a.2</td>
+                    <td>芯数：12芯 光纤类型：A1a.2</td>
+                    <td>长飞</td>
+                    <td>千米</td>
+                    <td>1000000</td>
+                    <td>1000</td>
+                    <td>
+                        <dl>
+                            <dt class="flt pt15">
+                                <img src="/res/images/spots-1.png">
+                            </dt>
+                            <div class="flt ml10" style="text-align: left;">
+                                <dt>
+                                    <span class="c-9">市场参考价：￥1980.00</span>
+                                    <span class="c-2 fw-b">促销价：￥1000.00</span>
+                                </dt>
+                                <dt class="c-f">2015-02-02 00:00至2019-08-19 00:00</dt>
+                                <dt>
+                                    <span class="c-2">秒杀价：￥</span>
+                                    <span class="c-f fz14 fw-b">789.00</span>
+                                </dt>
+                            </div>
+
+                        </dl>
+                    </td>
+                    <td class="c-2 fw-b">上架</td>
+                    <td>
+                        <dl>
+                            <dt class="c-h mb5">下架</dt>
+                            <dt class="c-h">删除</dt>
+                        </dl>
+                    </td>
+                </tr>
+                <tr class="">
+                    <td><input type="checkbox"></td>
+                    <td class="sku-pic">
+                        <img src="/res/images/location.png">
+                    </td>
+                    <td>c-0126558422</td>
+                    <td>室外多模中心管式轻铠装光 缆,HT-GYXTW-12A1a.2</td>
+                    <td>芯数：12芯 光纤类型：A1a.2</td>
+                    <td>长飞</td>
+                    <td>千米</td>
+                    <td>1000000</td>
+                    <td>1000</td>
+                    <td>
+                        <dl>
+                            <dt class="flt pt15">
+                                <img src="/res/images/spots-1.png">
+                            </dt>
+                            <div class="flt ml10" style="text-align: left;">
+                                <dt>
+                                    <span class="c-9">市场参考价：￥1980.00</span>
+                                    <span class="c-2 fw-b">促销价：￥1000.00</span>
+                                </dt>
+                                <dt class="c-f">2015-02-02 00:00至2019-08-19 00:00</dt>
+                                <dt>
+                                    <span class="c-2">秒杀价：￥</span>
+                                    <span class="c-f fz14 fw-b">789.00</span>
+                                </dt>
+                            </div>
+
+                        </dl>
+                    </td>
+                    <td class="c-2 fw-b">上架</td>
+                    <td>
+                        <dl>
+                            <dt class="c-h mb5">下架</dt>
+                            <dt class="c-h">删除</dt>
+                        </dl>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="paginationDiv" class="mt20"></div>
+    </div>
+</section>
+<script>
+
+    //分页
+    $(function(){
+        var queryParam = {};
+        queryParam.currentPageIndex = '1';
+        loadSpotMarketData(queryParam);
+    });
+
+    layui.use(['form','element'], function(){
+        var form = layui.form();
+        var element = layui.element();
+
+    })
+
+    function loadSpotMarketData(queryParam) {
+        //layer.load();
+        postUtil.call(apiUrl.getSecondKillList, queryParam, function (pageResult) {
+            var pageNumber = pageResult.DATA.pageNumber;
+            var totalPage = pageResult.DATA.totalPage;
+            var totalRow = pageResult.DATA.totalRow;
+            //layer.closeAll("loading");
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total:totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var skuName = $('#skuName').val();
+                        var skuStatus = $('#skuStatus').val();
+                        var skuStore = $('#skuStore').val();
+//                        var brandId = $('#brandId').val();
+//                        var tempParam = {};
+//                        tempParam.currentPageIndex = obj.curr;
+//                        tempParam.pageSize = PAGE_SIZE;
+//                        tempParam.skuName = skuName;
+//                        tempParam.skuClassifyName = skuClassifyName;
+//                        tempParam.skuClassifyId = skuClassifyId;
+//                        tempParam.brandId = brandId;
+//                        tempParam.statusList = getStatusList();
+                        loadSpotMarketData(obj.curr);
+                    }
+                }
+            });
+            querySpotMarketList(pageResult.DATA);
+        });
+    }
+
+
+    var vm;
+    var PAGE_SIZE = 10;
+    function querySpotMarketList(value){
+        Vue.filter("formatQuantity", function(value, length) {   //全局方法 Vue.filter() 注册一个自定义过滤器,必须放在Vue实例化前面
+            if(value != undefined && value.lenth >= 1){
+                return value.toFixed(length);
+            }else{
+                return "--";
+            }
+
+        });
+        Vue.filter('nullValue',function(input){
+            if(input=="" || input == undefined){
+                input="--";
+            }
+            return input
+        });
+        Vue.filter('time', function (value, format) {
+            value = value || '';
+            if(value == ''){
+                return '--';
+            }
+            format = format || 'YYYY/MM/DD HH:mm:ss';
+            return moment(value).format(format);
+        });
+        Vue.filter('default', function (value, defaultValue) {
+            value = value || '';
+            if(value == ''){
+                return defaultValue;
+            }
+            return value
+        });
+
+        vm = new Vue({
+            el:'#querySpotMarketList',
+            data:{
+                todos: value,
+                skuList: value.list
+            },
+            created: function () {
+                this.showData()
+            },
+            methods:{
+                showData:function () {}
+            }
+        })
+    }
+
+
+    //单选checkbox
+    $('.choose').click(function(){
+        var checked = this.checked ;
+        var choose = document.getElementsByClassName("choose");
+        var allChoose = document.getElementsByClassName("allChoose");
+        var checked_num=0;
+        for(var i=0;i<choose.length;i++){
+            if(choose[i].checked){
+                checked_num = checked_num + 1 ;
+            }
+        }
+        if(checked){
+            $(this).parent().parent().css('background-color','#FFFDF1');
+            if(!allChoose[0].checked&choose.length == checked_num){
+                allChoose[0].checked = true;
+            }
+        }else{
+            $(this).parent().parent().css('background-color','transparent');
+
+            if (allChoose[0].checked) {
+                allChoose[0].checked = false;
+            }
+        }
+    })
+    //全选checkbox
+    $('.allChoose').click(function(){
+        var checked = this.checked;
+        var inputs = document.getElementsByClassName("choose");
+
+        if(checked){
+            $(".choose").parent().parent().css('background-color','#FFFDF1');
+            for(var input in inputs){
+                inputs[input].checked = true;
+            }
+        }else{
+            $(".choose").parent().parent().css('background-color','transparent');
+            for(var input in inputs){
+                inputs[input].checked = false;
+            }
+        }
+    })
+    $(document).on('click','.tab-nav li',function () {
+        $(this).addClass("tab-this").siblings().removeClass("tab-this");
+        var val = $(this).val();
+        if(val==0){
+            $('.secKillGoods').hide();
+            $('.spotGoods').show();
+        }else if(val==1){
+            $('.secKillGoods').show();
+            $('.spotGoods').hide();
+        }
+    })
+
+    function setPromotions(){
+        var skuIdList="";
+        $.each($('input[name="selectSku"]:checked'), function (index, item) {
+            if(this.value != undefined && this.value != ""){
+                skuIdList +=this.value +",";
+            }
+        });
+        cardUtil.openCard("设置促销","/spotMarket/skuPromotions",{"skuIdList":skuIdList});
+        cardUtil.changeCard("设置促销");
+    }
+
+
+    function changeUpStatus(skuId) {
+        postUtil.call("/spotMarket/changeUpStatus", {skuId:skuId}, function (res) {
+            if(res.STATUS == "SUCCESS") {
+                if($('#changeLink_'+skuId).text() == "上架") {
+                    $('#changeLink_'+skuId).text("下架");
+                } else if($('#changeLink_'+skuId).text() == "下架") {
+                    $('#changeLink_'+skuId).text("上架");
+                }
+                if($('#status_'+skuId).text() == "上架") {
+                    $('#status_'+skuId).text("下架");
+                } else if($('#status_'+skuId).text() == "下架") {
+                    $('#status_'+skuId).text("上架");
+                }
+            } else {
+                layer.msg(res.MSG, {icon: 5});
+            }
+        })
+    }
+
+    //批量修改上下架
+    function batchSetUpStatus(status) {
+        if($('input[name="selectSku"]:checked').length == 0) {
+            layer.msg("请选择商品", {icon: 5});
+            return;
+        }
+        layer.load();
+        var checkStatusText = "";
+        if(status == "U") {
+            checkStatusText = "下架";
+        } else {
+            checkStatusText = "上架";
+        }
+        var isPass = true;
+        var skuIdList = [];
+        var msg = "";
+        $.each($('input[name="selectSku"]:checked'), function (index, item) {
+            var sss = $('#status_'+this.value).text() != checkStatusText;
+            var ssd = $('#status_'+this.value).text();
+            if($('#status_'+this.value).text() != checkStatusText) {
+                msg = "请选择状态为"+checkStatusText+"商品进行操作";
+                isPass = false;
+                return false;
+            }
+            skuIdList.push(this.value);
+        });
+
+        if(!isPass) {
+            layui.use('layer', function() {
+                layer.open({
+                    title: '数据填写有误',
+                    icon: 5,
+                    skin: 'youskin',
+                    area: ['550px', '300px'],
+                    btnAlign: 'c',
+                    content: msg,
+                    btn: ['我知道了'],
+                    yes: function (index1, layero) {
+                        layer.close(index1);
+                    },
+                    cancel: function () {
+                        //右上角关闭回调
+                    }
+                });
+            });
+            layer.closeAll("loading");
+            return ;
+        }
+        console.log(skuIdList);
+        var param = {};
+        param.skuIdList = skuIdList;
+        param.status = status;
+        postUtil.call("/spotMarket/batchSetUpStatus", {jsonData:JSON.stringify(param)}, function (res) {
+            if(res.STATUS == "SUCCESS") {
+                $.each(skuIdList, function (index, item) {
+                    if($('#changeLink_'+item).text() == "上架") {
+                        $('#changeLink_'+item).text("下架");
+                    } else if($('#changeLink_'+item).text() == "下架") {
+                        $('#changeLink_'+item).text("上架");
+                    }
+                    if($('#status_'+item).text() == "上架") {
+                        $('#status_'+item).text("下架");
+                    } else if($('#status_'+item).text() == "下架") {
+                        $('#status_'+item).text("上架");
+                    }
+                });
+                layer.msg("批量处理成功", {icon: 6});
+            } else {
+                layer.msg(res.MSG, {icon: 5});
+            }
+            layer.closeAll("loading");
+        });
+    }
+
+    $("#searchBtn").bind("click", function () {
+        var skuName = $('#skuName').val();
+        var skuStatus = $('#skuStatus').val();
+        var skuStore = $('#skuStore').val();
+        var queryParam = {};
+        queryParam.currentPageIndex = 1;
+        queryParam.pageSize = PAGE_SIZE;
+        queryParam.skuName = skuName;
+        queryParam.skuStatus = skuStatus;
+        queryParam.skuStore = skuStore;
+        postUtil.call(apiUrl.querySpotMarketList, queryParam, function (pageResult) {
+            var pageNumber = pageResult.DATA.pageNumber;
+            var totalPage = pageResult.DATA.totalPage;
+            var totalRow = pageResult.DATA.totalRow;
+            //layer.closeAll("loading");
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total:totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var skuName = $('#skuName').val();
+                        var skuStatus = $('#skuStatus').val();
+                        var skuStore = $('#skuStore').val();
+                        loadSpotMarketData(obj.curr);
+                    }
+                }
+            });
+            vm.todos=pageResult.DATA;
+            vm.skuList=pageResult.DATA.list;
+        });
+    });
+</script>
+</body>
+</html>

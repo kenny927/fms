@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div class="purchaseSearch">
+                <form>
+                    <dl class="form-list flt">
+                        <dt>用户名：</dt>
+                        <dd><input type="text" id="userName" style="width: 150px;" placeholder="请输入用户名"/></dd>
+                    </dl>
+                    <dl class="form-list flt">
+                        <dt>真实姓名：</dt>
+                        <dd><input type="text" id="userRealName" style="width: 150px;" placeholder="请输入真实姓名"/></dd>
+                    </dl>
+                    <dl class="form-list flt">
+                        <dd><span class="btn ml10" style="cursor: pointer;" id="searchBtn">查询</span></dd>
+                        <dd><span class="btn ml10" id="preAddAuthorityUserBtn" style="cursor: pointer;">新增</span></dd>
+                    </dl>
+                </form>
+            </div>
+            <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px">
+                <table class="layui-table pop" lay-skin="line">
+                    <thead>
+                    <tr>
+                        <th><input type="checkbox" name="allChoose"></th>
+                        <th>员工ID</th>
+                        <th>父级ID</th>
+                        <th>用户名</th>
+                        <th>真实姓名</th>
+                        <th>手机号</th>
+                        <th>邮箱</th>
+                        <th>账户</th>
+                    </tr>
+                    </thead>
+                    <tbody id="authorityEmployeeTable">
+                    </tbody>
+                </table>
+            </div>
+            <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript">
+
+    var PAGE_SIZE = 5;
+    
+    $("input[name=allChoose]").on("click",function(){
+			if($(this).prop("checked")){
+				$("input[name=primary]").prop("checked",true);
+			}else{
+				$("input[name=primary]").prop("checked", false);
+			}
+		});
+
+    function authorityEmployeeTableInit() {
+        var userName = $('#userName').val();
+        var userRealName = $('#userRealName').val();
+
+        var queryParam = {};
+        queryParam.currentPageIndex = 1;
+        queryParam.pageSize = PAGE_SIZE;
+        queryParam.userName = userName;
+        queryParam.userRealName = userRealName;
+        queryParam.mainObjectId = "10002";
+        queryParam.status = "Y";
+
+
+        loadAuthorityUserData(queryParam);
+    }
+
+    $(function () {
+        authorityEmployeeTableInit();
+
+        $("#searchBtn").bind("click", function () {
+            authorityEmployeeTableInit();
+        });
+
+        document.onkeydown = function (e) {
+            var ev = document.all ? window.event : e;
+            if (ev.keyCode == 13) {
+                authorityEmployeeTableInit();
+            }
+        };
+
+
+        $('#preAddAuthorityUserBtn').bind("click", function () {
+        	var len = $("input[type=checkbox][name=primary]:checked").length;
+        	if(len==0){
+        		layer.msg("请选中一个销售人员！",{icon:5});
+        		return ;
+        	}
+        	var authorityList = $("input[type=checkbox][name=primary]:checked");
+        	var userIds ="";
+        	for(var i=0;i<authorityList.length;i++){
+        		userIds+=authorityList[i].value+";";
+        	}
+//         	var ids = JSON.stringify(userIds);
+        	var ids = userIds;
+            layer.open({
+                skin: 'msgskin',
+                title: '新建销售与区域配置关系',
+                type: 2,
+                area: ['700px', '400px'],
+                fixed: false, //不固定
+                maxmin: true,
+                content: '/salerFitForArea/preAddSalerFitForArea?ids='+ids,
+		        btn : [ '新增' ,'取消'],
+		        yes : function(index, layero) {
+		        	var body = layer.getChildFrame('body', index);
+		        	var selects = $(body).find('select[name=province]');
+		        	var optiongList= $(body).find("select[name=province] option:selected");
+		        	var paraList =[];
+		        	for(var i=0;i<selects.length;i++){
+		        		var select = selects[i];
+		        		var para ={};
+		        		para.userId = select.getAttribute("id");
+		        		para.userName = select.getAttribute("username");
+		        		var option = $(select).find("option:selected")[0];
+		        		var province=option.getAttribute("value");
+		        		if(province==""||province==null){
+		        			layer.msg("请先给"+para.userName+"选择负责区域(省)",{icon:5});
+		        			return;
+		        		}
+		        		
+		        		para.province =province;
+		        		paraList.push(para);
+		        		
+		        	}
+		        	var optionBody = JSON.stringify(paraList);
+		        	postUtil.call("/salerFitForArea/addSalerFitForArea",{"optionBody":optionBody},function(result){
+		        		if(result.success==true){
+		        			layer.msg("新增销售与区域配置关系成功",{icon:6});
+		        			layer.close(index);
+		        		}else{
+		        			layer.msg(result.msg);
+		        		}
+		        	})
+// 		        	var iframeWin = window[layero.find('iframe')[0]['name']];//获得iframe的窗口对象
+		    	    var param2 = {};
+		    	    param2.mobileCode = body.find('input').val();
+		    	    var verificationCode = body.find('input').val();
+		    	    var mobileTemp = body.find('p')[2].innerHTML;
+		    	    var mobile = mobileTemp.substring(4,15);
+		    	    param2.mobile =mobile;
+		    	    param2.verificationCodeType = "ORDER_SALE_ELECTRONIC_SEAL";
+		        } ,
+				btn2 : function(
+						index,
+						layero) {
+					layer.close(index);//关闭弹窗
+					//取消的回调
+
+				},
+			   cancel : function() {
+
+			     }
+		      });
+//             postUtil.submit("/authorityUser/preAddAuthorityEmployeePage");
+        });
+
+    });
+
+    function loadAuthorityUserData(queryParam) {
+        layer.load();
+        postUtil.call("/authorityUser/listJson", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var userName = $('#userName').val();
+                        var userRealName = $('#userRealName').val();
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        tempParam.userName = userName;
+                        tempParam.userRealName = userRealName;
+                        tempParam.mainObjectId = "10002";
+                        tempParam.status = "Y";
+                        loadAuthorityUserData(tempParam);
+                    }
+                }
+            });
+            layer.closeAll("loading");
+        });
+    }
+
+    function renderTable(dataList) {
+        var length = dataList.length;
+        var table = document.getElementById("authorityEmployeeTable");
+        table.innerHTML = "";
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var row = renderRow(data);
+                table.appendChild(row);
+            }
+        } else {
+            var html = '<tr><td colspan="10"><p class="t-c fz16 c-2" style="line-height: 76px;">没有查询到员工信息</p></td></tr>';
+            $(table).html(html);
+        }
+    }
+
+    function renderRow(rowData) {
+        var userId = rowData.userId;
+        var pUserId = rowData.pUserId;
+        var userName = rowData.userName;
+        var userRealName = rowData.userRealName;
+        var mobile = rowData.mobile;
+        var email = rowData.email;
+        var accountName = rowData.accountName;
+        var createUser = rowData.createUser;
+        var createTimeStr = rowData.createTimeStr;
+        var updateUser = rowData.updateUser;
+        var updateTimeStr = rowData.updateTimeStr;
+
+
+        var tr = document.createElement('tr');
+        tr.appendChild(renderCell("checkbox", userId, "width:8%;"));
+        tr.appendChild(renderCell(null, userId, "width:8%;"));
+        tr.appendChild(renderCell(null, pUserId, "width:4%;"));
+        tr.appendChild(renderCell(null, userName, "width:10%;"));
+        tr.appendChild(renderCell(null, userRealName, "width:10%;"));
+        tr.appendChild(renderCell(null, mobile, "width:10%;"));
+        tr.appendChild(renderCell(null, email, "width:10%;"));
+        tr.appendChild(renderCell(null, accountName, "width:20%;"));
+        return tr;
+    }
+
+    function renderCell(name, value, style) {
+        var td = document.createElement('td');
+        if("checkbox" == name){
+        	 td.innerHTML = '<input type="checkbox" name="primary" value="' + value + '">' ;
+        } else {
+            if (value) {
+                td.innerText = value;
+            } else {
+                td.innerText = "--";
+            }
+        }
+        return td;
+    }
+
+    function preEditAuthorityEmployee(userId) {
+        var param = {};
+        param.userId = userId;
+        postUtil.submit("/authorityUser/preEditAuthorityEmployeePage", param);
+    }
+
+    function preResetPassword(userId) {
+        layer.open({
+            title: "密码重置",
+            type: 2,
+            area: ['500px', '300px'],
+            fixed: false, //不固定
+            maxmin: true,
+            content: '/authorityUser/preResetPasswordPage?userId=' + userId
+        });
+    }
+
+</script>
+</body>
+</html>

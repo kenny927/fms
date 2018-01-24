@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+		<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+		<script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+	</head>
+	<body>
+		<section id="itocCenter">
+	       <section class="itocContent">
+	       	<div class="itocMain">
+	       		<div class="purchaseSearch">
+					<form>
+						<dl class="form-list flt">
+							<dt>角色名称：</dt>
+							<dd><input type="text" id="roleName" style="width: 150px;" placeholder="请输入模板名称"/></dd>
+						</dl>
+						<dl class="form-list flt">
+							<dd><span class="btn ml10" style="cursor: pointer;" id="searchBtn">查询</span></dd>
+							<dd><span class="btn ml10" id="preAddAuthorityRoleBtn" style="cursor: pointer;">新增</span></dd>
+						</dl>
+					</form>
+	       		</div>
+                    <div class="table">
+                    	<ul class="th">
+                    		<li style="width:10%;"><div class="mida"><div class="midb">角色ID</div></div></li>
+                            <li style="width:20%"><div class="mida"><div class="midb">角色名称</div></div></li>
+                    		<li style="width:25%;"><div class="mida"><div class="midb">角色描述</div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb">创建人</div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb">创建时间</div></div></li>
+                    		<li style="width:9%;"><div class="mida"><div class="midb">修改人</div></div></li>
+                    		<li style="width:9%"><div class="mida"><div class="midb">修改时间</div></div></li>
+                    		<li style="width:9%"><div class="mida"><div class="midb">操作</div></div></li>
+                    	</ul>
+                    	<div class="information-list" id="authorityRoleTable"></div>
+                    	<div id="paginationDiv"></div>
+                    </div>
+	       	</div>
+	       </section>
+		</section>
+		<script type="text/javascript">
+
+            var PAGE_SIZE = 5;
+
+            function authorityRoleTableInit(){
+				var roleName = $('#roleName').val();
+
+                var queryParam = {};
+                queryParam.currentPageIndex = 1;
+                queryParam.pageSize = PAGE_SIZE;
+				queryParam.roleName = roleName;
+
+                loadAuthorityRoleData(queryParam);
+            }
+
+            $(function () {
+                authorityRoleTableInit();
+
+                $("#searchBtn").bind("click",function(){
+					authorityRoleTableInit();
+                });
+
+				document.onkeydown = function(e){
+					var ev = document.all ? window.event : e;
+					if(ev.keyCode==13) {
+						authorityRoleTableInit();
+					}
+				}
+
+
+				$('#preAddAuthorityRoleBtn').bind("click",function(){
+					postUtil.submit("/authorityRole/preAdd");
+				});
+
+            });
+
+			function loadAuthorityRoleData(queryParam) {
+				layer.load();
+				postUtil.call("/authorityRole/listJson", queryParam, function (pageResult) {
+					var pageNumber = pageResult.pageNumber;
+					var pageSize = pageResult.pageSize;
+					var totalPage = pageResult.totalPage;
+					var totalRow = pageResult.totalRow;
+					var dataList = pageResult.list;
+					renderTable(dataList);
+					laypage({
+						cont: 'paginationDiv',
+						pages: totalPage,
+						curr: pageNumber,
+						total: totalRow,
+						skip: true,
+						jump: function (obj, first) {
+							if (!first) {
+								var roleName = $('#roleName').val();
+								var tempParam = {};
+								tempParam.currentPageIndex = obj.curr;
+								tempParam.pageSize = PAGE_SIZE;
+								tempParam.roleName = roleName;
+								loadAuthorityRoleData(tempParam);
+							}
+						}
+					});
+					layer.closeAll("loading");
+				});
+			}
+
+			function renderTable(dataList) {
+				var length = dataList.length;
+				var table = document.getElementById("authorityRoleTable");
+				table.innerHTML = "";
+
+				if (length > 0) {
+					for (var i = 0; i < dataList.length; i++) {
+						var data = dataList[i];
+						var row = renderRow(data);
+						table.appendChild(row);
+					}
+				}else {
+					var html = '<p class="t-c fz16 c-2" style="line-height: 76px;">暂无角色信息！</p>';
+					$(table).html(html);
+				}
+			}
+
+            function renderRow(rowData) {
+                var roleId = rowData.roleId;
+                var roleName = rowData.roleName;
+                var roleDesc = rowData.roleDesc;
+                var createUser = rowData.createUser;
+				var createTimeStr = rowData.createTimeStr;
+				var updateUser = rowData.updateUser;
+				var updateTimeStr = rowData.updateTimeStr;
+
+
+				var ul = document.createElement('ul');
+				ul.setAttribute("class", "information informationList");
+// 				ul.setAttribute("style","height:75px;");
+
+				ul.appendChild(renderCell(null, roleId, "width:10%;"));
+				ul.appendChild(renderCell(null, roleName, "width:20%;"));
+				ul.appendChild(renderCell(null, roleDesc, "width:25%;"));
+				ul.appendChild(renderCell(null, createUser, "width:9%;"));
+				ul.appendChild(renderCell(null, createTimeStr, "width:9%;"));
+				ul.appendChild(renderCell(null, updateUser, "width:9%;"));
+				ul.appendChild(renderCell(null, updateTimeStr, "width:9%;"));
+				ul.appendChild(renderCell("operation", rowData, "width:9%;"));
+                return ul;
+            }
+
+			function renderCell(name, value, style) {
+				var li = document.createElement('li');
+				li.setAttribute("style", style)
+				var div_mida = document.createElement('div');
+				div_mida.setAttribute("class", "mida");
+				var div_midb = document.createElement('div');
+				div_midb.setAttribute("class", "midb");
+				//个性化差异-操作区域
+				if ("operation" == name) {
+					div_midb.innerHTML = '<p><a href="javascript:void(0);" onclick="preEditAuthorityRole(\'' + value.roleId + '\',\'' + value.roleName + '\',\'' + value.roleDesc + '\')">编辑</a></p>';
+				} else {
+					if (value) {
+						div_midb.innerText = value;
+					} else {
+						div_midb.innerText = "--";
+					}
+				}
+				div_mida.appendChild(div_midb);
+				li.appendChild(div_mida);
+				return li;
+			}
+
+			function preEditAuthorityRole(roleId,roleName,roleDesc) {
+				var param = {};
+				param.roleId = roleId;
+				param.roleName = roleName;
+				param.roleDesc = roleDesc;
+				postUtil.submit("/authorityRole/preEdit",param);
+			}
+
+		</script>
+	</body>
+</html>

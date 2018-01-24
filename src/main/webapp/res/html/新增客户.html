@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css"/>
+    <script src="/res/js/jquery-3.1.1.min.js"></script>
+    <script src="/res/public/layui/Area1.js" type="text/javascript"></script>
+    <script src="/res/public/layui/layui.js"></script>
+    <script src="/res/public/layui/layui-mz-min.js"></script>
+    <script src="/res/js/MultiSelectDropList.js"></script>
+    <script src="/res/public/layPage/laypage.js"></script>
+  </head>
+  <body>
+    <section id="itocCenter">
+         <section class="itocContent">
+          <div class="itocMain">
+            <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px; margin-top:10px;">
+                 <form class="jun-form-s form-css">
+                      <div>
+                        <h3 class="bg-f0 h3-tittle pl10 mt20">客户基本信息</h3>
+                        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+                           <div style="padding-left: 40px;">
+                            <dl class="dl-form">
+                               <dt class="flt fz12"><span class="c-f">*</span>客户类型：</dt>
+                               <dd class="flt layui-form">
+                                  <input type="radio" name="sex" value="企业" title="企业" checked="">
+                                  <input type="radio" name="sex" value="个人" title="个人">
+                               </dd>
+                            </dl>
+                            <dl class="dl-form">
+                               <dt class="flt fz12"><span class="c-f">*</span>客户名称：</dt>
+                               <dd class="flt"><input type="text" name="title"  placeholder="请输入标题" autocomplete="off" class="layui-input"></dd>
+                               <dd class="flt c-f ml10" style="line-height: 32px;">与客户库其他客户存在冲突,请停止创建</dd>
+                               <dd class="flt c-h ml10 cs-p" style="line-height: 32px;">查看冲突</dd>
+                            </dl>
+                            <dl class="dl-form">
+                               <dt class="flt fz12" style="width: 115px;margin-left:-25px;"><span class="c-f">*</span>统一社会信用代码：</dt>
+                               <dd class="flt"><input type="text" name="title"  placeholder="请输入标题" autocomplete="off" class="layui-input"></dd>
+                               <dd class="flt c-f ml10" style="line-height: 32px;">与客户库其他客户存在冲突,请停止创建</dd>
+                               <dd class="flt c-h ml10 cs-p" style="line-height: 32px;">查看冲突</dd>
+                            </dl>
+                            <dl class="dl-form" style="margin-bottom:10px;">
+                               <dt class="flt fz12" style="width: 115px;margin-left:-25px;">座机：</dt>
+                               <dd class="flt"><input style="width: 50px;" type="text" name="price_min" autocomplete="off" class="layui-input"></dd>
+                               <dd class="flt ml5 mr5" style="line-height: 32px;">-</dd>
+                               <dd class="flt"><input style="width: 175px;" type="text" name="price_min" autocomplete="off" class="layui-input"></dd>
+                               <dt class="flt"><span class="c-f">*</span>地址：</dt>
+                               <dd class="flt layui-form dd-city">
+                                  <select name="province" lay-filter="province" id="s_province" lay-search>
+                                      <option value="">请选择省</option>
+                                  </select>
+                               </dd>
+                               <dd class="flt layui-form dd-city">
+                                  <select name="city" lay-filter="city" lay-search>
+                                      <option value="">请选择市</option>
+                                  </select>
+                               </dd>
+                               <dd class="flt ml10"><input style="width: 175px;" placeholder="请输入详细地址" type="text" name="price_min" autocomplete="off" class="layui-input"></dd>
+                            </dl>
+                            </div>
+                            <div class="mt20">
+                            <hr class="hr-bor" />
+                               <span class="iconfont icon-icon13 frt fz12 c-9 mb10 cs-p"></span>
+                                <table class="layui-table pop" lay-skin="line">
+                                    <colgroup>
+                                      <col  width="300">
+                                      <col  width="150">
+                                      <col  width="150">
+                                      <col  width="150">
+                                      <col  width="150">
+                                      <col  width="150">
+                                    </colgroup>
+                                    <thead>
+                                      <tr>
+                                        <th >客户名称</th>
+                                        <th >座机</th>
+                                        <th >联系人</th>
+                                        <th >联系人电话</th>
+                                        <th >签约状态</th>
+                                        <th >客户经理</th>
+                                      </tr> 
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                      <td>武汉<span class="c-f">长飞光纤光缆</span>股份有限公司</td>
+                                      <td class="c-f">027-88888888</td>
+                                      <td>李先生</td>
+                                      <td>18877887788</td>
+                                      <td>已签约</td>
+                                      <td>朱舟</td>
+                                    </tr>
+                                    <tr>
+                                      <td>武汉<span class="c-f">长飞光纤光缆</span>股份有限公司</td>
+                                      <td class="c-f">027-88888888</td>
+                                      <td>李先生</td>
+                                      <td>18877887788</td>
+                                      <td>已签约</td>
+                                      <td>朱舟</td>
+                                    </tr>
+                                    </tbody>
+                                    </table>
+                                    </div>
+                        </blockquote>
+                      </div>
+                      <div>
+                        <h3 class="bg-f0 h3-tittle pl10 mt20">联系人</h3>
+                        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="padding-left: 40px;">
+                            <dl class="dl-form">
+                               <dt class="flt fz12"><span class="c-f">*</span>联系人：</dt>
+                               <dd class="flt layui-form">
+                                  <input type="text" name="title"  placeholder="请输入联系人姓名" autocomplete="off" class="layui-input">
+                               </dd>
+                               <dt class="flt fz12"><span class="c-f">*</span>性别：</dt>
+                               <dd class="flt layui-form">
+                                  <input type="radio" name="sex" value="男士" title="男士" checked="">
+                                  <input type="radio" name="sex" value="女士" title="女士">
+                               </dd>
+                            </dl>
+                            <dl class="dl-form">
+                               <dt class="flt fz12"><span class="c-f">*</span>联系方式：</dt>
+                               <dd class="flt"><input type="text" name="title"  placeholder="座机或手机都可以" autocomplete="off" class="layui-input"></dd>
+                               <dt class="flt fz12">邮箱：</dt>
+                               <dd class="flt"><input type="text" name="title"  placeholder="请输入邮箱" autocomplete="off" class="layui-input"></dd>
+                            </dl>
+                            <dl class="dl-form">
+                               <dt class="flt fz12">部门：</dt>
+                               <dd class="flt"><input type="text" name="title"  placeholder="请输入标题" autocomplete="off" class="layui-input"></dd>
+                               <dt class="flt fz12">职务：</dt>
+                               <dd class="flt"><input type="text" name="title"  placeholder="座机或手机都可以" autocomplete="off" class="layui-input"></dd>
+                            </dl>
+                            <dl class="dl-form" style="margin-bottom:0px;">
+                               <dt class="flt fz12" style="width: 115px;margin-left:-25px;">生成商城账号：</dt>
+                               <dd class="flt c-2" style="line-height: 32px;">是</dd>
+                            </dl>
+                        </blockquote>
+                      </div>
+                      <div>
+                        <h3 class="bg-f0 h3-tittle pl10 mt20">是否共享</h3>
+                        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="padding-left: 40px;">
+                            <dl class="dl-form" style="margin-bottom: 0">
+                               <dt class="flt fz12">新增至：</dt>
+                               <dd class="flt layui-form">
+                                  <input type="radio" name="sex" value="私海" title="私海" checked="">
+                                  <input type="radio" name="sex" value="私海" title="公海">
+                               </dd>
+                            </dl>
+                        </blockquote>
+                      </div>
+                      <div class="pb20 t-c">
+                      <button class="form-btn layui-btn-big" lay-filter="formDemo">提交</button>
+                      <button class="form-btn layui-btn-big" lay-filter="formDemo" style="background-color: #cccccc;">提交</button>
+                      <button class="form-btn  layui-btn-primary layui-btn-big ml10" lay-filter="formDemo">提交并继续创建</button>
+                      </div>
+                    </form>
+            </div>
+          </div>
+         </section>
+    </section>
+
+<script type="text/javascript">
+    
+    $(document).on('click','.icon-icon13',function(){
+      $(this).parent().hide();
+    })
+
+      layui.use(['form','jquery','laydate'], function(){
+        var form = layui.form();
+        var $ = layui.jquery;
+
+        })
+
+//省市联动  star
+    var areaData = Area; 
+    var $form;
+    var form;
+    var $;
+    layui.use('form', function() {
+    form = layui.form();
+    $form = $('form');
+        loadProvince();
+    });
+    function loadProvince() {
+      var proHtml = '';
+     for(var i = 0; i < areaData.length; i++) {
+       proHtml += '<option value="' + areaData[i].provinceCode + '_' + areaData[i].mallCityList.length + '_' + i + '">' +
+            areaData[i].provinceName + '</option>';
+                }
+    //初始化省数据
+       $form.find('select[name=province]').append(proHtml);
+       form.render();
+       form.on('select(province)', function(data) {
+       $form.find('select[name=area]').html('<option value="">请选择县/区</option>').parent().hide();
+       var value = data.value;
+      var d = value.split('_');
+       var code = d[0];
+       var count = d[1];
+       var index = d[2];
+       if(count > 0) {
+          loadCity(areaData[index].mallCityList);
+        } else {
+          $form.find('select[name=city]').parent().hide();
+        }
+      });
+    }
+ 
+    function loadCity(citys) {
+       var cityHtml = '';
+      for(var i = 0; i < citys.length; i++) {
+        cityHtml += '<option value="' + citys[i].cityCode + '_' + citys[i].mallAreaList.length + '_' + i + '">' +
+        citys[i].cityName + '</option>';
+      }
+     $form.find('select[name=city]').html(cityHtml).parent().show();
+     form.render();
+     form.on('select(city)', function(data) {
+     var value = data.value;
+     var d = value.split('_');
+     var code = d[0];
+     var count = d[1];
+     var index = d[2];
+     if(count > 0) {
+     loadArea(citys[index].mallAreaList);
+     } else {
+     $form.find('select[name=area]').parent().hide();
+     }
+     });
+ }
+ 
+     function loadArea(areas) {
+        var areaHtml = '';
+            for(var i = 0; i < areas.length; i++) {
+                areaHtml += '<option value="' + areas[i].areaCode + '">' +
+                 areas[i].areaName + '</option>';
+             }
+            $form.find('select[name=area]').html(areaHtml).parent().show();
+            form.render();
+            form.on('select(area)', function(data) {
+            });
+        }
+</script>
+  </body>
+</html>

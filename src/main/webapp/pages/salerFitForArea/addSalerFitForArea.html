@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="/res/css/sku.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/Area1.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+
+    <style type="text/css">
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd .goodsName {
+            height: 40px;
+            line-height: 20px;
+            width: 400px;
+            text-overflow: ellipsis;
+            color: #222222;
+        }
+
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd p {
+            height: 20px;
+            line-height: 20px;
+            color: #999999;
+            width: 400px;
+            text-overflow: ellipsis;
+        }
+
+        button {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+        <form id="mem_basic_frm" class="layui-form jun-form-s form-css" method="post">
+           <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px">
+                <table class="layui-table pop" lay-skin="line">
+                    <thead>
+                    <tr>
+                        <th>用户名</th>
+                        <th>真实姓名</th>
+                        <th>手机号</th>
+                        <th>邮箱</th>
+<!--                         <th>账户</th> -->
+                        <th>负责区域(省)</th>
+                    </tr>
+                    </thead>
+                <#list userList as item>
+				<tr>
+				    <td>${item.userName!""}</td>
+					<td>${item.userRealName!""}</td>
+					<td>${item.mobile!""}</a></td>
+					<td>${item.email}</td>
+<!-- 					<td>${item.accountName}</td> -->
+					<td>
+					  <select name="province" rg-validate-field="province" lay-filter="province" username="${item.userRealName}" id="${item.userId}" lay-search>
+                        <option value="">请选择省</option>
+                      </select>
+					</td>
+				</tr>
+				</#list>
+                </table>
+            </div>
+            <div class="purchaseSearch ml10"
+                 style="padding-bottom: 10px;padding-right: 20px;text-align:left;margin-left: 140px;">
+<!--                 <button id="doAddSalerFitForArea" class="btn-click2" style="height: 36px;width: 80px;">新增</button> -->
+<!--                 <button id="cancel" class="btn-click2" style="height: 36px;width: 80px;">取消</button> -->
+            </div>
+         </form>
+        </div>
+    </section>
+</section>
+<script type="text/javascript">
+
+//省市联动  star
+var areaData = Area;
+var $form;
+var form;
+
+layui.use('form', function() {
+    form = layui.form();
+    $form = $('form');
+    loadProvince();
+   });
+   
+function loadProvince() {
+    var proHtml = '';
+    for(var i = 0; i < areaData.length; i++) {
+        proHtml += '<option value="' + areaData[i].provinceName + '">' +
+                areaData[i].provinceName + '</option>';
+    }
+
+    $form.find('select[name=province]').append(proHtml);
+    form.render();
+//     form.on('select(province)', function(data) {
+//         var province = data.value;
+//         data.find('option').each(function(i,n){
+//                 if($(n).text()==_province)
+//                 {
+//                     $(n).attr("selected",true);
+//                 }
+//             })
+//      });
+    
+   }
+   
+   
+
+    function jumpToAuthorityEmployeeList() {
+        postUtil.submit("/authorityUser/preAuthorityEmployeeList");
+    }
+
+
+
+
+
+
+
+</script>
+</body>
+</html>

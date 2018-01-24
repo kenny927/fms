@@ -1,0 +1,80 @@
+<#macro attachment_info>
+    <div class="modal fade" id="list_attachment_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">附件列表</h4>
+                </div>
+                <div class="modal-body">
+                    <table id="attachmentTbl" class="table table-condensed" style="width:95%">
+                        <thead>
+                        <tr>
+                            <th>文件名</th>
+                            <th>上传人员</th>
+                            <th>上传时间</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="cancle-btn" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var table_info;
+        $(function() {
+            //重写 关闭默认警告，解决modal重新打开，警告
+            //$.fn.dataTable.ext.errMode = function(s,h,m){};
+        })
+        function listAttachment(businessKey,businessType){
+            var jsonpara ={};
+            jsonpara.type=businessType;
+            jsonpara.businessKey=businessKey;
+            table_info = $('#attachmentTbl').DataTable( {
+                paging: false,
+                searching: false,
+                bFilter: false,
+                lengthChange: false,
+                iDisplayLength:false,
+                bLengthChange:false,
+                destroy:true,
+                bInfo:false,   //关闭 bInfo Showing  entries
+                autoWidth:false,
+                language:{
+                    emptyTable : "暂无数据"
+                },
+                ajax: {
+                    url:"/file_server/list",
+                    type:"POST",
+                    dataType:"json",
+                    data:jsonpara
+                },
+                columns: [
+                    { data:"name"},
+                    { data: "realName" },
+                    { data: "uploadDate" }
+                ],
+                columnDefs: [
+                    {
+                        "targets": [3],
+                        "data": "id",
+                        "render": function(data, type, full) {
+                            return "<a class='btn btn-link' href='/file_server/download?id=" + data + "'>下载</a>";
+                        }
+                    }
+                ]
+            } );
+        }
+    </script>
+    <style>
+        .col-sm-12{
+            width:100%;
+        }
+    </style>
+</#macro>

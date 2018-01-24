@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/buyerenquire/buyerEnquireDetail.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/numCheck.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript">
+        var enquireId = '${enquireId}';
+        var edit = true;
+//        <#if (edit)>
+//            edit = true;
+//        </#if>
+    </script>
+    <style type="text/css">
+        textarea {
+            font-family: "Microsoft Yahei", "Droid Sans Fallback", "Arial", "Helvetica", "sans-serif", "宋体" !important;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <nav class="usermsg" id="accountInfo">
+
+        </nav>
+        <div class="itocMain">
+            <div class="usermsg1">
+                <div id="demandInfo">
+                <div class="roleDetail">
+                    <p>委托单<span id="demandId"></span><a href="javascript:;">展开>></a></p>
+                </div>
+                <div class="detailContent" style="display: none;">
+                    <dl class="detail-list">
+                        <dt>委托状态：</dt>
+                        <dd id="statusName"></dd>
+                    </dl>
+                    <dl class="detail-list">
+                        <dt>预留姓名：</dt>
+                        <dd><span class="roleColor" id="contactsName"></span></dd>
+                    </dl>
+                    <dl class="detail-list">
+                        <dt>预留联系电话：</dt>
+                        <dd><span class="roleColor" id="contactsMobileOrFixedPhoneNumber"></span></dd>
+                    </dl>
+                    <dl class="detail-list">
+                        <dt>项目地：</dt>
+                        <dd id="demandProjectAddress"></dd>
+                    </dl>
+                    <dl class="detail-list">
+                        <dt>期望交期：</dt>
+                        <dd class="fw-b fz14 c-f" id="demandExpectDeliveryTime"></dd>
+                    </dl>
+                    <dl class="detail-list read-only">
+                        <dt>需求描述：</dt>
+                        <dd class="" id="demandDescribe"></dd>
+                    </dl>
+                    <dl class="detail-list layuicss">
+                        <dt>需求附件：</dt>
+                        <dd class="need-list" id="attachments">
+
+                        </dd>
+                    </dl>
+                </div>
+                </div>
+                <div class="roleDetail">
+                    <p>询单<span id="enquireId"></span><a href="javascript:;">收起>></a></p>
+                </div>
+                <div class="table inquiry">
+                    <div class="roleDescription mb10 fz12">平台商品 <a href="javascript:addProduct();" style="float:right;">+添加商品</a></div>
+                    <ul class="th compact">
+                        <li style="width: 6%;"><div class="mida"><div class="midb">商品编码</div></div></li>
+                        <li style="width: 15%;"><div class="mida"><div class="midb">商品型号</div></div></li>
+                        <li style="width: 7%;"><div class="mida"><div class="midb">品牌</div></div></li>
+                        <li style="width: 26%;"><div class="mida"><div class="midb">商品名称</div></div></li>
+                        <li style="width: 26%;"><div class="mida"><div class="midb">商品描述</div></div></li>
+                        <li style="width: 8%;"><div class="mida"><div class="midb"><span class="c-f">*</span>数量</div></div></li>
+                        <li style="width: 7%;"><div class="mida"><div class="midb">计量单位</div></div></li>
+                        <li style="width: 5%; border-right: none;"><div class="mida"><div class="midb">操作</div></div></li>
+                    </ul>
+                    <div class="information-list" id="enquireProductList">
+
+                    </div>
+                    <div class="roleDescription mb10 fz12 mt20" >自定义商品 <a href="javascript:addCustomProduct();" style="float:right;">+添加商品</a></div>
+                    <ul class="th compact">
+                        <li style="width: 18%;"><div class="mida"><div class="midb">商品型号</div></div></li>
+                        <li style="width: 10%;"><div class="mida"><div class="midb"><span class="c-f">*</span>品牌</div></div></li>
+                        <li style="width: 23%;"><div class="mida"><div class="midb"><span class="c-f">*</span>商品名称</div></div></li>
+                        <li style="width: 21%;"><div class="mida"><div class="midb">描述</div></div></li>
+                        <li style="width: 8%;"><div class="mida"><div class="midb"><span class="c-f">*</span>数量</div></div></li>
+                        <li style="width: 11%;"><div class="mida"><div class="midb"><span class="c-f">*</span>计量单位</div></div></li>
+                        <li style="width: 9%; border-right: none;"><div class="mida"><div class="midb">操作</div></div></li>
+                    </ul>
+                    <div class="information-list" id="enquireCustomProductList">
+
+                    </div>
+                    <div class="detailContent Inquirytitle">
+                        <dl class="detail-list">
+                            <dt>询单生成时间：</dt>
+                            <dd id="createTime"></dd>
+                        </dl>
+                        <dl class="detail-list">
+                            <dt>询单状态：</dt>
+                            <dd><span class="c-2" id="statusDisplay"></span></dd>
+                            <dd><span class="c-9" id="updateTime"></span></dd>
+                            <dd id="close"></dd>
+                        </dl>
+                        <dl class="detail-list">
+                            <dt>期望交期：</dt>
+                            <dd class="fw-b fz14 c-f" id="expectDeliveryDate"></dd>
+                        </dl>
+                        <dl class="detail-list">
+                            <dt>报价方式：</dt>
+                            <dd><span id="offerModeDisplay"></span></dd>
+                        </dl>
+                        <dl class="detail-list status-radio">
+                            <dt><span class="c-f">*</span>配送方式：</dt>
+                            <dd><label><input type="radio" name="deliveryMode" value="LORRY" /><span>汽车</span></label></dd>
+                            <dd><label><input type="radio" name="deliveryMode" value="RAILWAY" />铁路</label></dd>
+                            <dd><label><input type="radio" name="deliveryMode" value="AIRLIFT" />空运</label></dd>
+                            <dd><label><input type="radio" name="deliveryMode" value="EXPRESS" />快递</label></dd>
+                            <dd><label><input type="radio" name="deliveryMode" value="SELF_PICK" />客户自提</label></dd>
+                            <dd><label><input type="radio" name="deliveryMode" value="OTHER" />其他</label></dd>
+                            <dd><label><input id="deliveryModeRemark" style="border:1px solid #E6E6E6;height: 35px;margin-top: -15px;width: 230px;" type="text" class="fz12 pl10" placeholder="请输入其他配送方式" /></label></dd>
+                        </dl>
+                        <dl class="detail-list">
+                            <dt>项目地：</dt>
+                            <dd id="projectAddress"></dd>
+                        </dl>
+                        <dl class="detail-list status-radio">
+                            <dt><span class="c-f">*</span>结算方式：</dt>
+                            <dd><label><input type="radio" name="payMode" value="CASH_BEFORE_DELIVERY"/><span>先款后货</span></label></dd>
+                            <dd><input type="radio" name="payMode" value="DEPOSIT"/>订金支付</dd>
+				            <dd><input class="fz12 t-c" id="payModeRemark1"  style="width: 32px;margin-top: -10px;height: 25px; border: 1px solid #E6E6E6;" type="text" /></dd>
+                            <dd>%</dd>
+                            <!--<dd><label><input type="radio" name="payMode" value="CASH_ON_DELIVERY"/><span>账期支付(货到</span><p class="per" style="right: -35px;width: 30px;"><input id="payModeRemark2" class="fz12 t-c" style="width: 70px;height: 25px; padding-left: 5px;border: 1px solid #E6E6E6;" type="text" placeholder="输入天数" /></p><span style="margin-left: 90px;">付款)</span></label></dd>-->
+                            <dd><label><input type="radio" name="payMode" value="CASH_ON_DELIVERY"/><span>账期支付(货到</span></label></dd><dd><input id="payModeRemark2" class="fz12 t-c" style="width: 70px;height: 25px; padding-left: 5px;border: 1px solid #E6E6E6; margin-top: -10px;" type="text" placeholder="输入天数" /></dd><dd>付款)</dd>
+                        </dl>
+                        <dl class="detail-list status-radio">
+                            <dt><span class="c-f">*</span>是否开票：</dt>
+                            <dd><label><input type="radio" name="isNeedInvoice" value="Y"/>开票(增值税准用发票)</label></dd>
+                            <dd><label><input type="radio" name="isNeedInvoice" value="N" />不开票</label></dd>
+
+                        </dl>
+                        <dl class="detail-list read-only">
+                            <dt>备注：</dt>
+                            <dd>
+                                <textarea id="remark" style="padding: 10px; border: 1px solid #E6E6E6;" rows="5" cols="111" placeholder="请输入您对该商品的其他需求(200字以内)"></textarea>
+                            </dd>
+                        </dl>
+                    </div>
+
+                </div>
+                <div class="roleDetail">
+                    <p>报价单<span></span><a href="javascript:;">收起>></a></p>
+                </div>
+                <div class="table inquiry quotation mb20">
+                    <div class="roleDescription mb10 fz12">请勾选报价分销商：<a href="javascript:chooseDistributor();" style="float:right;">+选择分销商</a></div>
+                    <ul class="th">
+                        <li style="width: 4%;"><div class="mida"><div class="midb"><input type="checkbox" id="selectAll"></div></div></li>
+                        <li style="width: 8%;"><div class="mida"><div class="midb">所在区域</div></div></li>
+                        <li style="width: 8%;"><div class="mida"><div class="midb">省份</div></div></li>
+                        <li style="width: 8%;"><div class="mida"><div class="midb">城市</div></div></li>
+                        <li style="width: 18%;"><div class="mida"><div class="midb">公司名称</div></div></li>
+                    </ul>
+                    <div class="information-list" id="sellerOfferList">
+
+                    </div>
+                </div>
+            </div>
+            <div class="sure-btn mb20" style="margin-top: 20px;">
+                <span class="sure" id="submitBtn">保存并提交</span>  <span class="sure" id="saveBtn">保存</span>
+            </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript">
+    //收起隐藏
+
+    $(document).on("click",".roleDetail a",function(){
+        if($(this).parent().parent().next().css("display")=="none"){
+            $(this).parent().parent().next().show();
+            $(this).html("收起>>");
+        }else{
+            $(this).parent().parent().next().hide();
+            $(this).html("展开>>");
+        }
+    });
+
+    //页面加载完后调用
+    $(function () {
+        //获取询价单列表数据
+        queryEnquire();
+    });
+</script>
+<#include "/res/freemarkerTpl/unitConfig.html" />
+<@unitConfig/>
+</body>
+</html>

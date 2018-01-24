@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+	<script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+	<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+	<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+	<script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+	<script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+</head>
+<style type="text/css">
+	td {width: 100px}
+</style>
+<body>
+	<div style="margin-left:50px">
+		<div style="margin-top:10px"></div>
+		<p>1.采购价格导入</p>
+		<table>
+			<tr>
+				<td></td>
+				<td><a href="/manage/file/downloadImportResultByName?fileName=purchase_price_template.xlsx">下载模板</a></td>
+				<td style="width :300px" id="tdpurchasePrice1"><input id='purchasePrice1' type="file" name="file"></td>
+				<!--<td><button class="btn btn-success" onclick="doUpload('purchasePrice',1)">导入</button>-->
+				<td><div id ="result_purchasePrice1"></div></td>
+			</tr>
+		</table>
+		<div style="margin-top:10px"></div>
+		<p>2.销售价格导入</p>
+		<table>
+			<tr>
+				<td></td>
+				<td><a href="/manage/file/downloadImportResultByName?fileName=sales_price_template.xlsx">下载模板</a></td>
+				<td style="width :300px" id="tdsalesPrice1"><input type="file" name="file" class="layui-upload-file" id="salesPrice1"></td>
+				<!--<td><button class="btn btn-success" onclick="doUpload('salesPrice',1)">导入</button></td>-->
+				<td><div id ="result_salesPrice1"></div></td>
+			</tr>
+		</table>
+		<div style="margin-top:10px"></div> 	
+		<p>3.默认供应商导入</p>
+			<table id="defaultVendor">
+				<tr>
+					<td></td>
+					<td><a href="/manage/file/downloadImportResultByName?fileName=default_vendor_template.xlsx">下载模板</a></td>
+					<td style="width :300px" id="tddefaultVendor1"><input id="defaultVendor1" type="file" name="file"></td>
+					<!--<td><button class="btn btn-success" onclick="doUpload('defaultVendor',1)">导入</button></td>-->
+					<td><div id ="result_defaultVendor1"></div></td>
+				</tr>
+			</table>
+		<div style="margin-top:10px"></div>
+		<p>4.批量设置平台sku编码和厂商编码的对应关系</p>
+			<table id="skuVendor">
+				<tr>
+					<td></td>
+					<td><a href="/manage/file/downloadImportResultByName?fileName=sku_vendor_template.xlsx">下载模板</a></td>
+					<td style="width :300px" id="tdskuVendor1"><input id="skuVendor1" type="file" name="file"></td>
+					<!--<td><button class="btn btn-success" onclick="doUpload('skuVendor',1)">导入</button></td>-->
+					<td><div id ="result_skuVendor1"></div></td>
+				</tr>
+			</table>
+	</div>
+<script>
+	$(function () {	
+		var modules =['purchasePrice','salesPrice','defaultVendor','skuVendor'];		
+		var types =[1,2];
+//		for(var i =0;i<modules.length;i++){
+//			var module = modules[i];
+//			for(var j=0;j<types.length;j++){
+//				var type =types[j];
+//				if(module=='image' && type ==2){
+//					continue;
+//				}
+//				$('#' + module+type).fileinput({
+//					language: 'zh', //设置语言
+//					//uploadUrl: url, //上传的地址
+//					showPreview:false,
+//					showUpload: false, //是否显示上传按钮
+//					showRemove:false,
+//					browseClass: "btn btn-primary" //按钮样式
+//				});
+//			}
+//		}
+	});
+
+    layui.use('upload', function(){
+
+        //导入采购价格
+        layui.upload({
+            elem: '#purchasePrice1',
+            title: '点击选择文件导入',
+            skin:'upload',
+            url: '/manage/price/importPurchasePrice', //上传接口
+            ext: 'xlsx',
+            type: 'file',
+            before: function(input){
+                // //返回的参数item，即为当前的input DOM对象
+                // console.log('文件上传中');
+            },
+            success: function(res){ //上传成功后的回调
+                if(res.success) {
+                    if(res.successType=="AllSuccess") {
+                        layer.msg("导入成功：成功导入"+res.NumOfSuccess+"条数据!");
+                    } else if(res.successType=="NonSuccess"){
+                        layer.msg("导入失败!");
+                    } else if(res.successType=="PartSuccess") {
+                        layer.msg("部分导入成功:成功导入"+res.NumOfSuccess+"条数据!");
+                    }
+                    generateResult("purchasePrice",1,'/manage/file/downloadImportResultByName?fileName=purchase_price_import_result.xlsx');
+                } else {
+                    layer.msg("导入失败，请点击查看结果查看详情", {icon:5});
+                }
+
+            }
+        });
+
+        //导入销售价格
+        layui.upload({
+            elem: '#salesPrice1',
+            title: '点击选择文件导入',
+            skin:'upload',
+            url: '/manage/price/importSalesPrice', //上传接口
+            ext: 'xlsx',
+			type: 'file',
+			before: function(input){
+                // //返回的参数item，即为当前的input DOM对象
+                // console.log('文件上传中');
+            },
+			success: function(res){ //上传成功后的回调
+                if(res.success) {
+                    if(res.successType=="AllSuccess") {
+                        layer.msg("导入成功：成功导入"+res.NumOfSuccess+"条数据!");
+                    } else if(res.successType=="NonSuccess"){
+                        layer.msg("导入失败!");
+                    } else if(res.successType=="PartSuccess") {
+                        layer.msg("部分导入成功:成功导入"+res.NumOfSuccess+"条数据!");
+                    }
+                    generateResult("salesPrice",1,'/manage/file/downloadImportResultByName?fileName=sales_price_import_result.xlsx');
+                } else {
+                    layer.msg("导入失败，请点击查看结果查看详情", {icon:5});
+                }
+
+            }
+        });
+
+        //导入默认供应商
+        layui.upload({
+            elem: '#defaultVendor1',
+            title: '点击选择文件导入',
+            skin:'upload',
+            url: '/manage/price/importDefaultVendor', //上传接口
+            ext: 'xlsx',
+            type: 'file',
+            before: function(input){
+                // //返回的参数item，即为当前的input DOM对象
+                // console.log('文件上传中');
+            },
+            success: function(res){ //上传成功后的回调
+                if(res.success) {
+                    if(res.successType=="AllSuccess") {
+                        layer.msg("导入成功：成功导入"+res.NumOfSuccess+"条数据!");
+                    } else if(res.successType=="NonSuccess"){
+                        layer.msg("导入失败!");
+                    } else if(res.successType=="PartSuccess") {
+                        layer.msg("部分导入成功:成功导入"+res.NumOfSuccess+"条数据!");
+                    }
+                    generateResult("defaultVendor",1,'/manage/file/downloadImportResultByName?fileName=default_vendor_import_result.xlsx');
+                } else {
+                    layer.msg("导入失败，请点击查看结果查看详情", {icon:5});
+                }
+
+            }
+        });
+
+        //导入sku编码和厂商编码对应关系
+        layui.upload({
+            elem: '#skuVendor1',
+            title: '点击选择文件导入',
+            skin:'upload',
+            url: '/manage/price/importSkuVendor', //上传接口
+            ext: 'xlsx',
+            type: 'file',
+            before: function(input){
+                // //返回的参数item，即为当前的input DOM对象
+                // console.log('文件上传中');
+            },
+            success: function(res){ //上传成功后的回调
+                if(res.success) {
+                    if(res.successType=="AllSuccess") {
+                        layer.msg("导入成功：成功导入"+res.NumOfSuccess+"条数据!");
+                    } else if(res.successType=="NonSuccess"){
+                        layer.msg("导入失败!");
+                    } else if(res.successType=="PartSuccess") {
+                        layer.msg("部分导入成功:成功导入"+res.NumOfSuccess+"条数据!");
+                    }
+                    generateResult("skuVendor",1,'/manage/file/downloadImportResultByName?fileName=sku_vendor_import_result.xlsx');
+                } else {
+                    layer.msg("导入失败，请点击查看结果查看详情", {icon:5});
+                }
+
+            }
+        });
+    });
+
+	function doUpload(module,type) {
+		var url='';
+		var fileElementId=''+module+type;
+		var resultUrl='${request.contextPath}/manage/file/downloadImportResultByName?fileName=';
+		if(module=='purchasePrice'){
+			url = '${request.contextPath}/manage/price/importPurchasePrice';
+			resultUrl+='purchase_price_import_result.xlsx';
+		}
+		if(module=='salesPrice'){
+			url = '${request.contextPath}/manage/price/importSalesPrice';
+			resultUrl+='sales_price_import_result.xlsx'
+		}
+		if(module=='defaultVendor'){
+			url = '${request.contextPath}/manage/price/importDefaultVendor';
+			resultUrl+='default_vendor_import_result.xlsx';
+		}
+		if(module=='skuVendor'){
+			url = '${request.contextPath}/manage/price/importSkuVendor';
+			resultUrl+='sku_vendor_import_result.xlsx';
+		}
+		$.ajaxFileUpload({
+            url: url, //用于文件上传的服务器端请求地址
+            secureuri: false, //是否需要安全协议，一般设置为false
+            fileElementId: fileElementId, //文件上传域的ID
+            dataType: 'json', //返回值类型 一般设置为json
+            success: function (data)  //服务器成功响应处理函数
+            {   
+            	if(data.success) {
+            		if(data.successType=="AllSuccess") {
+            			alert("导入成功：成功导入"+data.NumOfSuccess+"条数据!");
+            		} else if(data.successType=="NonSuccess"){
+            			alert("导入失败!");
+            		} else if(data.successType=="PartSuccess") {
+                        alert("部分导入成功:成功导入"+data.NumOfSuccess+"条数据!");
+            		}
+            		generateResult(module,type,resultUrl);
+            	} else {
+            	    alert(data.msg);
+            	}
+            	$("#td"+module+type).html('<input id="'+module+type+'" type="file" name="file"></input>');
+            	$('#' + module+type).fileinput({
+					language: 'zh', //设置语言
+					//uploadUrl: url, //上传的地址
+					showPreview:false,
+					showUpload: false, //是否显示上传按钮 
+					showRemove:false,
+					browseClass: "btn btn-primary" //按钮样式 
+				});
+            },
+            error: function (data, status, e)//服务器响应失败处理函数
+            {   
+            	generateResult(module,type,resultUrl);
+                alert("导入失败，请点击查看结果查看详情");
+            }
+        })
+	}
+	function clearResult(moudule,type,resultUrl){
+		$('#result_'+moudule+type).html('');
+	}
+	function generateResult(moudule,type,resultUrl){
+		var html = "<td><a href='"+resultUrl+"'>查看结果</a></td>"
+		$('#result_'+moudule+type).html(html);
+	}
+
+</script>
+</body>
+</html>

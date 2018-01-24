@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>商品预览</title>
+    <link rel="stylesheet" type="text/css" href="/res/public/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_nw3n40oqhr9c0udi.css<@resVersionDirective>?</@>"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/sku/jquery.jqzoom.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/sku/skuPreview.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript">
+        var isLogin = false;
+//        <#if (SYSTEM_USER_SESSION != null)>
+//        isLogin = true;
+//        </#if>
+        var previewData = ${previewData};
+        var spuData = ${spuData};
+    </script>
+    <style type="text/css">
+        .fenlist{
+            display: none;
+        }
+        .fenlei:hover .fenlist{
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<section id="detailContent">
+    <div class="w1200">
+        <div class="mianbaoxie">
+        </div>
+        <div class="content">
+            <div  class="preview" id="preview">
+                <div class="spec-preview">
+						<span class="jqzoom">
+						</span>
+                </div>
+                <!--缩图开始-->
+                <div class="spec-scroll">
+                    <a class="prev">&lt;</a>
+                    <a class="next">&gt;</a>
+                    <div class="items">
+                        <ul>
+                        </ul>
+                    </div>
+                </div>
+                <!--缩图结束-->
+            </div>
+            <div class="miaoshu">
+                <div class="good-detail ">
+
+                </div>
+            </div>
+        </div>
+        <div class="xq-content" id="descContent">
+            <nav class="nav1">
+                <ul id="descTabs">
+                    <!--<li><a class="active" href="#Introduction">商品介绍</a></li>-->
+                    <!--<li><a href="#Specifications">规格参数</a></li>-->
+                    <!--
+                    <li><a href="#answer">商品问答</a></li>
+                    <li><a href="#description">采购说明</a></li>
+                    <li><a href="#support">售后保障</a></li>
+                    <li><a href="#download">相关资料下载</a></li> -->
+                </ul>
+            </nav>
+            <!--<section class="xq-list" id="Introduction">-->
+            <!--<div class="xq">-->
+            <!--<h3>商品介绍</h3>-->
+            <!--<div class="good-detail">-->
+            <!--<div class="productDescribe">-->
+            <!--</div>-->
+
+            <!--</div>-->
+            <!--</div>-->
+            <!--</section>-->
+            <!--<section class="xq-list" id="Specifications">-->
+            <!--<div class="xq">-->
+            <!--<h3>规格参数</h3>-->
+            <!--<div class="good-detail">-->
+            <!--<div class="canshu">-->
+
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</section>-->
+            <!---->
+            <!--<section class="xq-list" id="answer">-->
+            <!--<div class="xq">-->
+            <!--<h3>商品问答</h3>-->
+            <!--<div class="good-detail">-->
+            <!--<div class="wenda">-->
+            <!---->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--</section>-->
+            <!--<section class="xq-list" id="description">-->
+            <!--<div class="xq">-->
+            <!--<h3>采购说明</h3>-->
+            <!--<div class="good-detail">-->
+            <!--<div class="caigou">-->
+            <!--</div>-->
+            <!--</div> -->
+            <!--</div>-->
+            <!--</section>-->
+            <!--<section class="xq-list" id="support">-->
+            <!--<div class="xq">-->
+            <!--<h3>售后保障</h3>-->
+            <!--<div class="good-detail">-->
+            <!--<div class="baozhang">-->
+            <!--</div>-->
+            <!--</div> -->
+            <!--</div>-->
+            <!--</section>-->
+            <!--<section class="xq-list" id="download">-->
+            <!--<div class="xq">-->
+            <!--<h3>相关资料下载</h3>-->
+            <!--<div class="good-detail">-->
+            <!--<div class="xiazai">-->
+            <!--<dl class="xiazai-list toubu">-->
+            <!--<dd class="xiazai-name">资料名称</dd>-->
+            <!--<dd class="xiazai-detail">描述</dd>-->
+            <!--<dt class="xiazai-icon">下载</dt>-->
+            <!--</dl>-->
+
+            <!--</div>-->
+            <!--</div> -->
+            <!--</div>-->
+            <!--</section>-->
+
+        </div>
+    </div>
+</section>
+<footer>
+
+</footer>
+
+</body>
+</html>

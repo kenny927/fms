@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>" />
+<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>" />
+<script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+ <div class="bz-bb pt20 pl20 pr20">
+	<table class="layui-table pop table-css" lay-skin="line">
+		<colgroup>
+			<col width="50">
+			<col width="300">
+		</colgroup>
+		<thead>
+			<tr>
+				<th><input type="checkbox" name="allChoose"></th>
+				<th>供应商名称</th>
+			</tr>
+		</thead>
+		<tbody id="supplierTable">
+		</tbody>
+	</table>
+	<div id="paginationDiv" style="margin-right: 7px; margin-top: -20px"></div>
+ </div>
+
+	<script type="text/javascript">
+		var skuId = '${skuId}';
+
+		function init() {
+			var queryParam = {};
+			queryParam.currentPageIndex = 1;
+			queryParam.skuId = skuId;
+			loadData(queryParam);
+		}
+
+		$(function() {
+			init();
+		});
+
+		function loadData(queryParam) {
+			layer.load();
+			postUtil.call("/sku/addPurchasePriceWindow", queryParam, function(
+					pageResult) {
+				var pageNumber = pageResult.pageNumber;
+				var pageSize = pageResult.pageSize;
+				var totalPage = pageResult.totalPage;
+				var totalRow = pageResult.totalRow;
+				var dataList = pageResult.list;
+				renderTable(dataList);
+				laypage({
+					cont : 'paginationDiv',
+					pages : totalPage,
+					curr : pageNumber,
+					total : totalRow,
+					skip : true,
+					jump : function(obj, first) {
+						if (!first) {
+							var userName = $('#userName').val();
+							var userRealName = $('#userRealName').val();
+							var tempParam = {};
+							tempParam.currentPageIndex = obj.curr;
+							tempParam.skuId = skuId;
+							loadData(tempParam);
+						}
+					}
+				});
+				layer.closeAll("loading");
+			});
+		}
+
+		function renderTable(dataList) {
+			var length = dataList.length;
+			var table = document.getElementById("supplierTable");
+			table.innerHTML = "";
+			var html = "";
+			if (length > 0) {
+				for (var i = 0; i < dataList.length; i++) {
+					var data = dataList[i];
+					html += '  <tr>'
+							+ '   <td><input type="checkbox" name="primary" value="'
+							+ data.accountId +'"accountName="'+data.accountName
+							+ '"></td>'+'   <td >'+data.accountName +'</td></tr>';
+				}
+			} else {
+				html = '<tr><td colspan="10"><p class="t-c fz16 c-2" style="line-height: 76px;">暂无信息</p></td></tr>';
+
+			}
+			$(table).html(html);
+			
+			$("input[name=allChoose]").on("click",function(){
+					if($(this).prop("checked")){
+						$("input[name=primary]").prop("checked",true);
+					}else{
+						$("input[name=primary]").prop("checked", false);
+					}
+				});
+		}
+	</script>
+</body>
+</html>

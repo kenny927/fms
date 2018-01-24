@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/StringUtils.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<div class="yofc-body" style="padding: 20px 50px;">
+    <form action="" class="jun-form-s form-css">
+        <dl class="dl-form">
+            <dt class="flt fz12"><span style="color:red">*</span>联系人姓名：</dt>
+            <dd class="flt">
+                <input type="hidden" id="linkmanId" value="">
+                <input type="hidden" id="accountId" value="">
+                <input type="text" id="linkmanName" name="title" value="" readonly placeholder="请输入联系人姓名" autocomplete="off"
+                       class="layui-input">
+            </dd>
+            <dt class="flt fz12">性别：</dt>
+            <dd class="flt layui-form" id="sex">
+                <input type="radio" class="disabled" name="sex" value="male" disabled checked title="先生"><input type="radio" class="disabled" name="sex" disabled value="female" title="女士">
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12"><span style="color:red">*</span>手机：</dt>
+            <dd class="flt">
+                <input type="text" name="title" id="linkmanTelephone" readonly value="" placeholder="请输入联系电话" autocomplete="off"
+                       class="layui-input">
+            </dd>
+            <dt class="flt fz12"><span style="color:red">*</span>邮箱：</dt>
+            <dd class="flt"><input type="text" id="email" name="title" value="" readonly placeholder="请输入邮箱" autocomplete="off"
+                                   class="layui-input">
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12">座机：</dt>
+            <dd class="flt">
+                <input type="text" name="title" id="linkmanFixedTelephone" readonly placeholder="请输入座机" autocomplete="off" value=""
+                       class="layui-input">
+            </dd>
+            <dt class="flt fz12">QQ：</dt>
+            <dd class="flt"><input type="text" id="qq" name="title" value="" readonly placeholder="请输入QQ" autocomplete="off"
+                                   class="layui-input">
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12">部门：</dt>
+            <dd class="flt"><input type="text" id="department" name="title" readonly value="" placeholder="请输入部门" autocomplete="off"
+                                   class="layui-input">
+            </dd>
+            <dt class="flt fz12">职务：</dt>
+            <dd class="flt">
+                <input type="text" id="linkmanPosition" name="title" value="" readonly placeholder="请输入职务"autocomplete="off"
+                       class="layui-input">
+            </dd>
+        </dl>
+        <dl class="dl-form" style="margin-bottom: 0px;">
+            <dt class="flt fz12">&nbsp;</dt>
+            <dd class="flt layui-form" id="Primary">
+                <input type="checkbox" id="isPrimary" readonly disabled title="设置为主要联系人" lay-skin="primary">
+            </dd>
+        </dl>
+    </form>
+    <div class="t-c">
+        <a class="form-btn  layui-btn-primary layui-btn-big ml10" id="cancelEditSystemAccountLinkmanBtn">取消</a>
+    </div>
+</div>
+<script type="text/javascript">
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    var linkmanId = '${linkmanId!}';
+    var accountId = '';
+
+    var $form;
+    var form;
+    var layer;
+    layui.use(['form', 'layer'], function () {
+        layer = layui.layer;
+        form = layui.form();
+        $form = $('form');
+            loadData();
+    });
+    function loadData() {
+        postUtil.call('/customerlinkman/queryCustomerlinkmanDetail',{'linkmanId':linkmanId},function (result) {
+            if(result.STATUS == 'SUCCESS') {
+                console.log(result.DATA);
+                $("#linkmanId").val(result.DATA.linkmanId);
+                $("#accountId").val(result.DATA.accountId);
+                accountId =result.DATA.accountId;
+                $("#linkmanName").val(result.DATA.linkmanName);
+                $("#accountId").val(result.DATA.accountId);
+                $("#linkmanTelephone").val(result.DATA.linkmanTelephone);
+                $("#linkmanFixedTelephone").val(result.DATA.linkmanFixedTelephone);
+                $("#email").val(result.DATA.email);
+                $("#qq").val(result.DATA.qq);
+                $("#department").val(result.DATA.department);
+                $("#linkmanPosition").val(result.DATA.linkmanPosition);
+                if(result.DATA.isGenAuthorityUser == "Y") {
+                    $("#isGenAuthorityUser").attr("checked").attr("disabled");
+                }
+                if(result.DATA.sex == 'female') {
+                    $("#sex").html('<input type="radio" name="sex" disabled value="male" title="先生"><input type="radio" name="sex" checked disabled  value="female" title="女士">');
+                }else {
+                    $("#sex").html('<input type="radio" name="sex" disabled checked value="male" title="先生"><input type="radio" name="sex" disabled   value="female" title="女士">');
+                }
+                if(result.DATA.isPrimary == 'Y'){
+                    $("#Primary").html('<input type="checkbox" id="isPrimary" disabled checked  title="设置为主要联系人" lay-skin="primary">');
+                }
+                form.render();
+                parent.layer.iframeAuto(index);
+            }
+        })
+    }
+    $('#cancelEditSystemAccountLinkmanBtn').bind("click", function () {
+        parent.layer.close(index);//关闭当前窗口
+    });
+</script>
+</body>
+</html>

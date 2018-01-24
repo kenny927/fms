@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+		<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+		<script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+	</head>
+	<body>
+		<section id="itocCenter">
+	       <section class="itocContent">
+	       	<div class="itocMain">
+	       		<div class="purchaseSearch">
+					<form>
+						<dl class="form-list flt">
+							<dt>常见问题名称：</dt>
+							<dd><input type="text" id="problemContent" style="width: 150px;" placeholder="请输入常见问题名称"/></dd>
+						</dl>
+						<dl class="form-list flt">
+							<dt>常见问题类型：</dt>
+							<dd>
+								<select id="problemType" style="width: 150px;height: 40px;">
+									<option value="NULL">请选择</option>
+									<option value="PURCHASE_ORDER">采购订单</option>
+									<option value="PROJECT_PREPARATION">项目报备</option>
+								</select>
+							</dd>
+						</dl>
+						<dl class="form-list flt">
+							<dd><span class="btn ml10" style="cursor: pointer;" id="searchBtn">查询</span></dd>
+							<dd><span class="btn ml10" id="preAddTemplateBtn" style="cursor: pointer;">新增</span></dd>
+						</dl>
+					</form>
+	       		</div>
+                    <div class="table">
+						<div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px">
+							<table class="layui-table" lay-skin="line">
+								<thead>
+								<tr>
+									<th style="text-align:center;width:10%">ID</th>
+									<th style="text-align:center;width:10%">问题内容</th>
+									<th style="text-align:center;width:20%">答案</th>
+									<th style="text-align:center;width:25%">问题类型</th>
+									<th style="text-align:center;width:7%">创建人</th>
+									<th style="text-align:center;width:7%">创建时间</th>
+									<th style="text-align:center;width:7%">操作</th>
+								</tr>
+								</thead>
+								<tbody id="systemMessageTemplateTable">
+								</tbody>
+							</table>
+						</div>
+						<div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+                    </div>
+	       	</div>
+	       </section>
+		</section>
+		<script type="text/javascript">
+
+            var PAGE_SIZE = 5;
+
+            function systemMessageTemplateTableInit(){
+				var problemContent = $('#problemContent').val();
+				var problemType = $('#problemType').val();
+                var queryParam = {};
+                queryParam.currentPageIndex = 1;
+                queryParam.pageSize = PAGE_SIZE;
+				queryParam.problemContent = problemContent;
+				queryParam.problemType = problemType;
+                loadSystemMessageTemplateData(queryParam);
+            }
+
+            $(function () {
+                systemMessageTemplateTableInit();
+
+                $("#searchBtn").bind("click",function(){
+					systemMessageTemplateTableInit();
+                });
+
+				document.onkeydown = function(e){
+					var ev = document.all ? window.event : e;
+					if(ev.keyCode==13) {
+						systemMessageTemplateTableInit();
+					}
+				}
+
+
+				$('#preAddTemplateBtn').bind("click",function(){
+					postUtil.submit("/system/platformBulletinProblem/preAddCommonProblem");
+				});
+
+            });
+
+			function loadSystemMessageTemplateData(queryParam) {
+				layer.load();
+				postUtil.call("/system/platformBulletinProblem/commonProblemList", queryParam, function (pageResult) {
+					var pageNumber = pageResult.pageNumber;
+					var pageSize = pageResult.pageSize;
+					var totalPage = pageResult.totalPage;
+					var totalRow = pageResult.totalRow;
+					var dataList = pageResult.list;
+					renderTable(dataList);
+					laypage({
+						cont: 'paginationDiv',
+						pages: totalPage,
+						curr: pageNumber,
+						total: totalRow,
+						skip: true,
+						jump: function (obj, first) {
+							if (!first) {
+								var problemContent = $('#problemContent').val();
+								var problemType = $('#problemType').val();
+								var tempParam = {};
+								tempParam.currentPageIndex = obj.curr;
+								tempParam.pageSize = PAGE_SIZE;
+								tempParam.problemContent = problemContent;
+								tempParam.problemType = problemType;
+								loadSystemMessageTemplateData(tempParam);
+							}
+						}
+					});
+					layer.closeAll("loading");
+				});
+			}
+
+			function renderTable(dataList) {
+				var length = dataList.length;
+				var table = document.getElementById("systemMessageTemplateTable");
+				table.innerHTML = "";
+				if (length > 0) {
+					for (var i = 0; i < dataList.length; i++) {
+						var data = dataList[i];
+						var row = renderRow(data);
+						table.appendChild(row);
+					}
+				} else {
+					var html = '<tr><td colspan="9"><p class="t-c fz16 c-2" style="line-height: 76px;">未查询到消息模板数据！</p></td></tr>';
+					$(table).html(html);
+				}
+			}
+
+            function renderRow(rowData) {
+                var id = rowData.id;
+                var problemContent = rowData.problemContent;
+                var answerContent = rowData.answerContent;
+                var problemType = rowData.problemType;
+                var createUser = rowData.createUser;
+                var createDateStr = rowData.createDateStr;
+
+				var tr = document.createElement('tr');
+				tr.appendChild(renderCell(null, id, "width:10%;"));
+				tr.appendChild(renderCell(null, problemContent, "width:10%;"));
+				tr.appendChild(renderCell(null, answerContent, "width:20%;"));
+				tr.appendChild(renderCell(null, problemType, "width:25%;"));
+				tr.appendChild(renderCell(null, createUser, "width:7%;"));
+				tr.appendChild(renderCell(null, createDateStr, "width:7%;"));
+				tr.appendChild(renderCell("operation", rowData, "width:7%;"));
+				return tr;
+            }
+
+			function renderCell(name, value, style) {
+				var td = document.createElement('td');
+				td.setAttribute("style", style);
+				//个性化差异-操作区域
+				if ("operation" == name) {
+					td.innerHTML = '<p><a href="javascript:void(0);" onclick="preEditSystemMessageTemplate(\'' + value.id + '\')">编辑</a></p>';
+				} else {
+					if (value) {
+						td.innerText = value;
+					} else {
+						td.innerText = "--";
+					}
+				}
+				return td;
+			}
+
+			function preEditSystemMessageTemplate(templateId) {
+				//var param = {};
+				//param.templateId = templateId;
+				//postUtil.submit("/system/messageTemplate/preEditTemplate",param);
+				cardUtil.openCard("编辑消息模板-" + templateId,"/system/platformBulletinProblem/preEditCommonProblem?templateId="+templateId);
+				cardUtil.changeCard("编辑消息模板-" + templateId);
+			}
+
+		</script>
+	</body>
+</html>

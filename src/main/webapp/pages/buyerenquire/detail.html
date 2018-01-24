@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/buyerenquire/buyerEnquireDetail.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript">
+        var enquireId = '${enquireId}';
+        var edit = false;
+//        <#if (edit)>
+//            edit = true;
+//        </#if>
+    </script>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <nav class="usermsg" id="accountInfo">
+
+        </nav>
+        <div class="itocMain">
+            <div class="usermsg1">
+                <div id="demandInfo">
+                <div class="roleDetail">
+                    <p>委托单<span id="demandId"></span><a href="javascript:;">展开>></a></p>
+                </div>
+                <div class="detailContent" style="display: none;">
+                    <dl class="detail-list">
+                        <dt>委托状态：</dt>
+                        <dd id="statusName"></dd>
+                    </dl>
+                    <dl class="detail-list">
+                        <dt>预留姓名：</dt>
+                        <dd><span class="roleColor" id="contactsName"></span></dd>
+                    </dl>
+                    <dl class="detail-list">
+                        <dt>预留联系电话：</dt>
+                        <dd><span class="roleColor" id="contactsMobileOrFixedPhoneNumber"></span></dd>
+                    </dl>
+                    <dl class="detail-list">
+                        <dt>项目地：</dt>
+                        <dd id="demandProjectAddress"></dd>
+                    </dl>
+                    <dl class="detail-list">
+                        <dt>期望交期：</dt>
+                        <dd class="fw-b fz14 c-f" id="demandExpectDeliveryTime"></dd>
+                    </dl>
+                    <dl class="detail-list read-only">
+                        <dt>需求描述：</dt>
+                        <dd class="" id="demandDescribe"></dd>
+                    </dl>
+                    <dl class="detail-list layuicss">
+                        <dt>需求附件：</dt>
+                        <dd class="need-list" id="attachments">
+
+                        </dd>
+                    </dl>
+                </div>
+                </div>
+                <div class="roleDetail">
+                    <p>询单<span id="enquireId"></span><a href="javascript:;">收起>></a></p>
+                </div>
+                <div class="table inquiry">
+                    <ul class="th">
+                        <li style="width: 9%;"><div class="mida"><div class="midb">商品类型</div></div></li>
+                        <li style="width: 11%;"><div class="mida"><div class="midb">商品编码</div></div></li>
+                        <li style="width: 10%;"><div class="mida"><div class="midb">商品型号</div></div></li>
+                        <li style="width: 10%;"><div class="mida"><div class="midb">品牌</div></div></li>
+                        <li style="width: 23%;"><div class="mida"><div class="midb">商品名称</div></div></li>
+                        <li style="width: 23%;"><div class="mida"><div class="midb">描述</div></div></li>
+                        <li style="width: 7%;"><div class="mida"><div class="midb">数量</div></div></li>
+                        <li style="width: 7%;"><div class="mida"><div class="midb">计量单位</div></div></li>
+                    </ul>
+                    <div class="information-list" id="enquireProductList">
+
+                    </div>
+                    <div class="detailContent Inquirytitle">
+                        <dl class="detail-list">
+                            <dt>询单生成时间：</dt>
+                            <dd id="createTime"></dd>
+                        </dl>
+                        <dl class="detail-list">
+                            <dt>询单状态：</dt>
+                            <dd><span class="c-2" id="statusDisplay"></span></dd>
+                            <dd><span class="c-9" id="updateTime"></span></dd>
+                        </dl>
+                        <dl class="detail-list">
+                            <dt>期望交期：</dt>
+                            <dd><span class="fw-b fz14 c-f" id="expectDeliveryDate"></span></dd>
+                        </dl>
+                        <dl class="detail-list">
+                            <dt>报价方式：</dt>
+                            <dd><span class="roleColor" id="offerModeDisplay"></span></dd>
+                        </dl>
+                        <dl class="detail-list">
+                            <dt>配送方式：</dt>
+                            <dd id="deliveryModeDisplay"></dd>
+                        </dl>
+                        <dl class="detail-list">
+                            <dt>项目地：</dt>
+                            <dd id="projectAddress"></dd>
+                        </dl>
+                        <dl class="detail-list">
+                            <dt>结算方式：</dt>
+                            <dd id="payModeDisplay"></dd>
+                        </dl>
+                        <dl class="detail-list">
+                            <dt>开票信息：</dt>
+                            <dd id="invoiceInfo"></dd>
+                        </dl>
+                        <dl class="detail-list read-only">
+                            <dt>备注：</dt>
+                            <dd id="remark"></dd>
+                        </dl>
+                    </div>
+
+                </div>
+                <div class="roleDetail">
+                    <p>报价单<span></span><a href="javascript:;">收起>></a></p>
+                </div>
+                <div class="table inquiry quotation mb20">
+                    <div class="roleDescription mb10 fz12">报价分销商：</div>
+                    <ul class="th">
+                        <!--<li style="width: 9%;"><div class="mida"><div class="midb">入库情况</div></div></li>-->
+                        <li style="width: 8%;"><div class="mida"><div class="midb">所在区域</div></div></li>
+                        <li style="width: 8%;"><div class="mida"><div class="midb">省份</div></div></li>
+                        <li style="width: 8%;"><div class="mida"><div class="midb">城市</div></div></li>
+                        <li style="width: 18%;"><div class="mida"><div class="midb">公司名称</div></div></li>
+                        <!--<li style="width: 7%;"><div class="mida"><div class="midb">询单量</div></div></li>-->
+                        <!--<li style="width: 21%;"><div class="mida"><div class="midb">应答次数/应答率</div></div></li>-->
+                        <!--<li style="width: 21%;"><div class="mida"><div class="midb">成交次数/应答成交率</div></div></li>-->
+                    </ul>
+                    <div class="information-list" id="sellerOfferList">
+                        <!--<ul class="information informationList">-->
+                            <!--&lt;!&ndash;<li style="width: 9%;"><div class="mida"><div class="midb">库内</div></div></li>&ndash;&gt;-->
+                            <!--<li style="width: 8%;"><div class="mida"><div class="midb">华商</div></div></li>-->
+                            <!--<li style="width: 8%;"><div class="mida"><div class="midb">湖北省</div></div></li>-->
+                            <!--<li style="width: 8%;"><div class="mida"><div class="midb">武汉市</div></div></li>-->
+                            <!--<li style="width: 18%;"><div class="mida"><div class="midb">上海光特通讯科技发展有限公司</div></div></li>-->
+                            <!--&lt;!&ndash;<li style="width: 7%;"><div class="mida"><div class="midb">500</div></div></li>&ndash;&gt;-->
+                            <!--&lt;!&ndash;<li style="width: 21%;"><div class="mida"><div class="midb">500/<span class="c-f">100%</span><span class="iconfont icon-iconset0414 c-f"></span></div></div></li>&ndash;&gt;-->
+                            <!--&lt;!&ndash;<li style="width: 21%;"><div class="mida"><div class="midb">500/<span class="c-f">100%</span><span class="iconfont icon-iconset0414 c-f"></span></div></div></li>&ndash;&gt;-->
+                        <!--</ul>-->
+                        <!--<ul class="information informationList">-->
+                            <!--&lt;!&ndash;<li style="width: 9%;"><div class="mida"><div class="midb">库内</div></div></li>&ndash;&gt;-->
+                            <!--<li style="width: 8%;"><div class="mida"><div class="midb">华商</div></div></li>-->
+                            <!--<li style="width: 8%;"><div class="mida"><div class="midb">湖北省</div></div></li>-->
+                            <!--<li style="width: 8%;"><div class="mida"><div class="midb">武汉市</div></div></li>-->
+                            <!--<li style="width: 18%;"><div class="mida"><div class="midb">上海光特通讯科技发展有限公司</div></div></li>-->
+                            <!--&lt;!&ndash;<li style="width: 7%;"><div class="mida"><div class="midb">500</div></div></li>&ndash;&gt;-->
+                            <!--&lt;!&ndash;<li style="width: 21%;"><div class="mida"><div class="midb">500/<span class="c-f">100%</span><span class="iconfont icon-iconset0414 c-f"></span></div></div></li>&ndash;&gt;-->
+                            <!--&lt;!&ndash;<li style="width: 21%;"><div class="mida"><div class="midb">500/<span class="c-f">100%</span><span class="iconfont icon-iconset0414 c-f"></span></div></div></li>&ndash;&gt;-->
+                        <!--</ul>-->
+                    </div>
+                    <div id="addOfferBtn">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
+
+<script type="text/javascript">
+    //收起隐藏
+
+    $(document).on("click",".roleDetail a",function(){
+        if($(this).parent().parent().next().css("display")=="none"){
+            $(this).parent().parent().next().show();
+            $(this).html("收起>>");
+        }else{
+            $(this).parent().parent().next().hide();
+            $(this).html("展开>>");
+        }
+    });
+
+    $(document).off("click", ".addOffer");
+    $(document).on("click",".addOffer",function(){
+        layer.open({
+            title:"请选择分销商",
+            type: 2,
+            area: ['1000px', '650px'],
+            fixed: false, //不固定
+            maxmin: true,
+            content: '/reusable/systemAccount/chooseDistributorPage'
+        });
+    });
+
+    function chooseDistributor() {
+        layer.open({
+            title:"请选择分销商",
+            type: 2,
+            area: ['1000px', '650px'],
+            fixed: false, //不固定
+            maxmin: true,
+            content: '/reusable/systemAccount/chooseDistributorPage'
+        });
+    }
+
+    //选择分销商的回调方法
+    function chooseDistributorCallback(distributorList) {
+        if(distributorList) {
+            var param={};
+            param.enquireId = enquireId;
+            param.distributorList = [];
+            $.each(distributorList, function (index, item) {
+                var distributor = {};
+                distributor.distributorId = item.accountId;
+                distributor.distributorName = item.accountName;
+                param.distributorList.push(distributor);
+            });
+            postUtil.call("/mallOrder/buyerEnquireService/addOffer", {"jsonData":JSON.stringify(param)}, function (res) {
+                if(res.STATUS == "SUCCESS") {
+                    layer.msg("新增分销商成功", {icon:6});
+                    var html = "";
+                    $.each(distributorList, function(index, item){
+                        html += '<ul class="information informationList">';
+                        html +='    <li style="width: 8%;"><div class="mida"><div class="midb">'+item.accountAreaName+'</div></div></li>';
+                        html +='    <li style="width: 8%;"><div class="mida"><div class="midb">'+item.province+'</div></div></li>';
+                        html +='    <li style="width: 8%;"><div class="mida"><div class="midb">'+item.city+'</div></div></li>';
+                        html +='    <li style="width: 18%;"><div class="mida"><div class="midb">'+item.accountName+'</div></div></li>';
+                        html +='    </ul>';
+                    });
+                    $("#sellerOfferList").append(html);
+                } else {
+                    layer.msg(res.MSG, {icon:5});
+                }
+            });
+        }
+        return true;
+    }
+
+    //页面加载完后调用
+    $(function () {
+        //获取询价单列表数据
+        queryEnquire();
+    });
+</script>
+<#include "/res/freemarkerTpl/unitConfig.html" />
+<@unitConfig/>
+</body>
+</html>

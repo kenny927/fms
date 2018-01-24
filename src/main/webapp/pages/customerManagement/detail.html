@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<!-- <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all"> -->
+<link rel="stylesheet" type="text/css" href="/res/public/layui-v2.0.0/layui/css/layui.css"/>
+<link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+<script type="text/javascript">
+	var _accountId='${accountId!}';
+  var createAccountUserId = '${accountManagerId!}';
+  var currentUserId  = '${currentUserId!}';
+</script>
+</head>
+<style>
+    [v-cloak]{
+        display: none;
+    }
+    .bor-dash{
+      padding-top: 0;
+      padding-bottom: 0;
+      border: 1px dashed #fff;
+      max-width: 150px;
+      /*min-width: 100px;*/
+    }
+    .bor-dash .abs-r{
+        top:0;
+    }
+    .bor-dash:hover{
+        border: 1px dashed #999;
+        padding-right: 20px;
+    }
+    .bor-dash:hover .abs-r{
+        display: block!important;
+    }
+    .layui-addLabel{
+      box-shadow: 1px 1px 1px 1px rgba(217,217,217,0.5);
+      display: none;
+    }
+    .show{
+      display: block;
+    }
+    .layui-table tbody tr.outcome,.layui-table tbody tr.outcome:hover{
+       background: #f5f5f5 !important;
+    }
+
+</style>
+<body>
+   <section class="bz-bb pl20 pr20 pt20 pb20" id="customerDetail"  v-cloak>
+      <div class="clr" style="padding:0 20px;">
+          <div class="flt" style="width: 64%;margin-right:2%;">
+            <h3 class="mb5">{{customerInfo.accountName}} <span>（{{customerInfo.linkman}}）</span>               
+              <@havePermission resourceCode="operation:customer:privateCustomer:manage:customer:detail">  <span class="c-h frt fz12 cs-p" id="editCustomerBtn" @click="editAccountInfo(customerInfo.accountId)">编辑</span></@>
+            </h3>
+            <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="height: 65px;">
+               <div class="flex">
+                <span style="flex: 1">社会信用代码：<span class="c-2">{{customerInfo.inteSocialCreditNo | nullValue}}</span></span>
+                <span style="flex: 1">客户类型：<span class="c-2">{{customerInfo.mainObjectName | nullValue}}</span></span>
+               </div>
+               <div class="flex">
+                <span style="flex: 1">所属行业：<span class="c-2">{{customerInfo.businessGroup | nullValue}}</span></span>
+                <span style="flex: 1">座机：<span class="c-2">{{customerInfo.telephone | nullValue}}</span></span>
+               </div>
+               <div class="flex">
+                <span style="flex: 1">地址：<span class="c-2">{{customerInfo.province+customerInfo.city+(customerInfo.address?customerInfo.address:'') | nullValue}}</span></span>
+               </div>
+            </blockquote>
+          </div>
+          <div class="flt" style="width: 34%;">
+            <h3 class="mb5">客户备注(长度限制为500)
+            <span class="c-h frt fz12 cs-p ">
+              <span v-if="editFlag" class="accountIntroduceBtn" @click="updateAccountIntroduce()">编辑</span>
+              <span v-else class="saveIntroduceBtn" @click="saveAccountIntroduce()">保存</span>
+            </span>
+            </h3>
+            <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor edit_back" id="accountIntroduceEdit" style="line-height: 15px;height: 65px;">
+              <div contenteditable="false" class="accountIntroduceContent" style="height:50px;overflow-y:auto;">{{customerInfo.accountIntroduce}}</div>
+            </blockquote>
+          </div>
+      </div>
+
+     <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+      <h3 class="mb5">客户标签</h3>
+      <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor mb15">
+          <div class="layui-row layui-col-space10" style="padding-bottom: 5px;margin-top: -1px;">
+             <template v-if="(createUser!=userId)&&newCustomerLabelList.length==0">
+               <div class="t-c">暂无相关标签！</div>
+             </template>
+              <template >
+                <div class="layui-col-md1 layui-elip pre c-2 bor-dash mr10" v-for="(item,index) in newCustomerLabelList">
+                  <a href="javascript:;" class="a-hover2 fz12" :title="item.labelName">{{item.labelName}}</a>
+                  <a @click="deleteLabel(index,item,true)" href="javascript:;" class="abs-r iconfont icon-chuyidong a-hover1 layui-hide"></a>
+               </div>
+              </template>
+              <div  v-if="createUser==userId" class="layui-col-md3 ml10 layui-addLabel-block" style="line-height: 23px;min-width: 100px;padding: 0px;">
+                <div class="fz12 pre c-h cs-p" @click="addLabel($event)">+添加标签
+                  <div class="layui-addLabel">
+                    <div class="layui-row layui-col-space10">
+                        <div class="layui-col-md4 layui-elip pr20 c-2" v-for="(item,index) in customerLabelList">
+                          <a @click="newAddLabelmethod($event,item)" href="javascript:;" class="a-hover2 fz12" :title="item.labelName">{{item.labelName}}</a>
+                          <a @click="deleteLabel(index,item,false)" href="javascript:;" class="abs-r iconfont icon-chuyidong a-hover1"></a>
+                        </div>
+                        <div class="layui-col-md12" style="border-top:1px solid #e6e6e6;">
+                            <input type="text" name="title"  @click="getLableName($event)" v-model="labelName" placeholder="请输入自定义标签名" autocomplete="off" class="layui-input inline mt5" style="width: 240px;">
+                            <a href="javascript:;" class="inline ml10 fz12" style="color: #035a9d;" @click="newAddLabel($event)">新增</a>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </div>      
+      </blockquote>
+     </div>
+
+      <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+          <h3 class="mb5">联系人
+              <span class="frt fz12 cs-p"><@havePermission resourceCode="operation:customer:privateCustomer:manage:linkman"><a class="fz12 c-h" href="javascript:void(0);" @click="addContact()">新增联系人</a></@></span>
+          </h3>
+          <table lay-skin="line" class="layui-table pop table-css linkManTable" >
+              <colgroup>
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+              </colgroup>
+                <thead>
+                  <tr class="bor-no">
+                    <th >创建时间</th>
+                    <th >联系人</th>
+                    <th >手机</th>
+                    <th >座机</th>
+                    <th >邮箱</th>
+                    <th >部门</th>
+                    <th >职务</th>
+                    <th >操作</th>
+                  </tr> 
+                </thead>
+              <tbody>
+                <tr v-show="contactList.length==0">
+                  <td  colspan="8" height="50px"  align="center">
+                        <span class="fz16">暂无相关信息</span>
+                  </td>
+                </tr>
+                <template v-for="(item,index) in contactList">
+                  <template v-if="item.effectivity=='Y'">                    
+                      <tr v-if="item.isPrimary=='Y'">
+                            <td class="c-f">{{item.createTime | time}}</td>
+                            <td class="c-f">{{item.linkmanName | nullValue}}</td>
+                            <td class="c-f">{{item.linkmanTelephone | nullValue}}</td>
+                            <td class="c-f">{{item.linkmanFixedTelephone | nullValue}}</td>
+                            <td class="c-f">{{item.email | nullValue}}</td>
+                            <td class="c-f">{{item.department | nullValue}}</td>
+                            <td class="c-f">{{item.linkmanPosition | nullValue }}</td>
+                            <td>
+                               <@havePermission resourceCode="operation:customer:privateCustomer:manage:linkman"><a class="c-h fz12 cs-p" href="javascript:void(0);" @click="editContact(item.linkmanId)">修改</a>
+                               <a class="c-h fz12 ml10 cs-p" href="javascript:void(0);" @click="stopContact(item,index)">停用</a>
+                               </@>                      
+                            </td>
+                         </tr>   
+                      <tr v-else>
+                        <td>{{item.createTime | time}}</td>
+                        <td>{{item.linkmanName | nullValue}}</td>
+                        <td>{{item.linkmanTelephone | nullValue}}</td>
+                        <td>{{item.linkmanFixedTelephone | nullValue}}</td>
+                        <td>{{item.email | nullValue}}</td>
+                        <td>{{item.department | nullValue}}</td>
+                        <td>{{item.linkmanPosition | nullValue }}</td>
+                        <td>
+                           <@havePermission resourceCode="operation:customer:privateCustomer:manage:linkman"><a class="c-h fz12 cs-p" href="javascript:void(0);" @click="editContact(item.linkmanId)">修改</a>
+                           <a class="c-h fz12 ml10 cs-p" href="javascript:void(0);" @click="stopContact(item,index)">停用</a>
+                           </@>                      
+                        </td>
+                     </tr>                    
+                  </template>
+                  <template  v-else>
+                    <tr class="outcome">
+                        <td>{{item.createTime | time}}</td>
+                        <td>{{item.linkmanName | nullValue}}</td>
+                        <td>{{item.linkmanTelephone | nullValue}}</td>
+                        <td>{{item.linkmanFixedTelephone | nullValue}}</td>
+                        <td>{{item.email | nullValue}}</td>
+                        <td>{{item.department | nullValue}}</td>
+                        <td>{{item.linkmanPosition | nullValue }}</td>
+                        <td>
+                        <@havePermission resourceCode="operation:customer:privateCustomer:manage:linkman">
+                            <a class="c-h fz12 cs-p" href="javascript:void(0);" @click="seeContactDetail(item.linkmanId)">查看</a>
+                            <a class="c-h fz12 ml10 cs-p" href="javascript:void(0);" @click="startContact(item,index)">启用</a>
+                            </@>
+                        </td>
+                    </tr>
+                 </template>
+               </template>
+              </tbody>
+              </table>
+              <div id="pageContact" class="yofc-page" style="margin-right:-13px;margin-top:-10px"></div>
+      </div>
+
+      <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+          <h3 class="mb5 mt5">拜访记录         
+              <span class="frt fz12 cs-p"> <@havePermission resourceCode="operation:customer:privateCustomer:manage:visitRecord"><a class="fz12 c-h" href="javascript:void(0);" @click="addVisitRecord(queryParam.accountId)">新建拜访记录</a></@></span>
+          </h3>
+          <table lay-skin="line" class="layui-table pop table-css mallOrderTable" >
+               <colgroup>
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="150">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+               </colgroup>
+               <thead>
+                  <tr class="bor-no">
+                    <th >拜访时间</th>
+                    <th >方式</th>
+                    <th >联系人</th>
+                    <th >内容</th>
+                    <th >拜访人</th>
+                    <th >录入时间</th>
+                    <th >操作</th>
+                  </tr> 
+                </thead>
+              <tbody>
+                  <tr v-show="visitRecords.length==0">
+                      <td  colspan="7" height="50px"  align="center">
+                          <span class="fz16">暂无相关信息!</span>
+                      </td>
+                  </tr>
+                  <tr v-for="(item,index) in visitRecords">
+                      <td>{{item.visitTime}}</td>
+                      <td>{{item.visitTypeCname | nullValue}}</td>
+                      <td>{{item.linkmanName  | nullValue}}<br>{{item.linkmanTelephone  | nullValue}}</td>
+                      <td class="layui-elip" style="max-width: 100px;" :title="item.content">{{item.content | nullValue}}</td>
+                      <td>{{item.userName | nullValue}}</td>
+                      <td>{{item.createTime | time}}</td>
+                      <td>
+                          <@havePermission resourceCode="operation:customer:privateCustomer:manage:visitRecord">
+                            <a class="fz12 c-h" v-if="item.isExpired" href="javascript:void(0);" @click="updateVisitRecord(queryParam.accountId,item.visitRecordId);">修改</a>
+                            <a class="fz12 c-h" v-else href="javascript:void(0);" @click="seeVisitRecord(item.visitRecordId)">查看</a>
+                          </@>
+                      </td>
+                  </tr>
+              </tbody>
+              </table>
+              <div id="pageVistRecords" class="yofc-page" style="margin-right:-13px;margin-top:-10px"></div>
+      </div>
+
+      <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+        <h3 class="mb5">项目信息</h3>
+        <table lay-skin="line" class="layui-table pop table-css orderProjectTable" >
+            <colgroup>
+              <col  width="150">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+              <col  width="200">
+            </colgroup>
+              <thead>
+                <tr class="bor-no">
+                  <th >报备时间</th>
+                  <th >等级</th>
+                  <th >项目名称</th>
+                  <th >业主方</th>
+                  <th >项目地</th>
+                  <th >项目状态</th>
+                </tr> 
+              </thead>
+            <tbody>
+                <tr v-show="projectList.length==0">
+                    <td  colspan="6" height="50px"  align="center">
+                        <span class="fz16">暂无相关信息!</span>
+                    </td>
+                </tr>
+                <tr v-for="(item,index) in projectList">
+                    <td>{{item.updateDate | nullValue}}</td>
+                    <td>{{item.projectLevel | nullValue}}</td>
+                    <td>{{item.projectName | nullValue}}</td>
+                    <td>{{item.proprietorCompanyName | nullValue}}</td>
+                    <td>{{item.projectProvince | nullValue}}{{item.projectCity | nullValue}}</td>
+                    <td>{{item.statusCname | nullValue}}</td>
+                </tr>
+            </tbody>
+            </table>
+            <div id="pageProjectList" class="yofc-page" style="margin-right:-13px;margin-top:-10px"></div>
+      </div>
+
+      <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;" class="mb20">
+        <h3 class="mb5">客户流转</h3>
+        <table lay-skin="line" class="layui-table pop table-css orderProjectTable" >
+            <colgroup>
+              <col  width="150">
+              <col  width="150">
+              <col  width="100">
+              <col  width="200">
+            </colgroup>
+            <thead>
+                <tr class="bor-no">
+                  <th >时间</th>
+                  <th >操作人</th>
+                  <th >类型</th>
+                  <th >操作记录</th>
+                </tr> 
+            </thead>
+            <tbody>
+                <tr v-show="customerTransfer.length==0">
+                    <td  colspan="5" height="50px"  align="center">
+                        <span class="fz16">暂无相关信息</span>
+                    </td>
+                </tr>
+                <tr v-for="(item,index) in customerTransfer">
+                    <td>{{item.createTime | time2}}</td>
+                    <td>{{item.userName | nullValue}}</td>
+                     <td>{{item.transmitTypeCname | nullValue}}</td>
+                    <td>{{item.content | nullValue}}</td>
+                </tr>
+            </tbody>
+            </table>
+            <div id="pageCustomerTransfer" class="yofc-page" style="margin-right:-13px;margin-top:-10px"></div>
+        </div>
+   </section>
+<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+<script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui-v2.0.0/layui/layui.js"></script>
+<script src="/res/public/vue/dist/vue.min.js"></script>
+<script>
+  var  vm,form,laypage,layer;
+
+  //过滤器 显示--
+  Vue.filter('nullValue', function (input) {
+       if (input == "" || input == undefined) {
+           input = "--";
+       }
+       return input
+  });
+
+  Vue.filter('time', function (value, format) {
+    value = value || '';
+    if(value == ''){
+        return '--';
+    }
+    format = format || 'YYYY-MM-DD HH:mm';
+    return moment(value).format(format);
+  });
+  
+  Vue.filter('time2', function (value, format) {
+	    value = value || '';
+	    if(value == ''){
+	        return '--';
+	    }
+	    format = format || 'YYYY-MM-DD HH:mm:ss';
+	    return moment(value).format(format);
+	});
+
+
+  vm = new Vue({
+    el:"#customerDetail",
+    data:{
+      queryParam:{
+         pageNumber:1,
+         currentPageIndex:1,
+         pageSize:5,
+         accountId:'',
+         recordType:'VISITING_RECORD',
+      },
+      editFlag:true,
+      customerInfo:{},
+      contactList:[], //联系人
+      visitRecords:[], //拜访记录
+      projectList:[],  //项目信息
+      customerTransfer:[], //项目流转
+      labelName:'',
+      customerLabelList:[],
+      newCustomerLabelList:[],
+      addLabelShow:false,
+      gray:false,
+      userId:'',
+      createUser:''
+    },
+    mounted:function(){
+      this.$nextTick(function(){
+         vm.queryParam.accountId = _accountId;
+         vm.createUser = createAccountUserId;
+         vm.userId = currentUserId;
+         this.showData();
+         this.initCustomerLabelList();
+         this.getCustomerLabelList();
+      })
+    },
+    methods:{
+      showData:function(){
+        layui.use(['form','element','layer','laypage'], function(){
+              form = layui.form;
+              element = layui.element;
+              layer = layui.layer;
+              laypage = layui.laypage;
+
+             
+              vm.loadCustomerInfo(vm.queryParam.accountId);
+              vm.loadContactList(vm.queryParam);
+              vm.loadVistRecords(vm.queryParam);
+              vm.loadProjectList(vm.queryParam);
+              vm.loadCustomerTransfer(vm.queryParam);     
+        })
+      },
+      loadCustomerInfo:function(accountId){
+         postUtil.call('/customerManagement/detail',{accountId:accountId},function(result){
+              vm.customerInfo = result.customerMap.account;
+              console.log(vm.customerInfo);
+          })
+      },
+      loadContactList:function(param){
+         postUtil.call("/mallCustomer/loadLinkmanlist", param, function (result){
+              console.log(result);
+             // if(result.STATUS == "SUCCESS"){
+                 var currentPageIndex = result.pageNumber;
+                 var pageSize = result.pageSize;
+                 var totalRow = result.totalRow;
+                 vm.contactList = result.list;
+
+                laypage.render({
+                        elem: 'pageContact'
+                        ,count: totalRow
+                        ,curr : currentPageIndex
+                        ,first: '首页'
+                        ,last: '尾页'
+                        ,layout: ['count', 'prev', 'page', 'next', 'limit', 'skip']
+                        ,limit: pageSize
+                        ,limits: [5, 10, 15]
+                        ,jump: function(obj,first){
+                            if(!first){
+                                vm.queryParam.currentPageIndex =  obj.curr;
+                                vm.queryParam.pageSize =  obj.limit;
+                                vm.loadContactList(vm.queryParam);
+                            }
+                        }
+                });
+             // }
+         })
+      },
+      loadVistRecords:function(param){
+
+         postUtil.call("/customer/relation/queryList", vm.queryParam, function (result){
+             if(result.STATUS == "SUCCESS"){
+                 var pageNumber = result.DATA.pageNumber;
+                 var pageSize = result.DATA.pageSize;
+                 var totalRow = result.DATA.totalRow;
+                 vm.visitRecords  = result.DATA.list;
+
+                laypage.render({
+                        elem: 'pageVistRecords'
+                        ,count: totalRow
+                        ,curr : pageNumber
+                        ,first: '首页'
+                        ,last: '尾页'
+                        ,layout: ['count', 'prev', 'page', 'next', 'limit', 'skip']
+                        ,limit: pageSize
+                        ,limits: [5, 10, 15]
+                        ,jump: function(obj,first){
+                            if(!first){
+                                vm.queryParam.pageNumber =  obj.curr;
+                                vm.queryParam.pageSize =  obj.limit;
+                                vm.loadVistRecords(vm.queryParam);
+                            }
+                        }
+                });
+             }
+         })
+
+      },
+      loadProjectList :function(param){
+         postUtil.call("/customerManagement/loadOrderProjectlist", param, function (result){
+             if(result.STATUS == "SUCCESS"){
+                 var pageNumber = result.DATA.pageNumber;
+                 var pageSize = result.DATA.pageSize;
+                 var totalRow = result.DATA.totalRow;
+                 vm.projectList  = result.DATA.list;
+
+                laypage.render({
+                        elem: 'pageProjectList'
+                        ,count: totalRow
+                        ,curr : pageNumber
+                        ,first: '首页'
+                        ,last: '尾页'
+                        ,layout: ['count', 'prev', 'page', 'next', 'limit', 'skip']
+                        ,limit: pageSize
+                        ,limits: [5, 10, 15]
+                        ,jump: function(obj,first){
+                            if(!first){
+                                vm.queryParam.pageNumber =  obj.curr;
+                                vm.queryParam.pageSize =  obj.limit;
+                                vm.loadProjectList(vm.queryParam);
+                            }
+                        }
+                });
+             }
+         })
+      },
+      loadCustomerTransfer:function(param){
+
+         postUtil.call("/customerManagement/loadCustomerTransmitRecord", param, function (result){
+             if(result.STATUS == "SUCCESS"){
+                 var pageNumber = result.DATA.pageNumber;
+                 var pageSize = result.DATA.pageSize;
+                 var totalRow = result.DATA.totalRow;
+                 vm.customerTransfer  = result.DATA.list;
+
+                laypage.render({
+                        elem: 'pageCustomerTransfer'
+                        ,count: totalRow
+                        ,curr : pageNumber
+                        ,first: '首页'
+                        ,last: '尾页'
+                        ,layout: ['count', 'prev', 'page', 'next', 'limit', 'skip']
+                        ,limit: pageSize
+                        ,limits: [5, 10, 15]
+                        ,jump: function(obj,first){
+                            if(!first){
+                                vm.queryParam.pageNumber =  obj.curr;
+                                vm.queryParam.pageSize =  obj.limit;
+                                vm.loadCustomerTransfer(vm.queryParam);
+                            }
+                        }
+                });
+             }
+         })
+
+      },
+      updateAccountIntroduce:function(){
+          this.editFlag = false;
+          $(".accountIntroduceContent").attr("contenteditable","true");
+          $("#accountIntroduceEdit").removeClass("edit_back");
+          $(".accountIntroduceContent").focus();
+      },
+      saveAccountIntroduce:function(){
+           var accountIntroduce=$(".accountIntroduceContent").text();
+           if(accountIntroduce!=null&&accountIntroduce!=""&&accountIntroduce.length>500){
+               layer.msg("客户备注超过长度限制！");
+               return;
+           }
+           var param={};
+           param.accountId=_accountId;
+           param.accountIntroduce=accountIntroduce;
+           postUtil.call("/customerManagement/saveAccountIntroduce", param,function(data){
+               var status=data.STATUS;
+               if("SUCCESS"==status){
+                   $(".accountIntroduceContent").attr("contenteditable","false");
+                   $("#accountIntroduceEdit").addClass("edit_back");
+                   vm.editFlag = true;
+               }
+           })
+      },
+      initCustomerLabelList:function(){
+         postUtil.call('/customerLabel/getCustomerLabelList',{customerId:vm.queryParam.accountId},function (result) {
+              if(result.STATUS == 'SUCCESS') {
+                 vm.newCustomerLabelList = result.DATA;
+              }
+          })
+      },
+      addLabel: function (event) {
+          event.stopPropagation();
+          // this.addLabelShow = true;
+          if($('.layui-addLabel').hasClass('show')){
+            $('.layui-addLabel').removeClass('show');
+          }else{
+            $('.layui-addLabel').addClass('show');
+          }
+      },
+      deleteLabel: function (index2,obj,flg) {
+        if(flg) {
+            vm.newCustomerLabelList.splice(index2,1);
+            postUtil.call('/customerLabel/unbundlingCustomLabel',{relationshipId:obj.relationshipId},function(result){
+                 if(result.STATUS == 'SUCCESS') {
+                    layer.msg('客户解绑标签成功！')
+                 }
+            })
+
+        }else {
+            layer.open({
+                title:'操作提示',
+                type:1,
+                skin:'msgskin',
+                btnAlign:'c',
+                area :['400px', '250px'],
+                btn: ['确认', '取消'],
+                content:'<div style="padding: 30px 50px;" class="fz12 clr"><div class="iconfont icon-jinggao1 fz18 c-f flt" style="width: 50px;font-size: 45px!important;"></div><div class="c-2 flt" style="width: 230px;font-size: 14px;line-height: 26px;">删除该标签将导致拥有该标签的所有客户丢失该标签信息,是否确认删除?</div></div>',
+                yes: function(index){
+                     var param={};
+                     param.labelId=obj.labelId;
+                     vm.deleteCustomLabel(param,index2,obj);
+                     layer.close(index)
+                }
+                ,btn2: function(index){
+                    layer.close(index)
+                }
+            });
+        }
+      },
+      newAddLabel: function (event) {
+          event.stopPropagation();
+          if(this.labelName) {
+              var param={};
+              param.labelName=this.labelName;
+              this.addCustomLabel(param);
+
+              this.labelName = '';
+          }else {
+              layer.msg('请输入自定义标签名!')
+          }
+      },
+      deleteCustomLabel:function (param,index2,obj) {
+        postUtil.call('/customerLabel/deleteCustomLabel',param,function (result) {
+            if(result.STATUS == 'SUCCESS') {
+                vm.customerLabelList.splice(index2,1);
+                vm.newCustomerLabelList.forEach(function (item,index) {
+                    if(item.labelId == obj.labelId) {
+                        vm.newCustomerLabelList.splice(index,1);
+                    }
+                })
+                layer.msg('删除自定义标签成功!')
+
+            }
+        })
+      },
+      addCustomLabel:function (param) { //给当前登录人添加标签
+          postUtil.call('/customerLabel/addCustomLabel',param,function (result) {
+              if(result.STATUS == 'SUCCESS') {
+                  vm.customerLabelList.push(result.DATA);
+                  layer.msg('新增自定义标签成功!')
+              }
+          })
+      },
+      newAddLabelmethod: function (event,obj) { //给该客户添加标签
+        event.stopPropagation();
+    	  var existsign=false;
+    	  vm.newCustomerLabelList.forEach(function (item,index) {
+    		  if(item.labelId==obj.labelId){
+    			  existsign=true;
+    		  }
+    		  
+    	  })
+         if(!existsign) {
+             vm.newCustomerLabelList.push(obj);
+             // vm.addLabelShow = false;
+             $('.layui-addLabel').removeClass('show');
+             postUtil.call('/customerLabel/bindingCustomLabel',{customerId:vm.queryParam.accountId,labelId:obj.labelId},function(result){
+                if(result.STATUS == 'SUCCESS') {
+                   vm.initCustomerLabelList();
+                }
+             })
+         }else {
+             layer.msg('请不要重复添加!')
+         }
+      },
+      getCustomerLabelList: function () { //获取当前登录用户所有标签
+          postUtil.call('/customerLabel/getCustomerLabelList',{},function (result) {
+              if(result.STATUS == 'SUCCESS') {
+                 vm.customerLabelList = result.DATA;
+              }
+          })
+      },
+      getLableName:function(event){
+        event.stopPropagation();
+      },
+      addVisitRecord: function (_accountId) {
+          layer.open({
+              title: '新增拜访记录',
+              type: 2,
+              skin: 'msgskin',
+              offset: ['10px', '230px'],
+              area: ['700px', '500px'],
+              content: "/distributor/user/addVisitRecordPage?accountId="+_accountId+"&role=customer",
+          });
+      },
+      updateVisitRecord: function (_accountId,visitRecordId) {
+          layer.open({
+              title: '修改拜访记录',
+              type: 2,
+              skin: 'msgskin',
+              offset: ['10px', '230px'],
+              area: ['700px', '500px'],
+              content: "/distributor/user/addVisitRecordPage?accountId="+_accountId+"&visitRecordId="+visitRecordId+"&role=customer",
+          });
+      },
+      seeVisitRecord: function (visitRecordId) {
+          layer.open({
+              title: '查看拜访记录',
+              type: 2,
+              skin: 'msgskin',
+              area: '700px',
+              content: "/customer/relation/record/preDetail?visitRecordId="+visitRecordId+"&recordType=VISITING_RECORD",
+          });
+      },
+      startContact:function(item,index){
+        postUtil.call('/customerlinkman/updateCustomerlinkmanDetail',{"linkmanId":item.linkmanId,effectivity:"Y"},function(result){
+          if(result.STATUS=='SUCCESS'){
+        	   // vm.contactList[index].effectivity = "Y";
+               vm.loadContactList(vm.queryParam);
+               layer.msg("启用成功!");
+          }else{
+        	  layer.msg(result.MSG);
+          }
+        })
+      },
+      stopContact:function(item,index){
+         postUtil.call('/customerlinkman/updateCustomerlinkmanDetail',{"linkmanId":item.linkmanId,effectivity:"N"},function(result){
+        	 if(result.STATUS=='SUCCESS'){
+        		   // vm.contactList[index].effectivity = "N";
+                vm.loadContactList(vm.queryParam);
+                layer.msg("停用成功!");
+            }else{
+          	    layer.msg(result.MSG);
+            }
+         
+         })
+      },
+      addContact:function(){
+        var _accountId = vm.queryParam.accountId;
+        layer.open({
+            title: '新增联系人',
+            type: 2,
+            skin: 'msgskin',
+            area: ['630px', '400px'],
+            content: "/customerlinkman/preEditCustomerlinkman?accountId="+_accountId,
+        })
+      },
+      editContact:function(linkmanId){
+         layer.open({
+            title: '修改联系人',
+            type: 2,
+            skin: 'msgskin',
+            area: ['630px', '400px'],
+            content: "/customerlinkman/preEditCustomerlinkman?linkmanId="+linkmanId,
+        })       
+      },
+      seeContactDetail:function(linkmanId){
+          layer.open({
+              title: '查看联系人',
+              type: 2,
+              skin: 'msgskin',
+              area: ['800px', '360px'],
+              content: "/customerlinkman/preCustomerlinkmanDetail?linkmanId="+linkmanId
+          });
+      },
+      editAccountInfo:function(accountId){
+        layer.open({
+           title: '修改客户信息',
+           skin: 'msgskin',
+           area: ['460px', '480px'],
+           type: 2,
+           content: '/customerManagement/preEditSystemAccount/'+accountId,
+       })
+      }, 
+
+     }
+
+  })
+  
+  function editAccount(result){
+	   vm.loadCustomerInfo(_accountId);
+      return true;
+  }
+
+  function updateAccountLinkmanCallback(data){
+    vm.loadContactList(vm.queryParam);
+    return true;
+  }
+
+  $('body').not('.layui-addLabel-block').click(function(){
+    if($('.layui-addLabel').hasClass('show')){
+      $('.layui-addLabel').removeClass('show');
+    }
+  })
+  
+</script>
+</body>
+</html>

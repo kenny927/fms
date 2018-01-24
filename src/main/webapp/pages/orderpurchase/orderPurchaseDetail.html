@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+	<script src="/res/public/layui/layui-mz-min.js<@resVersionDirective>?</@>"></script>
+	<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+      <script type="text/javascript" src="/res/js/orderlog/payCounter.js<@resVersionDirective>?</@>"></script>
+    <style>
+        .layui-upload-button{
+            height: 28px;
+            line-height: 28px;
+            border: 1px solid #035a9d;
+            cursor: pointer;
+        }
+        .layui-upload-button:hover {
+            background: #035a9d;
+        }
+        .layui-upload-button .layui-upload-icon{
+            color: #035a9d;
+            font-size: 12px;
+        }
+        .layui-upload-button:hover .layui-upload-icon{
+            color: #fff;
+        }
+        .layui-upload-button .layui-upload-icon .layui-icon{
+            display: none;
+        }
+    </style>
+</head>
+<body class="pb20">
+<div>
+    <div class="operations bz-bb pl20 pr20 pt20 txtR">
+        <ul class="layui-nav itoc-nav" style="width: 100px;position: absolute">
+            <li class="layui-nav-item">
+                <a href="javascript:void(0);">导出</a>
+                <dl class="layui-nav-child">
+                    <#if hasCable>
+                    <dd><a href="javascript:void(0)" onclick="exportContract(1)">导出订货通知</a></dd>
+                    <dd><a href="javascript:void(0)" onclick="exportContract(2)">导出发货指令</a></dd>
+                    <dd><a href="javascript:void(0)" onclick="exportContract(3)">导出内部合同</a></dd>
+                        <#if orderPurchaseType=="IN_STOCK_GROUP">
+                        <dd><a href="javascript:void(0)" onclick="exportContract(5)">导出加工合同评审表</a></dd>
+                        <dd><a href="javascript:void(0)" onclick="exportContract(6)">导出生产合同附件</a></dd>
+                        </#if>
+                    <#else>
+                        <#if orderPurchaseType=="IN_STOCK_GROUP">
+                            <dd><a href="javascript:void(0)" onclick="exportContract(2)">导出发货指令</a></dd>
+                            <dd><a href="javascript:void(0)" onclick="exportContract(7)">导出加工合同评审表</a></dd>
+                            <dd><a href="javascript:void(0)" onclick="exportContract(8)">导出生产合同附件</a></dd>
+                        </#if>
+                    </#if>
+                    <dd><a href="javascript:void(0)" onclick="exportContract(4)">导出采购合同</a></dd>
+
+                </dl>
+            </li>
+        </ul>
+        <#if orderPurchase.instructionStatus=='SENDED'>
+        	 <button onclick="checkInstruction(${orderPurchase.shippingInstrDetailId})" style="width:130px" class="form-btn layui-btn-itoc layui-btn-mini2">查看发货指令</button>
+        </#if>
+        
+        <#if orderPurchase.status=='PART_DELIVERY'||orderPurchase.status=='RECEIPT_CONFIRM'||orderPurchase.status=='DELIVERY_CONFIRM'||orderPurchase.status=='COMPLETED'||orderPurchase.status=='CANCELLED' >
+        	<button onclick="openDeliveryDetailTab()" class="form-btn layui-btn-itoc layui-btn-mini2">发货详情</button>
+        </#if>
+        <#if orderPurchase.contractTail==null || orderPurchase.contractTail=="">
+            <button onclick="distributeContractNo()" class="form-btn layui-btn-small ml10" style="width: 140px;">分配OEM合同号</button>
+        <#else>
+            <button class="form-btn layui-btn-small" style="background-color: #cccccc;width: 140px;">已分配OEM合同号</button>
+        </#if>
+        <input id="deployFileIp" onchange="doUpload()" type="file" lay-type="file" name="file">
+        <button onclick="watchAttachments()" class="form-btn layui-btn-itoc layui-btn-mini2">查看附件</button>
+    </div>
+    <div class="bz-bb pl20 pr20 pt20 jun-form-s form-css">
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+           <dl class="dl-form mb0">
+               <dt class="flt line-middle" >订单号：</dt>
+               <dd class="flt line-middle c-2 w180">${orderPurchase.orderPurchaseId!"--"}</dd>
+               <dt class="flt line-middle">创建时间：</dt>
+               <dd class="flt line-middle c-2 w180">${orderPurchase.createDateDisplay!"--"}</dd>
+               <dt class="flt line-middle">订单状态：</dt>
+               <dd class="flt line-middle c-f w180">${orderPurchase.statusName!"--"}</dd>
+               <dt class="flt line-middle" style="width:95px;">销售订单客户：</dt>
+               <dd class="flt line-middle c-2 w180">${orderPurchase.osPurchaseAccountName!"--"}</dd>
+           </dl>
+           <dl class="dl-form  mb0">
+               <dt class="flt line-middle">买方：</dt>
+               <dd class="flt line-middle c-f w180">${orderPurchase.purchaseAccountName!"--"}</dd>         
+               <dt class="flt line-middle">卖方：</dt>
+               <dd class="flt line-middle w180">${orderPurchase.supplierAccountName!"--"}</dd>
+               <dt class="flt line-middle">合同号：</dt>
+               <dd class="flt line-middle c-2 w180">${orderPurchase.externalContractId!"--"}</dd>
+               <dt class="flt line-middle" style="width:95px;">关联销售单号：</dt>
+               <dd class="flt line-middle c-2 w180">${orderPurchase.orderSalesId!"--"}</dd>
+           </dl>
+        </blockquote>
+    </div>
+
+    <div class="bz-bb pl20 pr20  mb20 pb20 jun-form-s form-css">
+        <h3 class="mt20 fz16 h3-tittle pl10 c-2">订单明细信息</h3>
+        <blockquote >          
+            <table class="layui-table pop">
+                <colgroup>
+                    <col  width="80">
+                    <col  width="200">
+                    <col  width="130">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>商品编码</th>
+                    <th>商品名称</th>
+                    <th>型号</th>
+                    <th>出库地</th>
+                    <th>数量</th>
+                    <th>单位</th>
+                    <th>采购价</th>
+                    <th>小计</th>
+                    <th>采购运费</th>
+                    <th>商品要求</th>
+                    <th>备注</th>
+                </tr>
+                </thead>
+               <#list orderPurchaseDetailList as orderPurchaseDetail>
+               <#if orderPurchaseDetail.spotSkuType!=""&&orderPurchaseDetail.spotSkuType="SECOND_KILL_SKU">
+                <tr class="secKill-bg">
+               <#else>
+               <tr>
+               </#if>
+					<td>${orderPurchaseDetail.skuId}</td>  
+					<td>${orderPurchaseDetail.skuName!"--"}</td>
+					<td>${orderPurchaseDetail.model!"--"}</td>  
+					<td>${orderPurchaseDetail.outStock!"--"}</td>  
+					<td class="unitDisplay" unitName="${orderPurchaseDetail.unitName}">${orderPurchaseDetail.quantity?default(0.000)?string("0.000")}</td>
+					<td>${orderPurchaseDetail.unitName!"--"}</td> 
+					<td>${orderPurchaseDetail.unitPrice?default(0.00)?string("0.00")}</td>
+					<td>${orderPurchaseDetail.skuAmount?default(0.00)?string("0.00")}</td> 
+					<td>${orderPurchaseDetail.otherAmount?default(0.00)?string("0.00")}</td> 
+				    <td>${orderPurchaseDetail.demand!""}</td>
+					<td>${orderPurchaseDetail.remark!""}</td> 
+				</tr>  
+			</#list> 
+            </table>
+            <div class="mt20">
+                <form action="" class="clr">
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">商品总金额：</dt>
+                        <dd class="frt line-middle w100 txtR">￥${orderPurchase.skuAmount?default(0.00)?string("0.00")}</dd>
+                    </dl>
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">运费：</dt>
+                        <dd class="frt line-middle w100 txtR">￥${orderPurchase.otherAmount?default(0.00)?string("0.00")}</dd>
+                    </dl>
+                    <dl class="dl-form frt mb5-i" >
+                        <dt class="flt">订单总金额：</dt>
+                        <dd class="frt line-middle w100 txtR">￥<span class="c-f fz18 fw-b">${orderPurchase.settlementAmount?default(0.00)?string("0.00")}</span></dd>
+                    </dl>
+                </form>
+            </div>
+            <h3 class="mt20 fz12 bg-f0 h3-tittle pl10 c-2 ">
+                <span class="fw-b ml10">收货人信息：</span>
+                <span>${orderPurchase.consigneeAddress!""}</span>
+                <span class="ml5">收货人：${orderPurchase.consignee!""}</span>
+                <span class="ml5">联系电话：${orderPurchase.consigneePhone!""}</span>
+            </h3>
+        </blockquote>
+        <!-- 合同详情 -->
+		<#assign order = orderPurchase>
+		<#assign orderContract = orderPurchseContract>
+		<#include "/res/freemarkerTpl/_contract_info.html" />
+		<@contract_info/>
+		<!-- 订单日志-->
+		<!-- <#assign orderAuditLog=orderAuditLog> -->
+		<#include "/res/freemarkerTpl/_order_log.html" />
+		<@order_log/>
+        
+    </div>
+</div>
+<script>
+    var orderPurchaseId = "${orderPurchase.orderPurchaseId}";
+    var layer;
+     layui.use(['layer', 'form','laydate','element','upload'], function() {
+        var form = layui.form();
+        var element = layui.element();
+        layer = layui.layer;
+         layui.upload({
+             title:'上传附件',
+             url: '/file_server/upload?type=PURCHASE_ORDER_SIGNED_CONTRACT&businessKey=' + orderPurchaseId + '&employId=' + '${SYSTEM_USER_SESSION.systemUser.employId}',
+             elem: '#deployFileIp',
+             success: function(res){
+                 layer.msg("上传成功");
+                 console.log(res); //上传成功返回值，必须为json格式
+             }
+         });
+     })
+    function goProductPreview(skuId) {
+	cardUtil.closeCard("预览商品-" + skuId);
+	cardUtil.openCard("预览商品-" + skuId, "/sku/previewBySkuId?skuId=" + skuId);
+	cardUtil.changeCard("预览商品-" + skuId);
+}
+
+    function exportContract(type) {
+        var url,defaultUrl="/systemExport/rpt";
+        var param = {orderPurchaseId:orderPurchaseId};
+        if(type == 1){
+            //url = '/order/purchase/salesOrderNotificationExport';
+            param.template = "sales_order_notification";
+            param.zipFileNamePatten =encodeURI("订货通知书");
+            url = '/order/purchase/commonExcelExport';
+            beforeExportContract(url, param);
+        }else if(type == 2){
+            param.template = "sales_inner_shipping_instruction";
+            param.zipFileNamePatten =encodeURI("内部合同发货指令");
+            url = '/order/purchase/commonExcelExport';
+            //beforeExportContract(url, param);
+            postUtil.get(url, param);
+        }else if(type == 3){
+            url = '/order/purchase/innerContractExport';
+            beforeExportContract(url, param);
+        }else if(type == 4){
+            url = '/order/purchase/orderPurchaseContractExport';
+            postUtil.get(url, param);
+        }else if(type == 5){
+            url = '/order/purchase/contractEvaluationSheetExport';
+            postUtil.get(url, param);
+        }else if(type == 6){
+            url = '/order/purchase/manufactrueContractExport';
+            postUtil.get(url, param);
+        }else if(type == 7){
+            //现货光配 导出加工合同评审表
+            var qParam = {},qdata={};
+            qParam.template = "purchase_contract_evaluation_sheet_odf";
+            qdata.orderPurchaseId = orderPurchaseId;
+            qParam.data=JSON.stringify(qdata);
+            postUtil.get(defaultUrl, qParam);
+        }else if(type == 8){
+            //现货光配 导出生产合同附件
+            var qParam = {},qdata={};
+            qParam.template = "purchase_manufacture_contract_odf";
+            qdata.orderPurchaseId = orderPurchaseId;
+            qParam.data=JSON.stringify(qdata);
+            postUtil.get(defaultUrl, qParam);
+        }
+        
+    }
+
+    function openDeliveryDetailTab() {
+    	cardUtil.closeCard("发货详情-" + orderPurchaseId);
+    	cardUtil.openCard("发货详情-" + orderPurchaseId,
+    			"/orderLog/page4P?orderPurchaseId=" + orderPurchaseId);
+    	cardUtil.changeCard("发货详情-" + orderPurchaseId);
+    }
+    
+    function beforeExportContract(url, param) {
+        postUtil.call('/order/purchase/checkOrderIndoorSku', param, function(result) {
+            if(result.STATUS == 'SUCCESS'){
+                if(!result.DATA){
+                    layer.msg(result.MSG);
+                }else{
+                    postUtil.get(url, param);
+                }
+            }else{
+                layer.msg(result.MSG);
+            }
+        });
+    }
+    
+    function checkInstruction() {
+    	cardUtil.closeCard("发货指令详情-" + orderPurchaseId);
+    	cardUtil.openCard("发货指令详情-" + orderPurchaseId,
+    			"/shippingInstruction/api/preShippingInstructionPage?shippingDetailId=" + orderPurchaseId);
+    	cardUtil.changeCard("发货指令详情-" + orderPurchaseId);
+    }
+    
+    function watchAttachments() {
+        layer.open({
+            title: "附件列表",
+            type:2,
+            area: ['745px','400px'],
+            content: '/orderPurchase/attachList?orderPurchaseId=' + orderPurchaseId,
+            btn : [ '关闭' ],
+            yes : function(index, layero) {
+                layer.close(index);
+            } ,
+            cancel : function() {
+
+            }
+        });
+    }
+
+    function distributeContractNo(){
+        postUtil.call('/orderPurchase/distributeContractNo', {orderPurchaseId:orderPurchaseId}, function(result) {
+            if(result.STATUS == 'SUCCESS'){
+                layer.msg("合同号分配成功");
+                cardUtil.refreshCard("订单详情-"+orderPurchaseId);
+            }else{
+                layer.msg(result.MSG);
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

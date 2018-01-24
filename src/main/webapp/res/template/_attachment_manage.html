@@ -1,0 +1,156 @@
+<#macro attachment_manage>
+<div class="modal fade" id="attachment_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true" onclick="restAttachmentList();">&times;</button>
+				<h4 class="modal-title" id="myModalLabel">附件列表</h4>
+			</div>
+			<div class="modal-body">	
+				<table style="width:100%">
+					<tr>
+						<td><input id="attam_file" type="file" name="file"  multiple></td><td width="17%"><button type="button" onclick="doUpload()" class="normal-btn">上传</button></td>
+					</tr>
+				</table>	
+			</div>
+			<div class="modal-footer" style="text-align:left;border-top:0px;padding-top:2px;padding-bottom:2px;">
+				<small id="uploadResultMessage"  class="text-primary "></small>
+			</div>
+			<div class="modal-body">
+				<table id="attachmentMrgTbl" class="table table-condensed" style="width:95%">
+					<thead>
+						<tr>
+							<th style="width: 200px;">文件名</th>
+							<th>上传人员</th>
+							<th>上传时间</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button type="button" onclick="restAttachmentList();" class="cancle-btn" data-dismiss="modal">关闭</button>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+var mrg_table;
+var current_type;
+var businessKey;
+$(function() {
+	//重写 关闭默认警告，解决modal重新打开，警告
+	//$.fn.dataTable.ext.errMode = function(s,h,m){};
+})
+function manageAttachment(type){
+	current_type = type;
+	businessKey = "${v_m_businessKey}";
+	var jsonpara ={};
+    jsonpara.type=type;
+    jsonpara.businessKey=businessKey;
+    businessKey
+    mrg_table = $('#attachmentMrgTbl').DataTable( {
+		paging: false,
+        searching: false,
+		bFilter: false,
+        lengthChange: false,
+        iDisplayLength:false,
+        bLengthChange:false,
+        //retrieve: true,
+        destroy:true,
+        bInfo:false,   //关闭 bInfo Showing  entries
+        autoWidth:false,
+        language:{
+        	emptyTable : "暂无数据"
+        },
+        ajax: {
+        	url:"/file_server/list",
+        	type:"POST",
+        	data:jsonpara			
+        },
+        columns: [
+            { data:"name"},
+            { data: "realName" },
+            { data: "uploadDate" }
+        ],
+        columnDefs: [
+                    {"sWidth":"40%","targets": [0]},
+       				{"sWidth":"15%","targets": [1]},
+         			{"sWidth":"25%","targets": [2]},
+       				{
+       					"sWidth":"20%",
+       					"targets": [3],
+       					"data": "id",
+       					"render": function(data, type, full) {
+       							return "<a class='btn-link' style='font-size:13px;'  href='/file_server/download?id=" + data + "'>下载</a><a class='btn btn-link' style='font-size:13px;' onclick='deleteAttachment("+data+");''>删除</a>";					
+       					}
+       				}
+       	]
+       			
+    } );
+}
+
+function doUpload() {
+    var jsonpara ={};
+    jsonpara.type=current_type;
+    jsonpara.businessKey=businessKey;
+    jsonpara.employId="${v_m_useremployId}";
+    var file =$("#attam_file")[0];
+    if(file.value==null||file.value==""){
+    	$('#uploadResultMessage').attr("class","text-danger");
+    	$('#uploadResultMessage').text("提示：请先选择文件再上传");
+    	return;
+    }
+	var url = '';
+	url = '/file_server/upload';
+	$.ajaxFileUpload({
+		url : url,
+		secureuri : false, 
+		fileElementId : 'attam_file', 
+		data:jsonpara,
+		dataType : 'text', 
+		success : function(data) 
+		{	
+			$('#uploadResultMessage').attr("class","text-success");
+			$('#uploadResultMessage').text("提示：上传附件成功");	
+			if( $.isFunction(window.doAfterUpload)){ 
+				doAfterUpload(current_type);  
+			}
+			mrg_table.ajax.reload();
+		},
+		error : function(data, status, e)
+		{
+			$('#uploadResultMessage').attr("class","text-danger");
+			$('#uploadResultMessage').text("提示：上传附件失败");	
+			mrg_table.ajax.reload();
+		}
+	});
+	//fix a bug for ie9
+	mrg_table.ajax.reload();
+};
+function deleteAttachment(id){
+	var jsonParam = {};
+	jsonParam.id = id;
+		$.ajax({
+			type : "POST",
+			url : "/file_server/delete?id"+id,
+			data : jsonParam,
+			success : function(result) {
+				$('#uploadResultMessage').text("提示：附件删除成功");	
+				mrg_table.ajax.reload();
+			}
+		});
+}
+function restAttachmentList(){
+	$('#uploadResultMessage').text("");	
+	//TODO
+}
+</script>
+<style>
+.col-sm-12{
+	width:100%;
+}
+</style>
+</#macro>

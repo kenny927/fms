@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/vue.js<@resVersionDirective>?</@>"></script>
+    <style>
+        [v-cloak]{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="bz-bb pt20 pl20 pr20" id="linkManList_div" cloak>
+    <form action="" class="layui-form jun-form-s form-css ml20">
+        <dl class="dl-form mb5-i" style="height: 300px;overflow-y: auto">
+            <dt class="mt20 c-2 fz14 c-f" style="width: 120px;text-align: left">请选择报价接收邮箱</dt>
+            <dd class="fz12">账户名称：{{account.accountName}}</dd>
+            <dd class="" v-for="item in lm"><input type="radio" name="email" lay-filter="email" value="{{item.email}}" title="联系人：{{item.linkmanTelephone}}&nbsp;&nbsp;邮箱：{{item.email == null || item.email=='' ? '--' : item.email}}"></dd>
+            <dd class="pre layui-form ">
+                <input type="radio" name="email" lay-filter="email" value="CUSTOMER" title="自定义邮箱" class=" flt">
+                <input type="text" style="width: 200px;height: 30px;" name="customer_email" lay-filter="customer_email" placeholder="请输入邮箱" autocomplete="off" class=""/>
+            </dd>
+        </dl>
+    <div class="layui-layer-btn-c" style="text-align:center">
+        <a class="form-btn layui-btn-small2 nohover" id="confirmCloseBtn" lay-submit="" lay-filter="formDemo">确认</a>
+        <a class="form-btn layui-btn-primary layui-btn-small2 ml10" id="cancelBtn">取消</a>
+    </div>
+    </form>
+</div>
+<script type="text/javascript">
+    var offerId = '${offerId}';
+    var buyerAccountId = '${buyerAccountId}';
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    var form;
+    $(function () {
+        loadLinkMans();
+    })
+
+    function loadLinkMans(){
+        var param = {
+                        offerId:offerId,
+                        buyerAccountId:buyerAccountId
+                    };
+        postUtil.call("/mallOrder/api/mallInquiry/queryLinManForOffer", param, function (result) {
+            if (result.STATUS == 'SUCCESS') {
+                renderData(result.DATA);
+                form.render();
+            } else {
+                layer.msg('系统发生未知错误' + result.MSG, {icon: 5});
+            }
+        });
+    }
+
+    function renderData(value){
+        new Vue({
+            el:'#linkManList_div',
+            data:{
+                account: value.account,
+                lm: value.linkMans
+            }
+        });
+    }
+
+    layui.use(['form', 'element', 'layer'], function () {
+        form = layui.form();
+        form.render();
+        $('#cancelBtn').bind("click", function () {
+            parent.layer.close(index);//关闭当前窗口
+        });
+
+        form.on('radio(email)', function(data){
+            if(data.value == 'CUSTOMER'){
+                $('input[name=customer_email]').removeAttr("disabled");
+            }else{
+                $('input[name=customer_email]').val("");
+                $('input[name=customer_email]').attr("disabled", "disabled");
+            }
+        });
+
+        form.on('submit(formDemo)', function(data) {
+            var email = data.field.email || '';
+            if(email.length < 1){
+                layer.msg("请选择接收邮箱!", {icon: 5});
+                return false;
+            }
+            var customer_email = data.field.customer_email || '';
+            if( email == 'CUSTOMER' && customer_email.length < 1 ){
+                layer.msg("请填写自定义邮箱!", {icon: 5});
+                return false;
+            }
+            if(customer_email.length > 0){
+                if (!/^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$/.test(customer_email)) {
+                    layer.msg("邮箱格式不正确!", {icon: 5});
+                    return false;
+                }
+            }
+
+            var param = {};
+            param.offerId = offerId;
+            if(email == 'CUSTOMER'){
+                param.email = customer_email;
+            }else {
+                param.email = email;
+            }
+            layer.load();
+            postUtil.call("/mallOrder/api/mallInquiry/sendEmail", param, function (result) {
+                if (result.STATUS == "SUCCESS") {
+                    layer.msg("邮件发送成功", {icon: 6});
+                } else {
+                    layer.msg("邮件发送失败:" + result.MSG, {icon: 5});
+                }
+                var success = parent.closeMallOrderCallback(result);//调用父页面的渲染方法
+                if (success) {
+                    setTimeout(function () {
+                        parent.layer.close(index);//关闭当前窗口
+                    }, 1000);
+
+                }
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

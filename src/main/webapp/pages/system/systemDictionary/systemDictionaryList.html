@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <style>
+        .btn {
+            display: block;
+            width: 86px;
+            height: 36px;
+            font: 12px/36px "microsoft yahei";
+            text-align: center;
+            text-decoration: none;
+            border-radius: 0;
+            background: #035a9d;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div class="purchaseSearch">
+                <form>
+                    <dl class="form-list flt">
+                        <dt>分类编码：</dt>
+                        <dd><input type="text" id="classify" style="width: 150px;" placeholder="请输入分类编码"/></dd>
+                    </dl>
+                    <dl class="form-list flt">
+                        <dt>编码：</dt>
+                        <dd><input type="text" id="code" style="width: 150px;" placeholder="请输入code"/></dd>
+                    </dl>
+                    <dl class="form-list flt">
+                        <dt>中文名称：</dt>
+                        <dd><input type="text" id="cName" style="width: 150px;" placeholder="请输入cName"/></dd>
+                    </dl>
+                    <dl class="form-list flt">
+                        <dd><span class="btn ml10" style="cursor: pointer;" id="searchBtn">查询</span></dd>
+                        <dd><span class="btn ml10" style="cursor: pointer;" id="addBtn">新增</span></dd>
+                    </dl>
+                </form>
+            </div>
+            <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px">
+                <table class="layui-table" lay-skin="line">
+                    <thead>
+                    <tr>
+                        <td colspan="8" align="right">
+                            <input id="uploadBtn" style="float: right;" type="file" name="file">
+                            <span class="btn ml10 frt" style="cursor: pointer;" id="exportBtn">导出数据字典</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="text-align:center;width:10%">ID</th>
+                        <th style="text-align:center;width:10%">编码</th>
+                        <th style="text-align:center;width:15%">中文名称</th>
+                        <th style="text-align:center;width:15%">英文名称</th>
+                        <th style="text-align:center;width:15%">分类编码</th>
+                        <th style="text-align:center;width:15%">备注</th>
+                        <th style="text-align:center;width:10%">序列</th>
+                        <th style="text-align:center;width:10%">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="systemDictionaryTable">
+                    </tbody>
+                </table>
+            </div>
+            <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+        </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript">
+    var layer = null;
+    layui.use(['layer', 'upload'], function () {
+        layer = layui.layer;
+
+        systemDictionaryTableInit();
+        //新增sku
+        layui.upload({
+            elem: '#uploadBtn',
+            title: '上传文件',
+            skin: 'upload',
+            url: '/systemDictionary/batchInsertSystemDictionary', //上传接口
+            ext: 'xlsx',
+            type: 'file',
+            before: function (input) {
+                // //返回的参数item，即为当前的input DOM对象
+                // console.log('文件上传中');
+                layer.load();
+            },
+            success: function (res) { //上传成功后的回调
+                layer.closeAll("loading");
+                if (res.STATUS) {
+                    if (res.STATUS == 'SUCCESS') {
+                        layer.msg("导入数据字典成功", {icon: 6});
+                        setTimeout(function () {
+                            systemDictionaryTableInit();
+                        }, 1000);
+
+                    } else {
+                        layer.msg(res.MSG + "", {icon: 5});
+                    }
+                } else {
+                    layer.msg("导入数据字典过程中出现异常", {icon: 5});
+                }
+            }
+        });
+
+    });
+
+
+    var PAGE_SIZE = 8;
+
+    function systemDictionaryTableInit() {
+        var classify = $('#classify').val();
+        var code = $('#code').val();
+        var cName = $('#cName').val();
+
+        var queryParam = {};
+        queryParam.currentPageIndex = 1;
+        queryParam.pageSize = PAGE_SIZE;
+
+        queryParam.classify = classify;
+        queryParam.code = code;
+        queryParam.cName = cName;
+
+        loadSystemDictionaryData(queryParam);
+    }
+
+
+    $(function () {
+
+        $("#searchBtn").bind("click", function () {
+            systemDictionaryTableInit();
+        });
+
+        document.onkeydown = function (e) {
+            var ev = document.all ? window.event : e;
+            if (ev.keyCode == 13) {
+                systemDictionaryTableInit();
+            }
+        };
+
+        $("#addBtn").bind("click", function () {
+            var url = "/systemDictionary/preAdd";
+            layer.open({
+                title: "数据字典-新增",
+                type: 2,
+                area: ['500px', '580px'],
+                fixed: false, //不固定
+                maxmin: true,
+                content: url
+            });
+        });
+        
+        $('#exportBtn').bind("click",function () {
+            postUtil.submit("/systemDictionary/export");
+        });
+
+    });
+
+    var currentDataList = null;
+
+    function loadSystemDictionaryData(queryParam) {
+        layer.load();
+        postUtil.call("/systemDictionary/listJson", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            currentDataList = dataList;
+            renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var classify = $('#classify').val();
+                        var code = $('#code').val();
+                        var cName = $('#cName').val();
+
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        tempParam.classify = classify;
+                        tempParam.code = code;
+                        tempParam.cName = cName;
+                        loadSystemDictionaryData(tempParam);
+                    }
+                }
+            });
+            layer.closeAll("loading");
+        });
+    }
+
+    function renderTable(dataList) {
+        var length = dataList.length;
+        var table = document.getElementById("systemDictionaryTable");
+        table.innerHTML = "";
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var row = renderRow(data);
+                table.appendChild(row);
+            }
+        } else {
+            var html = '<tr><td colspan="8"><p class="t-c fz16 c-2" style="line-height: 76px;">未查询到数据字典数据！</p></td></tr>';
+            $(table).html(html);
+        }
+    }
+
+
+    function renderRow(rowData) {
+        var id = rowData.id;
+        var code = rowData.code;
+        var cName = rowData.cName;
+        var eName = rowData.eName;
+        var classify = rowData.classify;
+        var remark = rowData.remark;
+        var seq = rowData.seq;
+        var tr = document.createElement('tr');
+        tr.appendChild(renderCell(null, id, "width:10%;"));
+        tr.appendChild(renderCell(null, code, "width:10%;"));
+        tr.appendChild(renderCell(null, cName, "width:15%;"));
+        tr.appendChild(renderCell(null, eName, "width:15%;"));
+        tr.appendChild(renderCell(null, classify, "width:15%;"));
+        tr.appendChild(renderCell(null, remark, "width:15%;"));
+        tr.appendChild(renderCell(null, seq, "width:10%;"));
+        tr.appendChild(renderCell("operation", rowData, "width:10%;"));
+        return tr;
+    }
+
+    function renderCell(name, value, style) {
+        var td = document.createElement('td');
+        td.setAttribute("style", style);
+        //个性化差异-操作区域
+        if (name == "operation") {
+            td.innerHTML = '<p>' +
+                    '<a class="c-h fz12" href="javascript:void(0);" onclick="preEdit(\'' + value.id + '\')">修改</a>&nbsp;' +
+                    '<a class="c-h fz12" href="javascript:void(0);" onclick="preDelete(\'' + value.id + '\')">删除</a>' +
+                    '</p>';
+        } else {
+            if (value) {
+                td.innerText = value;
+            } else {
+                td.innerText = "--";
+            }
+        }
+        return td;
+    }
+
+    function preEdit(id) {
+        var data = findDictionaryFromPage(id);
+        if (data == null) {
+            layer.msg("未查询到数据字典信息", {icon: 5});
+            return;
+        }
+
+        var url = "/systemDictionary/preEdit?id=" + id;
+        layer.open({
+            title: "数据字典-修改",
+            type: 2,
+            area: ['500px', '580px'],
+            fixed: false, //不固定
+            maxmin: true,
+            content: url
+        });
+
+    }
+
+    function preDelete(id) {
+//        var data = findDictionaryFromPage(id);
+//        if (data == null) {
+//            layer.msg("未查询到数据字典信息", {icon: 5});
+//            return;
+//        }
+        var layerContent = '<div class="t-c c-2" style="padding-top:10px;"><p>是否确认该字典?</p></div>';
+        layer.open({
+            title: "删除数据字典",
+            skin: 'myskin3',
+            area: ['300px', '180px'],
+            btnAlign: 'c',
+            content: layerContent,
+            btn: ['确定', '取消'],
+            yes: function (index, layero) {
+                layer.close(index);
+                var param = {};
+                param.id = id;
+                postUtil.call("/systemDictionary/delete", param, function (result) {
+                    if (result.STATUS == "SUCCESS") {
+                        layer.msg("审核成功~", {icon: 6});
+                        layer.close(index);
+                        systemDictionaryTableInit();
+                    } else {
+                        layer.msg(result.MSG + "", {icon: 5});
+                    }
+                });
+            }, btn2: function (index, layero) {
+                layer.close(index);
+            },
+            cancel: function () {
+
+            }
+        });
+    }
+
+    function findDictionaryFromPage(id) {
+        if (!currentDataList) {
+            return null;
+        }
+        var target = null;
+        for (var i = 0; i < currentDataList.length; i++) {
+            if (id == currentDataList[i].id) {
+                target = currentDataList[i];
+                break;
+            }
+        }
+        return target;
+    }
+
+    //新增数据字典回调
+    function addSystemDictionaryCallBack(result) {
+        if (result.STATUS == "SUCCESS") {
+            systemDictionaryTableInit();
+        }
+    }
+
+    function editSystemDictionaryCallBack(result) {
+        if (result.STATUS == "SUCCESS") {
+            systemDictionaryTableInit();
+        }
+    }
+
+</script>
+</body>
+</html>

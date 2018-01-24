@@ -1,0 +1,47 @@
+<#macro htmlBase>
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+		<link rel="stylesheet" type="text/css" href="/res/public/css/style.css<@resVersionDirective>?</@>"/>
+		<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+        <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+	</head>
+	<body>
+		<section id="itocCenter">
+		   <#include "/pages/sellerOffer/indexHeader.html">
+		   <@header />
+		   <#include "/pages/sellerOffer/indexFooter.html">	
+		   <@footer />	   
+	       <section class="itocContent">
+		       	<nav class="purchaseNav">
+		       		<ul>
+		       			<li><a href="/mallOrder/vagueDemand/preListVagueDemand">委托单</a></li>
+		       			<li><a href="/mallOrder/buyerEnquireService/list">询价单</a></li>
+		       			<li><a href="/mallSellerOffer/offerListPage">报价单</a></li>
+		       			<li><a href="/mallOrder/preList">商城订单</a></li>
+		       		</ul>
+		       	</nav>
+				<div class="itocMain">
+					<div class="purchaseSearch purchasepading">
+		       			<form>
+			       		    <dl class="form-list flt mb10">
+				       		    	<dt style="width: 80px;">搜报价单：</dt>
+				       		    	<dd><input type="text" id="num" placeholder="请输入报价单编号/询单编号" /></dd>
+				       		    	<dd><span class="btn ml10" onclick="search()">搜索</span></dd>
+			       		    </dl>
+		       			</form>
+		       		</div>
+		       		<div id="offerList">
+		       		
+		       		</div>
+		       		<div id="paginationDiv"></div>
+				</div>
+			</section>
+	    </section>
+		<#nested />
+	</body>
+</html>
+</#macro>

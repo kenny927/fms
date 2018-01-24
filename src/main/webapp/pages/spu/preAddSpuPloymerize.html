@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="/res/css/sku.css<@resVersionDirective>?</@>"/>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div class="addSku">
+                <dl class="sku-list">
+                    <dt class="mt5"><span class="c-f">*</span>内部分类：</dt>
+                    <dd class="inputContent">
+                        <input type="hidden" id="skuClassifyId">
+                        <input type="text" readonly="readonly" id="skuClassifyName" placeholder="请选择内部分类">
+                        <div class="xiala">
+                            <img src="/res/images/arrow2.png" style="cursor: pointer;" alt="">
+                        </div>
+                        <div id="treeNav"></div>
+                    </dd>
+                </dl>
+                <dl class="sku-list">
+                    <dt class="mt5"><span class="c-f">*</span>品牌：</dt>
+                    <dd class="inputContent">
+                        <input type="hidden" id="skuBrandId">
+                        <input type="text" readonly="readonly" id="skuBrandName" placeholder="请选择品牌">
+                    </dd>
+                    <dd>
+                        <button id="searchBtn" class="form-btn layui-btn-big ml10">SPU聚合查询</button>
+                    </dd>
+                </dl>
+            </div>
+
+            <!-- 渲染表格数据区域 -->
+            <div class="layui-tab-content" style="width: 95%;padding-left: 20px;">
+                <div class="layui-tab-item layui-show" id="skuTablesDiv">
+
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript">
+
+    var layer = null;
+    layui.use(['tree', 'layer'], function () {
+        layer = layui.layer;
+        var treeOption = {};
+        treeOption.skin = "shihuang";
+        treeOption.elem = "#treeNav";
+        treeOption.click = function (node) {
+            var classifyIsLeaf = node.classifyIsLeaf;
+            if (classifyIsLeaf == "1") {
+                $('#skuClassifyName').val(node.allParentName);
+                $('#skuClassifyId').val(node.classifyId);
+                $('#treeNav').hide();
+            } else {
+                layer.msg("请选择叶子节点", {"icon": "5"});
+
+            }
+        };
+
+        postUtil.call("/reusable/skuClassificatory/getAllSkuClassificatoryJsonForLayuiTree", null, function (result) {
+            treeOption.nodes = result;
+            layui.tree(treeOption);
+        });
+
+        $('#skuBrandName').bind("click", function () {
+            var skuClassifyId = $('#skuClassifyId').val();
+            if (skuClassifyId == null || skuClassifyId == "") {
+                layer.msg("在选择品牌之前请先选择内部分类", {icon: 5});
+                return;
+            }
+            layer.open({
+                title: "请选择品牌",
+                type: 2,
+                area: ['1000px', '550px'],
+                fixed: false,
+                maxmin: true,
+                content: '/reusable/skuClassifyBrand/chooseBrandPage?skuClassifyId=' + skuClassifyId
+            });
+        });
+
+        $('#searchBtn').bind("click", function () {
+            doSearch();
+        });
+    });
+
+    function doSearch() {
+        var skuClassifyId = $("#skuClassifyId").val();
+        var skuBrandId = $("#skuBrandId").val();
+        if (skuClassifyId == null || skuClassifyId == "") {
+            layer.msg("请选择内部分类", {icon: 5});
+            return;
+        }
+        if (skuBrandId == null || skuBrandId == "") {
+            layer.msg("请选择品牌", {icon: 5});
+            return;
+        }
+
+        var param = {};
+        param.skuClassifyId = skuClassifyId;
+        param.skuBrandId = skuBrandId;
+        postUtil.call("/spuPolymerize/querySkuCommodityBySkuClassifyAndBrand", param, function (result) {
+            if (result) {
+                renderSkuTables(result);
+            }
+        })
+    }
+
+    $(document).on("click", ".xiala", function () {
+        if ($(this).next().css("display") == "none") {
+            $(this).next().show();
+        } else {
+            $(this).next().hide();
+        }
+    });
+
+    //选择品牌后的回调函数
+    function chooseBrandCallback(dataArray) {
+        if (dataArray) {
+            if (dataArray.length != 1) {
+                layer.msg("请选择一个品牌", {icon: 5});
+                return false;
+            }
+        } else {
+            layer.msg("请选择一个品牌", {icon: 5});
+            return false;
+        }
+        var brand = dataArray[0];
+        $('#skuBrandId').val(brand.brandId);
+        $('#skuBrandName').val(brand.brandName);
+        return true;
+    }
+
+
+    function renderSkuTables(result) {
+        $('#skuTablesDiv').html("");
+        if (result) {
+            if (result.length > 0) {
+                for (var i = 0; i < result.length; i++) {
+                    var skuList = result[i].skuData;
+                    var startHtml = "<button id=\"\" onclick='doPolymerize(\"" + "checkbox_name_" + i + "\",\"" + "propertyName_" + i + "\")' class=\"form-btn layui-btn-small mb10\">聚合SKU</button>\n" +
+                            "                    <table class=\"layui-table\" lay-skin=\"line\">\n" +
+                            "                        <thead>\n" +
+                            "                        <tr>\n" +
+                            "                            <th style=\"text-align:center;width:10%\">序号</th>\n" +
+                            "                            <th style=\"text-align:center;width:10%\">\n" +
+                            "                                <input name=\"" + "checkbox_name_" + i + "\" type=\"checkbox\" value=\"\" onchange=\"checkAllSkuOrNot(this)\">全选\n" +
+                            "                            </th>\n" +
+                            "                            <th style=\"text-align:center;width:10%\">SKU_ID</th>\n" +
+                            "                            <th style=\"text-align:center;width:30%\">SKU_名称</th>\n" +
+                            "                            <th style=\"text-align:center;width:20%\">属性名称</th>\n" +
+                            "                            <th style=\"text-align:center;width:20%\">属性值</th>\n" +
+                            "                        </tr>\n" +
+                            "                        </thead>\n" +
+                            "                        <tbody>\n";
+                    var tempHtml = "";
+                    for (var j = 0; j < skuList.length; j++) {
+                        if (j == 0) {
+                            tempHtml = tempHtml + "<tr>" +
+                                    "<td rowspan=\"" + skuList.length + "\" align='center' style='vertical-align: middle;'>" +
+                                    "<span>" + (i + 1) + "</span>" +
+                                    "</td>" +
+                                    "<td>" +
+                                    "<input name=\"" + "checkbox_name_" + i + "\" type=\"checkbox\" value=\"" + skuList[j].skuId + "\" >" +
+                                    "</td>" +
+                                    "<td>" + skuList[j].skuId + "</td>" +
+                                    "<td>" + skuList[j].skuName + "</td>" +
+                                    "<td>" + skuList[j].propertyName + "</td>" +
+                                    "<td>" + skuList[j].propertyValue + "</td>" +
+                                    "</tr>";
+                        } else {
+                            tempHtml = tempHtml + "<tr>" +
+                                    "<td>" +
+                                    "<input name=\"" + "checkbox_name_" + i + "\" type=\"checkbox\" value=\"" + skuList[j].skuId + "\" >" +
+                                    "</td>" +
+                                    "<td>" + skuList[j].skuId + "</td>" +
+                                    "<td>" + skuList[j].skuName + "</td>" +
+                                    "<td>" + skuList[j].propertyName + "</td>" +
+                                    "<td>" + skuList[j].propertyValue + "</td>" +
+                                    "</tr>";
+                        }
+
+                    }
+                    var endHtml = "</tbody></table>";
+                    $('#skuTablesDiv').append(startHtml + tempHtml + endHtml);
+
+                }
+            } else {
+                layer.msg("当前已无可进行聚合的SKU信息", {icon: 5});
+            }
+        } else {
+            layer.msg("当前已无可进行聚合的SKU信息", {icon: 5});
+        }
+    }
+
+    function checkAllSkuOrNot(obj) {
+        var objs = document.getElementsByName(obj.name);
+        for (var i = 0; i < objs.length; i++) {
+            objs[i].checked = obj.checked;
+        }
+    }
+
+    //聚合执行
+    function doPolymerize(checkName, propertyName_index) {
+        var objs = document.getElementsByName(checkName);
+        var skuIds = "";
+        for (var i = 0; i < objs.length; i++) {
+            if (objs[i].checked == true) {
+                if (objs[i].value != "") {
+                    skuIds = skuIds + objs[i].value + "|";
+                }
+            }
+        }
+        if (skuIds == "") {
+            layer.msg("请勾选SKU后再进行聚合", {icon: 5});
+            return;
+        }
+        skuIds = skuIds.substring(0, skuIds.length - 1);
+        var skuClassifyId = $('#skuClassifyId').val();
+        var skuClassifyName = $('#skuClassifyName').val();
+        var skuBrandId = $('#skuBrandId').val();
+        var skuBrandName = $('#skuBrandName').val();
+
+        var param = {};
+        param.skuIds = skuIds;
+        param.skuClassifyId = skuClassifyId;
+        param.skuClassifyName = skuClassifyName;
+        param.skuBrandId = skuBrandId;
+        param.skuBrandName = skuBrandName;
+        var propertyNameAndValues = assemblePropertyAndValue(propertyName_index);
+        var propertyNameAndValuesString = JSON.stringify(propertyNameAndValues);
+        param.propertyNameAndValuesString = propertyNameAndValuesString;
+
+        postUtil.call("/spuPolymerize/createSpuOrAppendSkuToSpu", param, function (result) {
+            if (result.STATUS == "SUCCESS") {
+                layer.msg("创建SPU成功！", {icon: 6});
+                setTimeout(function () {
+                    doSearch();
+                }, 2000);
+            }
+        });
+    }
+
+    function assemblePropertyAndValue(propertyName_index) {
+        var paramArray = [];
+        var propertyNameObjs = $("td[name='" + propertyName_index + "']");
+        $(propertyNameObjs).each(function () {
+
+            var propertyName = $(this).text();
+            var propertyValues = "";
+            var tdObj = $(this).next();
+            $(tdObj).find("span").each(function () {
+                propertyValues = propertyValues + $(this).text() + "|";
+            });
+            propertyValues = propertyValues.substring(0, propertyValues.length - 1);
+
+            var param = {};
+            param.propertyName = propertyName;
+            param.propertyValues = propertyValues;
+            paramArray.push(param);
+        });
+        return paramArray;
+
+    }
+
+</script>
+</body>
+</html>

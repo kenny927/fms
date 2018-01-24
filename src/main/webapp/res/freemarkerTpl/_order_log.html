@@ -1,0 +1,30 @@
+<#macro order_log>
+	<h3 class="mt20 fz16 bg-f0 h3-tittle pl10">订单跟踪日志<span class="c-h frt fz12 cs-p under-l mr5 roleDetail">收起>></span></h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <table class="layui-table pop mb5-i" lay-skin="line">
+                <colgroup>
+                    <col  width="200">
+                    <col  width="200">
+                    <col  width="400">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th >时间</th>
+                    <th >操作人</th>
+                    <th >操作类型</th>
+                    <th >操作记录</th>
+                </tr>
+                </thead>
+                <tbody>
+                   <#list orderAuditLog as item>
+                   <tr>
+                        <td>${item.createDate}</td>
+                        <td>${item.userRealName!''}</td>
+                        <td>${item.auditTypeView!''}</td>
+                        <td>${item.auditMes!''}</td>
+                    </tr>
+                  </#list>
+                </tbody>
+            </table>
+        </blockquote>
+</#macro>

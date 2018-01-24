@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" >
+		<title></title>
+		<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+		<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>" />
+		<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css<@resVersionDirective>?</@>" />
+		<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+		<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+		<script src="/res/public/layui/Area1.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/js/ajaxfileupload_final.js<@resVersionDirective>?</@>"></script>
+		<script src="/res/public/vue/dist/vue.min.js"></script>
+		<style>
+			.layui-layedit {
+				width: 568px !important;
+				height: 164px!important;
+			}
+			
+			.layui-layedit iframe {
+				height: 121px !important;
+			}
+			.a-upload {
+	            padding: 4px 10px;
+	            height: 20px;
+	            line-height: 20px;
+	            position: relative;
+	            cursor: pointer;
+	            color: #407fe7;
+	            background: #fff;
+	            border: 1px solid #ddd;
+	            border-radius: 4px;
+	            overflow: hidden;
+	            display: inline-block;
+	            *display: inline;
+	            *zoom: 1
+	        }
+
+	        .a-upload  input {
+	            position: absolute;
+	            font-size: 100px;
+	            right: 0;
+	            top: 0;
+	            opacity: 0;
+	            filter: alpha(opacity=0);
+	            cursor: pointer
+	        }
+	
+	        .a-upload:hover {
+	            color: #fff;
+	            background: #407fe7;
+	            border-color: #407fe7;
+	            text-decoration: none
+	        }
+	        p[name="attachmentFile"]{
+	            color: #407fe7 !important;
+	        }
+		</style>
+		<script type="text/javascript">
+			var startDate= '${startDate!}';
+			var accountId = '${accountId!}';
+			var linkMan = '${record.linkmanId!}';
+			var visitRecordId = '${visitRecordId!}';
+			var userId ='${userId}';
+			var action = '${action}';
+			var form;
+			var layedit;
+			var edit_index;
+			var laydate;
+			var layer;
+			var vm;
+			var $form;
+			var areaData = Area;
+			var parent_index = parent.layer.getFrameIndex(window.name);
+			layui.use(['layer','form','laydate','layedit'], function(){
+				layer = layui.layer;
+				form = layui.form();
+				//编辑器
+				vm = new Vue({
+                    el:'#visitForm'
+                    ,data:{
+                        role:'${role!}',
+                        queryParam:{
+                            province:'${record.province!}',
+                            city:'${record.city!}',
+                            address:'${record.address!}'
+						}
+					}
+                    ,mounted:function () {
+                        this.$nextTick(function () {
+                            this.showData();
+                        })
+                    }
+                    ,methods:{
+                        showData: function () {
+                                $form = $('#visitForm');
+								var visitType = $("select[name='visitType']").val() ;
+								         if(visitType == 'PHONE') {
+								            $('#addressShow').hide();    
+								         }
+                                vm.loadProvince();
+                        },
+                        loadProvince: function () {
+                            var proHtml = '';
+                            for (var i = 0; i < areaData.length; i++) {
+                                if (this.queryParam.province != undefined && this.queryParam.province != '' && areaData[i].provinceName == this.queryParam.province) {
+                                    proHtml += '<option value="' + areaData[i].provinceCode + '_' + areaData[i].mallCityList.length + '_' + i + '_' + areaData[i].provinceName + '" selected>' +
+                                        areaData[i].provinceName + '</option>';
+                                    vm.loadCity(areaData[i].mallCityList);
+                                }else {
+                                    proHtml += '<option value="' + areaData[i].provinceCode + '_' + areaData[i].mallCityList.length + '_' + i + '_' + areaData[i].provinceName + '">' +
+                                        areaData[i].provinceName + '</option>';
+                                }
+                            }
+                            $form.find('select[name=province]').append(proHtml);
+                            form.render();
+                            form.on('select(province)', function(data) {
+                                vm.queryParam.city="";
+                                var value = data.value;
+                                var d = value.split('_');
+                                var code = d[0];
+                                var count = d[1];
+                                var index = d[2];
+                                vm.queryParam.province=d[3];
+                                if (count > 0) {
+                                    vm.loadCity(areaData[index].mallCityList);
+                                } else {
+                                    vm.queryParam.province = "";
+                                    vm.queryParam.city="";
+                                }
+                            });
+                            form.on('select(visitType)', function(data) {
+                                if(data.value == 'PHONE') {
+                                    $('#addressShow').hide();
+                                }else {
+                                    $('#addressShow').show();
+                                }
+                                 vm.$nextTick(function () {
+parent.layer.iframeAuto(parent_index);
+                                 })
+                               
+                            });
+
+                        },
+                        loadCity: function (citys) {
+                            var cityHtml = '';
+                            for (var i = 0; i < citys.length; i++) {
+                                if (this.queryParam.city != undefined && this.queryParam.city != '' && citys[i].cityName == this.queryParam.city) {
+
+                                   if(citys[i].mallAreaList){
+		                              cityHtml += '<option value="' + citys[i].cityCode + '_' + citys[i].mallAreaList.length + '_' + i + '_' + citys[i].cityName + '" selected>' +
+		                                citys[i].cityName + '</option>';
+		                              // vm.loadArea(citys[i].mallAreaList);
+		                           }else{
+		                              cityHtml += '<option value="' + citys[i].cityCode + '_0' + '_' + i + '_' + citys[i].cityName + '" selected>' + citys[i].cityName + '</option>';
+		                           }
+
+                                }else {
+                                     if(citys[i].mallAreaList){  
+				                         cityHtml += '<option value="' + citys[i].cityCode + '_' + citys[i].mallAreaList.length + '_' + i + '_' + citys[i].cityName + '">' +
+				                            citys[i].cityName + '</option>';
+				                     }else{
+				                         cityHtml += '<option value="' + citys[i].cityCode + '_0' + '_' + i + '_' + citys[i].cityName + '">' + citys[i].cityName + '</option>';
+				                     }
+                                }
+                            }
+                            if(!this.queryParam.city){
+                                vm.queryParam.city=citys[0].cityName;
+                            }
+                            $form.find('select[name=city]').html(cityHtml)
+                            form.render();
+                            form.on('select(city)', function(data) {
+                                var value = data.value;
+                                var d = value.split('_');
+                                var code = d[0];
+                                var count = d[1];
+                                var index = d[2];
+                                vm.queryParam.city=d[3];
+                            });
+                        }
+					}
+				})
+				layedit = layui.layedit;
+				edit_index = layedit.build('LAY_demo_editor',{
+					tool: [
+					  'strong','italic','underline','del','|',
+					  'left' ,'center','right','link' ,'unlink',
+					  'face'
+					]
+				});
+				laydate = layui.laydate;
+				
+				loadVisitTime();
+				loadLinkMan(accountId);
+		  	});
+
+			function  getLayedit(){
+				return layedit;
+			}
+			
+			function validateForm(){
+				var flag = true;
+				var visitTime = $("input[name=visitTime]");
+				if(!visitTime.val()){
+					visitTime.attr("required","required");
+					return false;
+				}
+				var content = layedit.getContent(edit_index);
+				if(!content){
+					layer.msg("请填写拜访记录",{icon:5});
+					return false;
+				}
+                var visitType = $("select[name=visitType]").val();
+				if(vm.role&&(visitType == 'MEETING_MARKET'||visitType == 'HOUSE')){
+				    var province = $("select[name=province]").val();
+                    var address = $("input[name=address]").val();
+                    if(!province){
+                        layer.msg("请选择省市",{icon:5});
+                        return false;
+					}else if(!address) {
+                        layer.msg("请填写详细地址",{icon:5});
+                        return false;
+					}
+				}
+				return flag;
+			}
+
+			function closeLayer(){
+			//先得到当前iframe层的索引
+				parent.layer.close(parent_index); //再执行关闭   
+			}
+			
+			function loadVisitTime(){
+				var config = {
+					min: startDate,
+					max: laydate.now(),
+					istime:true,
+					format: 'YYYY-MM-DD hh:mm',
+					istoday: true
+				};
+				document.getElementById('visitTime').onclick = function(){
+					config.elem = this;
+					laydate(config);
+				}
+				/* if(action=='edit'){
+					//$("input[name=visitTime]").attr("readonly","readonly");
+				}else{
+					document.getElementById('visitTime').onclick = function(){
+						config.elem = this;
+						laydate(config);
+					};
+				} */
+			}
+			
+			function loadLinkMan(accountId){
+			    var param = {};
+                param.accountId = accountId;
+                if(vm.role) {
+                param.effectivity = "Y"
+				}
+				postUtil.call("/mallCustomer/getLinkmanData",param,function(response){
+					if(response.success){
+						$.each($('#userId').children(),function(index,element){
+							if(index!=0){
+								$(element).remove();
+							}
+						});
+						$.each(response.data,function(index,element){
+							if(linkMan){
+								var html = '<option value="'+element.linkmanId+'"'+(element.linkmanId==linkMan?'selected':'')+'>'+element.linkmanName+'('+element.linkmanTelephone+')'+(element.linkmanPosition||'')+'</option>'
+							}else{
+								var html = '<option value="'+element.linkmanId+'"'+(index==0?'selected':'')+'>'+element.linkmanName+'('+element.linkmanTelephone+')'+(element.linkmanPosition||'')+'</option>'
+							}
+							$('#userId').append(html);
+						});
+						form.render('select');
+					}
+				});
+			}
+			
+		    function uploadAttachment() {
+		       var length= $('.orderSalesOppAttachments ul').find("li").length;
+		       var length2;
+		       if(vm.role){
+		           length2=2;
+			   }else {
+                   length2=5;
+			   }
+		        if(length>=length2){
+		            layer.msg('很抱歉，最多只能上传'+length2+'个附件',{icon:5});
+		            //重新加载上传组件
+		            $('#uploadAAA').html('<input type="file" id="uploadAttachmentFileBtn" name="file" onchange="uploadAttachment()" multiple="multiple" style="height: 30px;" />+添加附件');
+		            return;
+		        }
+
+		        var url = '/file_server/upload';
+		        var param = {};
+		        param.type="CUSTOMER_VISITING_RECORD";
+		        param.businessKey = visitRecordId;
+		        param.employId = userId;
+		        layer.load();
+		        $.ajaxFileUpload({
+		            url: url,
+		            secureuri: false,
+		            fileElementId: 'uploadAttachmentFileBtn',
+		            data: param,
+		            dataType: 'text',
+		            success: function (result) {
+		            	layer.closeAll('loading');
+		            	var rtnResult = eval('(' + result + ')');
+		                if (rtnResult.STATUS == "SUCCESS") {
+		                    var fileObjList = rtnResult.data;
+		                    var htmlFile = "";
+		                    for (var i = 0; i < fileObjList.length; i++) {
+		                        var attachmentFileId = fileObjList[i].id;
+		                        var attachmentFileName = fileObjList[i].name;
+		                        if(attachmentFileName){
+		                            htmlFile += '<li><a style="display: inline-block; width: 150px;" href="/file_server/download?id='+attachmentFileId+'" title="'+attachmentFileName+'"><p class="one-row">'+attachmentFileName+'</p></a><span style="display: inline-block;vertical-align: top;width: 50px;" class="deleteAttachment cs-p" onclick="deleteAttachment('+attachmentFileId+')"  Id="'+attachmentFileId+'">删除</span></li>';
+		                        }
+		                    }
+		                    $(".orderSalesOppAttachments ul").append(htmlFile);
+		                } else {
+		                	layer.msg(rtnResult.MSG);
+		                }
+		                //重新加载上传组件
+		                $('#uploadAAA').html('<input type="file" id="uploadAttachmentFileBtn" name="file" onchange="uploadAttachment()" multiple="multiple" style="height: 30px;" />+添加附件');
+		            },
+		            error: function (data, status, e) {
+		            	layer.closeAll('loading');
+		                //重新加载上传组件
+		                $('#uploadAAA').html('<input type="file" id="uploadAttachmentFileBtn" name="file" onchange="uploadAttachment()" multiple="multiple" style="height: 30px;" />+添加附件');
+		                layer.msg("上传过程中出现异常，请稍后再试",{icon:5});
+		            }
+		        });
+		    }
+
+		    function saveVisitRecord(){
+		    	if(!validateForm()){
+		    		return;
+		    	}
+		    	var param={
+		    		accountId:accountId,
+		    		visitRecordId :visitRecordId,
+		    		visitTime:$("input[name=visitTime]").val(),
+		    		linkmanId:$("select[name=userId]").val(),
+		    		visitType:$("select[name=visitType]").val(),
+		    		content:layedit.getText(edit_index)
+		    	};
+		    	if(vm.role) {
+		    		param.recordType = 'VISITING_RECORD';
+                    param.province = vm.queryParam.province;
+					param.city = vm.queryParam.city;
+					param.address = $("input[name=address]").val();
+				}
+		    	if(action=='add'){
+		    		//为空就是增加
+		    		postUtil.call("/distributor/user/saveVisitRecord",{data:JSON.stringify(param)},function(response){
+		    			if(response.STATUS=='SUCCESS'){
+		    				closeLayer();
+		    				if(vm.role) {
+                                parent.vm.loadVistRecords({accountId:accountId});
+							}else {
+                                parent.loadVistRecords({accountId:accountId});
+                            }
+		    			}else{
+		    				layer.msg("添加失败，原因："+response.MSG);
+		    			}
+		    		});
+		    	}else if(action=='edit'){
+		    		//不为空就是修改
+		    		postUtil.call("/distributor/user/updateVisitRecord",{data:JSON.stringify(param)},function(response){
+		    			if(response.STATUS=='SUCCESS'){
+                            if(vm.role) {
+                            	layer.msg("修改成功!");
+                                parent.vm.loadVistRecords({accountId:accountId});
+                            }else {
+                                parent.loadVistRecords({accountId:accountId});
+                            }
+                           closeLayer();
+		    			}else{
+		    				layer.msg("修改失败，原因："+response.MSG);
+		    			}
+		    		});
+		    	}
+
+		    }
+		    
+		    function deleteAttachment(id) {
+		        var attachmentId = id;
+		        layer.open({
+		            title: '操作提示',
+		            skin: 'myskin',
+		            area: ['450px', '280px'],
+		            btnAlign: 'c',
+		            content: '<p style="text-align: center;margin-top: 50px;">是否确认删除此附件？</p>',
+		            btn: ['确认', '取消'],
+		            yes: function (index, layero) {
+		                $('#'+id).parent().remove();
+		            	 postUtil.call("/file_server/delete", {"id":attachmentId}, function (result) {
+		            		 
+		            	 });
+		                layer.close(index);
+		            }, btn2: function (index, layero) {
+		                layer.close(index);
+		            },
+		            cancel: function () {
+		                //右上角关闭回调
+		            }
+		        });
+		    }
+
+		</script>
+	</head>
+	<body>
+		<div style="margin-top: 10px;margin-bottom: 10px;">
+			<form id ="visitForm" action="" class="jun-form-s form-css">
+				<dl class="dl-form">
+					<dt class="flt" style="width: 80px;">拜访时间：</dt>
+					<dd class="flt">
+						<input name="visitTime" value="<#if (record.visitTime??) >${record.visitTime?string('yyyy-MM-dd hh:mm')}</#if>" id="visitTime" 
+							style="height: 32px; width: 240px;"
+							class="layui-input laydate-icon" placeholder="自定义日期格式">
+					</dd>
+					<dt class="flt fz12">拜访方式：</dt>
+					<dd class="flt layui-form jun-form-l">
+						<select name="visitType" style="width: 240px;" lay-filter="visitType">
+							<option value="">请选择拜访方式</option>
+							<option value="PHONE" ${(record.visitType==null || record.visitType=='PHONE')?string('selected','')}>电话联系</option>
+							<option value="HOUSE" ${(record.visitType!=null && record.visitType=='HOUSE')?string('selected','')}>登门拜访</option>
+							<option v-if="!role" value="EMAIL" ${(record.visitType!=null && record.visitType=='EMAIL')?string('selected','')}>邮件</option>
+							<option v-if="!role" value="SMS" ${(record.visitType!=null && record.visitType=='SMS')?string('selected','')}>短信</option>
+							<option v-if="!role" value="CHANCE_MEETING" ${(record.visitType!=null && record.visitType=='CHANCE_MEETING')?string('selected','')}>偶遇</option>
+							<option  v-if="role" value="MEETING_MARKET" ${(record.visitType!=null && record.visitType=='MEETING_MARKET')?string('selected','')}>会议营销</option>
+						</select>
+					</dd>
+				</dl>
+				<dl class="dl-form">
+					<dt class="flt fz12" style="width: 80px;">联系人：</dt>
+					<dd class="flt layui-form jun-form-l">
+						<select id="userId" name="userId" style="width: 240px;">
+							<option value="">请选择联系人</option>
+						</select>
+					</dd>
+				</dl>
+				<dl class="dl-form" v-show="role" id="addressShow">
+					<dt class="flt"  style="width: 80px;">地址：</dt>
+					<dd class="flt layui-form dd-city">
+						<select name="province" lay-filter="province" lay-verify="province" lay-search>
+							<option value="">请选择省</option>
+						</select>
+					</dd>
+					<dd class="flt layui-form dd-city ml10">
+						<select name="city" lay-filter="city" lay-verify="city" lay-search>
+							<option value="">请选择市</option>
+						</select>
+					</dd>
+					<dd class="flt ml10"><input style="width: 175px;" lay-verify="address" :value="queryParam.address" type="text" name="address" autocomplete="off"  class="layui-input"></dd>
+				</dl>
+				<dl class="dl-form mb10-i">
+					<dt class="flt fz12" style="width: 80px;">拜访记录：</dt>
+					<dd class="flt layui-form">
+						<textarea class="layui-textarea layui-hide" name="content"
+							lay-verify="content" id="LAY_demo_editor">${record.content!}</textarea>
+					</dd>
+				</dl>
+		        <dl class="dl-form layuicss  mb10-i">
+		               <dt class="flt">&nbsp;</dt>
+		               <dd class="flt need-list orderSalesOppAttachments">
+		                   <ul>
+		                   <#list attachmentList as item>
+		                   	<li><a style="display: inline-block; width: 150px;" href="/file_server/download?id=${item.id}" title="${item.name}"><p class="one-row">${item.name}</p></a><span style="display: inline-block;vertical-align: top;width: 50px;" class="deleteAttachment cs-p"  onclick="deleteAttachment(${item.id})" Id="${item.id}">删除</span></li>
+		                   </#list>
+		                   </ul>
+		                   <div>
+		                       <a id="uploadAAA" class="a-upload" href="javascript:;">
+		                           <input type="file" id="uploadAttachmentFileBtn" name="file" onchange="uploadAttachment()" multiple="multiple" style="height: 30px;" />+添加附件
+		                       </a><span  v-if="role" class="c-9 ml5 fz12 inline line-middle" style="vertical-align: top">格式不限，大小在8M以内，最多支持2个</span>
+		                   </div>
+		               </dd>
+		       </dl>
+			</form>
+			<div class="t-c" style="margin-top: 10px;">
+	      		<button class="form-btn layui-btn-big"  onclick="saveVisitRecord()">保存</button>
+				<button class="form-btn  layui-btn-primary layui-btn-big ml10" onclick="closeLayer()">取消</button>
+			</div>
+		</div>
+	</body>
+</html>

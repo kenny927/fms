@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+		<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+		 <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+		<script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+		<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+        <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+       <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+       <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+       <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+       <script src="/res/js/MultiSelectDropList.js<@resVersionDirective>?</@>"></script>
+       <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+       <script type="text/javascript" src="/res/js/projectReport/publicProjectList.js<@resVersionDirective>?</@>"></script>
+        <style>
+        #itocCenter .itocContent .itocMain .purchaseSearch form {width:99%}
+        </style>
+	</head>
+	<body>
+		<section id="itocCenter">
+	       <section class="itocContent">
+	       	<div class="itocMain">
+	       		<div class="purchaseSearch" style="padding-top:10px;height:117px;padding-bottom:10px">
+					<form style="width:1200px;">
+						<dl class="form-list flt mt20">
+							<dt style="width:80px;">项目名称：</dt>
+							<dd><input  style="width:230px;height:33px;" type="text" id="projectNameLike" placeholder="请输入项目名称/项目编码" style="box-sizing: border-box;"/></dd>
+						</dl>
+						<dl class="form-list flt mt20" style="width:340px">
+							<dt>状态：</dt>
+							<dd class="pre">
+							<div class="multi_select" id="statusSelect" style="position:absolute;left:-2px;top:0;">
+								<!--<img style="position: absolute;right: 3px;top: 12px;cursor: pointer;" src="/res/images/arrow3.png" />-->
+							</div>
+							</dd>
+						</dl>
+                        <dl class="form-list flt mt20 mb5">
+							<dt style="width:98px;">分销商：</dt>
+							<dd><input style="width:228px;height:33px;"  type="text" id="distributorAccountNameLike" placeholder="请输入分销商公司名称"/></dd>
+						</dl>
+						<dl class="form-list flt mt10">
+							<dt style="width:80px;">等级：</dt>
+							<dd>
+								<select id="projectLevel" style="height: 35px;width: 240px;border: 1px solid #d6d6d6; padding-left:10px;">
+									<option value="ALL">全部</option>
+									<option value="A">A</option>
+									<option value="B">B</option>
+								</select>
+							</dd>
+						</dl>
+					    <dl class="form-list flt mt10">
+							<dt>来源：</dt>
+							<dd>
+								<select id="backupFrom" style="height: 35px;width: 240px;border: 1px solid #d6d6d6; padding-left:10px;">
+									<option value="ALL">全部</option>
+									<option value="DISTRIBUTOR">分销商提报</option>
+									<option value="PLATFORM">销售提报</option>
+								</select>
+							</dd>
+						</dl>
+<!-- 						<dl class="form-list flt mt10"> -->
+<!-- 							<dt>授权状态：</dt> -->
+<!-- 							<dd> -->
+<!-- 								<select id="backupGrantAuthorizationStatus" style="height: 35px;width: 240px;border: 1px solid #d6d6d6; padding-left:10px;"> -->
+<!-- 									<option value="ALL">全部</option> -->
+<!-- 									<option value="WAIT">待审核</option> -->
+<!-- 									<option value="OK">已授权</option> -->
+<!-- 									<option value="REFUSE">拒绝授权</option> -->
+<!-- 								</select> -->
+<!-- 							</dd> -->
+<!-- 						</dl> -->
+						<dl class="form-list flt" style="text-align:right; margin-top:9px;">
+							<dd><span class="btn ml20" onclick="search()" style="height:35px;cursor:pointer;">查询</span></dd>
+						</dl>
+					</form>
+	       		</div>
+	       		<div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px; margin-top:10px;">
+					<table class="layui-table pop" lay-skin="line">
+					    <colgroup>
+					      <col  width="150">
+					      <col  width="400">
+					      <col  width="200">
+					      <col  width="100">
+<!-- 					      <col  width="200"> -->
+					      <col  width="300">
+					      <col  width="150">
+					      <col  width="200">
+					      <col  width="200">
+					    </colgroup>
+					    <thead>
+					      <tr>
+					        <th >报备时间</th>
+					        <th >项目名称</th>
+					        <th >业主名称</th>
+					        <th >所在地</th>
+<!-- 					        <th >报备等级</th> -->
+					        <th >提报人</th>
+					        <th >状态</th>
+					        <th >销售代表</th>
+					        <th >操作</th>
+					      </tr> 
+					    </thead>
+					    <tbody>
+					    </tbody>
+					    </table>
+					    </div>
+                <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+	       	</div>
+	       </section>
+		</section>
+
+	   <script>
+	   var _listType ='${listType}';
+	   $("input[name=allChoose]").on("click",function(){
+			if($(this).prop("checked")){
+				$("input[name=primary]").prop("checked",true);
+			}else{
+				$("input[name=primary]").prop("checked", false);
+			}
+		});
+		var _currentPage=1;
+	    $(function (){
+		        $('#statusSelect').MSDL({
+		            'width': '240',
+		            'data': [{"text":"已登记","value":"PROTECTED"},{"text":"登记失效","value":"PROTECTED_INVALID"}],
+		            'id': "status"
+		        });
+	    	});
+		var layer;
+		layui.use('layer', function(){
+		 	layer = layui.layer;
+		});
+		</script>
+	</body>
+	<#include "/res/freemarkerTpl/unitConfig.html" />
+	<@unitConfig/>
+</html>

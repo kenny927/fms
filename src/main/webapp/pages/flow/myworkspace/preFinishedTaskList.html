@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <!--<link rel="stylesheet" type="text/css" href="/res/public/css/style.css<@resVersionDirective>?</@>"/>-->
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css<@resVersionDirective>?</@>"/>
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <!--<div class="purchaseSearch" style="padding-top:0px;padding-bottom:10px">-->
+                <form id="searchFrm" method="post" class="jun-form-s form-css mt20" action="">
+                    <dl class="dl-form">
+                        <dt class="flt">申请单号：</dt>
+                        <dd class="flt"><input type="text" name="applicationNo" placeholder="请输入申请单号" class="layui-input" /></dd>
+                        <dd class="flt ml10"><span class="form-btn layui-btn-small2" onclick="searchDefinition()" >查询</span></dd>
+                    </dl>
+                </form>
+            <!--</div>-->
+            <div class="table" id="applyList">
+                <ul class="th">
+                    <li style="width:4%;"><div class="mida"><div class="midb"></div></div></li>
+                    <li style="width:15%;"><div class="mida"><div class="midb">任务ID</div></div></li>
+                    <li style="width:15%;"><div class="mida"><div class="midb">任务名称</div></div></li>
+                    <li style="width:15%;"><div class="mida"><div class="midb">流程定义ID</div></div></li>
+                    <li style="width:15%;"><div class="mida"><div class="midb">开始时间</div></div></li>
+                    <li style="width:15%;"><div class="mida"><div class="midb">结束时间</div></div></li>
+                </ul>
+                <div class="information-list" style="border-right: none">
+
+                </div>
+            </div>
+            <div id="paginationDiv"></div>
+        </div>
+    </section>
+</section>
+<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+<script>
+    var html2 = "";
+    function isExitsVariable(variableName) {
+        try {
+            if (typeof (variableName) == "undefined") {
+                return "";
+            } else {
+                return variableName;
+            }
+        } catch (e) {
+        }
+        return "";
+    }
+
+    $(function () {
+        loadMallCustomerList(1);
+        //initLayUi();
+    });
+    function loadMallCustomerList(currentPageIndex, type) {
+        var param = {};
+        param.currentPage = currentPageIndex;
+        if (type==1) {
+            param.applicationNo = $('input[name=applicationNo]').val();
+            param.taskName = $('input[name=taskName]').val();
+        }
+        //alert(JSON.stringify(param));
+        postUtil.call("/flow/myworkspace/queryFinishedInstanceList", param, function (result) {
+            //alert(JSON.stringify(result));
+            var pageNumber = result.DATA.pageNumber;
+            var pageSize = result.DATA.pageSize;
+            var totalPage = result.DATA.totalPage;
+            var totalRow = result.DATA.totalRow;
+            var dataList = result.DATA.list;
+            renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        loadMallCustomerList(obj.curr, type);
+                    }
+                }
+            });
+        });
+    }
+
+    function renderTable(dataList) {
+        var html = "";
+        var length = dataList.length;
+        if (length > 0) {
+            for (var i1 = 0; i1 < dataList.length; i1++) {
+                var data = dataList[i1];
+                //var operationHtml = formatAction(data);
+                html += '<ul class="information informationList">' +
+                        '<li style="width:3%;"><div class="mida"><div class="midb"><span class="iconfont icon-jiahao jun-spread"></span></div></div></li>' +
+                        '<li style="width:12%;"><div class="mida"><div class="midb">' + '申请单号：' + isExitsVariable(data.businessKey) + '</div></div></li>' +
+                        '<li style="width:12%;"><div class="mida"><div class="midb">' + '实例ID：' + isExitsVariable(data.id) + '</div></div></li>' +
+                        '<li style="width:20%;"><div class="mida"><div class="midb">' + '开始时间：' + isExitsVariable(data.createTime) + '</div></div></li>' +
+                        '<li style="width:20%;"><div class="mida"><div class="midb">' + '结束时间：' + isExitsVariable(data.endTime) + '</div></div></li>' ;
+                html += '</ul>';
+                html += '<div style="background: #fefdb4; display: none;">';
+
+                for(var m = 0; m< data.taskList.length; m++){
+                    var cData = data.taskList[m];
+                    html += '<ul class="information informationList">';
+                    html += '<li style="width:4%;"><div class="mida"><div class="midb"></div></div></li>'+
+                            '<li style="width:15%;"><div class="mida"><div class="midb">' + isExitsVariable(cData.id) + '</div></div></li>' +
+                            '<li style="width:15%;"><div class="mida"><div class="midb">' + isExitsVariable(cData.name) + '</div></div></li>' +
+                            '<li style="width:15%;"><div class="mida"><div class="midb">' + isExitsVariable(cData.processDefinitionId) + '</div></div></li>' +
+                            '<li style="width:15%;"><div class="mida"><div class="midb">' + isExitsVariable(cData.createTime) + '</div></div></li>' +
+                            '<li style="width:15%;"><div class="mida"><div class="midb">' + isExitsVariable(cData.endTime) + '</div></div></li>' ;
+                    html += '</ul>';
+                }
+                html += '</div>';
+            }
+        }
+        $("div .table .information-list").html(html);
+    }
+
+    function formatAction(row) {
+        return "<a  href='javascript:openFinishTaskTab(" + row.id + ")' >办理任务</a>&nbsp;&nbsp;" + "<a target='_blank' href='javascript:openCurrentProcessView(" + row.id + ")' >查看当前流程图</a>";
+    }
+
+    function openFinishTaskTab(taskId) {
+        postUtil.submit("/task/redirectPage", {taskId: taskId});
+    }
+
+    function searchDefinition() {
+        loadMallCustomerList(1, 1);
+    }
+
+    $(document).on("click",".jun-spread",function(){
+
+        if($(this).parent().parent().parent().parent().next().css("display")=="none"){
+            $(this).parent().parent().parent().parent().next().show();
+            $(this).removeClass('icon-jiahao').addClass('icon-jianhao');
+        }else{
+            $(this).parent().parent().parent().parent().next().hide();
+            $(this).removeClass('icon-jianhao').addClass('icon-jiahao');
+        }
+    })
+</script>
+</body>
+</html>

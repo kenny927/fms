@@ -1,0 +1,17 @@
+<#macro footer currentMenu>
+    <div class="logo">
+        <a href="/index/preIndex"><img src="/res/images/logo.jpg" alt="" /></a>
+    </div>
+    <nav class="itocNav">
+        <ul>
+            <li><a href="/mallOrder/vagueDemand/preListVagueDemand" <#if currentMenu=="ORDER">class="active"</#if>> <span class="iconfont icon-dingdan"></span>采购</a></li>
+            <li><a href="/sku/template/preListNormalTemplate" <#if currentMenu=="SKU_DETAIL_TEMPLATE">class="active"</#if> ><span class="iconfont icon-1348weituogoumai"></span>商品详情模板</a></li>
+            <li><a href="javascript:;"><span class="iconfont icon-1348weituogoumai"></span>订单</a></li>
+            <li><a href="/sku/list" <#if currentMenu=="SKUS">class="active"</#if>> <span class="iconfont icon-shangpin"></span>商品</a></li>
+            <li><a href="/mallCustomer/preList"><span class="iconfont icon-kehu" <#if currentMenu=="CUSTOMER">class="active"</#if>></span>客户</a></li>
+            <li><a href="/projectReport/preReportList"><span class="iconfont icon-caiwu"></span>项目报备</a></li>
+            <li><a href="/system/messageTemplate/systemMessageTemplateListPage" <#if currentMenu=="SYSTEM">class="active"</#if>><span class="iconfont icon-shezhi"></span>系统</a></li>
+            <li><a href="/authorityRole/preList" <#if currentMenu=="AUTHORITY">class="active"</#if>><span class="iconfont icon-kehu"></span>权限</a></li>
+        </ul>
+    </nav>
+</#macro>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<link rel="stylesheet" type="text/css" href="/res/public/css/style.css<@resVersionDirective>?</@>" />
+<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_svvppt2njx9u23xr.css<@resVersionDirective>?</@>" />
+<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>" />
+<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>" />
+<script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/js/rg.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/js/mallCustomer/memberVerifyDetail.js<@resVersionDirective>?</@>"></script>
+
+<style type="text/css">
+
+.layui-table td, .layui-table th{
+    min-height: 30px;
+	line-height: 30px
+}
+</style>
+</head>
+<body>
+	<section id="itocCenter">
+		<section class="itocContent">
+			<div class="itocMain">
+				<div class="layui-form pl20 pr20 pt20">
+					<table class="layui-table">
+						<thead>
+							<tr>
+								<th class="fw-in" id="verify_data_table"></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr style="background-color: #fff;">
+								<td>
+									<div id="field_div">
+									</div>
+									<form class="layui-form">
+										<div class="layui-form-item t-l pt10">
+											<label class="layui-form-label"><span class="c-f">*</span>审核意见：</label>
+											<div class="layui-input-block">
+												<input type="radio" lay-filter="verifyResult" name="verifyResult" value="VERIFIED" title="通过">
+												<input type="radio" lay-filter="verifyResult" name="verifyResult" value="VERIFY_FAILED" title="拒绝">
+											</div>
+										</div>
+										<div class="layui-form-item layui-form-text" style="max-width: 50%" hidden id="inteSocialCreditNoDiv">
+											<label class="layui-form-label"><span class="c-f">*</span>企业社会信用代码：</label>
+											<div class="layui-input-block">
+												<input name="inteSocialCreditNo" lay-verify="inteSocialCreditNo" autocomplete="off" placeholder="请输入内容" class="layui-input"></input>
+											</div>
+										</div>
+										<div class="layui-form-item layui-form-text" style="max-width: 50%">
+											<div class="layui-input-block">
+												<textarea name="remark" lay-verify="remark" autocomplete="off" placeholder="请输入内容" class="layui-textarea"></textarea>
+											</div>
+										</div>
+										<div class="layui-form-item t-l">
+											<div class="layui-input-block">
+												<button class="search-btn fz12" style="cursor: pointer;" lay-submit="" lay-filter="demo1">立即提交</button>
+											</div>
+										</div>
+									</form>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="layui-form">
+						<table class="layui-table">
+							<thead>
+								<tr>
+									<th class="fw-in fz14">审核日志</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										<table id="logs_table" class="layui-table pop">
+											<colgroup>
+												<col width="200">
+												<col width="200">
+												<col width="200">
+												<col>
+											</colgroup>
+											<thead>
+												<tr>
+													<th style="padding-top:0px;padding-bottom:0px;">操作人</th>
+													<th style="padding-top:0px;padding-bottom:0px;">操作时间</th>
+													<th style="padding-top:0px;padding-bottom:0px;">处理意见</th>
+												</tr>
+											</thead>
+											<tbody>
+												
+											</tbody>
+										</table>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+		</section>
+	</section>
+	<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+	<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+	<script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+	<script>
+		var verifyId = "${verifyId}";
+		
+	</script>
+	
+</body>
+</html>

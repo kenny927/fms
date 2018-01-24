@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+		<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+		<script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+	</head>
+	<body>
+		<section id="itocCenter">
+	       <section class="itocContent">
+	       	<div class="itocMain">
+	       		<div class="purchaseSearch">
+					<form>
+						<dl class="form-list flt">
+							<dt>部门名称：</dt>
+							<dd><input type="text" id="departmentName" style="width: 150px;" placeholder="请输入部门名称"/></dd>
+						</dl>
+						<dl class="form-list flt">
+							<dd><span class="btn ml10" style="cursor: pointer;" id="searchBtn">查询</span></dd>
+							<dd><span class="btn ml10" id="preAddAuthorityDepartmentBtn" style="cursor: pointer;">维护</span></dd>
+						</dl>
+					</form>
+	       		</div>
+                    <div class="table">
+                    	<ul class="th">
+                    		<li style="width:10%;"><div class="mida"><div class="midb">部门ID</div></div></li>
+                            <li style="width:20%"><div class="mida"><div class="midb">部门名称</div></div></li>
+                    		<li style="width:25%;"><div class="mida"><div class="midb">部门描述</div></div></li>
+                    		<li style="width:15%;"><div class="mida"><div class="midb">部门层级</div></div></li>
+                    		<li style="width:5%;"><div class="mida"><div class="midb">部门类型</div></div></li>
+                    		<li style="width:5%;"><div class="mida"><div class="midb">创建人</div></div></li>
+                    		<li style="width:5%;"><div class="mida"><div class="midb">创建时间</div></div></li>
+                    		<li style="width:5%;"><div class="mida"><div class="midb">修改人</div></div></li>
+                    		<li style="width:5%"><div class="mida"><div class="midb">修改时间</div></div></li>
+                    		<li style="width:5%"><div class="mida"><div class="midb">操作</div></div></li>
+                    	</ul>
+                    	<div class="information-list" id="authorityDepartmentTable"></div>
+                    	<div id="paginationDiv"></div>
+                    </div>
+	       	</div>
+	       </section>
+		</section>
+		<script type="text/javascript">
+
+            var PAGE_SIZE = 5;
+
+            function authorityDepartmentTableInit(){
+				var departmentName = $('#departmentName').val();
+
+                var queryParam = {};
+                queryParam.currentPageIndex = 1;
+                queryParam.pageSize = PAGE_SIZE;
+				queryParam.departmentName = departmentName;
+
+                loadAuthorityDepartmentData(queryParam);
+            }
+
+            $(function () {
+                authorityDepartmentTableInit();
+
+                $("#searchBtn").bind("click",function(){
+					authorityDepartmentTableInit();
+                });
+
+				document.onkeydown = function(e){
+					var ev = document.all ? window.event : e;
+					if(ev.keyCode==13) {
+						authorityDepartmentTableInit();
+					}
+				}
+
+
+				$('#preAddAuthorityDepartmentBtn').bind("click",function(){
+					postUtil.submit("/authorityDepartment/preAdd");
+				});
+
+            });
+
+			function loadAuthorityDepartmentData(queryParam) {
+				layer.load();
+				postUtil.call("/authorityDepartment/listJson", queryParam, function (pageResult) {
+					var pageNumber = pageResult.pageNumber;
+					var pageSize = pageResult.pageSize;
+					var totalPage = pageResult.totalPage;
+					var totalRow = pageResult.totalRow;
+					var dataList = pageResult.list;
+					renderTable(dataList);
+					laypage({
+						cont: 'paginationDiv',
+						pages: totalPage,
+						curr: pageNumber,
+						total: totalRow,
+						skip: true,
+						jump: function (obj, first) {
+							if (!first) {
+								var departmentName = $('#departmentName').val();
+								var tempParam = {};
+								tempParam.currentPageIndex = obj.curr;
+								tempParam.pageSize = PAGE_SIZE;
+								tempParam.departmentName = departmentName;
+								loadAuthorityDepartmentData(tempParam);
+							}
+						}
+					});
+					layer.closeAll("loading");
+				});
+			}
+
+			function renderTable(dataList) {
+				var length = dataList.length;
+				var table = document.getElementById("authorityDepartmentTable");
+				table.innerHTML = "";
+
+				if (length > 0) {
+					for (var i = 0; i < dataList.length; i++) {
+						var data = dataList[i];
+						var row = renderRow(data);
+						table.appendChild(row);
+					}
+				}else {
+					var html = '<p class="t-c fz16 c-2" style="line-height: 76px;">暂无部门信息！</p>';
+					$(table).html(html);
+				}
+			}
+
+            function renderRow(rowData) {
+                var departmentId = rowData.departmentId;
+                var departmentName = rowData.departmentName;
+                var departmentDesc = rowData.departmentDesc;
+                var departmentAllName = rowData.departmentAllName;
+                var departmentType = rowData.departmentType;
+                var createUser = rowData.createUser;
+				var createTimeStr = rowData.createTimeStr;
+				var updateUser = rowData.updateUser;
+				var updateTimeStr = rowData.updateTimeStr;
+
+
+				var ul = document.createElement('ul');
+				ul.setAttribute("class", "information informationList");
+// 				ul.setAttribute("style","height:75px;");
+
+				ul.appendChild(renderCell(null, departmentId, "width:10%;"));
+				ul.appendChild(renderCell(null, departmentName, "width:20%;"));
+				ul.appendChild(renderCell(null, departmentDesc, "width:25%;"));
+				ul.appendChild(renderCell(null, departmentAllName, "width:15%;"));
+				ul.appendChild(renderCell("departmentType", departmentType, "width:5%;"));
+				ul.appendChild(renderCell(null, createUser, "width:5%;"));
+				ul.appendChild(renderCell(null, createTimeStr, "width:5%;"));
+				ul.appendChild(renderCell(null, updateUser, "width:5%;"));
+				ul.appendChild(renderCell(null, updateTimeStr, "width:5%;"));
+				ul.appendChild(renderCell("operation", rowData, "width:5%;"));
+                return ul;
+            }
+
+			function renderCell(name, value, style) {
+				var li = document.createElement('li');
+				li.setAttribute("style", style)
+				var div_mida = document.createElement('div');
+				div_mida.setAttribute("class", "mida");
+				var div_midb = document.createElement('div');
+				div_midb.setAttribute("class", "midb");
+				//个性化差异-操作区域
+				if ("operation" == name) {
+					div_midb.innerHTML = '<p><a href="javascript:void(0);" onclick="preEditAuthorityDepartment(\'' + value.departmentId + '\')">编辑</a></p>';
+				} else if("departmentType" == name) {
+				    var text = "";
+				    if(value == "DEPARTMENT") {
+                        text = "部门";
+					} else if(value == "POSITION"){
+                        text = "岗位";
+					}
+                    div_midb.innerText = text;
+				} else {
+					if (value) {
+						div_midb.innerText = value;
+					} else {
+						div_midb.innerText = "--";
+					}
+				}
+				div_mida.appendChild(div_midb);
+				li.appendChild(div_mida);
+				return li;
+			}
+
+			function preEditAuthorityDepartment(departmentId) {
+				var param = {};
+				param.departmentId = departmentId;
+				postUtil.submit("/authorityDepartment/preEdit",param);
+			}
+
+		</script>
+	</body>
+</html>

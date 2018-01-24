@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" type="text/css" href="/res/public/layui-v2.0.0/layui/css/layui.css"/>
+<link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+<style>
+    [v-cloak]{
+        display: none;
+    }
+    .form-css .dl-form dd input[type='text']{
+      width: 200px;
+    }
+    .form-css .dl-form .dd-city2 input[type='text'],.form-css .dl-form .dd-city .layui-anim-upbit{
+      width: 95px;
+    }
+    .picker-css{
+      width: 188px;
+    }
+    .tabs{
+      width: 100%;
+      height: 50px;
+      line-height: 50px;
+      border: 1px solid #d6d6d6;
+    }
+    .tabs .tab-content{
+      display: inline-block;
+    }
+    .tabs .tab-content a,.tabs .tab-content a:hover {
+      color: #035a9d;
+      padding: 5px 7px 7px 10px;
+    }
+
+    .tabs .tab-content .tab-item i{
+      font-style:normal;       
+    }
+
+    .tabs .tab-content .tab-item.edit{
+      background: #f5f5f5;
+      color:#222;
+    }
+    .tabs .tab-content .tab-item.edit span{
+        display:none; 
+    }
+    .tabs .tab-content .tab-item i{
+        display:none; 
+        margin:0px 5px;
+    }
+    .tabs .tab-content .tab-item.edit i{
+      display: inline-block;
+    }
+    .multi_select{
+      float: none;
+    }
+    .multi_select .select_rel{
+       width: 200px !important;
+     }
+     .multi_select .container{
+       width:198px !important;
+     }
+     .multi_select .content{
+      width:198px !important;
+      min-width: 198px;
+     }
+     #tabAll.multi_select .select_rel{
+       width: 120px !important;
+     }
+     #tabAll.multi_select .container{
+       width:118px !important;
+       margin-top: -5px;
+     }
+     #tabAll.multi_select .content{
+      width:118px !important;
+      min-width: 118px;
+     }
+     #tabSelect{
+        height: 20px !important;
+        border: none;
+        cursor: pointer;
+        background: none;
+        color:transparent;
+     }
+     .layui-table tbody tr.outcome,.layui-table tbody tr.outcome:hover{
+       background: #f5f5f5 !important;
+     }
+     .kongInfo .layui-icon{
+       display:none;
+     }
+</style>
+</head>
+<body>
+   <section class="bz-bb pl20 pr20 pt20 pb20" id="myCustomers">
+      <div class="jun-form-s form-css">  
+         <dl class="dl-form">
+              <dt class="flt fz12" style="width: 68px;">客户类型：</dt>
+              <dd class="flt layui-form jun-form-l">
+                   <select name="mainObjectId" id="mainObjectId" lay-filter="mainObjectId" >
+                    <option value="">全部</option>
+                    <option value="10007">行业客户</option>
+                    <option value="10006">企业客户</option>
+                  </select>
+              </dd>
+
+              <dt class="flt fz12 ml10">公司名称：</dt>
+              <dd class="flt">
+              		<input type="text" name="accountName" id="accountName"  placeholder="请输入客户名称" autocomplete="off" class="layui-input"  v-model="queryParam.accountName" />
+              </dd>
+
+              <dt class="flt fz12 ml10">联系方式：</dt>
+              <dd class="flt"><input type="text" name="title" id="contactWay"  placeholder="手机号/座机/邮箱" autocomplete="off" class="layui-input"  v-model="queryParam.contactWay" /></dd>
+          </dl>
+		      <dl class="dl-form">
+               <dt class="flt fz12" style="width: 68px;">地址：</dt>
+               <dd class="flt layui-form dd-city provinceSel dd-city2">
+                   <select name="province" lay-filter="province" id="s_province" lay-search>
+                       <option value="">请选择省</option>
+                   </select>
+               </dd>
+               <dd class="flt layui-form dd-city citySel dd-city2 ml10">
+                   <select name="city" lay-filter="city" lay-search>
+                       <option value="">请选择市</option>
+                   </select>
+               </dd>
+
+               <dt class="flt fz12 ml10">客户经理：</dt>
+               <dd class="flt pre">
+                 <div class="multi_select" id="accountManagerList" style="position:absolute;left:-2px;top:0px;z-index:9;"></div>
+               </dd>
+
+               <dt class="flt fz12" style="margin-left: 210px;">创建时间：</dt>
+               <dd class="flt layui-form">
+                  <input type="text" class="layui-input" id="createTime" placeholder="">
+               </dd>
+          </dl>
+          <dl class="dl-form">
+              <dt class="flt fz12" style="width: 68px;">所属行业：</dt>
+              <dd class="flt pre">
+                <div class="multi_select" id="industryList" style="position:absolute;left:-2px;top:0;z-index:9;"></div>
+              </dd>
+
+              <dt class="flt fz12 ml10" style="margin-left:210px;">客户标签：</dt>
+              <dd class="flt"><input type="text" name="labelName" id="labelName" placeholder="" autocomplete="off" class="layui-input pl10"   v-model="queryParam.labelName"></dd>
+
+              <dt class="flt fz12 ml10">入库状态：</dt>
+              <dd class="flt pre">
+                <div class="multi_select" id="statusList" style="position:absolute;left:-2px;top:0px;z-index:9;"></div>
+              </dd>
+
+              <button  @click="queryCustomer()" class="form-btn layui-btn-small2" style="margin-left: 210px;">查询</button>
+          </dl>
+          
+          <@havePermission resourceCode="operation:customer:privateCustomer:my:list:transmit">
+          	<button class="form-btn layui-btn-itoc layui-btn-small2 mb10 mr10"  @click="transmitCustomer()">转交</button>
+          </@>
+          <@havePermission resourceCode="operation:customer:distributor:account:detail:visitRecord">
+          <button class="form-btn layui-btn-itoc layui-btn-small2 mb10 mr10"  @click="addPlanDetail()">新建拜访计划</button>
+          </@>
+          <@havePermission resourceCode="operation:customer:privateCustomer:my:list:export">
+          	<button class="form-btn layui-btn-itoc layui-btn-small2 mb10"  @click="exportCustomer()">导出</button>
+          </@>
+      </div>
+
+      <div class="tabs mb10 fz12 ">
+        <span class="ml10 mr5 title c-6">标签:</span>
+        <div class="tab-content">
+          <div class="tab-content">
+		        <template v-for="(item,index) in tabList" v-if="index<6">
+		          <a class="tab-item fz12 mr15 cs-p" @click="queryTab(item,true)">{{item.labelName}}
+		           <span class="tab-item-num">({{item.labelCount}})</span>
+               <i @click="deleteTab($event,item,index)">x</i>
+		          </a>
+		        </template>
+		        <a class="pre fz12 mr15 cs-p">查看所有标签
+		          <div class="multi_select" id="tabAll" style="position:absolute;left:-17px;top:-15px;z-index:1;"></div>
+		        </a>
+	       </div>
+        </div>
+        <button class="form-btn layui-btn-itoc layui-btn-small2 mb10 frt mr10 mt10 location-tips" @click="manageTabs($event)"><span>管理我的标签</span>
+         <p>管理我的标签功能只<br>能管理本人名下的标<br>签信息,不能管理下属<br>员工的标签信息!</p>
+        </button>
+      </div>
+
+      <div class="content">
+         <table class="layui-table pop" lay-skin="line">
+              <colgroup>
+                <col  width="30">
+                <col  width="150">
+                <col  width="150">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th class="layui-form" @click="allChoose()"><input type="checkbox" title="" lay-skin="primary" v-bind:checked="allChecked"></th>
+                  <th>客户公司名称</th>
+                  <th>地址</th>
+                  <th>客户类型</th>
+                  <th>主要联系人</th>
+                  <th>电话</th>
+                  <th>所属行业</th>
+                  <th>客户状态</th>
+                  <th>客户经理</th>
+                  <th>创建时间</th>
+                </tr> 
+              </thead>
+              <tbody>
+                <tr v-if="customerList.length==0">
+                  <td colspan="10" style="height: 50px;" class="kongInfo">暂无相关信息！</td>
+                </tr>  
+                <template v-for="(item,index) in customerList">             
+                  <tr v-if="item.accountEntryStatus!='OUTCOME'">
+                      <td class="layui-form"  @click="simpleChoose(item)" >	
+                      	<input type="checkbox"  lay-skin="primary"  v-bind:checked="item.checkbox.checked"   :value="item.checkbox.value"/>
+                      </td>
+                      <td>
+                          <a class="c-h cs-p" v-if="item.accountEntryStatus=='INCOME'" @click="openDetailTab(item.accountId)" >{{item.accountName.replace(' ','&nbsp;')}}</a>
+                          <span v-else>[<span class="c-f">待审核</span>]{{item.accountName.replace(' ','&nbsp;')}}</span>
+                          <br>{{item.inteSocialCreditNo}}
+                      </td>
+                      <td>{{item.area}}</td>
+                      <td>{{item.mainObjectName}}客户</td>
+                      <td>{{item.linkman}}</td>
+                      <td>{{item.linkmanTelephone}}</td>
+                      <td>{{ ((null!=item.businessGroup)&&(''!=item.businessGroup))?item.businessGroup:'无' }}</td>
+                      <td>{{item.accountDealStatusName}}</td>
+                      <td>{{item.accountManagerName}}</td>
+                      <td>{{item.createDate|time}}</td>
+                  </tr>
+                  <tr v-else class="outcome">
+                      <td></td>
+                      <td>
+                          <span class="c-2">[已作废]{{item.accountName.replace(' ','&nbsp;')}}</span>
+                          <br>{{item.inteSocialCreditNo}}
+                      </td>
+                      <td>{{item.area}}</td>
+                      <td>{{item.mainObjectName}}客户</td>
+                      <td>{{item.linkman}}</td>
+                      <td>{{item.linkmanTelephone}}</td>
+                      <td>{{ ((null!=item.businessGroup)&&(''!=item.businessGroup))?item.businessGroup:'无' }}</td>
+                      <td>{{item.accountDealStatusName}}</td>
+                      <td>{{item.accountManagerName}}</td>
+                      <td>{{item.createDate|time}}</td>
+                  </tr>
+                </template>
+              </tbody>
+          </table>    
+
+        <div id="page" class="yofc-page mb20"></div>
+      </div> 
+   </section>
+
+<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui-v2.0.0/layui/layui.js"></script>
+<script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui/Area1.js" type="text/javascript"></script>
+<script src="/res/js/selectMultiple.js"></script>
+<script src="/res/public/js/MultiSelectDropList.js"></script>
+<script src="/res/public/vue/dist/vue.min.js"></script>
+<script>
+var form,laydate,layer,laypage,vm,areaData;
+
+var _menuType="checkAuthor";
+
+Vue.filter('time', function (value, format) {
+    value = value || '';
+    if(value == ''){
+        return '--';
+    }
+    format = format || 'YYYY-MM-DD HH:mm:ss';
+    return moment(value).format(format);
+});
+
+Vue.filter('default', function (value, defaultValue) {
+    value = value || '';
+    defaultValue = defaultValue || '--';
+    if(value == ''){
+        return defaultValue;
+    }
+    return value;
+});
+
+vm = new Vue({
+     el:'#myCustomers',
+     data:{
+          queryParam:{
+                pageNumber:1,
+                pageSize:10,
+                mainObjectId:'', 				//客户类型
+                accountName:'',  			//公司名称
+                contactWay:'',    				//联系方式
+                province:'',   					//省
+                city:'',   							//市
+                accountManager:'',   		//客户经理
+                createTime:'',   				//创建时间
+                businessGroupIds:'',    	//所属行业
+                accountEntryStatusCodes:'INCOME;TO_APPROVE',       						//入库状态
+                labelName:''					//labelName
+            },
+            customerList:[],
+            allChecked:false,
+            checkedNum:0,
+            unCheckedNum:0,
+            firstloadLayUI:true,
+            manageTabStatus:true,
+            tabList:[],
+            exportQueryParam:{}
+          },
+      mounted:function(){
+        this.$nextTick(function(){
+           this.showData(this.queryParam);
+        })
+      },
+      methods:{
+        showData:function(queryParam){
+           //第一次初始化 ui 页面
+           if(vm.firstloadLayUI)
+        	{
+              //入库状态
+              var statusList = [
+                   {text:'已入库',value:'INCOME'},
+                   {text:'待审核',value:'TO_APPROVE'},
+                   {text:'已作废',value:'OUTCOME'},
+                 ];
+              var defaultValue = [
+                  {text:'已入库',value:'INCOME'},
+                  {text:'待审核',value:'TO_APPROVE'},
+                ];
+               statusList.reverse();
+               $('#statusList').MSDL({
+                  'width': '200',
+                  'data': statusList,
+                  'id': "statusSelect",
+                  'defaultValue':defaultValue
+               });
+               //客户经理
+               var accountManagerList = [];
+               postUtil.call("/customerManagement/queryAllChildrenAccountManager",{},function(result){
+	                if(result.STATUS=="SUCCESS"){
+		                 var  datas =  result.DATA;
+		                 datas.forEach(function(item,index){
+		                    var value = {'text':item.accountManagerName,'value':item.accountManagerId};
+		                    accountManagerList.push(value);
+		                 });
+		                 accountManagerList.reverse();
+		                 $('#accountManagerList').MSDL({
+		                    'width': '200',
+		                    'data': accountManagerList,
+		                    'id': "accountManagerSelect"
+		                 });
+	                }
+               });
+               
+               //所属行业
+               var businessGroupDictionaryList=[];
+               postUtil.call("/customerManagement/querybusinessGroupDictionary",{},function(result){
+            	    //cName  code
+	                if(result.STATUS=="SUCCESS"){
+		                 var  datas =  result.DATA;
+		                 datas.forEach(function(item,index){
+		                    var value = {'text':item.cName,'value':item.cName};
+		                    businessGroupDictionaryList.push(value);
+		                 });
+		                 businessGroupDictionaryList.reverse();
+		                 $('#industryList').MSDL({
+		                     'width': '200',
+		                     'data': businessGroupDictionaryList,
+		                     'id': "industrySelect"
+		                  });
+	                }
+              });
+				//加载标签
+                vm.loadSystemAccountLabelStatistics();
+        	}
+           
+             layui.use(['form','laypage'], function (){
+	                form = layui.form;
+	                layer = layui.layer;
+	                laypage = layui.laypage;
+	                queryParam.menuType="ME";
+	                vm.exportQueryParam=queryParam;
+                  layer.load();
+	                postUtil.call('/customerManagement/list', queryParam, function (result) {
+	                 	if(result.STATUS == "SUCCESS"){
+	                 		layer.closeAll('loading');
+	                 		var pageNumber = result.DATA.pageNumber;
+	                         var pageSize = result.DATA.pageSize;
+	                         var totalRow = result.DATA.totalRow;
+	                         vm.allChecked=false;
+	                         for(var i in result.DATA.list)
+	                         {
+	                        	 result.DATA.list[i]["checkbox"]={value:result.DATA.list[i]['accountId'],checked:false}
+	                         }
+	                         vm.customerList = result.DATA.list;
+	                          //渲染页面
+	                          vm.$nextTick(function(){
+					               form.render();
+					           });
+		                       laypage.render({
+		                           elem: 'page'
+		                           ,count: totalRow
+		                           ,curr : pageNumber
+		                           ,first: '首页'
+		                           ,last: '尾页'
+		                           ,layout: ['count', 'prev', 'page', 'next', 'limit', 'skip']
+		                           ,limit: pageSize
+		                           ,limits: [5, 10, 15]
+		                           ,jump: function(obj,first){
+		                               if(!first){
+		                                   vm.queryParam.pageNumber =  obj.curr;
+		                                   vm.queryParam.pageSize =  obj.limit;
+		                                   vm.showData(vm.queryParam);
+		                               }
+		                           }
+		                       });
+                        layer.closeAll('loading');
+	                 	}else {
+	                         layer.closeAll('loading');
+	                         layer.msg('数据请求失败！', {icon: 5});
+	                     }
+	                 });
+	                
+             });
+            vm.$nextTick(function(){
+               vm.loadLayUI();
+            });
+        },
+        loadLayUI:function () {
+            this.$nextTick(function () {
+                layui.use(['form','laydate','element','layer','laypage'], function() {
+                    laydate = layui.laydate;
+                    form = layui.form;
+                    element = layui.element;
+                    layer = layui.layer;
+                    laypage = layui.laypage;
+                    areaData = Area;
+                    $form = $($('.form-css')[0]);
+                    if(vm.firstloadLayUI)
+                    {
+                      //选择区域
+                      vm.loadProvince();
+                      vm.firstloadLayUI=false;
+                    }
+                    //初始化时间控件                    
+                    laydate.render({
+                        elem: '#createTime',
+                        type:'date',
+                        format:"yyyy-MM-dd",
+                        range: true,
+                        done:function(value, date){
+                          vm.queryParam.createTime = value;
+                          console.log(value);
+                        }
+                    });
+                    form.on('radio(isOpenSku)', function(data){
+                        vm.backup.isOpenSku = data.value;
+                    });
+	                 form.on('select(mainObjectId)',function(data){
+	                	 vm.queryParam.mainObjectId=data.value;
+	                 });
+
+                    form.render();
+                });
+            });
+        },
+        loadProvince:function () {
+            var proHtml = '';
+            for (var i = 0; i < areaData.length; i++) {                
+                proHtml += '<option value="' + areaData[i].provinceCode + '_' + areaData[i].mallCityList.length + '_' + i + '_' + areaData[i].provinceName + '">' +
+                    areaData[i].provinceName + '</option>';
+            }
+            $form.find('select[name=province]').append(proHtml).parent().show();
+            form.render();
+            form.on('select(province)', function(data) {
+                var value = data.value;
+                var d = value.split('_');
+                var code = d[0];
+                var count = d[1];
+                var index = d[2];
+                vm.queryParam.province = d[3];
+                if (count > 0) {
+                    vm.loadCity(areaData[index].mallCityList);                
+                }else {
+                    $form.find('select[name=city]').html('').parent().show();
+                    vm.queryParam.city="";
+                    form.render();
+                }
+            });
+        },
+        loadCity:function (citys) {
+            var cityHtml = '';
+            for (var i = 0; i < citys.length; i++) {    
+            	if(i==0)
+            	{
+            		vm.queryParam.city=citys[i].cityName;
+            	}
+                cityHtml += '<option value="' + citys[i].cityCode + '_' + citys[i].mallAreaList.length + '_' + i + '_' + citys[i].cityName + '">' +citys[i].cityName 
+                + '</option>';
+            }
+            $form.find('select[name=city]').html(cityHtml).parent().show();
+            form.render();
+    
+            form.on('select(city)', function(data) {
+                var value = data.value;
+                var d = value.split('_');
+                var code = d[0];
+                var count = d[1];
+                var index = d[2];
+                vm.queryParam.city=d[3];
+            });
+        },
+        queryCustomer:function () {
+
+        	if(vm.manageTabStatus){
+            //加载标签
+            vm.loadSystemAccountLabelStatistics();
+          }
+          	
+            this.queryParam.pageNumber = 1;
+            this.queryParam.pageSize = 10;
+            //客户类型
+            this.queryParam.mainObjectId=vm.queryParam.mainObjectId;
+            //公司名称
+            this.queryParam.accountName=vm.queryParam.accountName;
+            //客户经理
+            this.queryParam.accountManagerIds=$("#accountManagerSelect_hidden").val();
+            //所属行业
+            this.queryParam.businessGroupIds=$("#industrySelect_hidden").val();
+            //客户状态
+            this.queryParam.accountEntryStatusCodes=$("#statusSelect_hidden").val();
+            this.showData(this.queryParam);
+        },
+        allChoose:function(){
+            this.allChecked = !this.allChecked;
+            if(this.allChecked)
+            {
+            	for(var i in vm.customerList)
+            	{
+            		if(!vm.customerList[i]['checkbox']['checked']&&(vm.customerList[i]['accountEntryStatus']!=null)&&(vm.customerList[i]['accountEntryStatus']!='OUTCOME'))
+            		{
+            			vm.customerList[i]['checkbox']['checked']=true;
+            		}
+            	}
+            }else{
+            	for(var i in vm.customerList)
+            	{
+            		vm.customerList[i]['checkbox']['checked']=false;
+            	}
+            }
+            this.$nextTick(function(){
+                form.render();
+            })
+        },
+        simpleChoose:function(item){
+            item["checkbox"].checked = !item["checkbox"].checked;
+            var isCheckAll=true;
+            for(var i in vm.customerList)
+        	{
+        		if(!vm.customerList[i]['checkbox']['checked']&&(vm.customerList[i]['accountEntryStatus']!=null)&&(vm.customerList[i]['accountEntryStatus']!='OUTCOME'))
+        		{
+        			isCheckAll=false;
+        		}
+        	}
+        	vm.allChecked=isCheckAll;
+            this.$nextTick(function(){
+                form.render();
+            });
+        },
+        manageTabs:function(e){
+          if(vm.manageTabStatus){
+            vm.manageTabStatus = false;
+            $(e.currentTarget).find('span').text('关闭标签');
+            $('.tabs .tab-content .tab-item').addClass('edit');
+            vm.manageMyTabs();
+          }else{
+            vm.manageTabStatus = true;
+            $(e.currentTarget).find('span').text('管理我的标签');
+            $('.tabs .tab-content .tab-item').removeClass('edit');
+            vm.loadSystemAccountLabelStatistics();
+          }
+        },
+        removeTab:function(e){
+           $(e.currentTarget).closest('.tab-item').remove();
+        },
+        manageMyTabs:function(){
+          postUtil.call('/customerLabel/getCustomerLabelList',null,function(result){
+               console.log(result);
+               if(result.STATUS == "SUCCESS"){
+                  vm.tabList = result.DATA;
+
+                  $('#tabAll').html('');
+
+                  var tabAll = [];
+                  vm.tabList.forEach(function(item,index){
+                    var value = {text:item.labelName,value:item.labelName};
+                    tabAll.push(value);
+                  })
+                  tabAll.reverse();
+                   $('#tabAll').MSDL({
+                      'width': '120',
+                      'data': tabAll,
+                      'id': "tabSelect"
+                  });
+                   $("#tabAll .container :checkbox").change(function(){
+                       var selectTabs=[];
+                       $("#tabAll .container :checkbox").each(function(){
+                            if($(this).is(':checked'))
+                          {
+                              if($(this).val())
+                              {
+                                selectTabs.push($(this).val());
+                              }
+                          }
+                        });
+                       if(selectTabs.length==0)
+                       {
+                           vm.queryCustomer();
+                       }else if(selectTabs.length!=0)
+                       {
+                          vm.queryTab({labelNames:selectTabs.join(';')},false)
+                       }
+                     });
+              }else{
+                layer.msg('数据请求失败！', {icon: 5});
+              }
+          })
+        },
+        exportCustomer:function(){
+        	//导出功能
+        	var isSelect=false;
+        	var tempSeletedItems=[];
+        	for(var i in vm.customerList)
+        	{
+        		if(vm.customerList[i]['checkbox']['checked'])
+        		{
+        			isSelect=true;
+        			if(vm.customerList[i]['checkbox']['value'])
+        			{
+        				tempSeletedItems.push(vm.customerList[i]['checkbox']['value']);
+        			}
+        		}
+        	}
+        	var param={};
+        	if(isSelect)
+        	{
+        		param.seletedItems=tempSeletedItems.join(",");
+        		postUtil.submit("/customerManagement/exportExcel",param);
+        	}else{
+        		postUtil.submit("/customerManagement/exportExcel",vm.exportQueryParam);
+        	}
+        	
+        },openDetailTab:function(accountId){
+        	//判断是否存在相应的tab，存在则直接跳转过去
+        	cardUtil.closeCard("客户详情-" + accountId);
+            cardUtil.openCard("客户详情-" + accountId,"/customerManagement/preDetail?accountId="+accountId+"&menuType="+_menuType);
+            cardUtil.changeCard("客户详情-" + accountId);
+        },loadSystemAccountLabelStatistics:function(){
+        	var queryParam={queryType:"ME"};
+        	postUtil.call('/customerLabel/getALLCustomerLabelList', queryParam, function (result) {
+            	if(result.STATUS == "SUCCESS"){
+            		vm.tabList = result.DATA;
+            		var tabAll = [];
+	                vm.tabList.forEach(function(item,index){
+	                  var value = {text:item.labelName,value:item.labelName};
+	                  tabAll.push(value);
+	                })
+	                 tabAll.reverse();
+	                $("#tabAll").html("");
+	                 $('#tabAll').MSDL({
+	                    'width': '120',
+	                    'data': tabAll,
+	                    'id': "tabSelect"
+	                 });
+		             $("#tabAll .container :checkbox").change(function(){
+		            	 var selectTabs=[];
+		            	 $("#tabAll .container :checkbox").each(function(){
+		            		    if($(this).is(':checked'))
+		            		 	{
+		            		    	if($(this).val())
+		            		    	{
+		            		    		selectTabs.push($(this).val());
+		            		    	}
+		            		 	}
+		            	  });
+		            	 if(selectTabs.length==0)
+		            	 {
+		            			 vm.queryCustomer();
+		            	 }else if(selectTabs.length!=0)
+		            	 {
+		            			vm.queryTab({labelNames:selectTabs.join(';')})
+		            	 }
+		             });
+            	}else{
+            		layer.msg('数据请求失败！', {icon: 5});
+            	}
+        	});
+        },queryTab:function(item,reLoadTag){
+        	layer.load();
+        	//加载标签
+    		if(reLoadTag)
+        	{
+    			vm.loadSystemAccountLabelStatistics();
+        	}
+    		if(item.labelName)
+    		{
+    			item.labelNames=item.labelName;
+    		}
+    		//点击标签查询
+           var queryParam = {};
+           queryParam.labelNames = item.labelNames;
+           queryParam.createUser = item.createUser;
+           queryParam.islablQuery = true;
+           queryParam.menuType="ME"
+           vm.exportQueryParam=queryParam;
+           postUtil.call('/customerManagement/list', queryParam, function (result) {
+	           if(result.STATUS == "SUCCESS"){
+	           		layer.closeAll('loading');
+		           	var pageNumber = result.DATA.pageNumber;
+		            var pageSize = result.DATA.pageSize;
+		            var totalRow = result.DATA.totalRow;
+		            vm.allChecked=false;
+	                for(var i in result.DATA.list)
+	                {
+	               	 result.DATA.list[i]["checkbox"]={value:result.DATA.list[i]['accountId'],checked:false}
+	                }
+	                vm.customerList = result.DATA.list;
+	                 	//渲染页面
+	                	vm.$nextTick(function(){
+	               		form.render();
+	         		});
+	                laypage.render({
+	                    elem: 'page'
+	                    ,count: totalRow
+	                    ,curr : pageNumber
+	                    ,first: '首页'
+	                    ,last: '尾页'
+	                    ,layout: ['count', 'prev', 'page', 'next', 'limit', 'skip']
+	                    ,limit: pageSize
+	                    ,limits: [5, 10, 15]
+	                    ,jump: function(obj,first){
+	                        if(!first){
+	                     	   var qps={};
+	                     	   qps.pageNumber=obj.curr;
+	                     	   qps.queryParam=obj.limit;
+	                     	   qps.labelNames = item.labelNames;
+	                     	   qps.islablQuery = true;
+	                            vm.queryTab(qps);
+	                        }
+	                    }
+	                });
+			   }else {
+	                   layer.closeAll('loading');
+	                   layer.msg('数据请求失败！', {icon: 5});
+			   }
+			 });
+	  },
+      transmitCustomer:function(){
+			var accountIds="";
+	        var accountIdList=[];
+	        for(var i in vm.customerList)
+	        {
+	        	if(true==vm.customerList[i]['checkbox']['checked'])
+	        	{
+	        		if(vm.customerList[i]['accountEntryStatus']=='TO_APPROVE')
+	            	{
+	            		layer.msg('不能转交“待审核”客户！');
+	            		return
+	            	}
+	        		accountIdList.push(vm.customerList[i]['accountId']);
+	        	}
+	        }
+	        accountIds=accountIdList.join(',');
+	        	if(accountIds==""){
+	        		layer.msg("请至少选择一条记录!");
+	        		return;
+	        	}
+	        	//调用转交接口
+	      	  	layer.open({
+	                title: '客户转交',
+	                area: ['830px','500px'],
+	                type: 2,
+	                content: '/customerManagement/preTransmitRecord?accountIds='+accountIds
+	            });
+	   },
+       deleteTab:function(event,obj,index2){
+         event.stopPropagation();
+         layer.open({
+                title:'操作提示',
+                type:1,
+                skin:'msgskin',
+                btnAlign:'c',
+                area :['450px', '300px'],
+                btn: ['确认', '取消'],
+                scrolling:'no',
+                content:'<div style="padding: 30px 50px;" class="fz12 clr"><div class="iconfont icon-jinggao1 fz18 c-f flt" style="width: 50px;font-size: 45px!important;"></div><div class="c-2 flt" style="width: 230px;font-size: 14px;line-height: 26px;">删除该标签将导致拥有该标签的所有客户丢失该标签信息,是否确认删除?</div><p class="clr fz14 c-2 t-c pt20">如需删除某客户的某个标签，请到该客户详情页操作!</p></div>',
+                yes: function(index){
+                     var param={};
+                     param.labelId=obj.labelId;
+                     vm.deleteCustomLabel(param,index2,obj);
+                     layer.close(index);
+                }
+                ,btn2: function(index){
+                    layer.close(index);
+                }
+          });
+       },deleteCustomLabel:function (param,index2,obj) {
+          postUtil.call('/customerLabel/deleteCustomLabel',param,function (result) {
+              if(result.STATUS == 'SUCCESS') {
+                  vm.tabList.splice(index2,1);
+
+                  $('#tabAll').html('');
+
+                  var tabAll = [];
+                  vm.tabList.forEach(function(item,index){
+                    var value = {text:item.labelName,value:item.labelId};
+                    tabAll.push(value);
+                  })
+                  tabAll.reverse();
+                   $('#tabAll').MSDL({
+                      'width': '120',
+                      'data': tabAll,
+                      'id': "tabSelect"
+                  });
+
+                  layer.msg('删除自定义标签成功!')
+              }
+          });
+      },addPlanDetail:function(){
+    	  var selectAccounts=[];
+    	  for(var i in vm.customerList)
+	      {
+	      		if(vm.customerList[i]['checkbox']['checked'])
+	      		{
+	      			if(vm.customerList[i]['accountEntryStatus']=='TO_APPROVE')
+            		{
+            			layer.msg('“待审核”客户不能新建拜访计划！');
+            			return
+            		}
+	      			selectAccounts.push(vm.customerList[i]['checkbox']['value']);
+	      		}
+	      }
+    	  if(0==selectAccounts.length)
+    	  {
+    		  layer.msg("请选择一条记录!");
+    	  }else if(selectAccounts.length>1)
+    	  {
+    		  layer.msg("请选择一条记录!");
+    	  }else{
+    		  var selectAccount=selectAccounts[0];
+    		  layer.open({
+                  title: '新建拜访计划',
+                  type: 2,
+                  area: ['800px','560px'],
+                  content: "/customer/relation/plan/preDetail?accountId="+selectAccount
+              });
+    	  }
+      },saveVisitRecordCallback:function(result){
+    		var isPass = true;
+    	    if (result.STATUS=="SUCCESS") {
+    	        layer.msg("新增拜访记录成功", {icon: 6});
+    	        isPass = true;
+    	    } else {
+    	        layer.msg("新增拜访记录失败:" + result.MSG, {icon: 5});
+    	        isPass = false;
+    	    }
+    	    if(isPass){
+    	   	 	vm.queryParam.currentPageIndex=1;
+    	        postUtil.call('/customerManagement/list', vm.queryParam, function (result) {
+    	         	if(result.STATUS == "SUCCESS"){
+    	         		layer.closeAll('loading');
+    	         		var pageNumber = result.DATA.pageNumber;
+    	                 var pageSize = result.DATA.pageSize;
+    	                 var totalRow = result.DATA.totalRow;
+    	                 vm.allChecked=false;
+    	                 for(var i in result.DATA.list)
+    	                 {
+    	                	 result.DATA.list[i]["checkbox"]={value:result.DATA.list[i]['accountId'],checked:false}
+    	                 }
+    	                 vm.customerList = result.DATA.list;
+    	                  //渲染页面
+    	                  vm.$nextTick(function(){
+    			               form.render();
+    			          });
+	    		           laypage.render({
+	    		               elem: 'page'
+	    		               ,count: totalRow
+	    		               ,curr : pageNumber
+	    		               ,first: '首页'
+	    		               ,last: '尾页'
+	    		               ,layout: ['count', 'prev', 'page', 'next', 'limit', 'skip']
+	    		               ,limit: pageSize
+	    		               ,limits: [5, 10, 15]
+	    		               ,jump: function(obj,first){
+	    		                   if(!first){
+	    		                       vm.queryParam.pageNumber =  obj.curr;
+	    		                       vm.queryParam.pageSize =  obj.limit;
+	    		                       vm.showData(vm.queryParam);
+	    		                   }
+	    		               }
+	    		           });
+    	         	}else {
+    	                 layer.closeAll('loading');
+    	                 layer.msg('数据请求失败！', {icon: 5});
+    	             }
+    	         });
+    	   }
+    	   return isPass;
+    	}
+     }
+});
+     
+/**
+ * 转交回调方法
+ */
+function saveTransmitRecordCallback()
+{
+	vm.queryCustomer();
+	return true;
+}
+</script>
+</body>
+</html>

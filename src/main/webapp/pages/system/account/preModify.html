@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css<@resVersionDirective>?</@>"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/WorldArea.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui-mz-min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/MultiSelectDropList.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/js/rg.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/rg-validator-1.1.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <style>
+        .similar-mark{
+            color:red;
+        }
+        .form-css .dl-form dd input[type='text'] {
+            width: 200px;
+        }
+
+        .form-css .dl-form dd.w180 {
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px; margin-top:10px;">
+                <form id="mem_basic_frm" class="layui-form jun-form-s form-css" method="post">
+                    <div>
+                        <h3 class="bg-f0 h3-tittle pl10 mt20">客户基本信息</h3>
+                        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+                            <div style="padding-left: 40px;">
+                                <dl class="dl-form">
+                                    <dt class="flt fz12"><span class="c-f">*</span>客户类型：</dt>
+                                    <dd class="flt layui-form">
+                                        <input type="radio" name="accountType" lay-filter="accountType" value="Enterprise" title="企业">
+                                        <input type="radio" name="accountType" lay-filter="accountType" value="Individual" title="个人" checked>
+                                    </dd>
+                                    <dd class="flt fz12" style="margin-left: 20px;">
+                                        <span class="c-f" style="line-height:32px;">请注意：输入客户名称为公司名称时，请选择企业（客户类型）</span>
+                                    </dd>
+                                </dl>
+                                <dl class="dl-form">
+                                    <dt class="flt fz12"><span class="c-f">*</span>客户名称：</dt>
+                                    <dd class="flt pre rg_group"><input type="text" name="accountName" rg-validate-field="accountName"  placeholder="请输入客户名称" autocomplete="off" class="layui-input" value=""></dd>
+                                    <dt class="flt fz12" id="inteSocialCreditNo_dt" style="width: 135px;margin-left:10px;display:none;"><span class="c-f">*</span>统一社会信用代码：</dt>
+                                    <dd class="flt pre " id="inteSocialCreditNo_dd" style="display:none;"><input type="text" name="inteSocialCreditNo"  placeholder="请输入统一社会信用代码" autocomplete="off" class="layui-input">
+                                        <span style="position: absolute;right:-25px;top:5px;" class="jun-yang-msg iconfont icon-asmkticon0239" id="inteSocialCreditNoHelp" title="1、若是事业单位，请填“无” 2、若不是事业单位，请填15或18位社会信用代码"></span>
+                                    </dd>
+                                </dl>
+                                <dl class="dl-form" style="margin-bottom:10px;">
+                                    <dt class="flt fz12" style="width: 115px;margin-left:-25px;">座机：</dt>
+                                    <dd class="flt rg_group"><input type="text" name="telephone" rg-validate-field="telephone" placeholder="格式：027-88888888" autocomplete="off" class="layui-input"></dd>
+                                    <dt class="flt fz12" style="width: 135px;margin-left:10px;">国家：</dt>
+                                    <dd class="flt rg_group">
+                                        <select name="country" rg-validate-field="country" lay-filter="country" id="s_country" lay-search>
+                                            <option value="">请选国家</option>
+                                        </select>
+                                    </dd>
+                                </dl>
+                                <dl class="dl-form" style="margin-bottom:10px;">
+                                    <dt class="flt" style="width: 115px;margin-left:-25px;"><span class="c-f">*</span>地址：</dt>
+                                    <dd class="flt pre layui-form dd-city rg_group">
+                                        <select name="province" rg-validate-field="province" lay-filter="province" id="s_province" lay-search>
+                                            <option value="">请选择省</option>
+                                        </select>
+                                    </dd>
+                                    <dd class="flt pre layui-form dd-city rg_group ml10">
+                                        <select name="city" rg-validate-field="city" lay-filter="city" lay-search>
+                                            <option value="">请选择市</option>
+                                        </select>
+                                    </dd>
+                                    <dd class="flt ml10"><input style="width: 175px;" placeholder="请输入详细地址" type="text" name="address" autocomplete="off" class="layui-input"></dd>
+                                </dl>
+                            </div>
+                            <div class="mt20" hidden id="chongtouDiv">
+                                <hr class="hr-bor" />
+                                <span class="iconfont icon-icon13 frt fz12 c-9 mb10 cs-p"></span>
+                                <table class="layui-table pop" lay-skin="line">
+                                    <colgroup>
+                                        <col  width="300">
+                                        <col  width="150">
+                                        <col  width="150">
+                                        <col  width="150">
+                                        <col  width="150">
+                                        <col  width="150">
+                                        <col  width="150">
+                                        <col  width="150">
+                                    </colgroup>
+                                    <thead>
+                                    <tr>
+                                        <th >客户名称</th>
+                                        <th >地址</th>
+                                        <th >座机</th>
+                                        <th >客户状态</th>
+                                        <th >客户来源</th>
+                                        <th >客户经理</th>
+                                        <th >创建时间</th>
+                                        <th >操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </blockquote>
+                    </div>
+                    <div>
+                        <h3 class="bg-f0 h3-tittle pl10 mt20">联系人</h3>
+                        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="padding-left: 40px;">
+                            <div>
+                            <dl class="dl-form">
+                                <dt class="flt fz12"><span class="c-f">*</span>联系人：</dt>
+                                <dd class="flt layui-form pre rg_group">
+                                    <input type="text" name="linkmanName" rg-validate-field="linkmanName" placeholder="请输入联系人姓名" autocomplete="off" class="layui-input">
+                                </dd>
+                                <dt class="flt fz12"><span class="c-f">*</span>性别：</dt>
+                                <dd class="flt pre layui-form">
+                                    <input type="radio" name="sex" value="male" title="先生" checked="">
+                                    <input type="radio" name="sex" value="female" title="女士">
+                                </dd>
+                            </dl>
+                            <dl class="dl-form">
+                                <dt class="flt fz12">手机号：</dt>
+                                <dd class="flt pre rg_group"><input type="text" name="linkmanTelephone" rg-validate-field="linkmanTelephone"  placeholder="请输入手机号" autocomplete="off" class="layui-input"></dd>
+                                <dt class="flt fz12">座机：</dt>
+                                <dd class="flt pre rg_group"><input type="text" name="linkmanFixedTelephone" rg-validate-field="linkmanFixedTelephone"  placeholder="请输入座机" autocomplete="off" class="layui-input"></dd>
+                                <dt class="flt fz12">邮箱：</dt>
+                                <dd class="flt rg_group"><input type="text" name="email" rg-validate-field="email"  placeholder="请输入邮箱" autocomplete="off" class="layui-input"></dd>
+                            </dl>
+                            <dl class="dl-form">
+                                <dt class="flt fz12">部门：</dt>
+                                <dd class="flt"><input type="text" name="department"  placeholder="请输入部门" autocomplete="off" class="layui-input"></dd>
+                                <dt class="flt fz12">职务：</dt>
+                                <dd class="flt"><input type="text" name="duty"  placeholder="请输入职务" autocomplete="off" class="layui-input"></dd>
+                            </dl>
+                            <dl class="dl-form">
+                                                      </dl>
+                            <dl class="dl-form" style="margin-bottom:0px;">
+                                <dt class="flt fz12" style="width: 115px;margin-left:-25px;">生成商城账号：</dt>
+                                <dd class="flt c-2" style="line-height: 32px;" id="createUserFlagTemp">
+                                    <input type="radio" name="createUserFlag" lay-filter="createUserFlag" value="Y" title="是" checked="">
+                                    <input type="radio" name="createUserFlag" lay-filter="createUserFlag" value="N" title="否" >
+                                </dd>
+                            </dl>
+                             <dl class="dl-form">
+					               <dt class="flt fz12">客户介绍：</dt>
+					               <dd class="flt fz12 layui-form">
+					                 <textarea cols="88" id="accountIntroduce" name="accountIntroduce" style="min-height:85px" placeholder="请输入客户介绍(长度限制为500)" class="layui-textarea"></textarea>  
+					               </dd>
+            				 </dl>
+                            </div>
+                            <div class="mt20" hidden id="chongtouDiv1">
+                                <hr class="hr-bor" />
+                                <span class="iconfont icon-icon13 frt fz12 c-9 mb10 cs-p"></span>
+                                <table class="layui-table pop" lay-skin="line">
+                                    <colgroup>
+                                        <col  width="300">
+                                        <col  width="150">
+                                        <col  width="150">
+                                        <col  width="150">
+                                        <col  width="150">
+                                        <col  width="150">
+                                        <col  width="150">
+                                        <col  width="150">
+                                    </colgroup>
+                                    <thead>
+                                    <tr>
+                                        <th >客户名称</th>
+                                        <th >联系人</th>
+                                        <th >联系电话</th>
+                                        <th >客户状态</th>
+                                        <th >客户来源</th>
+                                        <th >客户经理</th>
+                                        <th >创建时间</th>
+                                        <th >操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </blockquote>
+                    </div>
+                    <div>
+                        <h3 class="bg-f0 h3-tittle pl10 mt20">是否共享</h3>
+                        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="padding-left: 40px;">
+                            <dl class="dl-form" style="margin-bottom: 0">
+                                <dt class="flt fz12">新增至：</dt>
+                                <dd class="flt layui-form">
+                                    <input type="radio" name="shared" value="public" title="私海" checked="">
+                                    <input type="radio" name="shared" value="private" title="公海">
+                                </dd>
+                            </dl>
+                        </blockquote>
+                    </div>
+                    <div class="pb20 t-c mt20">
+                        <button class="form-btn layui-btn-big ml10" lay-submit="" lay-filter="formDemo">提交</button>
+                        <button class="form-btn  layui-btn-primary layui-btn-big ml10" lay-submit="" lay-filter="formDemo2">提交并继续创建</button>
+                        <@havePermission resourceCode="operation:customer:engineer:add:forceupdate">
+                        <button class="form-btn layui-btn-big ml10" lay-submit="" lay-filter="formDemo3" style="display: none">入库</button>
+                    </@>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</section>
+
+<script type="text/javascript">
+    //省市联动  star
+    var areaData = Area;
+    var $form;
+    var form;
+    var $;
+    var rgValidator;
+    var defaultCountry = "中国";
+
+    function loadCountry() {
+        defaultCountry = defaultCountry || '';
+
+        var ctHtml = '';
+        for(var i = 0; i < WorldArea.length; i++) {
+            if(defaultCountry != '' && defaultCountry == WorldArea[i].countryName) {
+                ctHtml += '<option value="' + WorldArea[i].countryName + '" selected>' +
+                        WorldArea[i].countryName + '</option>';
+            }else{
+                ctHtml += '<option value="' + WorldArea[i].countryName + '">' +
+                        WorldArea[i].countryName + '</option>';
+            }
+        }
+
+        if(defaultCountry != ''){
+            var provincesDefault = getProvinceByCountry(WorldArea, defaultCountry);
+            if(provincesDefault.length > 0) {
+                loadProvince(provincesDefault);
+            } else {
+                hideArea();
+            }
+        }
+
+        $form.find('select[name=country]').append(ctHtml);
+        form.render();
+
+        form.on('select(country)', function(data) {
+            var value = data.value;
+            var provinces = getProvinceByCountry(WorldArea, value);
+            if(provinces.length > 0) {
+                resetProvinceAddress(provinces);
+            } else {
+                hideArea();
+                repeatCheck();
+            }
+            renderRadioForChecked();
+            
+            if($('input[name=telephone]').val() != '') {
+                rgValidator.rgValidateFieldOne($('input[name=telephone]'), ops.fields['telephone']);
+            }
+            if($('input[name=linkmanTelephone]').val() != '') {
+                rgValidator.rgValidateFieldOne($('input[name=linkmanTelephone]'), ops.fields['linkmanTelephone']);
+            }
+        });
+    }
+    
+    //渲染是否生成账号单选框
+    function renderRadioForChecked(){
+        var country = $form.find('select[name=country]').val() || '';
+        var province = $form.find('select[name=province]').val() || '';
+	    $("#createUserFlagTemp").empty();
+	    var html="";
+        if(country.indexOf("中国") < 0 || province.indexOf("香港") > -1 || province.indexOf("澳门")  > -1 || province.indexOf("台湾")  > -1){
+             html+="<input type='radio' name='createUserFlag' lay-filter='createUserFlag' value='Y' title='是' >"
+             +"<input type='radio' name='createUserFlag' lay-filter='createUserFlag' value='N' title='否' checked=''>";
+        } else{
+            html+="<input type='radio' name='createUserFlag' lay-filter='createUserFlag' value='Y' title='是' checked=''>"
+                +"<input type='radio' name='createUserFlag' lay-filter='createUserFlag' value='N' title='否' >"
+        }
+        $("#createUserFlagTemp").html(html);
+        form.render();
+    };
+
+    /**
+     * 国家切换时，省市、地址需重置
+     * */
+    function resetProvinceAddress(provinces) {
+        $form.find('select[name=province]').val("");
+        $form.find('select[name=city]').val("");
+        $form.find('input[name=address]').val("");
+        loadProvince(provinces);
+    }
+
+    function hideArea(){
+        $form.find('select[name=province]').val("");
+        $form.find('select[name=city]').val("");
+        $form.find('input[name=address]').val("");
+        $form.find('select[name=province]').parent().parent().hide();
+        $form.find('select[name=province]').parent().removeClass("rg_group");
+        $form.find('select[name=city]').parent().removeClass("rg_group");
+    }
+
+    function showArea(){
+        $form.find('select[name=province]').parent().parent().show();
+        $form.find('select[name=province]').parent().addClass("rg_group");
+        $form.find('select[name=city]').parent().addClass("rg_group");
+    }
+
+    function loadProvince(province) {
+        var proHtml = '';
+        province = province || areaData;
+        for(var i = 0; i < areaData.length; i++) {
+            proHtml += '<option value="' + areaData[i].provinceName + '">' +
+                    areaData[i].provinceName + '</option>';
+        }
+        showArea();
+        $form.find('select[name=province]').append(proHtml);
+        form.render();
+        form.on('select(province)', function(data) {
+        	renderRadioForChecked();
+            var value = data.value;
+            var cities = getCityByProvince(areaData, value);
+            if(cities.length > 0) {
+                loadCity(cities);
+            }
+            if($('input[name=telephone]').val() != '') {
+                rgValidator.rgValidateFieldOne($('input[name=telephone]'), ops.fields['telephone']);
+            }
+            if($('input[name=linkmanTelephone]').val() != '') {
+                rgValidator.rgValidateFieldOne($('input[name=linkmanTelephone]'), ops.fields['linkmanTelephone']);
+            }
+        });
+    }
+
+    function loadCity(citys) {
+        var cityHtml = '';
+        for(var i = 0; i < citys.length; i++) {
+            cityHtml += '<option value="' + citys[i].cityName + '">' +
+                    citys[i].cityName + '</option>';
+        }
+        $form.find('select[name=city]').html(cityHtml).parent().show();
+        form.render();
+
+        repeatCheck();
+        enableSubmitBtn();
+    }
+
+    function getCityByProvince(areaData, provinceName) {
+        var cities = [];
+        $.each(areaData, function (index, item) {
+            if(item.provinceName == provinceName) {
+                cities = item.mallCityList;
+                return false;
+            }
+        });
+        return cities;
+    }
+
+    $(document).on('click','.icon-icon13',function(){
+        $(this).parent().hide();
+    })
+
+    function submitAccountIgnoreWarning(data, type){
+        var message = rgValidator.validateOnSubmit(ops);
+        //验证结果：只有公司名称/信用代码/所在地冲突 的场景下, 可以强行入库
+        //逻辑：1.验证失败标签只有一个(rg_error_msg)，且必须要一个冲突提醒(#accountName #inteSocialCreditNo repeat-view-msg)MESSAGE
+        //     2.含有rg_error_icon ，则验证不通过
+        var len1 = $('.rg_group').find('.rg_error_icon').length;
+        if(len1 > 0){
+            layer.msg("页面必填字段填写有误", {icon: 5});
+            return false;
+        }
+
+        var len2 = $('input[name=accountName]').parent().find(".repeat-view-msg").length;
+        var len3 = $('.rg_error_msg').length;
+        if(len2 == len3 && len2 > 0){
+            //alert('skip validation 1');
+            var param = {};
+            param.accountName = $('input[name=accountName]').val();
+            param.accountType = 'Individual';
+            param.country = $form.find('select[name=country]').val()
+            param.province = $form.find('select[name=province]').val() ;
+            param.city = $form.find('select[name=city]').val() ;
+            var blresult = asyncCallValidation('/systemAccount/checkConflictAccountName', param);
+            if(!blresult){
+                //账户名称精确匹配，如果一致，则不能入库，否则即使冲突也可入库；
+                layer.msg("已存在相同的账户名称，请检查", {icon: 5});
+                return false;
+            }
+        }else if(len3 > 0){
+            layer.msg("页面填写有误或者有冲突，请检查", {icon: 5});
+            return false;
+        }
+
+        callSubmitAccount(data, type);
+    }
+
+    function asyncCallValidation(url, param){
+        var blresult = true;
+        $.ajax({
+            url: url,
+            type: 'post',
+            dataType: 'json',
+            data: param,
+            timeout: 10000,
+            async: false,
+            success: function (result) {
+                if(result.success){
+                    blresult =  result.data;
+                }else{
+                    alert(result.message);
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+        return blresult;
+    }
+
+    function submitAccount(data, type){
+        rgValidator.validateOnSubmit(ops);
+        if(rgValidator.validateOnSubmit(ops) != ''){
+            layer.msg("页面填写有误或者有冲突，请检查", {icon: 5});
+            return false;
+        }
+        var accountIntroduce=$("#accountIntroduce").val();
+        if($.trim(accountIntroduce)!=""&&$.trim(accountIntroduce).length>500){
+        	layer.msg("客户介绍内容超长，长度限制为500", {icon: 5});
+        	return false;
+        }
+        callSubmitAccount(data, type);
+    }
+
+    function callSubmitAccount(data, type){
+        var param = {};
+        
+        
+//         var country = $form.find('select[name=country]').val() || '';
+//         var province = $form.find('select[name=province]').val() || '';
+// 	    $("#createUserFlagTemp").empty();
+// 	    var html="";
+//         if(country.indexOf("中国") < 0 || province.indexOf("香港") > -1 || province.indexOf("澳门")  > -1 || province.indexOf("台湾")  > -1){
+//              html+="<input type='radio' name='createUserFlag' lay-filter='createUserFlag' value='Y' title='是' >"
+//              +"<input type='radio' name='createUserFlag' lay-filter='createUserFlag' value='N' title='否' checked=''>";
+//         } 
+//         if(data.field.linkmanTelephone == '' && data.field.linkmanFixedTelephone == ''){
+//             layer.msg("联系人手机号和座机至少填写一项，请检查", {icon: 5});
+//             return false;
+//         }
+        
+        param.data = JSON.stringify(data.field);
+        //alert(JSON.stringify(data.field));
+        layer.load();
+        postUtil.call('/systemAccount/detail', param, function(result) {
+            //alert(JSON.stringify(result));
+            layer.open({
+                title: '操作提示',
+                skin: 'youskin',
+                area: ['480px', '300px'],
+                btnAlign: 'c',
+                content: '<p class="iconfont icon-yiwancheng1" style="text-align: center;margin-top: 30px;"></p><p style="text-align: center;margin-top: 30px;font-size:12px;color:#222222">' + result.MSG + '</p>',
+                btn: ['关闭'],
+                yes: function(index, layero){
+                    //TODO 跳转至详情页面
+                    if(type == 1){
+                        postUtil.submit('/mallCustomer/preDetail?accountId=' + result.DATA,null);
+                    }else{
+                        postUtil.submit('/systemAccount/preModify',null);
+                    }
+                    layer.closeAll('loading');
+                }
+            });
+        });
+    }
+
+    layui.use(['form','jquery','laydate'], function(){
+        var form = layui.form();
+        var $ = layui.jquery;
+        layer = layui.layer;
+        form.on('submit(formDemo)', function(data) {
+            submitAccount(data, 1);
+            return false;
+        });
+
+        form.on('submit(formDemo2)', function(data) {
+            submitAccount(data, 2);
+            return false;
+        });
+
+        form.on('submit(formDemo3)', function(data) {
+            submitAccountIgnoreWarning(data, 1);
+            return false;
+        });
+
+        form.on('radio(createUserFlag)', function(data){
+            var linkmanTelephone = $('input[name=linkmanTelephone]').val();
+            if(linkmanTelephone && linkmanTelephone != ''){
+                rgValidator.rgValidateFieldOne($('input[name=linkmanTelephone]'), ops.fields['linkmanTelephone']);
+            }
+        });
+
+        form.on('select(city)', function(data) {
+            repeatCheck();
+            enableSubmitBtn();
+        });
+
+        form.on('radio(accountType)', function(data){
+            var obj = $("input[name=inteSocialCreditNo]");
+            if(data.value=="Enterprise"){
+                obj.attr("rg-validate-field", "inteSocialCreditNo");
+                obj.parent().addClass("rg_group");
+                $('#inteSocialCreditNo_dt').show();
+                $('#inteSocialCreditNo_dd').show();
+                $('#chongtouDiv').hide();
+
+                //强制入库按钮控制
+                $('button[lay-filter=formDemo3]').show();
+
+                rgValidator.bindValidator();
+            }else{
+                obj.removeAttr("rg-validate-field");
+                obj.parent().removeClass("rg_group");
+                obj.parent().find(".rg_error_msg").remove();
+                $('#inteSocialCreditNo_dt').hide();
+                $('#inteSocialCreditNo_dd').hide();
+                $('#chongtouDiv').hide();
+
+                //强制入库按钮控制
+                $('button[lay-filter=formDemo3]').hide();
+            }
+            if(lastAccountType != data.value){
+                lastAccountType = data.value;
+                resetAccountNameValidator();
+            }
+        });
+        rgValidator = new RgValidator(ops);
+        rgValidator.bindValidator();
+        //rgValidate(ops);
+    })
+
+    var lastAccountType = 'Individual';
+
+    var ops = {
+        form: "mem_basic_frm",
+        valid: "",
+        invalidMessageClass : ' iconfont c-f jun-ch fz12 ',
+        invalidMessageStyle : '',
+        invalidIconOnlyWhileRequired : true,
+        fieldInType: "dd",
+        fields:{
+            accountName : {
+                message : '客户名称验证失败',
+                callback : 'enableSubmitBtn',
+                validators : {
+                    notEmpty : {
+                        message : "请留下客户名称！"
+                    },
+                    csValidating : {
+                        callback : 'accountNameCsValidator',
+                        message : '与客户库其他客户存在冲突<span class="c-h ml10 cs-p repeat-view-msg" style="line-height: 32px;" onclick="queryCheckConflictAccountName()">查看冲突</span>'
+                    }
+                }
+            },
+            inteSocialCreditNo : {
+                message : '客户名称验证失败',
+                callback : "enableSubmitBtn",
+                validators : {
+                    notEmpty : {
+                        message : "请留下统一社会信用代码！"
+                    },
+                    regexp : {
+                        message : "统一社会信用代码格式不正确",
+                        regexp : /(^[0-9A-Z]{18}$)|(^[0-9A-Z]{15}$)|(^无$)/
+                    },
+                    service : {
+                        ifregexp : /(^[0-9A-Z]{18}$)|(^[0-9A-Z]{15}$)/,
+                        url : '/systemAccount/checkConflictInteSocialCreditNo',
+                        message : '与客户库其他客户存在冲突<span class="c-h ml10 cs-p repeat-view-msg" style="line-height: 32px;" onclick="queryCheckConflictInteSocialCreditNo()">查看冲突</span>'
+                    },
+                    csValidating: {
+                        callback : 'repeatCheck',
+                        message : ""
+                    }
+                }
+            },
+            province : {
+                message : '所选身份验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请留下省份！"
+                    }
+                }
+            },
+            telephone: {
+                message : '所选客户座机验证失败',
+                validators : {
+                    csValidating : {
+                        callback : 'telephoneCommonValidator',
+                        message : "请输入的电话格式不正确(由数字或-组成)"
+                    }
+                }
+            },
+            city : {
+                message : '所选城市验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请留下城市！"
+                    }
+                }
+            },
+            linkmanName : {
+                message : '联系人验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请留下联系人！"
+                    }
+                }
+            },
+            linkmanTelephone: {
+                message : '联系方式验证失败',
+                callback : "linkmanTelephoneOnSuccess",
+                validators : {
+                    csValidating : {
+                        callback : 'linkmanTelephoneCommonValidator',
+                        message : "请输入的手机号码格式不正确"
+                    },
+                    csValidating1 : {
+                        callback : 'linkmanTelephoneCsValidator',
+                        message : "注册商城账号请输入手机号码"
+                    },
+                    csValidating2 : {
+                        callback : 'otherAreaLinkmanTelephoneCsValidator',
+                        message : '与客户库其他客户联系人电话冲突<span  class="c-h ml10 cs-p repeat-view-msg line-middle fz12" onclick="queryCheckConflictLinkmanTelephone()" >查看冲突</span>'
+                    },
+                    service : {
+                        ifregexp : /(^0?1[3|4|5|7|8][0-9]\d{8}$)|(^0[\d]{2,3}-[\d]{7,8}$)/,
+                        url : '/systemAccount/checkLinkmanTelephone',
+                        message : '与客户库其他客户联系人电话冲突<span  class="c-h ml10 cs-p repeat-view-msg line-middle fz12" onclick="queryCheckConflictLinkmanTelephone()" >查看冲突</span>'
+                    }
+                }
+            },
+            linkmanFixedTelephone: {
+                message : '所选客户座机验证失败',
+                validators : {
+                    csValidating : {
+                        callback : 'telephoneCommonValidator',
+                        message : "请输入的座机格式不正确(由数字或-组成)"
+                    }
+                }
+            },
+            email: {
+                message : '邮箱验证失败',
+                validators : {
+                    regexp : {
+                        message : "您输入的邮箱格式不正确哦！",
+                        regexp : /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
+                    }
+                }
+            }
+        }
+    };
+
+    layui.use('form', function() {
+        form = layui.form();
+        $form = $('form');
+        loadCountry();
+        //loadProvince();
+    });
+
+    function loadArea(areas) {
+        var areaHtml = '';
+        for(var i = 0; i < areas.length; i++) {
+            areaHtml += '<option value="' + areas[i].areaCode + '">' +
+                    areas[i].areaName + '</option>';
+        }
+        $form.find('select[name=area]').html(areaHtml).parent().show();
+        form.render();
+        form.on('select(area)', function(data) {
+        });
+    }
+
+    function queryCheckConflictAccountName(){
+        var param = $('#mem_basic_frm').serialize();
+        postUtil.call('/systemAccount/queryCheckConflictAccountName', param, function(result) {
+            if(result.success){
+                if(result.data){
+                    renderTable(result.data);
+                }
+            }else{
+                alert(result.msg);
+            }
+        });
+    }
+
+    function queryCheckConflictInteSocialCreditNo(){
+        var param = {inteSocialCreditNo:$('input[name=inteSocialCreditNo]').val()};
+        postUtil.call('/systemAccount/queryCheckConflictInteSocialCreditNo', param, function(result) {
+            if(result.success){
+                if(result.data){
+                    renderTable(result.data);
+                }
+            }else{
+                alert(result.msg);
+            }
+        });
+    }
+
+    function queryCheckConflictLinkmanTelephone() {
+        var param = {linkmanTelephone: $('input[name=linkmanTelephone]').val()};
+        postUtil.call('/systemAccount/queryCheckConflictLinkmanTelephone', param, function (result) {
+            if (result.success) {
+                if (result.data) {
+                    window.scrollBy(0, 250);
+                    renderLinkmanTelephoneTable(result.data);
+                }
+            } else {
+                alert(result.msg);
+            }
+        })
+    }
+
+    function renderTable(dataList){
+        var html = '';
+        $('#chongtouDiv').show();
+        for (var i1 = 0; i1 < dataList.length; i1++) {
+            var data = dataList[i1];
+            //alert(JSON.stringify(data));
+            var newDate = new Date();
+            newDate.setTime(data.account.createDate);
+            var operatorHtml = '<@havePermission resourceCode="operation:customer:engineer:add:viewctdetail"><span class="c-h ml10 cs-p" style="line-height: 32px;" onclick="openDetail(\'' + data.account.accountId + '\')">查看详情</span></@>'
+            html += '<tr>'
+                    + '<td>' + isExitsVariable(data.account.accountName) + '<br>' + isExitsVariable(data.account.inteSocialCreditNo) + '</td>'
+                    + '<td>' + isExitsVariable(data.account.province) + isExitsVariable(data.account.city) + '</td>'
+                    + '<td>' + isExitsVariable(data.account.telephone) + '</td>'
+                    + '<td>' + isExitsVariable(data.account.accountStatus) + '</td>'
+                    + '<td>' + isExitsVariable(data.account.accountResource) + '</td>'
+                    + '<td>' + isExitsVariable(data.account.accountManagerName) + '</td>'
+                    + '<td>' + newDate.format('yyyy-MM-dd h:m:s') + '</td>'
+                    + '<td>' + operatorHtml + '</td>'
+                    + '</tr>';
+        }
+        $("#chongtouDiv .layui-table tbody").html(html);
+    }
+
+    function renderLinkmanTelephoneTable(dataList){
+        var html = '';
+        $('#chongtouDiv1').show();
+        for (var i1 = 0; i1 < dataList.length; i1++) {
+            var data = dataList[i1];
+            //alert(JSON.stringify(data));
+            var newDate = new Date();
+            newDate.setTime(data.createDate);
+            var operatorHtml = '<@havePermission resourceCode="operation:customer:engineer:add:viewctdetail"><span class="c-h ml10 cs-p" style="line-height: 32px;" onclick="openDetail(\'' + data.accountId + '\')">查看详情</span></@>'
+            html += '<tr>'
+                    + '<td>' + isExitsVariable(data.accountName)  + '<br>' + isExitsVariable(data.inteSocialCreditNo) + '</td>'
+                    + '<td>' + isExitsVariable(data.linkmanName) + '</td>'
+                    + '<td><span class="similar-mark">' + isExitsVariable(data.linkmanTelephone) + '</span></td>'
+                    + '<td>' + isExitsVariable(data.accountStatus) + '</td>'
+                    + '<td>' + isExitsVariable(data.accountResource) + '</td>'
+                    + '<td>' + isExitsVariable(data.accountManagerName) + '</td>'
+                    + '<td>' + newDate.format('yyyy-MM-dd h:m:s') + '</td>'
+                    + '<td>' + operatorHtml + '</td>'
+                    + '</tr>';
+        }
+        $("#chongtouDiv1 .layui-table tbody").html(html);
+    }
+
+    function openDetail(accountId){
+        cardUtil.openCard("客户详情-" + accountId,"/mallCustomer/preDetail?accountId=" + accountId);
+        cardUtil.changeCard("客户详情-" + accountId);
+    }
+
+    function repeatCheck(){
+        //企业用户和个人用户 城市和客户名称，所在地都有值，后才进行校验
+        if(needCheckRepeat()){
+            var result = rgValidator.rgValidateFieldOne($('input[name=accountName]'), {
+                message: '客户名称验证失败',
+                //callback: 'accountName_callback_on_success',
+                validators: {
+                    notEmpty: {
+                        message: "请留下客户名称！"
+                    },
+                    csValidating: {
+                        callback: 'accountNameCsValidator',
+                        message: '与客户库其他客户存在冲突,请停止创建<span class="c-h ml10 cs-p repeat-view-msg" style="line-height: 32px;" onclick="queryCheckConflictAccountName()">查看冲突</span>'
+                    }
+                }
+            });
+            if(result == ''){
+                $('#chongtouDiv').css("display", "none")
+            }
+        }
+
+        return true;
+    }
+
+    function needCheckRepeat(){
+        var inteSocialCreditNo = $('input[name=inteSocialCreditNo]').val() || '';
+        var accountName = $('input[name=accountName]').val() || '';
+        var accountType = $('input[name=accountType]:checked').val() || '';
+        var city = $form.find('select[name=city]').val() || '';
+        var country = $form.find('select[name=country]').val() || '';
+        //企业用户和个人用户 城市和客户名称，所在地都有值，后才进行校验
+        if((city == '' && country=='中国') || accountName == ''){
+            return false;
+        }
+        if(accountType == 'Enterprise' && inteSocialCreditNo == ''){
+            return false;
+        }
+        return true;
+    }
+
+    function accountNameCsValidator(obj){
+        var blresult = true;
+        var param = $('#mem_basic_frm').serialize();
+        if(needCheckRepeat()){
+            $.ajax({
+                url: '/systemAccount/checkConflictAccountName',
+                type: 'post',
+                dataType: 'json',
+                data: param,
+                timeout: 10000,
+                async: false,
+                success: function (result) {
+                    if(result.success){
+                        blresult =  result.data;
+                    }else{
+                        alert(result.message);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert(errorThrown);
+                }
+            });
+        }
+
+        if(blresult){
+            $('#chongtouDiv').hide();
+        }
+        return blresult;
+    }
+
+    function telephoneCommonValidator(obj) {
+        var country = $form.find('select[name=country]').val() || '';
+        var province = $form.find('select[name=province]').val() || '';
+        if(obj.val() == ''){
+            return true;
+        }
+        if(country.indexOf("中国") < 0 || province.indexOf("香港") > -1 || province.indexOf("澳门")  > -1 || province.indexOf("台湾")  > -1){
+            return true;
+        }else if(/^0[\d]{2,3}-[\d]{7,8}$/.test(obj.val())){
+            return true;
+        }
+        return false;
+    }
+    
+    function linkmanTelephoneCommonValidator(obj) {
+        var country = $form.find('select[name=country]').val() || '';
+        var province = $form.find('select[name=province]').val() || '';
+        if(obj.val() == ''){
+            return true;
+        }
+        if(country.indexOf("中国") < 0 || province.indexOf("香港") > -1 || province.indexOf("澳门")  > -1 || province.indexOf("台湾")  > -1){
+            return true;
+        }else if(/(^0?1[3|4|5|7|8][0-9]\d{8}$)/.test(obj.val())){
+            return true;
+        }
+        return false;
+    }
+    
+    function otherAreaLinkmanTelephoneCsValidator(obj) {
+        var blresult = true;
+        if(obj.val()==''){
+            return true;
+        }
+        var param = {checkParam1: obj.val(), name : obj.val()};
+        var country = $form.find('select[name=country]').val() || '';
+        var province = $form.find('select[name=province]').val() || '';
+        if(country.indexOf("中国") < 0 || province.indexOf("香港") > -1 || province.indexOf("澳门")  > -1 || province.indexOf("台湾")  > -1){
+            if(needCheckRepeat()){
+                $.ajax({
+                    url: '/systemAccount/checkLinkmanTelephone',
+                    type: 'post',
+                    dataType: 'json',
+                    data: param,
+                    timeout: 10000,
+                    async: false,
+                    success: function (result) {
+                        if(result.success){
+                            blresult =  result.data;
+                        }else{
+                            alert(result.message);
+                        }
+                    },
+                    error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert(errorThrown);
+                    }
+                });
+            }
+        }
+        if(blresult){
+            $('#chongtouDiv').hide();
+        }
+        return blresult;
+    }
+
+    function linkmanTelephoneCsValidator(obj){
+        var createUserFlag = $form.find('input[name=createUserFlag]:checked');
+        if(obj.val()=='' && createUserFlag.val()=='N'){
+            return true;
+        }
+        if(createUserFlag.val() == 'Y'){
+            return /^0?1[3|4|5|7|8][0-9]\d{8}$/.test(obj.val());
+        }
+        return true;
+    }
+
+    function linkmanTelephoneOnSuccess(message){
+        enableSubmitBtn();
+        if(message.length <= 0){
+            $('#chongtouDiv1').hide();
+        }
+    }
+
+    function enableSubmitBtn(){
+        var btn = $('button[lay-filter=formDemo]');
+        var btn2 = $('button[lay-filter=formDemo2]');
+        var obj = $form.find('span .repeat-view-msg');
+        if(obj.length > 0){
+            btn.css("background-color","#cccccc");
+            btn.attr("disabled", "disabled");
+            btn2.attr("disabled", "disabled");
+        }else{
+            btn.css("background-color", '#035a9d');
+            btn.removeAttr("disabled")
+            btn2.removeAttr("disabled");
+        }
+    }
+
+    function isExitsVariable(variableName) {
+        try {
+            if (typeof (variableName) == "undefined") {
+                return "";
+            } else if (variableName == null){
+                return "";
+            }else {
+                return variableName;
+            }
+        } catch (e) {
+        }
+        return "";
+    }
+
+    function resetAccountNameValidator(){
+        RgValidator.reset($('input[name=accountName]'));
+        RgValidator.reset($('input[name=inteSocialCreditNo]'));
+    }
+
+</script>
+</body>
+</html>

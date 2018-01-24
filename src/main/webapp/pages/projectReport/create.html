@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/public/css/style.css<@resVersionDirective>?</@>" />
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_svvppt2njx9u23xr.css<@resVersionDirective>?</@>" />
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>" />
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>" />
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/js/rg.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<section id="itocCenter">
+    <header>
+        <#include "/res/freemarkerTpl/header.html" /> <#if (SYSTEM_USER_SESSION != null)> <@header currentUser=SYSTEM_USER_SESSION.systemUser/> <#else> <@header currentUser=""/>
+    </#if>
+        <div class="search">
+            <div class="crumbs flt">
+                <a href="javascript:;">首页</a>> <a class="c-b-i" href="javascript:;">项目报备</a>> <a class="c-b-i" href="javascript:;">创建申请</a>
+            </div>
+
+        </div>
+    </header>
+    <footer> <#include "/res/freemarkerTpl/left_menu.html" /> <@footer currentMenu="CUSTOMER"/> </footer>
+    <section class="itocContent">
+        <nav class="purchaseNav">
+            <ul>
+                <li><a href="javascript:void(0)">审核详情</a></li>
+            </ul>
+        </nav>
+        <div class="itocMain">
+            <div class="layui-form pl20 pr20 pt20">
+                <table class="layui-table">
+                    <thead>
+                    <tr>
+                        <th class="fw-in" id="verify_data_table"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr style="background-color: #fff;">
+                        <td>
+                            <div id="field_div">
+                            </div>
+                            <form class="layui-form">
+                                <div class="layui-form-item t-l pt10">
+                                    <label class="layui-form-label"><span class="c-f">*</span>字段1：</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="taskId">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item layui-form-text" style="max-width: 50%">
+                                    <label class="layui-form-label"><span class="c-f">*</span>字段2：</label>
+                                    <div class="layui-input-block">
+                                        <textarea name="remark" lay-verify="remark" autocomplete="off" placeholder="请输入内容" class="layui-textarea"></textarea>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item t-l">
+                                    <div class="layui-input-block">
+                                        <button class="search-btn fz12" style="cursor: pointer;" lay-submit="" lay-filter="demo1">立即提交</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+    </section>
+</section>
+<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+<script>
+
+    $(function() {
+        initLayUi();
+    });
+
+    function initLayUi(){
+        layui.use(
+                [ 'form', 'layedit', 'laydate', 'layer' ],
+                function() {
+                    var form = layui.form(), layer = layui.layer, layedit = layui.layedit, laydate = layui.laydate;
+
+                    //创建一个编辑器
+                    var editIndex = layedit.build('LAY_demo_editor');
+
+                    //自定义验证规则
+                    /*form.verify({
+                     remark : function(value) {
+                     var checkValue = $('input[name=verifyResult]:checked').val();
+                     if(checkValue == 'VERIFY_FAILED'){
+                     if (value.length < 5) {
+                     return '审批意见至少得5个字符啊';
+                     }
+                     }
+                     },
+                     content : function(value) {
+                     layedit.sync(editIndex);
+                     }
+                     });*/
+
+                    //监听指定开关
+                    form.on('switch(switchTest)', function(data) {
+                        layer.msg('开关checked：'
+                                + (this.checked ? 'true' : 'false'), {
+                            offset : '6px'
+                        });
+                        layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF',
+                                data.othis)
+                    });
+
+                    //监听提交
+                    form.on('submit(demo1)', function(data) {
+
+                        postUtil.call("/projectReport/doCreate", data.field, function(result) {
+                            layer.open({
+                                title: '操作提示',
+                                skin: 'youskin',
+                                area: ['480px', '300px'],
+                                btnAlign: 'c',
+                                content: '<p class="iconfont icon-yiwancheng1" style="text-align: center;margin-top: 30px;"></p><p style="text-align: center;margin-top: 30px;font-size:12px;color:#222222">' + result.MSG + '</p>',
+                                btn: ['关闭'],
+                                yes: function(index, layero){
+                                    postUtil.submit('/flow/myworkspace/preWaittingTaskList',null);
+                                }
+                            });
+                        });
+                        return false;
+                    });
+                });
+    }
+</script>
+
+</body>
+</html>

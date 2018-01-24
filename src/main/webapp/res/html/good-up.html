@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <script src="/res/js/jquery-3.1.1.min.js"></script>
+    <!--<script src="/res/public/layui/Area1.js" type="text/javascript"></script>-->
+    <script src="/res/public/layui/layui.js"></script>
+    <script src="/res/js/MultiSelectDropList.js"></script>
+    <script src="/res/js/echarts.min.js"></script>
+</head>
+<body>
+    <section class="bz-bb pl20 pr20 pt20 pb20">
+        <table class="layui-table pop table-css" lay-skin="line">
+            <colgroup>
+                <col  width="200">
+                <col  width="200">
+                <col  width="200">
+                <col  width="300">
+                <col  width="200">
+                <col  width="300">
+                <col  width="150">
+                <col  width="200">
+                <col  width="200">
+                <col  width="200">
+            </colgroup>
+            <thead>
+            <tr>
+                <th><span class="fz16 c-2">销售机会</span></th>
+                <th >项目型商机</th>
+                <th >零售型商机</th>
+                <th >零售型比价</th>
+                <th >零售型预算</th>
+                <th >其他</th>
+                <th >总计</th>
+                <th >对应客户数</th>
+                <th >转化询单</th>
+                <th >待处理</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>今日</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+            </tr>
+            <tr>
+                <td>本周</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+            </tr>
+            <tr>
+                <td>本月</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+                <td>5</td>
+            </tr>
+            </tbody>
+        </table>
+        <h3 class="mb5 fz12 totalNav"><a href="javascript:;" class="c-6 c-h fw-b fz12">按天统计</a><a href="javascript:;" class="c-6 fz12 ml10">按周统计</a><a href="javascript:;" class="c-6 fz12 ml10" href="javascript:;">按月统计</a></h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="margin-bottom: 0;">
+            <form action="" class="jun-form-s form-css">
+                <dl class="dl-form" style="margin-bottom: 0">
+                    <dt class="flt">选择月份：</dt>
+                    <dd class="flt"><input name="followDate" value="2017-04-13 20:56:55" style="height: 32px;width: 240px;" class="layui-input laydate-icon" placeholder="自定义日期格式" onclick="layui.laydate({elem: this, istime: true, format: 'YYYY-MM'})" validate="true"></dd>
+                    <dt class="flt fz12 ml20">下拉多选：</dt>
+                    <dd class="flt pre w240 line-middle" style="height: 32px;">
+                        <div class="multi_select" id="statusSelect" style="position:absolute;left:-2px;top:0;z-index:1">
+                            <!--<img class="cs-p" style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" />-->
+                        </div>
+                    </dd>
+                    <dt class="flt fz12">创建人：</dt>
+                    <dd class="flt layui-form jun-form-l">
+                        <select name="interest" lay-filter="aihao"  style="width: 240px;">
+                            <option value=""></option>
+                            <option value="0">写作</option>
+                            <option value="1" selected="">全部</option>
+                            <option value="2">游戏</option>
+                            <option value="3">音乐</option>
+                            <option value="4">旅行</option>
+                        </select>
+                    </dd>
+                    <dd class="flt ml10"><span class="form-btn layui-btn-small2">查询</span></dd>
+                    <dd class="frt"><span class="form-btn layui-btn-itoc layui-btn-small2 fz12"><span class="iconfont icon-daochu"></span>导出</span></dd>
+                </dl>
+            </form>
+
+        </blockquote>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <div id="main" style="width: 100%;height: 400px;" ></div>
+        </blockquote>
+    </section>
+</body>
+<script>
+    layui.use(['form','laydate'], function() {
+        var form = layui.form();
+        //日期控件 star
+        var start = {
+            min: laydate.now()
+            , max: '2099-06-16 23:59:59'
+            , istoday: false
+            , choose: function (datas) {
+                end.min = datas; //开始日选好后，重置结束日的最小日期
+                end.start = datas //将结束日的初始值设定为开始日
+            }
+        };
+
+        var end = {
+            min: laydate.now()
+            , max: '2099-06-16 23:59:59'
+            , istoday: false
+            , choose: function (datas) {
+                start.max = datas; //结束日选好后，重置开始日的最大日期
+            }
+        };
+    })
+    $(function (){
+        $('#statusSelect').MSDL({
+            'width': '240',
+            'data': [{"text":"保护中","value":"PROTECTED"},{"text":"保护失效","value":"PROTECTED_INVALID"}],
+            'id': "status"
+        });
+    });
+    $(document).on('click','#statusSelect',function(){
+        if($("#statusSelect").find(".container").css("display")=="none"){
+            $("#statusSelect").find(".container").show();
+            $(this).find("img").attr('src','/res/images/arrow4.png');
+            return false;
+        }else{
+            $("#statusSelect").find(".container").hide();
+            $(this).find("img").attr('src','/res/images/arrow3.png');
+        }
+    })
+    $(document).on('click','.totalNav a',function(){
+        $(this).addClass("c-h fw-b").siblings().removeClass("c-h fw-b");
+    })
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+
+    // 指定图表的配置项和数据
+    option = {
+        title: {
+            text: ''
+        },
+        tooltip: {
+            trigger: 'axis'
+        },
+        legend: {
+            data:['销售机会','对应客户数']
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        toolbox: {
+            feature: {
+                saveAsImage: {}
+            }
+        },
+        xAxis: {
+            type: 'category',
+            data: ['2017/4/1','2017/4/2','2017/4/3',
+                '2017/4/4','2017/4/5','2017/4/6','2017/4/7','2017/4/8','2017/4/9','2017/4/10','2017/4/11','2017/4/12','2017/4/13','2017/4/14','2017/4/15','2017/4/16','2017/4/17','2017/4/18','2017/4/19'
+                ,'2017/4/20','2017/4/21','2017/4/22','2017/4/23','2017/4/24','2017/4/25','2017/4/26','2017/4/27','2017/4/28','2017/4/29','2017/4/30']
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: [
+            {
+                name:'销售机会',
+                type:'line',
+                itemStyle: {
+                    normal: {
+                        color: '#035a9d'
+                    }
+                },
+                smooth: true,
+                data:[14, 20, 30, 15, 16, 32, 28, 20, 30, 15, 16, 32, 28, 20, 30, 15, 16, 32, 28, 20, 30, 15, 16, 32, 28, 20, 30, 15, 16, 32]
+            },
+            {
+                name:'对应客户数',
+                type:'line',
+                smooth: true,
+                itemStyle: {
+                    normal: {
+                        color: '#f48000'
+                    }
+                },
+                data:[18, 20, 30, 15, 16, 32, 28, 20, 30, 15, 16, 32, 28, 20, 30, 15, 16, 32, 28, 20, 30, 15, 16, 32, 28, 20, 30, 15, 16, 32]
+            }
+        ]
+    };
+
+
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+</script>
+</html>

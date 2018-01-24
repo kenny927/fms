@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <style type="text/css">
+
+        #itocCenter .itocContent .itocMain {
+            width: 100%;
+            box-sizing: border-box;
+            background: #ffffff;
+            padding-bottom: 30px;
+            min-height: 100%;
+            height: auto;
+        }
+
+        select {
+            margin-left: 10px;
+            height: 34px;
+            line-height: 34px;
+            width: 148px;
+            padding-left: 10px;
+            border: 1px solid #e6e6e6;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter" style="padding-left: 0px;">
+    <section class="itocContent">
+        <div class="itocMain" style="border: 0px;">
+            <div class="table inquiry" id="addInquiry">
+                <div class="treeSearch mb20" style="padding-top: 8px;">
+                    省份：<select id="s_province" name="s_province"></select>  
+                    城市：<select id="s_city" name="s_city"></select>
+                    <select id="s_county" name="s_county" style="display: none;"></select>  
+                    <script class="resources library" src="/res/js/area.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+                    <script type="text/javascript">_init_area();</script>
+                    <button id="searchBtn" class="search-btn" style="cursor: pointer;">查询</button>
+                    <button id="chooseBtn" style="width: auto;cursor: pointer;" class="search-btn">添加分销商</button>
+                </div>
+
+                <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px">
+                    <table class="layui-table pop" lay-skin="line">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>所在区域</th>
+                            <th>省份</th>
+                            <th>城市</th>
+                            <th>公司名称</th>
+                        </tr>
+                        </thead>
+                        <tbody id="distributorTable_tbody">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+            </div>
+        </div>
+    </section>
+</section>
+
+<script type="text/javascript">
+    $(function () {
+        $('#addInquiry').show();
+    });
+
+    var PAGE_SIZE = 5;
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    var distributorDataMap = {};
+
+
+    function doSearch() {
+        var province = $('#s_province').val();
+        var city = $('#s_city').val();
+        var queryParam = {};
+        queryParam.currentPageIndex = 1;
+        queryParam.pageSize = PAGE_SIZE;
+        if (province != "省份") {
+            queryParam.province = province;
+        }
+        if (city != "地级市") {
+            queryParam.city = city;
+        }
+
+        loadDistributorData(queryParam);
+    }
+
+    $(function () {
+
+        doSearch();
+
+        $("#searchBtn").bind("click", function () {
+            doSearch();
+        });
+
+        $('#chooseBtn').bind("click", function () {
+            var accountChecks = document.getElementsByName("accountIdCheckBox");
+            var checkedAccountIds = [];
+            if (accountChecks.length > 0) {
+                for (var i = 0; i < accountChecks.length; i++) {
+                    if (accountChecks[i].checked == true) {
+                        checkedAccountIds.push(accountChecks[i].value);
+                    }
+                }
+
+                if (checkedAccountIds.length == 0) {
+                    alert("请查询数据勾选后再进行操作");
+                } else {
+                    var choosedDistributorDataArray = [];
+                    for (var j = 0; j < checkedAccountIds.length; j++) {
+                        var tempAccountData = distributorDataMap[checkedAccountIds[j]];
+                        choosedDistributorDataArray.push(tempAccountData);
+                    }
+                    var success = parent.chooseDistributorCallback(choosedDistributorDataArray);//调用父页面的渲染方法
+                    if (success) {
+                        parent.layer.close(index);//关闭当前窗口
+                    }
+                }
+            } else {
+                alert("请查询数据勾选后再进行操作");
+            }
+        });
+    });
+
+    function loadDistributorData(queryParam) {
+        layer.load();
+
+        postUtil.call("/reusable/systemAccount/distributorJsonData", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            renderTable(dataList);
+            layer.closeAll("loading");
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                skip: true,
+                total: totalRow,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var province = $('#s_province').val();
+                        var city = $('#s_city').val();
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        if (province != "省份") {
+                            tempParam.province = province;
+                        }
+                        if (city != "地级市") {
+                            tempParam.city = city;
+                        }
+                        loadDistributorData(tempParam);
+                    }
+                }
+            });
+        });
+    }
+
+    function renderTable(dataList) {
+        distributorDataMap = {};
+        var length = dataList.length;
+        var table = document.getElementById("distributorTable_tbody");
+        table.innerHTML = "";
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var accountId = data.accountId;
+                distributorDataMap[accountId] = data;
+                var row = renderRow(data);
+                table.appendChild(row);
+            }
+        } else {
+            var html = '<tr><td colspan="5"><p class="t-c fz16 c-2" style="line-height: 76px;">没有查询到相关的分销商信息</p></td></tr>';
+            $(table).html(html);
+        }
+    }
+
+    function renderRow(rowData) {
+
+        var accountId = rowData.accountId;
+        var accountName = rowData.accountName;
+        var mainObjectId = rowData.mainObjectId;
+        var province = rowData.province;
+        var city = rowData.city;
+        var accountAreaId = rowData.accountAreaId;
+        var accountAreaName = rowData.accountAreaName;
+
+        var tr = document.createElement('tr');
+        tr.appendChild(renderCell("accountIdCheckBox", accountId, "width:10%;"));
+        tr.appendChild(renderCell(null, accountAreaName, "width:10%;"));
+        tr.appendChild(renderCell(null, province, "width:10%;"));
+        tr.appendChild(renderCell(null, city, "width:10%;"));
+        tr.appendChild(renderCell(null, accountName, "width:60%;"));
+        return tr;
+    }
+
+    function renderCell(name, value, style) {
+
+        var td = document.createElement('td');
+
+        if (style) {
+            td.style = style;
+        }
+
+        if ("accountIdCheckBox" == name) {
+            td.innerHTML = '<input type="radio" name="accountIdCheckBox" value="' + value + '" />';
+        } else {
+            if (value) {
+                td.innerText = value;
+            } else {
+                td.innerText = "--";
+            }
+        }
+        return td;
+    }
+</script>
+</body>
+</html>

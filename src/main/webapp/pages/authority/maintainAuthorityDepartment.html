@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+		<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+		<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+		<script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+
+		<!-- ztree v3.5 -->
+		<link rel="stylesheet" type="text/css" href="/res/public/zTree_v3/css/zTreeStyle/zTreeStyle.css<@resVersionDirective>?</@>"/>
+		<script type="text/javascript" src="/res/public/zTree_v3/js/jquery.ztree.core-3.5.min.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/public/zTree_v3/js/jquery.ztree.excheck-3.5.min.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/public/zTree_v3/js/jquery.ztree.exedit.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript" src="/res/js/department/maintainDepartmentTree.js<@resVersionDirective>?</@>"></script>
+		<script type="text/javascript">
+			var selectDepartmentId = "${selectDepartmentId}";
+		</script>
+		<style>
+			.ztree_wd li span.button.add {
+				margin-left: 2px;
+				margin-right: -1px;
+				background-position: -144px 0;
+				vertical-align: top;
+				*vertical-align: middle
+			}
+
+			/*list_ztree表格*/
+			.list_ztree {
+				padding: 0;
+				border: 1px solid #CDD6D5;
+			}
+
+			.list_ztree li a {
+				vertical-align: middle;
+				height: 40px;
+			}
+
+			.list_ztree li > a {
+				width: 100%;
+			}
+
+			.list_ztree li > a,
+			.list_ztree li a.curSelectedNode {
+				padding-top: 0px;
+				background: none;
+				height: auto;
+				border: none;
+				cursor: default;
+				opacity: 1;
+			}
+
+			.list_ztree li ul {
+				padding-left: 0px
+			}
+
+			.list_ztree div.diy span {
+				line-height: 30px;
+				vertical-align: middle;
+			}
+
+			.list_ztree div.diy {
+				height: 100%;
+				width: 25%;
+				line-height: 30px;
+				border-top: 1px solid #dddddd;
+				border-left: 0px solid #dddddd;
+				text-align: center;
+				display: inline-block;
+				box-sizing: border-box;
+				/*color: #6c6c6c;*/
+				font-family: "SimSun";
+				font-size: 12px;
+				vertical-align: top;
+			}
+
+			.list_ztree div.diy:first-child {
+				text-align: left;
+				text-indent: 10px;
+				border-left: none;
+			}
+
+			.list_ztree .head {
+				background: #eaeaea;
+			}
+
+			.list_ztree .head div.diy {
+				border-top: none;
+				border-right: 0px solid #CDD2D4;
+				color: #000;
+				font-family: "Microsoft YaHei";
+				font-size: 14px;
+			}
+
+			/*end--ztree表格*/
+			.edit_department_ztree li span.button.add {
+				margin-left: 2px;
+				margin-right: -1px;
+				background-position: -144px 0;
+				vertical-align: top;
+				*vertical-align: middle
+			}
+
+			.dhButton {
+				color: #fff;
+				font-size: 14px;
+				border: 0px;
+				background-color: #FE6527;
+				min-width: 90px;
+				vertical-align: middle;
+				height: 32px;
+				margin-left:5px;
+				margin-right:5px;
+			}
+		</style>
+	</head>
+	<body>
+		<section id="itocCenter">
+	       <section class="itocContent">
+	       	<div class="itocMain">
+				<div style="float: left;width: 15%;display: block;">
+					<div style="margin-top: 30px;font-weight: bolder;">部门/岗位信息：</div>
+					<div style="margin-top: 10px;">
+						<ul id="tree" class="ztree edit_department_ztree"></ul>
+					</div>
+					<!--<div style="display: inline-block; width: 200px; height: 600px; padding: 10px; overflow: scroll;">-->
+						<!--<ul id="treeNav" class="layui-box layui-tree"></ul>-->
+					<!--</div>-->
+				</div>
+				<div style="float: right;width: 78%;display: block;">
+	       		<div class="purchaseSearch">
+					<form>
+						<dl class="form-list flt">
+							<dt>描述：</dt>
+							<dd><input type="text" id="departmentDesc" style="width: 180px;"  /></dd>
+							<dt>类型：</dt>
+							<dd>
+								<select id="departmentType" style="width: 180px;height: 35px;">
+									<option value="">---请选择---</option>
+									<option value="DEPARTMENT">部门</option>
+									<option value="POSITION">岗位</option>
+								</select>
+							</dd>
+							<dd><span class="btn ml10" id="updateBtn" style="cursor: pointer;width: 60px;height: 35px;">保存</span></dd>
+						</dl>
+					</form>
+	       		</div>
+					<div style="margin-top: 20px;margin-right: 20px;margin-bottom: 5px;float:right;">
+						<button id="batchRemoveUser" class="search-btn" style="cursor: pointer;">批量移除</button>
+						<button id="addUser" class="search-btn" style="cursor: pointer;">添加人员</button>
+					</div>
+					<div class="table" style="height: 300px;">
+						<ul class="th">
+							<li style="width:3%;"><div class="mida"><div class="midb"><input type="checkbox" id="selectAllUser"></div></div></li>
+							<li style="width:10%"><div class="mida"><div class="midb">员工姓名</div></div></li>
+							<li style="width:10%;"><div class="mida"><div class="midb">真是姓名</div></div></li>
+							<li style="width:3%;"><div class="mida"><div class="midb">性别</div></div></li>
+							<li style="width:8%;"><div class="mida"><div class="midb">手机</div></div></li>
+							<li style="width:10%;"><div class="mida"><div class="midb">邮箱</div></div></li>
+							<li style="width:6%;"><div class="mida"><div class="midb">来源</div></div></li>
+							<li style="width:10%;"><div class="mida"><div class="midb">上级</div></div></li>
+							<li style="width:5%"><div class="mida"><div class="midb">操作</div></div></li>
+						</ul>
+						<div class="information-list" id="userTable">
+							<p class="t-c fz16 c-2" style="line-height: 76px;">暂无信息！</p>
+						</div>
+						<div id="userPaginationDiv"></div>
+					</div>
+					<div style="margin-top: 20px;margin-right: 20px;margin-bottom: 5px;float:right;">
+						<button id="batchRemoveRole" class="search-btn" style="cursor: pointer;">批量移除</button>
+						<button id="addRole" class="search-btn" style="cursor: pointer;">添加角色</button>
+					</div>
+					<div class="table" style="height: 300px;">
+						<ul class="th">
+							<li style="width:10%;"><div class="mida"><div class="midb"><input type="checkbox" id="selectAllRole"></div></div></li>
+							<li style="width:25%"><div class="mida"><div class="midb">角色名称</div></div></li>
+							<li style="width:25%;"><div class="mida"><div class="midb">角色描述</div></div></li>
+							<li style="width:5%"><div class="mida"><div class="midb">操作</div></div></li>
+						</ul>
+						<div class="information-list" id="roleTable">
+							<p class="t-c fz16 c-2" style="line-height: 76px;">暂无信息！</p>
+						</div>
+						<div id="rolePaginationDiv"></div>
+					</div>
+	       	</div>
+			</div>
+	       </section>
+		</section>
+		<script type="text/javascript">
+            var currentDepartmentType = "";
+
+            $(document).on("click", "#updateBtn", function () {
+                if(currentDepartmentId == "") {
+                    layer.msg("请选择节点", {icon: 5});
+                    return;
+				}
+                var departmentType = $("#departmentType").val();
+                if(currentDepartmentType == "POSITION" && departmentType != currentDepartmentType) {
+                    if($('input:checkbox[name="userCheck"]').length > 0
+					|| $('input:checkbox[name="roleCheck"]').length > 0) {
+                        layer.msg("类型设置为非岗位时请先移除员工和角色后操作", {icon: 5});
+                        return;
+					}
+				}
+                layer.load();
+                var param = {};
+                param.departmentId = currentDepartmentId;
+                param.departmentDesc = $("#departmentDesc").val();
+                param.departmentType = departmentType;
+                currentDepartmentType = departmentType;
+                postUtil.call("/authorityDepartment/update",{jsonData:JSON.stringify(param)},function(res){
+                    if(res.STATUS = "SUCCESS") {
+                        layer.msg("更新成功", {icon: 6});
+//                        $("#departmentDesc").val("");
+//                        $("#departmentType").val("");
+                    } else {
+                        layer.msg("更新失败，错误信息如下:<br>" + res.MSG, {icon: 5});
+                    }
+                    layer.closeAll("loading");
+                });
+            });
+
+            $(document).on("click", "#userTable ul", function () {
+                var checked = $(this).find('input:checkbox[name="userCheck"]').attr("checked");
+                $(this).find('input:checkbox[name="userCheck"]').attr("checked", !checked);
+                var isAllChecked = true;
+                $.each($('input:checkbox[name="userCheck"]'), function (index, item) {
+                    if(!$(item).is(':checked')) {
+                        isAllChecked = false;
+                        return false;
+                    }
+                });
+                $("#selectAllUser").prop("checked", isAllChecked);
+            });
+
+            $(document).on("click", '#selectAllUser', function () {
+                var selectAllChecked = document.getElementById("selectAllUser").checked;
+                var checks = document.getElementsByName("userCheck");
+                if (checks.length > 0) {
+                    for (var i = 0; i < checks.length; i++) {
+                        checks[i].checked = selectAllChecked;
+                    }
+                }
+            });
+
+            $(document).on("click", "#roleTable ul", function () {
+                var checked = $(this).find('input:checkbox[name="roleCheck"]').attr("checked");
+                $(this).find('input:checkbox[name="roleCheck"]').attr("checked", !checked);
+                var isAllChecked = true;
+                $.each($('input:checkbox[name="roleCheck"]'), function (index, item) {
+                    if(!$(item).is(':checked')) {
+                        isAllChecked = false;
+                        return false;
+                    }
+                });
+                $("#selectAllRole").prop("checked", isAllChecked);
+            });
+
+            $(document).on("click", '#selectAllRole', function () {
+                var selectAllChecked = document.getElementById("selectAllRole").checked;
+                var checks = document.getElementsByName("roleCheck");
+                if (checks.length > 0) {
+                    for (var i = 0; i < checks.length; i++) {
+                        checks[i].checked = selectAllChecked;
+                    }
+                }
+            });
+
+            $(document).on("click",'#cancelAddAuthorityDepartmentBtn',function(){
+                returnToAuthorityDepartmentList();
+            });
+
+            $(document).on("click",'#batchRemoveUser',function(){
+                if($('input:checkbox[name="userCheck"]:checked').length == 0) {
+                    layer.msg("请勾选员工");
+                    return;
+				}
+				var msgIndex = layer.load();
+                var userIds = [];
+				$.each($('input:checkbox[name="userCheck"]:checked'), function (index, item) {
+                    userIds.push($(item).val());
+				});
+				var delParam = {};
+                delParam.departmentId = currentDepartmentId;
+                delParam.userIds = userIds;
+                postUtil.call("/authorityDepartment/removeUser", {jsonData:JSON.stringify(delParam)}, function (res) {
+                    if(res.STATUS == "SUCCESS") {
+                        layer.msg("删除人员成功",{icon:6});
+                        var queryParam = {};
+                        queryParam.currentPageIndex = 1;
+                        queryParam.pageSize = PAGE_SIZE;
+                        queryParam.departmentId = currentDepartmentId;
+                        loadUserData(queryParam);
+					} else {
+                        layer.msg("删除人员失败",{icon:5});
+					}
+					layer.close(msgIndex);
+                });
+            });
+
+            $(document).on("click",'#batchRemoveRole',function(){
+                if($('input:checkbox[name="roleCheck"]:checked').length == 0) {
+                    layer.msg("请勾选角色");
+                    return;
+                }
+                var msgIndex = layer.load();
+                var roleIds = [];
+                $.each($('input:checkbox[name="roleCheck"]:checked'), function (index, item) {
+                    roleIds.push($(item).val());
+                });
+                var delParam = {};
+                delParam.departmentId = currentDepartmentId;
+                delParam.roleIds = roleIds;
+                postUtil.call("/authorityDepartment/removeRole", {jsonData:JSON.stringify(delParam)}, function (res) {
+                    if(res.STATUS == "SUCCESS") {
+                        layer.msg("删除角色成功",{icon:6});
+                        var queryParam = {};
+                        queryParam.currentPageIndex = 1;
+                        queryParam.pageSize = PAGE_SIZE;
+                        queryParam.departmentId = currentDepartmentId;
+                        loadRoleData(queryParam);
+                    } else {
+                        layer.msg("删除角色失败",{icon:5});
+                    }
+                    layer.close(msgIndex);
+                });
+            });
+
+            $(document).on("click",'#addUser',function(){
+                if(currentDepartmentId == "") {
+                    layer.msg("请选择节点", {icon: 5});
+                    return;
+                }
+                if(currentDepartmentType != "POSITION") {
+                    layer.msg("非岗位无法添加人员", {icon: 5});
+                    return;
+				}
+                layer.open({
+                    title:"请选择员工",
+                    type: 2,
+                    area: ['1000px', '550px'],
+                    fixed: false, //不固定
+                    maxmin: true,
+                    content: '/reusable/user/chooseUserPage'
+                });
+            });
+
+            $(document).on("click",'#addRole',function(){
+                if(currentDepartmentId == "") {
+                    layer.msg("请选择节点", {icon: 5});
+                    return;
+                }
+                if(currentDepartmentType != "POSITION") {
+                    layer.msg("非岗位无法添加角色", {icon: 5});
+                    return;
+                }
+                layer.open({
+                    title:"请选择角色",
+                    type: 2,
+                    area: ['1000px', '550px'],
+                    fixed: false, //不固定
+                    maxmin: true,
+                    content: '/reusable/role/chooseRolePage'
+                });
+            });
+
+
+            function initData() {
+				loadDepartment(currentDepartmentId);
+            }
+
+            function clearData() {
+                $("#departmentDesc").val("");
+                $("#departmentType").val("");
+                clearTableById("userTable");
+                clearTableById("roleTable");
+            }
+
+            function clearTableById(tableId) {
+                var table = document.getElementById(tableId);
+                table.innerHTML = "";
+
+                var html = '<p class="t-c fz16 c-2" style="line-height: 76px;">暂无信息！</p>';
+                $(table).html(html);
+                if(tableId == "userTable") {
+                    $("#selectAllUser").prop("checked", false);
+				} else {
+                    $("#selectAllRole").prop("checked", false);
+				}
+            }
+
+            function loadDepartment(departmentId) {
+                var index = layer.load();
+                postUtil.call("/authorityDepartment/info/"+departmentId, null, function (res) {
+                    if(res) {
+                        var department = res;
+                        $("#departmentDesc").val(department.departmentDesc);
+                        $("#departmentType").val(department.departmentType);
+                        currentDepartmentType = department.departmentType;
+					} else {
+                        layer.msg("加载部门信息失败", {icon: 5});
+					}
+                    layer.close(index);
+                });
+                var queryParam = {};
+                queryParam.currentPageIndex = 1;
+                queryParam.pageSize = PAGE_SIZE;
+                queryParam.departmentId = departmentId;
+
+                loadUserData(queryParam);
+
+                loadRoleData(queryParam);
+            }
+
+
+            function returnToAuthorityDepartmentList(){
+                postUtil.submit("/authorityDepartment/preList");
+            }
+            var PAGE_SIZE = 5;
+
+            function userTableInit(){
+
+                var queryParam = {};
+                queryParam.currentPageIndex = 1;
+                queryParam.pageSize = PAGE_SIZE;
+
+                loadUserData(queryParam);
+
+
+            }
+
+            function loadUserData(queryParam) {
+                var index = layer.load();
+                postUtil.call("/authorityDepartment/loadUser", queryParam, function (pageResult) {
+                    var pageNumber = pageResult.pageNumber;
+                    var pageSize = pageResult.pageSize;
+                    var totalPage = pageResult.totalPage;
+                    var totalRow = pageResult.totalRow;
+                    var dataList = pageResult.list;
+                    renderTableById(dataList, "userTable");
+                    laypage({
+                        cont: 'userPaginationDiv',
+                        pages: totalPage,
+                        curr: pageNumber,
+                        total: totalRow,
+                        skip: true,
+                        jump: function (obj, first) {
+                            if (!first) {
+                                var tempParam = {};
+                                tempParam.currentPageIndex = obj.curr;
+                                tempParam.pageSize = PAGE_SIZE;
+                                tempParam.departmentId = currentDepartmentId;
+                                loadUserData(tempParam);
+                            }
+                        }
+                    });
+                    layer.close(index);
+                });
+            }
+
+            function roleTableInit(){
+
+                var queryParam = {};
+                queryParam.currentPageIndex = 1;
+                queryParam.pageSize = PAGE_SIZE;
+
+                loadRoleData(queryParam);
+            }
+
+            function loadRoleData(queryParam) {
+                var index = layer.load();
+                postUtil.call("/authorityDepartment/loadRole", queryParam, function (pageResult) {
+                    var pageNumber = pageResult.pageNumber;
+                    var pageSize = pageResult.pageSize;
+                    var totalPage = pageResult.totalPage;
+                    var totalRow = pageResult.totalRow;
+                    var dataList = pageResult.list;
+                    renderTableById(dataList, "roleTable");
+                    laypage({
+                        cont: 'rolePaginationDiv',
+                        pages: totalPage,
+                        curr: pageNumber,
+                        total: totalRow,
+                        skip: true,
+                        jump: function (obj, first) {
+                            if (!first) {
+                                var tempParam = {};
+                                tempParam.currentPageIndex = obj.curr;
+                                tempParam.pageSize = PAGE_SIZE;
+                                tempParam.departmentId = currentDepartmentId;
+                                loadRoleData(tempParam);
+                            }
+                        }
+                    });
+                    layer.close(index);
+                });
+            }
+
+            function renderTableById(dataList, tableId) {
+                var length = dataList.length;
+                var table = document.getElementById(tableId);
+                table.innerHTML = "";
+                if(tableId == "userTable") {
+                    $("#selectAllUser").prop("checked", false);
+                } else {
+                    $("#selectAllRole").prop("checked", false);
+                }
+
+                if (length > 0) {
+                    for (var i = 0; i < dataList.length; i++) {
+                        var data = dataList[i];
+                        var row = renderRow(data, tableId);
+                        table.appendChild(row);
+                    }
+                }else {
+                    var html = '<p class="t-c fz16 c-2" style="line-height: 76px;">暂无信息！</p>';
+                    $(table).html(html);
+                }
+            }
+
+            function renderRow(rowData, tableId) {
+                if(tableId == "userTable") {
+                    return renderUserRow(rowData);
+                } else if(tableId == "roleTable") {
+                    return renderRoleRow(rowData);
+                }
+                return "";
+            }
+
+            function renderUserRow(rowData) {
+                var userId = rowData.userId;
+                var userName = rowData.userName;
+                var userRealName = rowData.userRealName;
+                var sex = rowData.sex;
+                var mobile = rowData.mobile;
+                var email = rowData.email;
+                var createChannel = rowData.createChannel;
+                var pUserId = rowData.pUserId;
+                var pUserName = rowData.pUserName;
+
+                var ul = document.createElement('ul');
+                ul.setAttribute("class", "information");
+                ul.setAttribute("style","height:35px;");
+
+                ul.appendChild(renderUserCell("check", userId, "width:3%;height:35px;"));
+                ul.appendChild(renderUserCell(null, userName, "width:10%;height:35px;"));
+                ul.appendChild(renderUserCell(null, userRealName, "width:10%;height:35px;"));
+                ul.appendChild(renderUserCell(null, sex, "width:3%;height:35px;"));
+                ul.appendChild(renderUserCell(null, mobile, "width:8%;height:35px;"));
+                ul.appendChild(renderUserCell(null, email, "width:10%;height:35px;"));
+                ul.appendChild(renderUserCell(null, createChannel, "width:6%;height:35px;"));
+                ul.appendChild(renderUserCell(null, pUserName, "width:10%;height:35px;"));
+                ul.appendChild(renderUserCell("operation", rowData, "width:5%;height:35px;"));
+                return ul;
+            }
+
+            function renderRoleRow(rowData) {
+                var roleId = rowData.roleId;
+                var roleName = rowData.roleName;
+                var roleDesc = rowData.roleDesc;
+
+
+                var ul = document.createElement('ul');
+                ul.setAttribute("class", "information");
+                ul.setAttribute("style","height:35px;");
+
+                ul.appendChild(renderRoleCell("check", roleId, "width:10%;height:35px;"));
+                ul.appendChild(renderRoleCell(null, roleName, "width:25%;height:35px;"));
+                ul.appendChild(renderRoleCell(null, roleDesc, "width:25%;height:35px;"));
+                ul.appendChild(renderRoleCell("operation", rowData, "width:5%;height:35px;"));
+                return ul;
+            }
+
+            function renderUserCell(name, value, style) {
+                var li = document.createElement('li');
+                li.setAttribute("style", style)
+                var div_mida = document.createElement('div');
+                div_mida.setAttribute("class", "mida");
+                var div_midb = document.createElement('div');
+                div_midb.setAttribute("class", "midb");
+                //个性化差异-操作区域
+                if ("operation" == name) {
+                    div_midb.innerHTML = '<p><a href="javascript:void(0);" onclick="removeUser(\'' + value.userId + '\')">移除</a></p>';
+                } else if("check" == name) {
+                    div_midb.innerHTML = '<input type="checkbox" name="userCheck" value="'+value+'">';
+                } else {
+                    if (value) {
+                        div_midb.innerText = value;
+                    } else {
+                        div_midb.innerText = "--";
+                    }
+                }
+                div_mida.appendChild(div_midb);
+                li.appendChild(div_mida);
+                return li;
+            }
+
+            function renderRoleCell(name, value, style) {
+                var li = document.createElement('li');
+                li.setAttribute("style", style)
+                var div_mida = document.createElement('div');
+                div_mida.setAttribute("class", "mida");
+                var div_midb = document.createElement('div');
+                div_midb.setAttribute("class", "midb");
+                //个性化差异-操作区域
+                if ("operation" == name) {
+                    div_midb.innerHTML = '<p><a href="javascript:void(0);" onclick="removeRole(\''+value.roleId+'\')">移除</a></p>';
+                } else if("check" == name) {
+                    div_midb.innerHTML = '<input type="checkbox" name="roleCheck" value="'+value+'">';
+                } else {
+                    if (value) {
+                        div_midb.innerText = value;
+                    } else {
+                        div_midb.innerText = "--";
+                    }
+                }
+                div_mida.appendChild(div_midb);
+                li.appendChild(div_mida);
+                return li;
+            }
+
+            function chooseUserCallback(userData) {
+                if(userData) {
+                    var tableId = "userTable";
+                    var table = document.getElementById(tableId);
+					var userToAdd = [];
+                    var userIds = [];
+                    $.each(userData, function (index, item) {
+//                        var isExist = false;
+//                        $.each($('input:checkbox[name="userCheck"]'), function (idx, itm) {
+//                            if(item.userId == $(itm).val()) {
+//                                isExist = true;
+//                                return true;
+//                            }
+//                        });
+//                        if(isExist) {
+//                            return true;
+//                        }
+//                        userToAdd.push(item);
+                        userIds.push(item.userId);
+                    });
+					if(userIds.length > 0) {
+					    var saveParam = {};
+                        saveParam.departmentId = currentDepartmentId;
+                        saveParam.userIds = userIds;
+                        var msgIndex = layer.load();
+                        postUtil.call("/authorityDepartment/addUser", {jsonData:JSON.stringify(saveParam)}, function (res) {
+							if(res.STATUS == "SUCCESS"){
+							    layer.msg("添加人员成功", {icon: 6});
+                                var queryParam = {};
+                                queryParam.currentPageIndex = 1;
+                                queryParam.pageSize = PAGE_SIZE;
+                                queryParam.departmentId = currentDepartmentId;
+                                loadUserData(queryParam);
+							} else {
+                                layer.msg("添加人员失败", {icon: 5});
+							}
+                            layer.close(msgIndex);
+                        });
+					}
+                }
+                return true;
+            }
+
+            function chooseRoleCallback(roleData) {
+                if(roleData) {
+                    var tableId = "roleTable";
+                    var table = document.getElementById(tableId);
+                    var roleToAdd = [];
+                    var roleIds = [];
+                    $.each(roleData, function (index, item) {
+//                        var isExist = false;
+//                        $.each($('input:checkbox[name="roleCheck"]'), function (idx, itm) {
+//                            if(item.roleId == $(itm).val()) {
+//                                isExist = true;
+//                                return true;
+//                            }
+//                        });
+//                        if(isExist) {
+//                            return true;
+//                        }
+//                        roleToAdd.push(item);
+                        roleIds.push(item.roleId);
+                    });
+                    if(roleIds.length > 0) {
+                        var saveParam = {};
+                        saveParam.departmentId = currentDepartmentId;
+                        saveParam.roleIds = roleIds;
+                        var msgIndex = layer.load();
+                        postUtil.call("/authorityDepartment/addRole", {jsonData:JSON.stringify(saveParam)}, function (res) {
+                            if(res.STATUS == "SUCCESS"){
+                                layer.msg("添加角色成功", {icon: 6});
+                                var queryParam = {};
+                                queryParam.currentPageIndex = 1;
+                                queryParam.pageSize = PAGE_SIZE;
+                                queryParam.departmentId = currentDepartmentId;
+                                loadRoleData(queryParam);
+                            } else {
+                                layer.msg("添加角色失败", {icon: 5});
+                            }
+                            layer.close(msgIndex);
+                        });
+                    }
+                }
+                return true;
+            }
+
+            function removeUser(userId) {
+                var msgIndex = layer.load();
+                var delParam = {};
+                delParam.departmentId = currentDepartmentId;
+                delParam.userIds = [];
+                delParam.userIds.push(userId);
+                postUtil.call("/authorityDepartment/removeUser", {jsonData:JSON.stringify(delParam)}, function (res) {
+                    if(res.STATUS == "SUCCESS") {
+                        layer.msg("删除人员成功",{icon:6});
+                        var queryParam = {};
+                        queryParam.currentPageIndex = 1;
+                        queryParam.pageSize = PAGE_SIZE;
+                        queryParam.departmentId = currentDepartmentId;
+                        loadUserData(queryParam);
+                    } else {
+                        layer.msg("删除人员失败",{icon:5});
+                    }
+                    layer.close(msgIndex);
+                });
+            }
+
+            function removeRole(roleId) {
+                var msgIndex = layer.load();
+                var delParam = {};
+                delParam.departmentId = currentDepartmentId;
+                delParam.roleIds = [];
+                delParam.roleIds.push(roleId);
+                postUtil.call("/authorityDepartment/removeRole", {jsonData:JSON.stringify(delParam)}, function (res) {
+                    if(res.STATUS == "SUCCESS") {
+                        layer.msg("删除角色成功",{icon:6});
+                        var queryParam = {};
+                        queryParam.currentPageIndex = 1;
+                        queryParam.pageSize = PAGE_SIZE;
+                        queryParam.departmentId = currentDepartmentId;
+                        loadRoleData(queryParam);
+                    } else {
+                        layer.msg("删除角色失败",{icon:5});
+                    }
+                    layer.close(msgIndex);
+                });
+            }
+
+
+		</script>
+	</body>
+</html>

@@ -1,0 +1,27 @@
+{
+    "MSG": "success msg.",
+    "STATUS": "SUCCESS",
+    "DATA":
+    [
+        {
+            "offerId":"123456",
+            "offerHistoryId":"789012",
+            "offerStatus":"CLOSE",
+            "operationContent":"关闭询单",
+            "operationMainObjectId":"平台",
+            "operationUserName":"张三",
+            "operationAccountName":"yofc",
+            "operationTime":"2017-06-03 16:33:33"
+        },
+        {
+            "offerId":"123456",
+            "offerHistoryId":"456789",
+            "offerStatus":"NO_FLLOW",
+            "operationContent":"待跟进询单",
+            "operationMainObjectId":"工程商",
+            "operationUserName":"张三",
+            "operationAccountName":"yofc",
+            "operationTime":"2017-06-03 16:33:33"
+        }
+    ]
+}

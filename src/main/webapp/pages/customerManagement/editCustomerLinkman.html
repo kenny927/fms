@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/StringUtils.js<@resVersionDirective>?</@>"></script>
+    <style>
+        .form-css .dl-form dd input[type='text']{
+            width: 200px;
+        }
+        .layui-btn-big{
+            width: 88px;
+        }
+    </style>
+</head>
+<body>
+<div class="yofc-body" style="padding: 20px 20px;">
+    <form action="" class="jun-form-s form-css">
+        <dl class="dl-form">
+            <dt class="flt fz12"><span style="color:red">*</span>联系人姓名：</dt>
+            <dd class="flt">
+                <input type="hidden" id="linkmanId" value="">
+                <input type="hidden" id="accountId" value="">
+                <input type="text" id="linkmanName" name="title" value="" placeholder="请输入联系人姓名" autocomplete="off"
+                       class="layui-input">
+            </dd>
+            <dt class="flt fz12">性别：</dt>
+            <dd class="flt layui-form" id="sex">
+                <input type="radio" name="sex" value="male" checked title="先生"><input type="radio" name="sex"  value="female" title="女士">
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12"><span style="color:red">*</span>手机：</dt>
+            <dd class="flt">
+                <input type="text" name="title" id="linkmanTelephone" value="" placeholder="请输入联系电话" autocomplete="off"
+                class="layui-input">
+            </dd>
+            <dt class="flt fz12"><span style="color:red">*</span>邮箱：</dt>
+            <dd class="flt"><input type="text" id="email" name="title" value="" placeholder="请输入邮箱" autocomplete="off"
+                                   class="layui-input">
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12">座机：</dt>
+            <dd class="flt">
+                <input type="text" name="title" id="linkmanFixedTelephone" placeholder="请输入座机" autocomplete="off" value=""
+                       class="layui-input">
+            </dd>
+            <dt class="flt fz12">QQ：</dt>
+            <dd class="flt"><input type="text" id="qq" name="title" value="" placeholder="请输入QQ" autocomplete="off"
+                                   class="layui-input">
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12">部门：</dt>
+            <dd class="flt"><input type="text" id="department" name="title" value="" placeholder="请输入部门" autocomplete="off"
+                                   class="layui-input">
+            </dd>
+            <dt class="flt fz12">职务：</dt>
+            <dd class="flt">
+                <input type="text" id="linkmanPosition" name="title" value="" placeholder="请输入职务"autocomplete="off"
+                       class="layui-input">
+            </dd>
+        </dl>
+        <dl class="dl-form" style="margin-bottom: 0px;">
+            <dt class="flt fz12">&nbsp;</dt>
+            <dd class="flt layui-form" id="Primary">
+                <input type="checkbox" id="isPrimary" title="设置为主要联系人" lay-skin="primary">
+            </dd>
+        </dl>
+    </form>
+    <div class="t-c">
+        <span class="form-btn layui-btn-big" id="editSystemAccountLinkmanBtn">保存</span>
+        <span class="form-btn  layui-btn-primary layui-btn-big ml10" id="cancelEditSystemAccountLinkmanBtn">取消</span>
+    </div>
+</div>
+<script type="text/javascript">
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    var linkmanId = '${linkmanId!}';
+    var accountId = '${accountId!}';
+    var $form;
+    var form;
+    var layer;
+    layui.use(['form', 'layer'], function () {
+        layer = layui.layer;
+        form = layui.form();
+        $form = $('form');
+        if(linkmanId) {
+            loadData();
+        }
+        parent.layer.iframeAuto(index);
+        $('#cancelEditSystemAccountLinkmanBtn').bind("click", function () {
+            parent.layer.close(index);//关闭当前窗口
+        });
+
+        $('#editSystemAccountLinkmanBtn').bind("click", function () {
+            var linkmanName = $('#linkmanName').val();
+            var sex = $("[name='sex']:checked").val();
+            var linkmanTelephone = $('#linkmanTelephone').val();
+            var linkmanFixedTelephone = $('#linkmanFixedTelephone').val();
+            var email = $('#email').val();
+            var department = $('#department').val();
+            var linkmanPosition = $('#linkmanPosition').val();
+            var isPrimary = $('#isPrimary')[0].checked;
+            isPrimary = (isPrimary == true) ? "Y" : "N";
+            if (StringUtils.isEmpty(linkmanName)) {
+                layer.msg("联系人姓名不允许为空", {icon: 5});
+                return;
+            }
+            if (!sex) {
+                layer.msg("请选择联系人性别", {icon: 5});
+                return;
+            }
+            if (linkmanTelephone == null || linkmanTelephone == "") {
+                layer.msg("联系人电话不允许为空", {icon: 5});
+                return;
+            }
+            var reg1 = /^0?1[3|4|5|7|8][0-9]\d{8}$/;//校验手机号码
+            if(linkmanTelephone != '' && !reg1.test(linkmanTelephone)){
+                layer.msg("联系人电话请输入合法的手机号码", {icon: 5});
+                return;
+            }
+
+            if(linkmanFixedTelephone !=null && linkmanFixedTelephone != ''){
+                var reg1 = /^0[\d]{2,3}-[\d]{7,8}$/;
+                if (!reg1.test(linkmanFixedTelephone)) {
+                    layer.msg("联系人座机电话请输入合法的座机号码", {icon: 5});
+                    return;
+                }
+            }
+            if (email == null || email == "") {
+                layer.msg("邮箱不允许为空", {icon: 5});
+                return;
+            }
+            if(email != null && email != "") {
+                var email_reg = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+                if(!email_reg.test(email)){
+                    layer.msg("请输入合法的邮箱", {icon: 5});
+                    return;
+                }
+            }
+            var param = {};
+            param.linkmanId = $('#linkmanId').val();
+            param.accountId = accountId;
+            param.linkmanName = linkmanName;
+            param.sex = sex;
+            param.linkmanTelephone = linkmanTelephone;
+            param.linkmanFixedTelephone =  linkmanFixedTelephone;
+            param.email = email;
+            param.qq=$('#qq').val();
+            param.department = department;
+            param.isPrimary = isPrimary;
+            param.linkmanPosition = linkmanPosition;
+            postUtil.call("/customerlinkman/saveCustomerlinkmanDetail", {"jsonStr": JSON.stringify(param)}, function (result) {
+                if (result.STATUS == "SUCCESS") {
+                    if(linkmanId) {
+                        layer.msg("修改联系人成功", {icon: 6});
+                    }else {
+                        layer.msg("新增联系人成功", {icon: 6});
+                    }
+                    var success = parent.updateAccountLinkmanCallback(result);//调用父页面的渲染方法
+                    if (success) {
+                        setTimeout(function () {
+                            parent.layer.close(index);//关闭当前窗口
+                        },1500);
+                    }
+                } else {
+                    layer.msg("失败原因:" + result.MSG, {icon: 5});
+                }
+            });
+        });
+    });
+     function loadData() {
+         postUtil.call('/customerlinkman/queryCustomerlinkmanDetail',{'linkmanId':linkmanId},function (result) {
+             if(result.STATUS == 'SUCCESS') {
+                  console.log(result.DATA);
+                 $("#linkmanId").val(result.DATA.linkmanId);
+                 $("#accountId").val(result.DATA.accountId);
+                 accountId =result.DATA.accountId;
+                 $("#linkmanName").val(result.DATA.linkmanName);
+                 $("#accountId").val(result.DATA.accountId);
+                 $("#linkmanTelephone").val(result.DATA.linkmanTelephone);
+                 $("#linkmanFixedTelephone").val(result.DATA.linkmanFixedTelephone);
+                 $("#email").val(result.DATA.email);
+                 $("#qq").val(result.DATA.qq);
+                 $("#department").val(result.DATA.department);
+                 $("#linkmanPosition").val(result.DATA.linkmanPosition);
+                 if(result.DATA.isGenAuthorityUser == "Y") {
+                     $("#isGenAuthorityUser").attr("checked").attr("disabled");
+                 }
+                 if(result.DATA.sex == 'female') {
+                     $("#sex").html('<input type="radio" name="sex" value="male" title="先生"><input type="radio" name="sex" checked  value="female" title="女士">');
+                 }else {
+                     $("#sex").html('<input type="radio" name="sex" checked value="male" title="先生"><input type="radio" name="sex"   value="female" title="女士">');
+                 }
+                 if(result.DATA.isPrimary == 'Y'){
+                     $("#Primary").html('<input type="checkbox" id="isPrimary" checked  title="设置为主要联系人" lay-skin="primary">');
+                 }
+                 form.render();
+             }
+         })
+     }
+
+</script>
+</body>
+</html>

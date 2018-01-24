@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/Area1.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/vue.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/numCheck.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/mallInquiryOrder/address_invoice.js<@resVersionDirective>?</@>"></script>
+    <style>
+        input[type="file"]::-webkit-file-upload-button {
+            width: 70px;
+            height: 40px;
+            overflow: hidden;
+            line-height: 3em;
+            background: #FFFFFF;
+            content: "";
+            cursor: pointer;
+            background:url(/res/images/addfile.jpg) no-repeat 0 0;
+            outline: none;
+            border: 0 none;z-index: 2;
+        }
+
+        p[name="attachmentFile"]{
+            color: blue !important;
+        }
+        [v-cloak]{
+            display: none;
+        }
+        .goods-detail dl dd{
+            max-width: 415px;
+        }
+    </style>
+    <script>
+        var offerId = '${offerId}';
+        var layer;
+        var vm
+        var $;
+        var _userId="";
+        var _accountId="";
+        var _accountInfo={};
+        var _entrustOrderContact="";
+        var _entrustOrderContactMobile="";
+        var laydate;
+        var _city="";
+        var $form;
+        var form;
+        var _province="";
+        var data2={};
+        var buyerAccountId="";
+        var offerType='';
+        //页面加载完后调用
+        $(function () {
+            //复制询价单预处理
+            if(offerId) {
+                postUtil.call("/mallOrder/api/mallInquiry/detail", {offerId:offerId}, function (result) {
+                    if (result.STATUS == 'SUCCESS') {
+                        console.log(result.DATA)
+
+                        inquiryOrderHistoryDetail(result.DATA);
+                        layui.use('form', function() {
+                            form = layui.form();
+                            $form =$($('.form-css')[0]);
+                            loadProvince();
+                            form.render();
+                        });
+                    } else {
+                        layer.msg('系统发生未知错误' + result.MSG, {icon: 5});
+                    }
+                });
+            }else {
+                layui.use('form', function() {
+                    form = layui.form();
+                    $form =$($('.form-css')[0]);
+                    loadProvince();
+                    form.render();
+                });
+                //代客下询单预处理
+                inquiryOrderHistoryDetail2();
+            }
+
+        });
+
+        function  inquiryOrderHistoryDetail2(){
+//            Vue.filter('date',{
+//                read:function(input){ //model-view
+//                    var oDate = new Date(Number(input));
+//                    return oDate.getFullYear() + '-' + (oDate.getMonth() + 1) + '-' + oDate.getDate();
+//                },
+//                write:function(val){ //view -> model
+//                    return val;
+//                }
+//            });
+
+            _province="";
+            _city="";
+           data2={
+                    "buyerSellerInfo": {
+                            "accountName": "",
+                            "province": "",
+                            "offerAccountName": "",
+                            "entrustOrderContactMobile": "",
+                            "city": "",
+                            "entrustOrderContact": "",
+                            "buyerAccountId": ""
+                    },
+                    "expectDeliveryDate":"",
+                    "offerValidUntil":"",
+                    "accountManagerName":"",
+                    "mobile":"",
+                    "offerType":"",
+                    "email":"",
+                    "qq":"",
+                    "replyDeliveryDate":"",
+                    "inquiryOrderStatus":"",
+                    "inquiryOrderStatusName":"",
+                    "operationTime":"",
+                    "inquiryOrderProvince": "",
+                    "invoiceType": "",
+                    "deliveryMode": "LORRY",
+                    "skuList": [
+                    {
+                        "skuId": "",
+                        "skuName": "",
+                        "skuModel": "",
+                        "orginImg":"",
+                        "skuBrandName": "",
+                        "skuPropertyList":"",
+                        "skuProductImage": "",
+                        "skuClassifyName": "",
+                        "skuClassifyId":"",
+                        "mallClassifyName": "",
+                        "skuUnitName": "",
+                        "directoryPrice":0,
+                        "skuQuantity": "",
+                        "skuOfferPrice": "",
+                        "skuOfferAmount": "",
+                        "remark":""
+                    }
+                ],
+                    "customSkuList":
+                [
+                    {
+                        "skuName":"",
+                        "skuBrandName":"",
+                        "skuModel":"",
+                        "skuClassifyName":"",
+                        "mallClassifyName":"",
+                        "skuUnitName":"",
+                        "skuQuantity":"",
+                        "skuPrice":"",
+                        "skuAmount":"",
+                        "remark":""
+                    }
+                ],
+                    "operationLog": [
+                    {
+                        "orderLogId": "1004",
+                        "offerId": "BE20170607762357",
+                        "offerHistoryId": "1006",
+                        "offerStatus": "NO_FLLOW",
+                        "operationContent": "",
+                        "operationMainObjectId": "",
+                        "operationUserId": "",
+                        "operationUserName": "",
+                        "operationAccountId": "",
+                        "operationAccountName": "",
+                        "operationTime": 0
+                    }
+                ],
+                    "purchasingRequisitionDesc": "",
+                    "accountManagerId": "",
+                    "payMode": "CASH_BEFORE_DELIVERY",
+                    "deliveryModeRemark": "",
+                    "isNeedInvoice": "Y",
+                    "payModeRemark": "",
+                    "inquiryOrderCity": "",
+                    "offerId": "",
+                    "offerTotalPrice":"" ,
+                    "offerOtherFeesDesc": "",
+                    "offerOtherFees": "",
+                    "offerSkuTotalPrice":"",
+                    "offerFreight": "",
+                    "attachmentList": [],
+                    "attachmentId": "",
+                    "attachmentFileListStr": [{
+                        "offerId": "",
+                        "attachmentId": "",
+                        "attachmentName": ""
+                    }]
+            };
+            $("#enquire_expectDeliveryTime").val("");
+//            if (!data2.buyerSellerInfo.offerAccountName) {
+//                data2.buyerSellerInfo.offerAccountName = "";
+//            }
+            Vue.filter('nullValue', function (input) {
+                if (input == "" || input == undefined) {
+                    input = "--";
+                }
+                return input
+            });
+            Vue.filter("formatQuantity", {
+                read:function(value){
+                    if(value && !isNaN(value)){
+                        var val=parseFloat(value).toFixed(3);
+                        return val;
+                    }
+                },
+                write:function(value){
+                    return value;
+                }
+            });
+            Vue.filter("formatQuantity2", {
+                read:function(value){
+                    if(value && !isNaN(value)){
+                        var val=parseFloat(value).toFixed(2);
+                        return val;
+                    }
+                },
+                write:function(value){
+                    return value;
+                }
+            });
+            //日期时间显示格式
+            Vue.filter('date',{
+                read:function(input){ //model-view
+                    var oDate = new Date(Number(input));
+                    return oDate.getFullYear() + '-' + (oDate.getMonth() + 1) + '-' + oDate.getDate() ;
+                },
+                write:function(val){ //view -> model
+                    return val;
+                }
+            });
+            Vue.filter('time', function (value, format) {
+                value = value || '';
+                if(value == ''){
+                    return '--';
+                }
+                format = format || 'YYYY/MM/DD HH:mm:ss';
+                return moment(value).format(format);
+            });
+              vm =new Vue({
+                    el: "#queryBuyerEnquireDetail",
+                    data: {
+                        message: "",
+                        datas: data2,
+                        lis: data2.operationLog,
+                        malls: data2.skuList,
+                        attachmentFileListStr:data2.attachmentList,
+                        buyerSellerInfo:data2.buyerSellerInfo,
+                        diys: data2.customSkuList,
+                        chooseSystemAccount: {},
+                        nowIndex: -100,
+                        endPrice1: "",
+                        endPrice2: "",
+                        offerSkuTotalPrice: data2.offerSkuTotalPrice,
+                        offerOtherFees: data2.offerOtherFees,
+                        offerFreight: data2.offerFreight,
+                        offerTotalPrice: data2.offerTotalPrice,
+                        willShow: "",
+                        buyerAttachmentList:data2.attachmentList,
+//                        payModeRemark1:"",
+                        word: "展开",
+                        now: -1,
+                        cash:30,
+                        dep:"",
+                        msg1: "",
+                        msg3: false,
+                        msg4: "+分销商报价",
+                        selectDistributor:'选择分销商',
+                        msg5: true,
+                        msg6: true,
+                        msg7: true,
+                        msg8: false,
+                        attachment: true,
+                        vendorAccountName :data2.vendorAccountName,
+                        vendorAccountId :data2.vendorAccountId,
+                    },
+                    computed: {
+                        offerSkuTotalPrice: function (item, key) {
+                            return this.multiply(item, key) + this.multiply2(item, key)
+                        },
+                        offerTotalPrice: function () {
+//                            if(this.offerOtherFees==undefined){
+//                                return this.offerSkuTotalPrice + this.offerFreight;
+//                            }else{
+//                                return this.offerSkuTotalPrice + this.offerFreight + this.offerOtherFees;
+//                            }
+                            if(this.offerOtherFees==undefined&&this.offerFreight==undefined ){
+                                return this.offerSkuTotalPrice;
+                            }else if(this.offerOtherFees==undefined){
+                                return this.offerSkuTotalPrice + Number(this.offerFreight);
+                            }else if(this.offerFreight==undefined){
+                                return this.offerSkuTotalPrice + Number(this.offerOtherFees);
+                            }else{
+                                return this.offerSkuTotalPrice + Number(this.offerFreight) + Number(this.offerOtherFees);
+                            }
+                        }
+                    },
+                    created: function () {
+                        this.showData();
+                    },
+                    ready: function(){
+                        $("#enquire_expectDeliveryTime").val("");
+//                        $()
+
+                    },
+                    methods: {
+                        showData: function () {
+                            this.datas.offerOtherFees="";
+                            this.datas.offerFreight="";
+                            this.malls=[];
+                            this.lis=[];
+                            this.diys=[];
+//                            if (this.diys == undefined) {
+//                                this.diys = new Array;
+//                            }
+//                            this.datas={};
+                            this.attachmentList=[];
+                            this.payModeRemark1="";
+                        },
+                        add: function (item, key) {
+                            var precision = unitConfig[item.skuUnitName];
+                            item.skuQuantity = (parseFloat(item.skuQuantity) + 1).toFixed(precision);
+                            this.multiply(item, key);
+                        },
+                        min: function (item, key) {
+                            if (item.skuQuantity > 1) {
+                                var precision = unitConfig[item.skuUnitName];
+                                item.skuQuantity = (parseFloat(item.skuQuantity) - 1).toFixed(precision);
+                                this.multiply(item, key);
+                            }
+                        },
+                        addCustomProduct: function () {
+                            if (this.diys == undefined) {
+//                                this.diys = new Array;
+
+                                this.diys=[]
+                            }
+                            this.diys.push({
+                                skuName: "",
+                                skuBrandName: "",
+                                skuModel: "",
+                                skuClassifyName: "",
+                                mallClassifyName: "",
+                                skuUnitName: "",
+                                skuQuantity: "",
+                                skuPrice: "",
+                                skuAmount: "",
+                                remark: ""
+                            });
+                        },
+                        deleteMsg: function (n) {
+                            this.malls.splice(n, 1);
+                        },
+                        deleteMsg2: function (n) {
+                            this.diys.splice(n, 1);
+
+                        },
+                        multiply: function (item, key) {
+                            this.endPrice2 = 0;
+                            var totalMoney = 0;
+                            //每行报价小计
+                            item.skuOfferAmount = (parseFloat(item.skuOfferPrice) * parseFloat(item.skuQuantity));
+                            // 判断结果是否为NaN
+                            if (isNaN(item.skuOfferAmount)) {
+                                item.skuOfferAmount = '0.00';
+                            } else {
+                                item.skuOfferAmount = item.skuOfferAmount;
+                            }
+                            // 商品总报价 (商品报价+自定义商品报价)
+                            for (var i = 0; i < this.malls.length; i++) {
+                                totalMoney += parseFloat(this.malls[i].skuOfferAmount);
+                            }
+                            this.datas.offerSkuTotalPrice = parseFloat(totalMoney) + parseFloat(this.endPrice1);
+                            this.endPrice2 = Number(totalMoney);
+                            return this.endPrice2;
+                        },
+                        multiply2: function (item, key) {
+                            this.endPrice1 = 0;
+                            var totalMoney2 = 0;
+                            //每行报价小计
+                            item.skuAmount = (parseFloat(item.skuPrice) * parseFloat(item.skuQuantity));
+                            // 判断结果是否为NaNs
+                            if (isNaN(item.skuAmount)) {
+                                item.skuAmount = '0.00';
+                            } else {
+                                item.skuAmount = item.skuAmount;
+                            }
+                            // 商品总报价 (商品报价+自定义商品报价)
+                            for (var i = 0; i < this.diys.length; i++) {
+                                totalMoney2 += parseFloat(this.diys[i].skuAmount);
+                            }
+                            this.datas.offerSkuTotalPrice += Number(totalMoney2);
+                            this.endPrice1 = Number(totalMoney2);
+                            return this.endPrice1
+                        },
+                        multiply3: function (offerFreight) {
+//                            this.offerOtherFees = Number(offerOtherFees);
+                            this.offerFreight = Number(offerFreight);
+                        },
+                        multiply4: function (offerOtherFees) {
+                            this.offerOtherFees = Number(offerOtherFees);
+//                            this.offerFreight = Number(offerFreight);
+                        },
+                        fn: function () {
+                            if (this.willShow == true) {
+                                this.willShow = false;
+                                this.word = "展开";
+                            } else {
+                                this.willShow = true;
+                                this.word = "收起";
+                            }
+                        }
+                    }
+                })
+            }
+
+        function inquiryOrderHistoryDetail(data){
+            _accountId=data.buyerSellerInfo.buyerAccountId;
+            buyerAccountId = data.buyerSellerInfo.buyerAccountId;
+            _userId=data.buyerSellerInfo.buyerUserId;
+            _entrustOrderContact=data.buyerSellerInfo.entrustOrderContact;
+            _entrustOrderContactMobile=data.buyerSellerInfo.entrustOrderContactMobile;
+            _province=data.inquiryOrderProvince;
+            _city=data.inquiryOrderCity;
+//            loadProvince();
+            //过滤器 显示--
+            Vue.filter('nullValue', function (input) {
+                if (input == "" || input == undefined) {
+                    input = "--";
+                }
+                return input
+            });
+            //日期时间显示格式
+            Vue.filter('date',{
+                read:function(input){ //model-view
+                    var oDate = new Date(Number(input));
+                    return oDate.getFullYear() + '-' + (oDate.getMonth() + 1) + '-' + oDate.getDate();
+                },
+                write:function(val){ //view -> model
+                    return val;
+                }
+            });
+            Vue.filter('time', function (value, format) {
+                value = value || '';
+                if(value == ''){
+                    return '--';
+                }
+                format = format || 'YYYY/MM/DD HH:mm:ss';
+                return moment(value).format(format);
+            });
+            Vue.filter("formatQuantity", {
+                read:function(value){
+                    if(value && !isNaN(value)){
+                        var val=parseFloat(value).toFixed(3);
+                        return val;
+                    }
+                },
+                write:function(value){
+                    return value;
+                }
+            });
+            Vue.filter("formatQuantity2", {
+                read:function(value){
+//                    debugger;
+                    if(value && !isNaN(value)){
+                        var val=parseFloat(value).toFixed(2);
+                        return val;
+                    }
+                },
+                write:function(value){
+                    return value;
+                }
+            });
+            //为空值时候
+                $.each(data.skuList, function (index, item) {
+                    if (!item.skuOfferAmount) {
+                        item.skuOfferAmount = "";
+                    }
+                    if(item.imgUrl){
+                        item.orginImg = item.imgUrl+item.orginImg;
+                    }
+                    if (!item.skuOfferPrice) {
+                        item.skuOfferPrice = "";
+                    }
+                    if (!item.remark) {
+                        item.remark = "";
+                    }
+                })
+                if(!data.offerFreight || data.offerFreight.length==0){
+                    data.offerFreight="";
+                }
+                if(!data.offerOtherFees){
+                    data.offerOtherFees="";
+                }
+                if(!data.offerOtherFeesDesc){
+                    data.offerOtherFeesDesc="";
+                }
+                if (!data.buyerSellerInfo.offerAccountName) {
+                    data.buyerSellerInfo.offerAccountName = "";
+                }
+                if (!data.buyerAttachmentList) {
+                    data.buyerAttachmentList = new Array;
+                }
+                if(data.purchasingRequisitionDesc && data.purchasingRequisitionDesc!=""){
+                    var num=1000-Number(data.purchasingRequisitionDesc.length)
+                    $("#demandDescribeWord").html(num);
+                }
+                //修改询价单详情数据
+                  console.log(data.attachmentList);
+                vm = new Vue({
+                    el: "#queryBuyerEnquireDetail",
+                    data: {
+                        message: "",
+                        datas: data,
+                        lis: data.operationLog,
+                        malls: data.skuList,
+                        diys: data.customSkuList,
+                        chooseSystemAccount: {},
+                        attachmentFileListStr:data.attachmentList,
+                        buyerAttachmentList:data.attachmentList,
+                        nowIndex: -100,
+                        endPrice1: "",
+                        endPrice2: "",
+                        skuProductPrice: data.offerSkuTotalPrice,
+                        offerOtherFees: data.offerOtherFees,
+                        offerFreight: data.offerFreight,
+                        offerTotalPrice: "",
+                        willShow: "",
+                        word: "展开",
+                        now: -1,
+                        cash:30,
+                        dep:"",
+                        msg1:true,
+                        msg3: true,
+                        msg4: "+分销商报价",
+                        selectDistributor:'选择分销商',
+                        msg5: false,
+                        msg6: true,
+                        msg7: true,
+                        msg8: true,
+                        attachment: true,
+                        offerersAccountId :data.buyerSellerInfo.offerersAccountId,
+                        offerValidUntil:data.offerValidUntil,
+                        vendorAccountName :data.vendorAccountName,
+                        vendorAccountId :data.vendorAccountId,                        
+                        replyDeliveryDate:data.replyDeliveryDate,
+                        parentId:data.parentId
+                    },
+                    computed: {
+                        offerSkuTotalPrice: function (item, key) {
+                            return this.multiply(item, key) + this.multiply2(item, key)
+                        },
+                        offerTotalPrice: function () {
+                            if(this.offerOtherFees==undefined&&this.offerFreight==undefined ){
+                                return this.offerSkuTotalPrice;
+                            }else if(this.offerOtherFees==undefined){
+                                return this.offerSkuTotalPrice + this.offerFreight;
+                            }else if(this.offerFreight==undefined){
+                                return this.offerSkuTotalPrice + this.offerOtherFees;
+                            }else{
+                                return this.offerSkuTotalPrice + this.offerFreight + this.offerOtherFees;
+                            }
+                        }
+                    },
+                    created: function () {
+                        this.showData();
+                        if(this.datas.offerType=="DISTRIBUTOR_OFFER"){
+                        	offerType='distributor';
+                            $("#choseBidder div:last").find("span").eq(0).removeClass("layui-btn-itoc");
+                        }
+                        if (this.datas.offerType=="PLATFORM_OFFER") {
+                        	offerType='platform';
+                            $("#choseBidder div:first").find("span").removeClass("layui-btn-itoc");
+                            this.datas.buyerSellerInfo.offerAccountName="";
+                        }
+                        if(this.datas.vendorAccountId){
+                        	this.selectDistributor='修改';
+                        	$('#choseBidder div').find("a:first").show();
+                        }
+                        if(this.datas.offerersAccountId){
+                        	this.msg4='修改';
+                        	$('#choseBidder div').find("a:last").show();
+                        }
+                    },
+                    ready: function(){
+                        this.lis=[];
+                        if (this.datas.offerType=="PLATFORM_OFFER") {
+//                                    this.msg6 = false;
+                            console.log("平台")
+                        }else {
+                            console.log("分销商")
+//                                    this.msg7 = false;
+                            this.msg3=false;
+//                                    this.msg4 = "";
+                            this.datas.offerOtherFees=0;
+                            this.datas.offerFreight=0;
+                            this.offerOtherFees=0;
+                            this.offerFreight=0;
+                            this.offerTotalPrice=0;
+                            this.offerSkuTotalPrice=0;
+                            this.datas.offerOtherFeesDesc="";
+                            $.each(this.malls,function (index,item) {
+                                item.skuOfferPrice="";
+                                item.skuOfferAmount="";
+                            })
+                            $.each(this.diys,function (index,item) {
+                                item.skuPrice="";
+                                item.skuAmount="";
+                            })
+                        }
+
+                    },
+                    methods: {
+                        showData: function () {
+                            if(this.datas.payMode=="DEPOSIT"){
+                                this.cash=this.datas.payModeRemark;
+                            }else if(this.datas.payMode=="CASH_ON_DELIVERY"){
+                                this.dep=this.datas.payModeRemark;
+                            }
+                            if (this.diys == undefined) {
+                                this.diys = new Array;
+                            }
+                            if (this.malls == undefined) {
+                                this.malls=[];
+                                this.malls.push({
+                                    skuId: "",
+                                    skuName: "",
+                                    skuModel: "",
+                                    skuBrandName: "",
+                                    skuPropertyList:"",
+                                    skuProductImage: "",
+                                    skuClassifyName: "",
+                                    mallClassifyName: "",
+                                    skuUnitName: "",
+                                    remark:"",
+                                    directoryPrice:0,
+                                    skuQuantity: "",
+                                    skuOfferPrice: 0,
+                                    skuOfferAmount: 0
+                                })
+                                this.malls=[];
+                            }
+                            this.chooseSystemAccount={
+                                mobile:data.buyerSellerInfo.entrustOrderContactMobile,
+                                accountManagerName:data.accountManagerName,
+                                linkman:data.buyerSellerInfo.entrustOrderContact,
+                                email:data.buyerSellerInfo.email,
+                                accountName:data.buyerSellerInfo.accountName,
+                                accountResourceCname:data.buyerSellerInfo.accountResourceCname,
+                                createDate:data.buyerSellerInfo.createDate
+                            };
+                        },
+                        add: function (item, key) {
+//                            item.skuQuantity = parseFloat(item.skuQuantity) + 1;
+//                            this.multiply(item, key);
+                            var precision = unitConfig[item.skuUnitName];
+                            item.skuQuantity = (parseFloat(item.skuQuantity) + 1).toFixed(precision);
+                            this.multiply(item, key);
+                        },
+                        min: function (item, key) {
+//                            if (item.skuQuantity > 1) {
+//                                item.skuQuantity = parseFloat(item.skuQuantity) - 1;
+//                                this.multiply(item, key);
+//                            }
+                            if (item.skuQuantity > 1) {
+                                var precision = unitConfig[item.skuUnitName];
+                                item.skuQuantity = (parseFloat(item.skuQuantity) - 1).toFixed(precision);
+                                this.multiply(item, key);
+                            }
+                        },
+                        addCustomProduct: function () {
+                            if (this.diys == undefined) {
+                                this.diys = new Array;
+                            }
+                            this.diys.push({
+                                skuName: "",
+                                skuBrandName: "",
+                                skuModel: "",
+                                skuClassifyName: "",
+                                mallClassifyName: "",
+                                skuUnitName: "",
+                                skuQuantity: "",
+                                skuPrice: "",
+                                skuAmount: "",
+                                remark: ""
+                            });
+                        },
+                        deleteMsg: function (n) {
+                            this.malls.splice(n, 1);
+                        },
+                        deleteMsg2: function (n) {
+                            this.diys.splice(n, 1);
+
+                        },
+                        multiply: function (item, key) {
+                            this.endPrice2 = 0;
+                            var totalMoney = 0;
+                            //每行报价小计
+                            item.skuOfferAmount = (parseFloat(item.skuOfferPrice) * parseFloat(item.skuQuantity));
+                            // 判断结果是否为NaN
+                            if (isNaN(item.skuOfferAmount)) {
+                                item.skuOfferAmount = '0.00';
+                            } else {
+                                item.skuOfferAmount = item.skuOfferAmount;
+                            }
+                            // 商品总报价 (商品报价+自定义商品报价)
+                            for (var i = 0; i < this.malls.length; i++) {
+                                totalMoney += parseFloat(this.malls[i].skuOfferAmount);
+                            }
+                            this.datas.offerSkuTotalPrice = Number(totalMoney) + Number(this.endPrice1);
+                            this.endPrice2 = Number(totalMoney);
+                            return this.endPrice2;
+                        },
+                        multiply2: function (item, key) {
+                            this.endPrice1 = 0;
+                            var totalMoney2 = 0;
+                            //每行报价小计
+                            item.skuAmount = (parseFloat(item.skuPrice) * parseFloat(item.skuQuantity));
+                            // 判断结果是否为NaNs
+                            if (isNaN(item.skuAmount)) {
+                                item.skuAmount = '0.00';
+                            } else {
+                                item.skuAmount = item.skuAmount;
+                            }
+                            // 商品总报价 (商品报价+自定义商品报价)
+//                    for (var i = 0; i < this.diys.length; i++) {
+//                        totalMoney2 += parseFloat(this.diys[i].skuAmount);
+//                    }
+                            $.each(this.diys, function (index, item) {
+                                totalMoney2 += parseFloat(item.skuAmount);
+                            })
+
+                            this.datas.offerSkuTotalPrice += Number(totalMoney2);
+                            this.endPrice1 = Number(totalMoney2);
+                            return this.endPrice1
+                        },
+                        multiply3: function (offerFreight) {
+//                            this.offerOtherFees = Number(offerOtherFees);
+                            this.offerFreight = Number(offerFreight);
+                        },
+                        multiply4: function (offerOtherFees) {
+                            this.offerOtherFees = Number(offerOtherFees);
+//                            this.offerFreight = Number(offerFreight);
+                        },
+                        fn: function () {
+                            if (this.willShow == true) {
+                                this.willShow = false;
+                                this.word = "展开";
+                            } else {
+                                this.willShow = true;
+                                this.word = "收起";
+                            }
+                        },
+                        updateBuyerConsigneeAddress:function(){
+                            updateBuyerConsigneeAddress(this.datas.consigneeAddressId)
+                        },
+                        deleteBuyerConsigneeAddress:function(){
+                            deleteBuyerConsigneeAddress(this.datas.consigneeAddressId)
+                        },
+                        updateBuyerInvoiceAddress:function(){
+                            updateBuyerInvoiceAddress(this.datas.invoiceAddressId);
+                        },
+                        deleteBuyerInvoiceAddress:function(){
+                            deleteBuyerInvoiceAddress(this.datas.invoiceAddressId);
+                        },
+                        updateBuyerInvoice:function(){
+                            updateBuyerInvoice(this.datas.invoiceId)
+                        },
+                        deleteBuyerInvoice:function(){
+                            deleteBuyerInvoice(this.datas.invoiceId)
+                        }
+                    }
+                })
+//             form.render();
+            renderUnitDisplay();
+        }
+    </script>
+</head>
+<body>
+<div id="queryBuyerEnquireDetail" v-cloak>
+    <div class="bz-bb pl20 pr20 pt10 pb20">
+        <form action="" class="jun-form-s form-css">
+            <h3 v-show="msg8" class="mt20 fz16 bg-f0 h3-tittle pl10">复制询价单</h3>
+            <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" v-show="msg8">
+                     <dl class="form">
+                         <dd>原始询价单：是否为同一询价需求</dd>
+                         <dd class="layui-form">
+                             <input type="radio" name="sex" value="是" title="是" lay-filter="inquiry" checked="checked">
+                             <input type="radio" name="sex" value="否" title="否" lay-filter="inquiry2">
+                         </dd>
+                     </dl>
+            </blockquote>
+            <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">工程商</h3>
+            <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <span class="form-btn layui-btn-itoc layui-btn-big chooseSystemAccount" v-show="msg5">请选择工程商</span>
+            <div v-show="msg1">
+                <table  class="layui-table pop table-css table-style">
+                <colgroup>
+                    <col  width="100">
+                    <col  width="400">
+                    <col  width="100">
+                    <col  width="400">
+                    </colgroup>
+                <tbody>
+                <tr>
+                    <td bgcolor="#f0f0f0" align="right">账号</td>
+                    <td align="left" v-text="chooseSystemAccount.mobile"></td>
+                    <td bgcolor="#f0f0f0" align="right">专属客户经理</td>
+                    <td align="left">{{chooseSystemAccount.accountManagerName|nullValue}}</td>
+                    </tr>
+                <tr>
+                    <td bgcolor="#f0f0f0" align="right">姓名</td>
+                    <td align="left">{{chooseSystemAccount.linkman|nullValue}}</td>
+                    <td bgcolor="#f0f0f0" align="right">邮箱</td>
+                    <td align="left">{{chooseSystemAccount.email|nullValue}}</td>
+                    </tr>
+                <tr>
+                    <td bgcolor="#f0f0f0" align="right">公司名称</td>
+                    <td align="left">{{chooseSystemAccount.accountName|nullValue}}</td>
+                    <td bgcolor="#f0f0f0" align="right">来源</td>
+                    <td align="left">{{chooseSystemAccount.accountResourceCname|nullValue}}</td>
+                    </tr>
+                <tr>
+                    <td bgcolor="#f0f0f0" align="right">注册时间</td>
+                    <td colspan="3" align="left">{{chooseSystemAccount.createDate|nullValue}}</td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+        </blockquote>
+        <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">商品信息</h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <h3 class="mb5">商城商品<span class="c-h frt fz12 cs-p under-l" onclick="addProduct()">+添加商城商品</span></h3>
+            <table class="layui-table pop">
+                <colgroup>
+                    <col  width="250">
+                    <col  width="100">
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="200">
+                    <col v-show="msg3"  width="100">
+                    <col v-show="msg3"  width="100">
+                    <col  width="100">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>商品</th>
+                    <th >目录价</th>
+                    <th ><span class="c-f">*</span>数量</th>
+                    <th >计量单位</th>
+                    <th >商品描述</th>
+                    <th v-show="msg3"><span class="c-f">*</span>商品报价 <span v-if="datas.isNeedInvoice=='Y'">(含税)</span><span v-else>(不含税)</span></th>
+                    <!--<th v-show="msg3" ><span>*</span>商品报价(含税/不含税)</th>-->
+                    <th  v-show="msg3"><span class="c-f">*</span>报价小计</th>
+                    <th >操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-show="malls.length==0">
+                    <td  colspan="8" height="50px"  align="center">
+                        <span class="fz16">暂无相关信息</span>
+                    </td>
+                </tr>
+                <tr v-for="item in malls">
+                    <td class="goods-detail">
+                        <dl>
+                            <dt><img v-bind:src="item.orginImg"  alt="">
+                            <p>{{item.skuBrandName|nullValue}}</p>
+                            </dt>
+                            <dd class="t-l ml10">
+                                <p class="one-row c-2">{{item.skuName|nullValue}}</p>
+                                <p class="mt10">商品型号:{{item.skuModel|nullValue}}</p>
+                                <p>商品编码:{{item.skuId|nullValue}}</p>
+                                <p>商品属性:{{item.skuPropertyList}}</p>
+                            </dd>
+                        </dl>
+                    </td>
+                    <td>{{item.directoryPrice | currency '' '2'}}</td>
+                    <td class="reduce-add">
+                        <dl>
+                            <dd class="cs-p min" v-on:click="min(item,key)">-</dd>
+                            <dd><input type="text"  v-model="item.skuQuantity" @keyup="multiply(item,key)"  class="unitCheck unitDisplay" unitName="{{item.skuUnitName}}"  type="text"/></dd>
+                            <dd class="cs-p add" v-on:click="add(item,key)">+</dd>
+                        </dl>
+                    </td>
+                    <td>{{item.skuUnitName}}</td>
+                    <td class="lay-form">
+                        <textarea cols="130" placeholder="请输入内容" class="layui-textarea"  v-model="item.remark"></textarea>
+                    </td>
+                    <td v-show="msg3">
+                        <input  type="text" name="skuOfferPrice"  placeholder="请输入报价"  class="layui-input num2" v-model="item.skuOfferPrice|formatQuantity2" @keyup="multiply(item,key)"/>
+                    </td>
+                    <td v-show="msg3">{{item.skuOfferAmount|currency '' '2'}}</td>
+                    <td><a href="javsscript:;" class="c-h cs-p fz12" v-on:click="deleteMsg($index)">删除</a></td>
+                </tr>
+                </tbody>
+            </table>
+            <h3 class="mb5"><span class="c-h frt fz12 cs-p under-l"   v-on:click="addCustomProduct()">+添加自定义商品</span></h3>
+            <table class="layui-table pop">
+                <colgroup>
+                    <col  width="300">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="200">
+                    <col v-show="msg3" width="200">
+                    <col v-show="msg3" width="150">
+                    <col  width="100">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th><span class="c-f">*</span>商品名称</th>
+                    <th >商品型号</th>
+                    <th ><span class="c-f">*</span>品牌</th>
+                    <th ><span class="c-f">*</span>数量</th>
+                    <th ><span class="c-f">*</span>计量单位</th>
+                    <th >商品描述</th>
+                    <th v-show="msg3" ><span class="c-f">*</span>商品报价 <span v-if="datas.isNeedInvoice=='Y'" >(含税)</span><span v-else>(不含税)</span></th>
+                    <th v-show="msg3"><span  class="c-f">*</span>报价小计</th>
+                    <th >操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-show="diys.length==0">
+                <td  colspan="9" height="50px"  align="center">
+                <span class="fz16">暂无相关信息</span>
+                </td>
+                </tr>
+                <tr class="diy-input"  v-for="item in diys">
+                    <td><input type="text" name="title"  autocomplete="off" placeholder="请输入商品名称" class="layui-input" v-model="item.skuName"></td>
+                    <td><input type="text" name="title"  autocomplete="off" placeholder="请输入商品型号" class="layui-input"  v-model="item.skuModel"></td>
+                    <td><input type="text" name="title"  autocomplete="off" placeholder="请输入品牌" class="layui-input" v-model="item.skuBrandName"></td>
+                    <td><input type="text" name="title"  autocomplete="off" placeholder="请输入数量" class="layui-input num3" v-model="item.skuQuantity |formatQuantity" @keyup="multiply2(item,key)"></td>
+                    <td><input type="text" name="title"  autocomplete="off" placeholder="请输入计量单位" class="layui-input" v-model="item.skuUnitName"></td>
+                    <td><input type="text" name="title"  autocomplete="off" placeholder="请输入商品描述" class="layui-input" v-model="item.remark"></td>
+                    <td v-show="msg3"><input type="text" name="title"  autocomplete="off" placeholder="请输入商品报价"  class="layui-input num2"  v-model="item.skuPrice|formatQuantity2" @keyup="multiply2(item,key)"></td>
+                    <td v-show="msg3">{{item.skuAmount|currency '' '2'}}</td>
+                <td><a href="javascript:;" v-on:click="deleteMsg2($index)">删除</a></td>
+                </tr>
+                </tbody>
+            </table>
+            <div v-show="msg3" class="mt20  clr">
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">商品总报价：</dt>
+                        <dd class="flt line-middle w100">{{offerSkuTotalPrice|currency '' '2'}}</dd>
+                        <dd class="flt line-middle ml5">元</dd>
+                    </dl>
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">运费：</dt>
+                        <dd class="flt"><input type="text" name="title" v-model="datas.offerFreight" @keyup="multiply3(datas.offerFreight)" placeholder="请输入运费" autocomplete="off" class="layui-input w100 num2"></dd>
+                        <dd class="flt line-middle ml5">元</dd>
+                    </dl>
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">其他费用描述：</dt>
+                        <dd class="flt"><input type="text" name="title"  placeholder="请输入费用描述" v-model="datas.offerOtherFeesDesc" autocomplete="off" class="layui-input w100"></dd>
+                        <dt class="flt">金额：</dt>
+                        <dd class="flt"><input type="text" name="title" placeholder="请输入金额" v-model="datas.offerOtherFees" @keyup="multiply4(datas.offerOtherFees)" autocomplete="off" class="layui-input w100 num2"></dd>
+                        <dd class="flt line-middle ml5">元</dd>
+                    </dl>
+                    <dl class="dl-form frt mb5-i" >
+                        <dt class="flt">总价：</dt>
+                        <dd class="flt line-middle w100">{{offerTotalPrice|currency '' '2'}}</dd>
+                        <dd class="flt line-middle ml5">元</dd>
+                    </dl>
+            </div>
+        </blockquote>
+        <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">详细信息</h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <dl class="dl-form">
+                <dt class="flt"><span class="c-f">*</span>期望交期：</dt>
+                <dd class="flt w240"><input type="text" v-bind:value="datas.expectDeliveryDate| date" id="enquire_expectDeliveryTime" name="followDate"  style="height: 32px;width: 240px;" class="layui-input laydate-icon" placeholder="请选择期望交期" onclick="layui.laydate({elem: this, istime: true, format: 'YYYY-MM-DD'})" validate="true"></dd>
+                <dt class="flt" v-show="msg3"><span class="c-f"></span>回复交期：</dt>
+                <dd v-show="msg3" class="flt line-middle ml5">付款后</dd>
+                <dd v-show="msg3" class="flt ml5"><input id="deliverDays" v-bind:value="datas.deliverDays" style="height: 32px;width: 40px;" class="layui-input" ></dd>
+                <dd v-show="msg3" class="flt line-middle mr5 ml5">天发货</dd>
+                <!--<dd v-show="msg3" class="flt"><input name="followDate"  v-bind:value="replyDeliveryDate | date " id="enquire_replyDeliveryDate"  style="height: 32px;width: 240px;" class="layui-input laydate-icon" placeholder="自定义日期格式" onclick="layui.laydate({elem: this, istime: true, format: 'YYYY-MM-DD'})" validate="true"></dd>-->
+            </dl>
+            <dl class="dl-form">
+                <dt class="flt"><span class="c-f">*</span>收货地：</dt>
+                <dd class="flt layui-form dd-city dd-city2">
+                    <select name="province" lay-filter="province" id="enquire_projectProvince">
+                        <option value="">请选择省</option>
+                    </select>
+                </dd>
+                <dd class="flt layui-form dd-city dd-city2 ml10">
+                    <select name="city" lay-filter="city"  id="enquire_projectCity">
+                        <option value="">请选择市</option>
+                    </select>
+                </dd>
+                <dt class="flt" v-show="msg3"><span class="c-f">*</span>报价有效期至：</dt>
+                <dd v-show="msg3" class="flt"><input name="followDate" id="enquire_offerValidUntil" v-bind:value="offerValidUntil | date "  style="height: 32px;width: 240px;" class="layui-input laydate-icon" placeholder="请填写报价有效期" onclick="layui.laydate({elem: this, istime: true, format: 'YYYY-MM-DD'})" validate="true"></dd>
+            </dl>
+            <dl class="dl-form mb5-i">
+                <dt class="flt">详细地址：</dt>
+                <dd id="deliveryAddress" class="flt line-middle c-2">
+                    <div v-if="datas.consigneeAddressId"><span>{{datas.consignee}}</span><span class='ml10'>{{datas.consigneeMobile}}</span><span class='ml10'>{{datas.consigneeAddress}}</span><span class='ml10 c-h cs-p' @click="updateBuyerConsigneeAddress()">修改</span><span class='ml10 c-h cs-p' @click="deleteBuyerConsigneeAddress()">删除</span></div>
+                    <span v-else="datas.consigneeAddressId==''" onclick="javascript:addDeliveryAddress()" class="form-btn  layui-btn-primary layui-btn-small2 ml5">新增收货地址</span>
+                </dd>
+            </dl>
+            <dl class="dl-form mb10-i">
+                    <dt class="flt"><span class="c-f">*</span>配送方式：</dt>
+                    <dd class="flt layui-form">
+                        <input type="radio" name="deliveryMode" value="LORRY" title="汽车" v-bind:checked="datas.deliveryMode=='LORRY'">
+                        <input type="radio" name="deliveryMode" value="RAILWAY" title="铁路" v-bind:checked="datas.deliveryMode=='RAILWAY'">
+                        <input type="radio" name="deliveryMode" value="AIRLIFT" title="空运" v-bind:checked="datas.deliveryMode=='AIRLIFT'">
+                        <input type="radio" name="deliveryMode" value="EXPRESS" title="快递" v-bind:checked="datas.deliveryMode=='EXPRESS'">
+                        <input type="radio" name="deliveryMode" value="SELF_PICK" title="客户自提" v-bind:checked="datas.deliveryMode=='SELF_PICK'">
+                        <input type="radio" name="deliveryMode" value="OTHER" title="其他" v-bind:checked="datas.deliveryMode=='OTHER'">
+                    </dd>
+                    <dd class="flt"><input type="text" name="title" id="deliveryModeRemark" v-bind:value="datas.deliveryModeRemark" placeholder="请输入其他配送方式"  autocomplete="off" class="layui-input"></dd>
+                </dl>
+                <dl class="dl-form mb10-i layui-form">
+                    <dt class="flt"><span class="c-f">*</span>结算方式：</dt>
+                    <dd class="flt"><input type="radio" name="payMode" value="CASH_BEFORE_DELIVERY" title="先款后货" v-bind:checked="datas.payMode=='CASH_BEFORE_DELIVERY'">
+                        <input type="radio" name="payMode"  value="DEPOSIT" title="订金支付" v-bind:checked="datas.payMode=='DEPOSIT'" ></dd>
+                    <dd class="flt">
+                        <input type="text" name="title" id="payModeRemark1" autocomplete="off" class="layui-input" style="width: 40px;margin-left:-18px;" v-bind:value="cash">
+                    </dd>
+                    <dd class="flt line-middle">%</dd>
+                </dl>
+                <dl class="dl-form mb5-i" v-if="datas.isNeedInvoice == 'Y'">
+                    <dt class="flt">发票信息：</dt>
+                    <dd id="buyerInvoice" class="flt line-middle  c-2">
+                        <div v-if="datas.invoiceId"><span>{{datas.invoiceCorporationName}}</span><span class='ml10'>{{datas.invoiceEaxpayerIdentificationNumber}}</span><span class='ml10'>{{datas.invoiceCorporationBankDesc}}</span><span class='ml10'>{{datas.invoiceCorporationBankAccount}}</span><span class='ml10 c-h cs-p' @click='updateBuyerInvoice()' >修改</span><span class='ml10 c-h cs-p' @click='deleteBuyerInvoice()'>删除</span></div>
+                        <span v-else="datas.invoiceId==''" onclick="javascript:addBuyerInvoice()" class="form-btn  layui-btn-primary layui-btn-small2 ml5">新增发票信息</span>
+                    </dd>
+                </dl>
+                <dl class="dl-form mb5-i" v-if="datas.isNeedInvoice == 'Y'">
+                    <dt class="flt">收票地址：</dt>
+                    <dd id="buyerInvoiceAddress" class="flt line-middle  c-2">
+                        <div v-if="datas.invoiceAddressId"><span>{{datas.consignee}}</span><span class='ml10'>{{datas.consigneeMobile}}</span><span class='ml10'>{{datas.consigneeAddress}}</span><span class='ml10 c-h cs-p' @click='updateBuyerInvoiceAddress()'>修改</span><span class='ml10 c-h cs-p' @click='deleteBuyerInvoiceAddress()'>删除</span></div>
+                        <span v-else="datas.invoiceAddressId==''" onclick="javascript:addBuyerInvoiceAddress()" class="form-btn  layui-btn-primary layui-btn-small2 ml5">新增收票地址</span>
+                    </dd>
+                </dl>
+                <dl class="dl-form mb10-i">
+                    <dt class="flt"><span class="c-f">*</span>是否开票：</dt>
+                    <dd class="flt layui-form">
+                        <input type="radio" name="isNeedInvoice" value="Y" lay-filter="isNeedInvoiceY" title="开票（增值税专用发票）" v-bind:checked="datas.isNeedInvoice=='Y'">
+                        <input type="radio" name="isNeedInvoice" value="N" lay-filter="isNeedInvoiceN" title="不开票" v-bind:checked="datas.isNeedInvoice=='N'">
+                    </dd>
+                </dl>
+                <dl class="dl-form mb5-i">
+                    <dt class="flt fz12">备注：</dt>
+                    <dd class="flt layui-form pre">
+                        <textarea id="remark" cols="130" rows="5" v-text="datas.purchasingRequisitionDesc"  placeholder="输入您对商品的其他要求,1000以内" class="layui-textarea demandDescribe" style="resize: none;"></textarea>
+                        <span class="wordwrap" style="position: absolute;right: 10px;bottom: 0;"><var class="word" id="demandDescribeWord" style="color: red;">1000</var>/1000</span>
+                        <span class="msg" style="display: none;color: red;" id="demandDescribeMsg"></span>
+                    </dd>
+                </dl>
+                <dl class="dl-form mb5-i">
+                    <dt class="flt fz12">附件：</dt>
+                    <dd class="flt">
+                        <ul id="attachmentFileListStr" class="attachmentFileList clr" style="width: 820px;">
+                            <li class="flex flt" v-for="item in attachmentFileListStr"><p class="t-l" style="flex: 5;" onclick="downLoadFile('{{item.attachmentId}}')" >{{item.attachmentName}}</p>
+                                <a class="delete" href="javadcript:;" style="flex: 1;" onclick="deleteAttachmentFile('{{item.attachmentId}}')">删除</a></li>
+                        </ul>
+                        <div class="t-l" v-show="attachment">
+                            <input type="file"  lay-type="file"  name="file" id="buyerAttachmentListFileBtn"  class="layui-upload-file inline" lay-title="添加附件" />
+                            <p class="msg fz12 c-9 inline ml10">最多5个附件,单个附件8M以内,格式不限</p>
+                        </div>
+                    </dd>
+                </dl>
+        </blockquote>
+        <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">添加报价人</h3>
+            <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" id="choseBidder">
+	            <div v-show="msg7" class="mb20">
+	                <span class="form-btn layui-btn-small2 layui-btn-itoc">平台报价</span>
+	                <a href="javascript:;" class="fz12 cs-p c-h ml10 mr20" style="display: none" onclick="chooseDistributor()">{{selectDistributor}}</a><span class="fz12 c-2" id="vendorAccountName">{{vendorAccountName}}</span>
+	            </div>
+	            <div v-show="msg6">
+	                <span class="form-btn layui-btn-small2 layui-btn-itoc">分销商报价</span>
+	                <a href="javascript:;" class="fz12 cs-p c-h ml10 mr20" style="display: none" onclick="chooseDistributor()">{{msg4}}</a><span class="fz12 c-2" id="offerAccountName">{{datas.buyerSellerInfo.offerAccountName}}</span>
+	            </div>
+            </blockquote>
+        <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">操作日志<span class="c-h frt fz12 cs-p under-l mr20"   @click="fn()">{{word}}></span></h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <table class="layui-table pop mb5-i" lay-skin="line"  v-show="willShow">
+                <colgroup>
+                    <col  width="200">
+                    <col  width="200">
+                    <col  width="200">
+                    <col  width="400">
+                    <col  width="200">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th >时间</th>
+                    <th >操作人</th>
+                    <th >询单状态</th>
+                    <th >操作内容</th>
+                    <th >操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr v-show="lis.length==0">
+                        <td  colspan="5" height="50px"  align="center">
+                            <span class="fz16">暂无相关信息</span>
+                        </td>
+                    </tr>
+                    <tr v-for="item in lis">
+                        <td>{{item.operationTime |time}}</td>
+                        <td v-if="item.operationMainObjectId=='10004'">{{item.operationUserName}}({{item.userRealName}})</td>
+                        <td v-if="item.operationMainObjectId=='10002'">专属客户经理({{item.operationUserName}})</td>
+                        <td v-if="item.operationMainObjectId=='10003'">{{item.operationAccountName}}</td>
+                        <td>{{item.offerStatusName}}</td>
+                        <td>{{item.operationContent}}</td>
+                        <td><a href="javascript:;" class="c-h fz12 cs-p" v-show="$index==0">查看原始单据</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </blockquote>
+            <div class="t-c"><span class="form-btn layui-btn-small2 mb20" lay-submit="" lay-filter="demo1">生成询价单</span></div>
+     </form>
+</div>
+<script src="/res/js/copyInquiryDetail.js<@resVersionDirective>?</@>"></script>
+<#include "/res/freemarkerTpl/unitConfig.html" />
+<@unitConfig/>
+</body>
+</html>

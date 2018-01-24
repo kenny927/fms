@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+<link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+<script src="/res/js/jquery-3.1.1.min.js"></script>
+<script src="/res/public/layui/layui.js"></script>
+<script src="/res/public/layPage/laypage.js"></script>
+</head>
+<body>
+   <section class="bz-bb pl20 pr20 pt20 pb20">
+     <div class="clr" style="padding:0 20px;">
+          <div class="flt" style="width: 64%;margin-right:2%;">
+           <h3 class="mb5">北京纵横至诚科技有限公司（朱舟）<span class="c-h frt fz12 cs-p">编辑</span></h3>
+            <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="height: 50px;">
+               <div class="flex">
+                <span style="flex: 1">座机：<span class="c-2">027-88888888</span></span>
+                <span style="flex: 1">销售代表：<span class="c-2">赵冠杰</span></span>
+               </div>
+               <div class="flex">
+                <span style="flex: 1">区域：<span class="c-2">北区</span></span>
+                <span style="flex: 1">地址：<span class="c-2">湖北省武汉市洪山区光谷大道9号</span></span>
+               </div>
+            </blockquote>
+          </div>
+          <div class="flt" style="width: 34%;">
+            <h3 class="mb5">公司介绍(长度限制为500)<span class="c-h frt fz12 cs-p "><span class="accountIntroduceBtn" onclick="updateAccountIntroduce()">编辑</span></span></h3>
+            <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor edit_back" id="accountIntroduceEdit" style="line-height: 15px;height: 50px;">
+              <div contenteditable="false" class="accountIntroduceContent" style="height:50px;overflow-y:auto;">大师法规大概</div>
+            </blockquote>
+          </div>
+      </div>
+
+      <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+          <h3 class="mb5 mt10">店铺合同信息</h3>
+          <h3 class="bg-f0 h3-tittle pl20 fz12" style="border-bottom:1px solid #e2e2e2;">
+              <div class="flex">
+                <span style="flex: 1">合同编号：<span class="c-2"> 201708009</span></span>
+                <span style="flex: 1">创建时间：<span class="c-2"> 2017-8-15 14:00:00</span></span>
+                <span style="flex: 1">合同生效周期：<span class="c-2"> 2017-8-14  -  2018-8-14</span></span>
+                <span style="flex: 1">合同附件：<a class="c-h cs-p">明祥合同.pdf</a></span>
+               </div>
+          </h3>
+          <table lay-skin="line" class="layui-table pop table-css mallOrderTable" >
+              <colgroup>
+                <col  width="200">
+                <col  width="200">
+                <col  width="100">
+                <col  width="100">
+              </colgroup>
+                <thead>
+                  <tr class="bor-no">
+                    <th >授权经营品牌</th>
+                    <th >授权经营类目</th>
+                    <th >操作人</th>
+                    <th >操作</th>
+                  </tr> 
+                </thead>
+              <tbody>
+              <tr style="height: 50px;"><td colspan="4">暂无合同信息和店铺经营授权信息！</td></tr>
+              </tbody>
+              </table>
+              <div id="paginationDivMallOrder" style="margin-right:-13px;margin-top:-10px"></div>
+      </div>
+
+
+      <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+        <h3 class="mb5 mt10">财务信息</h3>
+        <h3 class="bg-f0 h3-tittle pl20 fz12" style="border-bottom:1px solid #e2e2e2;">
+            <div class="flex">
+                <span style="flex: 1"><span class="fw-b c-2 mr20">【对私账号】</span>收款人姓名：<span class="c-2">xxx</span></span>
+                <span style="flex: 1">开户银行：<span class="c-2">赵冠杰</span></span>
+                <span style="flex: 1">银行账号：<span class="c-2">xxxxxxxxxxxxxxxxxxxxxx</span></span>
+            </div>
+        </h3>
+        <table lay-skin="line" class="layui-table pop table-css orderProjectTable" >
+            <colgroup>
+              <col  width="150">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+            </colgroup>
+              <thead>
+                <tr class="bor-no">
+                  <th >税号</th>
+                  <th >注册地址</th>
+                  <th >开户银行</th>
+                  <th >银行账号</th>
+                  <th >平台清分子账户</th>
+                </tr> 
+              </thead>
+            <tbody>
+               <tr style="height: 50px;"><td colspan="5">暂无信息!</td></tr>
+            </tbody>
+            </table>
+            <div id="paginationDivOrderProject" style="margin-right:-13px;margin-top:-10px"></div>
+      </div>
+
+      <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+          <h3 class="mb5">员工账号<span class="frt fz12 cs-p"><a class="fz12 c-h" href="javascript:addVisitRecord(_accountId);">新增员工</a></span></h3>
+          <table lay-skin="line" class="layui-table pop table-css mallOrderTable" >
+              <colgroup>
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+              </colgroup>
+                <thead>
+                  <tr class="bor-no">
+                    <th >创建时间</th>
+                    <th >登录名</th>
+                    <th >姓名</th>
+                    <th >性别</th>
+                    <th >手机</th>
+                    <th >邮箱</th>
+                    <th >职位</th>
+                    <th >部门</th>
+                    <th >角色岗位</th>
+                    <th >操作</th>
+                  </tr> 
+                </thead>
+              <tbody>
+              <tr style="height: 50px;"><td colspan="10">暂无员工信息!</td></tr>
+              </tbody>
+              </table>
+              <div id="paginationDivMallOrder" style="margin-right:-13px;margin-top:-10px"></div>
+      </div>
+
+      <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+        <h3 class="mb5">商城账号</h3>
+        <table lay-skin="line" class="layui-table pop table-css orderProjectTable" >
+            <colgroup>
+              <col  width="150">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+            </colgroup>
+              <thead>
+                <tr class="bor-no">
+                  <th >注册时间</th>
+                  <th >用户名</th>
+                  <th >性别</th>
+                  <th >手机</th>
+                  <th >邮箱</th>
+                  <th >备注</th>
+                </tr> 
+              </thead>
+            <tbody>
+               <tr style="height: 50px;"><td colspan="6">暂无信息!</td></tr>
+            </tbody>
+            </table>
+            <div id="paginationDivOrderProject" style="margin-right:-13px;margin-top:-10px"></div>
+        </div>
+
+        <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+          <h3 class="mb5">拜访记录<span class="frt fz12 cs-p"><a class="fz12 c-h " href="javascript:addVisitRecord(_accountId);">新建拜访记录</a></span></h3>
+          <table lay-skin="line" class="layui-table pop table-css mallOrderTable" >
+              <colgroup>
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="100">
+                <col  width="200">
+                <col  width="100">
+                <col  width="100">
+              </colgroup>
+                <thead>
+                  <tr class="bor-no">
+                    <th >时间</th>
+                    <th >方式</th>
+                    <th >联系人</th>
+                    <th >职务</th>
+                    <th >内容</th>
+                    <th >跟进人</th>
+                    <th >操作</th>
+                  </tr> 
+                </thead>
+              <tbody>
+              <tr style="height: 50px;"><td colspan="7">暂无拜访信息!</td></tr>
+              </tbody>
+              </table>
+              <div id="paginationDivMallOrder" style="margin-right:-13px;margin-top:-10px"></div>
+      </div>
+
+      <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+        <h3 class="mb5">订货单</h3>
+        <table lay-skin="line" class="layui-table pop table-css orderProjectTable" >
+            <colgroup>
+              <col  width="150">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+              <col  width="200">
+            </colgroup>
+              <thead>
+                <tr class="bor-no">
+                  <th >下单时间</th>
+                  <th >创建人</th>
+                  <th >订单编号</th>
+                  <th >订单金额</th>
+                  <th >订单状态</th>
+                  <th >商品型号</th>
+                </tr> 
+              </thead>
+            <tbody>
+               <tr style="height: 50px;"><td colspan="6">暂无信息!</td></tr>
+            </tbody>
+            </table>
+            <div id="paginationDivOrderProject" style="margin-right:-13px;margin-top:-10px"></div>
+        </div>
+
+
+      <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+        <h3 class="mb5">商城订单</h3>
+        <table lay-skin="line" class="layui-table pop table-css orderProjectTable" >
+            <colgroup>
+              <col  width="150">
+              <col  width="150">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+            </colgroup>
+              <thead>
+                <tr class="bor-no">
+                  <th >下单时间</th>
+                  <th >客户名称</th>
+                  <th >订单编号</th>
+                  <th >订单金额</th>
+                  <th >订单状态</th>
+                </tr> 
+              </thead>
+            <tbody>
+               <tr style="height: 50px;"><td colspan="5">暂无信息!</td></tr>
+            </tbody>
+            </table>
+            <div id="paginationDivOrderProject" style="margin-right:-13px;margin-top:-10px"></div>
+        </div>
+
+      <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px;">
+        <h3 class="mb5">项目信息</h3>
+        <table lay-skin="line" class="layui-table pop table-css orderProjectTable" >
+            <colgroup>
+              <col  width="150">
+              <col  width="150">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+              <col  width="100">
+            </colgroup>
+              <thead>
+                <tr class="bor-no">
+                  <th >报备时间</th>
+                  <th >项目名称</th>
+                  <th >等级</th>
+                  <th >业主方</th>
+                  <th >项目地</th>
+                  <th >报备状态</th>
+                </tr> 
+              </thead>
+            <tbody>
+               <tr style="height: 50px;"><td colspan="6">暂无信息!</td></tr>
+            </tbody>
+          </table>
+            <div id="paginationDivOrderProject" style="margin-right:-13px;margin-top:-10px"></div>
+        </div>
+      
+   </section>
+   <script>
+   //分页
+   $(function(){
+      loadMallVagueData(1);
+    });
+
+   layui.use(['form','element'], function(){
+       var form = layui.form();
+       var element = layui.element();
+      
+   })
+
+   function loadMallVagueData(currentPageIndex) {
+        var param = {};
+        param.currentPageIndex = currentPageIndex;
+            var pages = 100;
+            laypage({
+                cont: 'paginationDiv',
+                pages: pages,
+                curr: currentPageIndex,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        loadMallVagueData(obj.curr);
+                    }
+                }
+            });
+    }
+   </script>
+</body>
+</html>

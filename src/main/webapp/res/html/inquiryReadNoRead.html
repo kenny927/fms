@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <script src="/res/js/jquery-3.1.1.min.js"></script>
+    <script src="/res/public/layui/layui.js"></script>
+    <script src="/res/common/globalVar.js"></script>
+    <script src="/res/common/post.js"></script>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+</head>
+<body>
+<div class="bz-bb pl20 pr20 pt20" id="inquiryOrderBase">
+    <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor bg-f0" style="padding: 0">
+        <form action="" class="jun-form-s form-css">
+            <dl class="dl-form" style="margin-bottom: 0">
+                <dt class="flt w78">报价：</dt>
+                <dd class="flt line-middle w240"><span class="c-f">{{todos.offerTotalPrice}}</span>元</dd>
+                <dt class="flt">回复交期：</dt>
+                <dd class="flt line-middle fw-b w240">{{todos.replyDeliveryDate}}</dd>
+                <dt class="flt">期望交期：</dt>
+                <dd class="flt line-middle w240">{{todos.expectDeliveryDate}}</dd>
+                <dt class="flt">有效交期：</dt>
+                <dd class="flt line-middle w240">{{todos.offerValidUntil}}</dd>
+            </dl>
+        </form>
+    </blockquote>
+    <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">商品信息</h3>
+    <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+        <h3 class="mb5 fw-b">商城商品</h3>
+        <table class="layui-table pop">
+            <colgroup>
+                <col  width="400">
+                <col  width="100">
+                <col  width="200">
+                <col  width="100">
+                <col  width="200">
+                <col  width="100">
+                <col  width="100">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>商品</th>
+                <th >目录价</th>
+                <th >数量</th>
+                <th >计量单位</th>
+                <th >商品描述</th>
+                <th ><span>*</span>商品报价(含税/不含税)</th>
+                <th >报价小计</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr  v-for="item in malls">
+                    <td class="goods-detail">
+                        <dl>
+                            <dt><img v-bind:src="item.skuProductImage"  alt="">
+                            <p>{{item.skuBrandName}}</p>
+                            </dt>
+                            <dd class="t-l ml10">
+                                <p class="one-row c-2">{{item.skuName}}</p>
+                                <p class="mt10">商品型号:{{item.skuMode}}</p>
+                                <p>商品编码:{{item.skuId}}</p>
+                                <p>{{item.skuProperty}}</p>
+                            </dd>
+                        </dl>
+                    </td>
+                    <td>{{item.directoryPrice}}</td>
+                    <td>{{item.skuQuantity}}</td>
+                    <td>{{item.skuUnitName}}</td>
+                    <td>{{item.remark}}</td>
+                    <td>{{item.skuOfferPrice}}</td>
+                <td>{{item.skuOfferAmount}}</td>
+            </tr>
+            </tbody>
+        </table>
+        <h3 class="mb5 fw-b">自定义商品</h3>
+        <table class="layui-table pop">
+            <colgroup>
+                <col  width="300">
+                <col  width="100">
+                <col  width="100">
+                <col  width="200">
+                <col  width="100">
+                <col  width="200">
+                <col  width="200">
+                <col  width="150">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>商品名称</th>
+                <th >商品型号</th>
+                <th >品牌</th>
+                <th >数量</th>
+                <th >计量单位</th>
+                <th >商品描述</th>
+                <th ><span>*</span>商品报价(含税/不含税)</th>
+                <th>报价小计</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in diys">
+                    <td>{{item.skuName}}</td>
+                    <td>{{item.skuMode}}</td>
+                    <td>{{item.skuBrandName}}</td>
+                    <td>{{item.skuQuantity}}</td>
+                    <td>{{item.skuUnitName}}</td>
+                    <td>{{item.remark}}</td>
+                    <td>{{item.skuPrice}}</td>
+                    <td>{{item.skuAmount}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <!--10%-->
+        <div class="mt20">
+            <form action="" class="jun-form-s form-css clr">
+                <dl class="dl-form frt mb10-i">
+                    <dt class="flt">商品总报价：</dt>
+                    <dd class="flt line-middle w100"></dd>
+                    <dd class="flt line-middle ml5">{{todos.offerSkuTotalPrice}}</dd>
+                </dl>
+                <dl class="dl-form frt mb10-i">
+                    <dt class="flt">运费：</dt>
+                    <dd class="flt line-middle"></dd>
+                    <dd class="flt line-middle ml5">{{todos.offerFreight}}</dd>
+                </dl>
+                <dl class="dl-form frt mb10-i">
+                    <dt class="flt">其他费用描述：</dt>
+                    <dd class="flt line-middle"></dd>
+                    <dd class="flt line-middle ml5">{{todos.offerOtherFeesDesc}}</dd>
+                    <dt class="flt">金额：</dt>
+                    <dd class="flt line-middle"></dd>
+                    <dd class="flt line-middle ml5">{{todos.offerOtherFees}}</dd>
+                </dl>
+                <dl class="dl-form frt mb5-i" >
+                    <dt class="flt">总价：</dt>
+                    <dd class="flt line-middle w100"></dd>
+                    <dd class="flt line-middle ml5">{{todos.offerTotalPrice}}</dd>
+                </dl>
+            </form>
+        </div>
+    </blockquote>
+    <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">详细信息</h3>
+    <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+        <form action="" class="jun-form-s form-css">
+            <dl class="dl-form mb5-i">
+                <dt class="flt">配送方式：</dt>
+                <dd class="flt line-middle c-2">{{todos.deliveryMode}}</dd>
+            </dl>
+            <dl class="dl-form mb5-i">
+                <dt class="flt">项目地：</dt>
+                <dd class="flt line-middle c-2">{{todos.inquiryOrderProvince}}{{todos.inquiryOrderCity}}</dd>
+            </dl>
+            <dl class="dl-form mb5-i">
+                <dt class="flt">详细地址：</dt>
+                <dd class="flt line-middle c-2">{{todos.inquiryOrderAddress}}</dd>
+            </dl>
+            <dl class="dl-form mb5-i layui-form">
+                <dt class="flt">结算方式：</dt>
+                <dd class="flt line-middle c-2">{{todos.payMode}}</dd>
+            </dl>
+            <dl class="dl-form mb5-i">
+                <dt class="flt">是否开票：</dt>
+                <dd class="flt line-middle  c-2">{{todos.isNeedInvoice}}</dd>
+            </dl>
+            <dl class="dl-form mb5-i">
+                <dt class="flt fz12">备注：</dt>
+                <dd class="flt line-middle  c-2" style="width: 800px">{{todos.purchasingRequisitionDesc}}</dd>
+            </dl>
+        </form>
+    </blockquote>
+</div>
+<script type="text/javascript">
+
+    //页面加载完后调用
+    $(function () {
+        $.ajax({
+            type:"post",
+            data:{"offerHistoryId":${offerHistoryId}},
+            url: apiUrl.inquiryOrderHistorydetail,
+            success:function(data){
+                console.log(data)
+                inquiryOrderHistoryDetail(data.DATA);
+            }
+        })
+    });
+    function inquiryOrderHistoryDetail(value){
+        new Vue({
+            el:'#inquiryOrderBase',
+            data:{
+                todos: value,
+                malls: value.inquiryOrderSkuList,
+                diys : value.inquiryOrderCustomSkuList
+
+            }
+        })
+    }
+</script>
+</body>
+</html>

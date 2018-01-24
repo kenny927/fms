@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/payCounter.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+    <script src="/res/common/numCheck.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+    <script type="text/javascript" src="/res/js/orderSale/saleOrderDetail.js<@resVersionDirective>?</@>"></script>
+    <!-- uxcore配置 -->
+    <link rel="stylesheet" href="/res/reactjs/css/global.css">
+    <link rel="stylesheet" href="/res/reactjs/css/orange.css">
+    <link rel="stylesheet" href="/res/reactjs/address.maintain.css">
+    <script src="/res/reactjs/reactbase.js"></script>
+    <!-- 项目中订制的 uxcore -->
+    <script src="/res/reactjs/uxcore.js"></script>
+    <script>
+        window.pageConfig = {
+            getListApi: '/receiptAddress/list?accountId=${purchaseAccountId}',
+            saveOrUpdate: '/receiptAddress/saveOrUpdate',
+            getCityData: '/res/reactjs/data/cityData.json',
+            addressIconPath:'/res/reactjs/addressIcon.png',
+            displayAddress: '${consigneeAddress} 联系人：${consignee} 联系电话：${consigneePhone}',
+            receiptMan:'${consignee}',
+            receiptManPhone:'${consigneePhone}',
+            funllAddress:'${consigneeAddress}',
+            accountId:'${purchaseAccountId}',
+            dataType: "json"
+        };
+    </script>
+</head>
+<body class="pb20">
+<div>
+    <div class="operations bz-bb pl20 pr20 pt20 txtR">
+      <button onclick="watchAttachments()" class="form-btn layui-btn-itoc layui-btn-mini2">查看附件</button>
+	  <#if sealSwitch == "ON">
+			<#if (sealFileId?exists && "PAYMENT_CONFIRM,DELIVERY_CONFIRM,PART_DELIVERY,RECEIPT_CONFIRM,COMPLETED"?index_of(status)!=-1) >
+            <a id="downloadContract" href="/file_server/download?id=${sealFileId}" class="form-btn layui-btn-itoc layui-btn-mini2">下载合同</a>
+	   </#if></#if>
+	  <#if (status!='CANCELLED')>
+	  <button onclick="save()" class="form-btn layui-btn-mini2 ml10 audit">保存</button>
+      <button onclick="discardOrderSales()" class="form-btn layui-btn-mini2 ml10 audit">作废</button>
+      </#if>
+	  <#if (status=='PLATFORM_SALES_APPROVE')>
+	  	<button onclick="audit()" class="form-btn layui-btn-small ml10">通过</button>
+	  </#if>
+		<!-- 现货商品，带付款审核 -->
+	  <#if (status=='PAYMENT_CONFIRM')>
+		<button onclick="audit()" class="form-btn layui-btn-small ml10">付款审核通过</button>
+	  </#if>
+
+      <!--收款确认-->
+      <#if (status=='GATHERING_CONFIRM' && isPaymentCheckGroupUser)>
+        <button onclick="audit()" class="form-btn layui-btn-small ml10">已收到款</button>
+      </#if>
+
+    </div>
+
+    <div class="bz-bb pl20 pr20 pt20 jun-form-s form-css">
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+           <dl class="dl-form mb0">
+               <dt class="flt line-middle">订单号：</dt>
+               <dd class="flt line-middle c-2 w240">${orderSalesId}</dd>
+               <dt class="flt line-middle">创建时间：</dt>
+               <dd class="flt line-middle c-2 w240">${orderInfo.createDate?string('yyyy-MM-dd HH:mm:ss')}</dd>
+               <dt class="flt line-middle">订单状态：</dt>
+               <dd class="flt line-middle c-f w240">${statusName}</dd>
+           </dl>
+           <dl class="dl-form  mb0">
+               <dt class="flt line-middle">付款状态：</dt>
+               <dd class="flt line-middle c-f w240" id="colockbox">
+               <#if "DELIVERY_CONFIRM,PART_DELIVERY,RECEIPT_CONFIRM,COMPLETED"?index_of(orderInfo.status)!=-1 >已付款<#else>未付款</#if>               
+                  <#if status == 'PAYMENT_CONFIRM'>
+                  <div class="inline colockbox" startTime="${orderInfo.updateDate?string('yyyy-MM-dd HH:mm:ss')}" currentTime="${orderInfo.currentTime?string('yyyy-MM-dd HH:mm:ss')}">		
+                  <span class="counterDesc c-9 ml5">还剩</span>
+                  <span class="day c-f fw-b">00</span>
+                  <span class="c-9">天</span>
+                  <span class="hour c-f fw-b">00</span>
+                  <span class="c-9">小时</span>
+                  <span class="minute c-f fw-b">00</span>
+                  <span class="c-9">分</span>
+                  <span class="second c-f fw-b">00</span>
+                  <span class="c-9">秒</span>
+                  </div>
+                  </#if>
+               </dd>
+               <dt class="flt line-middle">买方：</dt>
+               <dd class="flt line-middle c-2 w240">${accountName}</dd>
+               <dt class="flt line-middle">卖方：</dt>
+               <dd class="flt line-middle w240">长飞光纤光缆股份有限公司</dd>
+           </dl>
+           <dl class="dl-form  mb0">
+               <dt class="flt line-middle">合同号：</dt>
+               <dd class="flt line-middle c-2 w240">${externalContractId}</dd>
+               <dt class="flt line-middle">客户经理：</dt>
+               <dd class="flt line-middle c-2 w240">${orderInfo.userRealName} ${orderInfo.mobile}</dd>
+               <#if orderInfo.mallOrderId != null && orderInfo.mallOrderId !=''>
+                   <dt class="flt line-middle">关联商城订单：</dt>
+                   <dd class="flt line-middle c-2 w240">${orderInfo.mallOrderId}${orderInfo.mallOrderStatus}</dd>
+               </#if>
+           </dl>
+        </blockquote>
+    </div>
+    <div class="bz-bb pl20 pr20  mb20 pb20 jun-form-s form-css">
+        <h3 class="mt20 fz16 h3-tittle pl10 c-2">订单明细信息</h3>
+        <blockquote >          
+            <table id="skuInfo" class="layui-table pop">
+                   <colgroup>
+                    <col  width="150">
+                    <col  width="60">
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="100">                   
+                    <col  width="80">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="150">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="150">
+                    <col  width="180">
+                    <col  width="150">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>供应商</th>
+                    <th>商品编码</th>
+                    <th>商品名称</th>
+                    <th>型号</th>
+                    <th>出库地</th>
+                    <th>数量</th>
+                    <th>单位</th>
+                    <th>单价</th>
+                    <th>小计</th>
+                    <th>销售运费</th>
+                    <th>采购价</th>
+                    <th>采购小计</th>
+                    <!--<th>采购运费</th>-->
+                    <th>商品要求</th>
+                    <th>备注</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- 秒杀商品要加背景色 待发货之前的状态销售运费、采购运费、商品要求及备注都可以编辑-->
+                <#list details as item>
+                   <#if item.spotSkuType=='SECOND_KILL_SKU'>
+                   <tr class="secKill-bg"> 
+                   <#else>
+                   <tr> 
+                   </#if>
+                   	  <td name="orderSalesDetailId" style="display:none">${item.orderSalesDetailId}</td>
+                      <td name='supplierName'>${item.supplierName}</td>
+                      <td name='skuId'>${item.skuId}</td>
+                      <td name="skuName">${item.skuName}</td>
+                      <td name='model'>${item.model}</td>
+                      <td name='outStock'>${item.outStock}</td>
+					  <!--<td class="unitDisplay" unitName="${item.unitName}">${item.quantity?default(0.000)?string('0.000')}</td> -->
+                      <td name='quantity'>${item.quantity?default(0.000)?string('0.000')}</td>
+                      <td name='unitName'>${item.unitName}</td>
+                      <td name='unitPrice'>${item.unitPrice?default(0.00)?string('0.00')}</td><!--${item.approveUnitPrice?default(0.00)?string('0.00')} -->
+                      <td name='settlementAmount'>${item.settlementAmount?default(0.00)?string('0.00')}</td>
+                      <#if status =='PAYMENT_CONFIRM' >
+                      <td name="expenseAmount">${item.expenseAmount?default(0.00)?string('0.00')}</td>
+                      <#else>
+                      <td><input type="text" name="expenseAmount"  placeholder="请输入" value="${item.expenseAmount?default(0.00)?string('0.00')}" class="layui-input num2 expenseAmount"/></td>
+                      </#if>
+                      
+                      <td name="purchasePrice">${item.purchasePrice?default(0.00)?string("0.00")}</td>
+                      <td name="purchaseAmount">${item.purchaseAmount?default(0.00)?string("0.00")}</td>
+                      <!--<#if status =='PAYMENT_CONFIRM' >-->
+                      <!--<td name="expensePurchaseAmount"><#if item.expensePurchaseAmount!=null>${item.expensePurchaseAmount?default(0.00)?string('0.00')}<#else>0.00</#if></td>-->
+                      <!--<#else>-->
+                      <!--<td><input type="text" name="expensePurchaseAmount"  placeholder="请输入" value="<#if item.expensePurchaseAmount!=null>${item.expensePurchaseAmount?default(0.00)?string('0.00')}<#else>0.00</#if>"  class="layui-input num2 expensePurchaseAmount"/></td>-->
+                      <!--</#if>-->
+                      <td name='demand'>
+                      <#if status =='PAYMENT_CONFIRM' >
+                        ${item.demand!}
+                      <#else>
+                        <textarea name='demand' cols="130" placeholder="请输入内容" class="layui-textarea remark">${item.demand!}</textarea>
+                      </#if>
+                      </td>
+                      <td name='remark'>
+						<!--<textarea cols="130" placeholder="请输入内容" class="layui-textarea remark">${item.remark!}</textarea> -->
+						${item.remark!}
+                      </td>
+                  </tr>
+                  </#list>
+                </tbody>
+            </table>
+            <div class="mt20">
+                <form action="" class="clr">
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">商品总金额：</dt>
+                        <dd class="frt line-middle w100 txtR">￥<span id="totalexpense">${skuAmount?default(0.00)?string('0.00')}</span></dd>
+                    </dl>
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">运费：</dt>
+                        <dd class="frt line-middle w100 txtR">￥<span id="totaltransexpense">${otherAmount?default(0.00)?string('0.00')}</span></dd>
+                    </dl>
+                    <dl class="dl-form frt mb5-i" >
+                        <dt class="flt">订单总金额：</dt>
+                        <dd class="frt line-middle w100 txtR">￥<span id="paytotalexpense" class="c-f fz18 fw-b">${totalAmount?default(0.00)?string('0.00')}</span></dd>
+                    </dl>
+                </form>
+            </div>
+            <h3 class="mt20 fz12 bg-f0 h3-tittle pl10 c-2 ">
+                <span class="fw-b ml10">收货人信息：<div id="App" style="display: inline-block;"></div>
+                    <!-- 项目脚本资源加载 -->
+                <script src="/res/reactjs/address.maintain-zh-cn.js"></script></span>
+
+            </h3>
+        </blockquote>
+ 		<!-- 合同详情 -->
+		<#assign order = orderInfo>
+		<!-- <#assign orderContract = orderContract>-->
+		<#include "/res/freemarkerTpl/_contract_info.html" />
+		<@contract_info/>
+ 		<!-- <#assign orderAuditLog=orderAuditLog> -->
+		<#include "/res/freemarkerTpl/_order_log.html" />
+		<@order_log/>
+ 
+    </div>
+</div>
+<script type="text/javascript">
+	var status = '${status}';
+	var orderSalesId = '${orderSalesId}';
+	var sealSwitch = '${sealSwitch}';
+
+	var form;
+	var layer;
+	layui.use(['layer','form','laydate'], function() {
+		layer = layui.layer;
+	    form = layui.form();
+	    var laydate = layui.laydate;
+	    $.each($('.colockbox'), function(n, item){
+			var startTime = $(item).attr("startTime");
+			var currentTime = $(item).attr("currentTime");
+	   		var tmpTime = Date.parse(startTime.replace(/-/g,"/"));
+	   		var tmpCurrentTime = Date.parse(currentTime.replace(/-/g,"/"));
+	   		countDown(new Date(tmpTime).getTime()+(24*3600*1000),new Date(tmpCurrentTime).getTime(),$(item));
+		});
+	});
+
+	$(function(){
+		//renderUnitDisplay();
+	});
+	
+	$(function(){
+		//当是现货订单时
+		$(document).on('change blur','.expenseAmount',function(){
+			var sum=0;
+			$.each($(".expenseAmount"),function(index,element){
+				if($(element).val()){
+					sum+=parseFloat($(element).val());
+				}
+			});
+			$(this).val(parseFloat($(this).val()).toFixed(2));
+			
+
+			$('#totaltransexpense').text(sum.toFixed(2));
+			
+			var totalexpense =  parseFloat($('#totalexpense').text());
+			$('#paytotalexpense').text((totalexpense+sum).toFixed(2));
+		});
+		
+//		$(document).on('change blur','.expensePurchaseAmount',function(){
+//			$(this).val(parseFloat($(this).val()).toFixed(2));
+//		});
+	});
+	
+</script>
+<!--  
+		<#include "/res/freemarkerTpl/unitConfig.html" />
+		<@unitConfig/>
+-->
+</body>
+</html>

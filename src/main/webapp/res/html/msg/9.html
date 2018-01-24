@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <script src="/res/js/jquery-3.1.1.min.js"></script>
+    <style>
+        .w150{
+            width: 150px!important;
+        }
+        /*错误时候边框变红*/
+        .bor-errno input[type='text']{
+            border:1px solid #ff4800!important;
+        }
+        .msg{
+            position: absolute;
+            left: 0;
+            top:32px;
+            display: none;
+            font-size: 12px;
+            color: #ff4800;
+        }
+        .icon-tongguo{
+            display: none;
+            position: absolute;
+            right: -20px;
+            top:5px;
+            display: none;
+            color: #00a930;
+            font-size: 14px;
+        }
+        .show{
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<div class="bz-bb pt20 pl20 pr20">
+    <form action="" class="jun-form-s form-css ml20" style="min-height: 260px;">
+        <dl class="dl-form mt20">
+            <dt class="flt"><span class="c-f">*</span>任务名称：</dt>
+            <dd class="flt pre bor-errno"><input type="text" name="title"  placeholder="请输入标题" autocomplete="off" class="layui-input">
+                <span class="msg show">111</span>
+                <span class="iconfont icon-tongguo show"></span>
+                <!--默认隐藏 show 显示-->
+            </dd>
+            <dt class="flt w150"><span class="c-f">*</span>任务Java Class名：</dt>
+            <dd class="flt pre"><input type="text" name="title"  placeholder="请输入标题" autocomplete="off" class="layui-input">
+                <span class="msg show">111</span>
+                <span class="iconfont icon-tongguo show"></span>
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt"><span class="c-f">*</span>任务状态：</dt>
+            <dd class="flt pre"><input type="text" name="title"  placeholder="请输入标题" autocomplete="off" class="layui-input">
+                <span class="msg show">111</span>
+                <span class="iconfont icon-tongguo show"></span>
+            </dd>
+            <dt class="flt w150"><span class="c-f">*</span>任务说明：</dt>
+            <dd class="flt pre"><input type="text" name="title"  placeholder="请输入标题" autocomplete="off" class="layui-input">
+                <span class="msg show">111</span>
+                <span class="iconfont icon-tongguo show"></span>
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt" style="width: 110px;margin-left: -20px;">任务类型：</dt>
+            <dd class="flt pre layui-form">
+                <select name="interest" lay-filter="aihao"  style="width: 240px;">
+                    <option value=""></option>
+                    <option value="0">写作</option>
+                    <option value="1" selected="">全部</option>
+                    <option value="2">游戏</option>
+                    <option value="3">音乐</option>
+                    <option value="4">旅行</option>
+                </select>
+                <span class="msg show">111</span>
+                <span class="iconfont icon-tongguo show"></span>
+            </dd>
+            <dt class="flt w150"><span class="c-f">*</span>时间表达式：</dt>
+            <dd class="flt pre"><input type="text" name="title"  placeholder="请输入标题" autocomplete="off" class="layui-input">
+                <span class="msg show">111</span>
+                <span class="iconfont icon-tongguo show"></span>
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt">开始时间：</dt>
+            <dd class="flt pre"><input type="text" name="title"  placeholder="请输入标题" autocomplete="off" class="layui-input">
+                <span class="msg show">111</span>
+                <span class="iconfont icon-tongguo show"></span>
+            </dd>
+            <dt class="flt  w150"><span class="c-f">*</span>结束时间：</dt>
+            <dd class="flt pre"><input type="text" name="title"  placeholder="请输入标题" autocomplete="off" class="layui-input">
+                <span class="msg show">111</span>
+                <span class="iconfont icon-tongguo show"></span>
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt">重复次数：</dt>
+            <dd class="flt pre"><input type="text" name="title"  placeholder="请输入标题" autocomplete="off" class="layui-input">
+                <span class="msg show">111</span>
+                <span class="iconfont icon-tongguo show"></span>
+            </dd>
+            <dt class="flt  w150"><span class="c-f">*</span>间隔时间毫秒：</dt>
+            <dd class="flt pre"><input type="text" name="title"  placeholder="请输入标题" autocomplete="off" class="layui-input">
+                <span class="msg show">111</span>
+                <span class="iconfont icon-tongguo show"></span>
+            </dd>
+        </dl>
+    </form>
+</div>
+<script type="text/javascript">
+    layui.use('form', function() {
+        var  form = layui.form();
+        form.render();
+    })
+</script>
+</body>
+</html>

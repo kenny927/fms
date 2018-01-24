@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/vue.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <style type="text/css">
+        [v-cloak]{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="bz-bb pl20 pr20 pt20" id="inquiryOrderBase" v-cloak>
+    <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor bg-f0" style="padding: 0">
+        <form action="" class="jun-form-s form-css">
+            <dl class="dl-form" style="margin-bottom: 0">
+                <dt class="flt w78">报价：</dt>
+                <dd class="flt line-middle w240"><span class="c-f fw-b">{{todos.offerTotalPrice | currency '' | default '--'}}</span><span class="c-2">元</span></dd>
+                <dt class="flt">回复交期：</dt>
+                <dd class="flt line-middle fw-b w240">{{todos.replyDeliveryDate | time}}</dd>
+            </dl>
+            <dl class="dl-form" style="margin-bottom: 0">
+                <dt class="flt">期望交期：</dt>
+                <dd class="flt line-middle fw-b w240">{{todos.expectDeliveryDate | time}}</dd>
+                <dt class="flt">有效交期：</dt>
+                <dd class="flt line-middle fw-b w240">{{todos.offerValidUntil|time}}</dd>
+            </dl>
+        </form>
+    </blockquote>
+    <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">商品信息</h3>
+    <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+        <h3 class="mb5 fw-b">商城商品</h3>
+        <table class="layui-table pop">
+            <colgroup>
+                <col  width="400">
+                <col  width="100">
+                <col  width="200">
+                <col  width="100">
+                <col  width="200">
+                <col  width="100">
+                <col  width="100">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>商品</th>
+                <th >目录价</th>
+                <th >数量</th>
+                <th >计量单位</th>
+                <th >商品描述</th>
+                <th v-if="todos.isNeedInvoiceCname=='开票'"><span>*</span>商品报价(含税)</th>
+                <th v-else><span>*</span>商品报价(不含税)</th>
+                <th >报价小计</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr  v-for="item in malls">
+                    <td class="goods-detail">
+                        <dl>
+                            <dt><img v-bind:src="item.skuProductImage"  alt="">
+                            <p>{{item.skuBrandName}}</p>
+                            </dt>
+                            <dd class="t-l ml10">
+                                <p class="one-row c-2">{{item.skuName}}</p>
+                                <p class="mt10">商品型号:{{item.skuMode}}</p>
+                                <p>商品编码:{{item.skuId}}</p>
+                                <p>{{item.skuProperty}}</p>
+                            </dd>
+                        </dl>
+                    </td>
+                    <td>{{item.directoryPrice}}</td>
+                    <td v-if="item.skuUnitName == '米' || item.skuUnitName == '千米'">{{item.skuQuantity | formatQuantity '3'}}</td>
+                    <td v-else>{{item.skuQuantity | formatQuantity '0'}}</td>
+                    <td>{{item.skuUnitName}}</td>
+                    <td>{{item.remark}}</td>
+                    <td>{{item.skuOfferPrice|currency '' '2'}}</td>
+                    <td>{{item.skuOfferAmount|currency '' '2'}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <h3 class="mb5 fw-b">自定义商品</h3>
+        <table class="layui-table pop">
+            <colgroup>
+                <col  width="300">
+                <col  width="100">
+                <col  width="100">
+                <col  width="200">
+                <col  width="100">
+                <col  width="200">
+                <col  width="200">
+                <col  width="150">
+            </colgroup>
+            <thead>
+            <tr>
+                <th>商品名称</th>
+                <th >商品型号</th>
+                <th >品牌</th>
+                <th >数量</th>
+                <th >计量单位</th>
+                <th >商品描述</th>
+                <th v-if="todos.isNeedInvoiceCname=='开票'"><span>*</span>商品报价(含税)</th>
+                <th v-else><span>*</span>商品报价(不含税)</th>
+                <th>报价小计</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr v-for="item in diys">
+                    <td>{{item.skuName}}</td>
+                    <td>{{item.skuModel}}</td>
+                    <td>{{item.skuBrandName}}</td>
+                    <td>{{item.skuQuantity | formatQuantity '3'}}</td>
+                    <td>{{item.skuUnitName}}</td>
+                    <td>{{item.remark}}</td>
+                    <td>{{item.skuPrice|currency '' '2'}}</td>
+                    <td>{{item.skuAmount|currency '' '2'}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <!--10%-->
+        <div class="mt20">
+            <form action="" class="jun-form-s form-css clr">
+                <dl class="dl-form frt mb10-i">
+                    <dt class="flt">商品总报价：</dt>
+                    <dd class="flt line-middle w100 t-r">{{todos.offerSkuTotalPrice|currency '' '2'}}</dd>
+                    <dd class="flt line-middle ml5">元</dd>
+                </dl>
+                <dl class="dl-form frt mb10-i">
+                    <dt class="flt">运费：</dt>
+                    <dd class="flt line-middle  w100 t-r">{{todos.offerFreight|currency '' '2'}}</dd>
+                    <dd class="flt line-middle ml5">元</dd>
+                </dl>
+                <dl class="dl-form frt mb10-i">
+                    <dt class="flt" style="width: 110px" v-if="todos.offerOtherFeesDesc == undefined || todos.offerOtherFeesDesc == null || todos.offerOtherFeesDesc == ''">其他费用描述：</dt>
+                    <dt v-else class="flt" style="width: 110px">{{todos.offerOtherFeesDesc}}</dt>
+                    <dd class="flt line-middle w100 t-r">{{todos.offerOtherFees|currency '' '2'}}</dd>
+                    <dd class="flt line-middle ml5">元</dd>
+                </dl>
+                <dl class="dl-form frt mb5-i" >
+                    <dt class="flt">总价：</dt>
+                    <dd class="flt line-middle w100 t-r">{{todos.offerTotalPrice|currency '' '2'}}</dd>
+                    <dd class="flt line-middle ml5">元</dd>
+                </dl>
+            </form>
+        </div>
+    </blockquote>
+    <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">详细信息</h3>
+    <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+        <form action="" class="jun-form-s form-css">
+            <dl class="dl-form mb5-i">
+                <dt class="flt">配送方式：</dt>
+                <dd class="flt line-middle c-2" v-if="todos.deliveryMode=='OTHER'">{{todos.deliveryModeCname}}:{{todos.deliveryModeRemark}}</dd>
+                <dd class="flt line-middle c-2" v-else>{{todos.deliveryModeCname}}</dd>
+            </dl>
+            <dl class="dl-form mb5-i">
+                <dt class="flt">项目地：</dt>
+                <dd class="flt line-middle c-2">{{todos.inquiryOrderProvince}}{{todos.inquiryOrderCity}}</dd>
+            </dl>
+            <dl class="dl-form mb5-i layui-form">
+                <dt class="flt">结算方式：</dt>
+                <dd class="flt line-middle c-2" v-if="todos.payMode=='DEPOSIT'">{{todos.payModeCname}}{{todos.payModeRemark}}%</dd>
+                <dd class="flt line-middle c-2" v-if="todos.payMode=='CASH_ON_DELIVERY'">货到<span class="c-f fw-b">{{todos.payModeRemark}}</span>天付款</dd>
+                <dd class="flt line-middle c-2" v-if="todos.payMode=='CASH_BEFORE_DELIVERY'">{{todos.payModeCname}}</dd>
+            </dl>
+            <dl class="dl-form mb5-i">
+                <dt class="flt">是否开票：</dt>
+                <dd class="flt line-middle  c-2" v-if="todos.isNeedInvoiceCname=='开票'">开票（增值税专用发票）</dd>
+                <dd class="flt line-middle  c-2" v-else>{{todos.isNeedInvoiceCname}}</dd>
+            </dl>
+            <dl class="dl-form mb5-i">
+                <dt class="flt fz12">备注：</dt>
+                <dd class="flt line-middle  c-2" style="width: 800px">{{todos.purchasingRequisitionDesc}}</dd>
+            </dl>
+            <dl class="dl-form mb5-i">
+                <dt class="flt fz12">附件：</dt>
+                <dd class="flt line-middle">
+                    <template v-if="attachment!=null || attachment.length > 0">
+                        <a href="javascript:;" class="c-h cs-p mr20 fz12" v-for="item in attachment" onclick="downLoadMallAttachment('{{item.attachmentId}}')">{{item.attachmentName}}</a>
+                    </template>
+                    <template v-else>
+                        --
+                    </template>
+                </dd>
+            </dl>
+        </form>
+    </blockquote>
+</div>
+<script type="text/javascript">
+
+    //页面加载完后调用
+    $(function () {
+        postUtil.call("/mallOrder/api/inquiryOrderHistory/detail", {"offerHistoryId":"${offerHistoryId}"}, function (result) {
+            if (result.STATUS == 'SUCCESS') {
+                inquiryOrderHistoryDetail(result.DATA);
+            } else {
+                layer.msg('系统发生未知错误' + result.MSG, {icon: 5});
+            }
+        });
+    });
+    function inquiryOrderHistoryDetail(value){
+        Vue.filter("formatQuantity", function(value, length) {   //全局方法 Vue.filter() 注册一个自定义过滤器,必须放在Vue实例化前面
+            return value.toFixed(length);
+        });
+        Vue.filter('time', function (value, format) {
+            value = value || '';
+            if(value == ''){
+                return '--';
+            }
+            format = format || 'YYYY/MM/DD';
+            return moment(value).format(format);
+        });
+        new Vue({
+            el:'#inquiryOrderBase',
+            data:{
+                todos: value,
+                malls: value.inquiryOrderSkuList,
+                attachment : value.attachmentList,
+                diys : value.inquiryOrderCustomSkuList
+            }
+        })
+    }
+</script>
+</body>
+</html>

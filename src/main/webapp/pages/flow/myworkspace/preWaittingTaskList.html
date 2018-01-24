@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/public/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/flow/rgWorkFlow.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/js/rg.js<@resVersionDirective>?</@>"></script>
+
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <form id="searchFrm" method="post" class="jun-form-s form-css pt20" action="">
+                <dl class="dl-form">
+                    <dt class="flt">申请单号：</dt>
+                    <dd class="flt"><input type="text" name="applicationNo" placeholder="请输入流程名称" class="layui-input" /></dd>
+                    <dt class="flt">任务名称：</dt>
+                    <dd class="flt"><input type="text" name="taskName" placeholder="请输入流程名称" class="layui-input" /></dd>
+                    <dd class="flt ml10"><span class="form-btn layui-btn-small2" onclick="searchDefinition()" >查询</span></dd>
+                </dl>
+            </form>
+            <div class="layui-form" style="width:96%;margin-left:2%;">
+                <table class="layui-table pop" lay-skin="line">
+                    <colgroup>
+                        <col width="300">
+                        <col width="100">
+                        <col width="100">
+                        <col width="100">
+                        <col width="100">
+                        <col width="100">
+                        <col width="300">
+                        <col>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th style="text-align:center">流程名称</th>
+                        <th style="text-align:center">任务ID</th>
+                        <th style="text-align:center">申请单号</th>
+                        <th style="text-align:center">任务名称</th>
+                        <th style="text-align:center">处理人</th>
+                        <th style="text-align:center">开始时间</th>
+                        <th style="text-align:center">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div id="paginationDiv"></div>
+        </div>
+    </section>
+</section>
+<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+<script>
+    var html2 = "";
+    function isExitsVariable(variableName) {
+        try {
+            if (typeof (variableName) == "undefined") {
+                return "";
+            } else {
+                return variableName;
+            }
+        } catch (e) {
+        }
+        return "";
+    }
+
+    $(function () {
+        loadMallCustomerList(1);
+        //initLayUi();
+    });
+    function loadMallCustomerList(currentPageIndex, type) {
+        var param = {};
+        param.currentPage = currentPageIndex;
+        if (type==1) {
+            param.applicationNo = $('input[name=applicationNo]').val();
+            param.taskName = $('input[name=taskName]').val();
+        }
+        //alert(JSON.stringify(param));
+        postUtil.call("/flow/myworkspace/queryWaittingTaskList", param, function (result) {
+            //alert(JSON.stringify(result));
+            var pageNumber = result.DATA.pageNumber;
+            var pageSize = result.DATA.pageSize;
+            var totalPage = result.DATA.totalPage;
+            var totalRow = result.DATA.totalRow;
+            var dataList = result.DATA.list;
+            renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        loadMallCustomerList(obj.curr, type);
+                    }
+                }
+            });
+        });
+    }
+
+    function renderTable(dataList) {
+        var html = "";
+        var length = dataList.length;
+        if (length > 0) {
+            for (var i1 = 0; i1 < dataList.length; i1++) {
+                var data = dataList[i1];
+                var operationHtml = formatAction(data);
+                html += '  <tr>' +
+                        '   <td>' + isExitsVariable(data.definitionName) + '</td>' +
+                        '   <td>' + isExitsVariable(data.id) + '</td>' +
+                        '   <td>' + isExitsVariable(data.businessKey) + '</td>' +
+                        '   <td>' + isExitsVariable(data.name) + '</td>' +
+                        '   <td>' + isExitsVariable(data.owners) + '</td>' +
+                        '   <td>' + isExitsVariable(data.createTime) + '</td>' +
+                        '   <td>' + operationHtml + '</td>' +
+                        '  </tr>'
+            }
+        }
+        $(".layui-table tbody").html(html);
+    }
+
+    function formatAction(row) {
+        var html=  "<a href='javascript:openFinishTaskTab(" + row.id + "," + row.businessKey + ")' >办理任务</a>&nbsp;&nbsp;";
+        if( row.owners_type=='candidate' && isExitsVariable(row.owners_group) ==''  ){
+            html += "<a href='javascript:openPreTaskAssign(" + row.id + "," + row.businessKey + ")'>维护处理人</a><br>" ;
+        }
+        html += "<a href='javascript:openPreTaskVariables(" + row.id + "," + row.businessKey + ")'>设置变量</a><br>" ;
+        html += "<a href='javascript:openHisComment("+ row.id +")'>操作历史</a>&nbsp;&nbsp;" +
+                "<a target='_blank' href='javascript:openCurrentProcessView(" + row.id + ")' >查看当前流程图</a>";
+        return html;
+    }
+
+    function openPreTaskAssign(taskId, businessKey){
+        var url = "/task/preTaskAssign/" + taskId ;
+        cardUtil.refreshCard("维护处理人-" + businessKey, url);
+        cardUtil.openCard("维护处理人-" + businessKey, url);
+        cardUtil.changeCard("维护处理人-" + businessKey);
+    }
+
+    function openPreTaskVariables(taskId, businessKey){
+        var url = "/task/preFlowVariables/" + taskId ;
+        cardUtil.refreshCard("流程变量设置-" + businessKey, url);
+        cardUtil.openCard("流程变量设置-" + businessKey, url);
+        cardUtil.changeCard("流程变量设置-" + businessKey);
+    }
+
+    function openHisComment(taskId) {
+        var param = {};
+        postUtil.call("/task/historyComment/" + taskId, param, function (result) {
+            var html;
+            if(result.DATA){
+                html = '<table class="layui-table ml15 mr15" lay-even="" lay-skin="row" style="width: 95%">';
+                html = html + '<colgroup>' +
+                        '<col width="50">' +
+                        '<col width="150">' +
+                        '<col width="250">' +
+                        '<col width="100">' +
+                        '<col width="150">' +
+                        '<col> </colgroup>';
+                html = html + '<thead> ' +
+                        '<tr> ' +
+                        '<th style="text-align: center;">序号</th> ' +
+                        '<th style="text-align: center;">环节</th> ' +
+                        '<th style="text-align: center;">操作意见</th> ' +
+                        '<th style="text-align: center;">人员</th> ' +
+                        '<th style="text-align: center;">操作时间</th> ' +
+                        '</tr> </thead><tbody>';
+                for(var i=0; i<result.DATA.length; i++){
+                    var record = result.DATA[i];
+                    html = html + '<tr>';
+                    html = html + '<td>' + (i + 1)+ '</td>';
+                    html = html + '<td>' + record.name + '</td>';
+                    html = html + '<td>' + record.message + '</td>';
+                    html = html + '<td>' + record.userId + '</td>';
+                    html = html + '<td>' + record.time + '</td>';
+                    html = html + '</tr>';
+                }
+                html = html + '</tbody></table>';
+                layer.open({
+                    type: 1,
+                    //title: false,
+                    closeBtn: 1,
+                    area: ['900px', '380px'],
+                    skin: 'layui-layer-rim', //没有背景色
+                    shadeClose: true,
+                    content: html
+                });
+            }
+        });
+    }
+    
+    function openCurrentProcessView(taskId) {
+        var param = {};
+        //param.taskId = taskId;
+        postUtil.call("/task/queryProcessView/" + taskId, param, function (result) {
+            var htm = "";
+            htm = '<img style="position: relative;top: 0px;left: 0px;" src="/flow/processDefinition/showView/' + result.DATA.deploymentId + '?diagramResourceName=' + result.DATA.diagramResourceName + '"/>'
+                    + '<div id="divFlowImg" style="position: absolute;border:1px solid red;"'
+                    +'</div>' ;
+            
+            layer.open({
+                type: 1,
+                title: false,
+                closeBtn: 1,
+                skin: 'youskin',
+                area: ['900px', '380px'],
+                //skin: 'layui-layer-nobg', //没有背景色
+                shadeClose: true,
+                content: htm
+            });
+            $("#divFlowImg").css("top",(result.DATA.current_process_view_y -3) + 'px');
+            $("#divFlowImg").css("left",(result.DATA.current_process_view_x -3) + 'px');
+            $("#divFlowImg").css("width",(result.DATA.current_process_view_width + 3) + 'px');
+            $("#divFlowImg").css("height",(result.DATA.current_process_view_height + 3) + 'px');
+        });
+    }
+
+    layui.use(
+            ['form', 'layedit', 'laydate', 'layer'],
+            function () {
+                var form = layui.form(), layer = layui.layer, layedit = layui.layedit, laydate = layui.laydate;
+
+                //创建一个编辑器
+                var editIndex = layedit.build('LAY_demo_editor');
+
+
+                //监听指定开关
+                form.on('switch(switchTest)', function (data) {
+                    layer.msg('开关checked：'
+                            + (this.checked ? 'true' : 'false'), {
+                        offset: '6px'
+                    });
+                    layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF',
+                            data.othis)
+                });
+
+            });
+
+    function initLayUi() {
+        layui.use(
+                ['form', 'layedit', 'laydate', 'layer'],
+                function () {
+                    var form = layui.form(), layer = layui.layer, layedit = layui.layedit, laydate = layui.laydate;
+
+                    //创建一个编辑器
+                    var editIndex = layedit.build('LAY_demo_editor');
+
+
+                    //监听指定开关
+                    form.on('switch(switchTest)', function (data) {
+                        layer.msg('开关checked：'
+                                + (this.checked ? 'true' : 'false'), {
+                            offset: '6px'
+                        });
+                        layer.tips('温馨提示：请注意开关状态的文字可以随意定义，而不仅仅是ON|OFF',
+                                data.othis)
+                    });
+
+                });
+    }
+
+    function searchDefinition() {
+        loadMallCustomerList(1, 1);
+    }
+
+</script>
+<style type="text/css">
+    .layui-layer-page .layui-layer-content{
+        overflow: inherit;
+    }
+</style>
+</body>
+</html>

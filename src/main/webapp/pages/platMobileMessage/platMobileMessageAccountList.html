@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <link rel="stylesheet" type="text/css"
+          href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div class="purchaseSearch">
+                <form>
+                    <dl class="form-list flt">
+                        <dt>账户名称：</dt>
+                        <dd><input type="text" id="accountName" style="width: 150px;" placeholder="请输入账户名"/></dd>
+                    </dl>
+                    <dl class="form-list flt">
+                        <dd><span class="btn ml10" style="cursor: pointer;" id="searchBtn">查询</span></dd>
+                        <!--<dd><span class="btn ml10" id="preAddAuthorityUserBtn" style="cursor: pointer;">新增</span></dd>-->
+                    </dl>
+                </form>
+            </div>
+            <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px">
+                <table class="layui-table pop" lay-skin="line">
+                    <thead>
+                    <tr>
+                        <td colspan="11" align="right">
+                            <input id="uploadBtn" style="float: right;" type="file" name="file">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>账户ID</th>
+                        <th>父账户ID</th>
+                        <th>短信平台识别码</th>
+                        <th>短信平台地址</th>
+                        <th>账户名</th>
+                        <!--<th>密码</th>-->
+                        <th>签名</th>
+                        <th>接入KEY</th>
+                        <th>接入SECRET</th>
+                        <th>备注</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="platMobileMessageAccountTable">
+                    </tbody>
+                </table>
+            </div>
+            <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript">
+
+    var layer = null;
+    layui.use(['layer', 'upload'], function () {
+        layer = layui.layer;
+        //批量上传短信
+        layui.upload({
+            elem: '#uploadBtn',
+            title: '批量上传短信',
+            skin: 'upload',
+            url: '/platMobileMessageAccount/batchSMToSendInsert', //上传接口
+            ext: 'xlsx',
+            type: 'file',
+            before: function (input) {
+                layer.load();
+            },
+            success: function (res) { //上传成功后的回调
+                layer.closeAll("loading");
+                if (res.STATUS) {
+                    if (res.STATUS == 'SUCCESS') {
+                        layer.msg("批量导入短信成功~", {icon: 6});
+                    } else {
+                        layer.msg(res.MSG + "", {icon: 5});
+                    }
+                } else {
+                    layer.msg("批量导入短信过程中出现异常", {icon: 5});
+                }
+            }
+        });
+    });
+
+    var PAGE_SIZE = 5;
+
+    function platMobileMessageAccountTableInit() {
+        var accountName = $('#accountName').val();
+
+        var queryParam = {};
+        queryParam.currentPageIndex = 1;
+        queryParam.pageSize = PAGE_SIZE;
+        queryParam.accountName = accountName;
+
+        loadPlatMobileMessageAccountData(queryParam);
+    }
+
+    $(function () {
+        platMobileMessageAccountTableInit();
+
+        $("#searchBtn").bind("click", function () {
+            platMobileMessageAccountTableInit();
+        });
+
+        document.onkeydown = function (e) {
+            var ev = document.all ? window.event : e;
+            if (ev.keyCode == 13) {
+                platMobileMessageAccountTableInit();
+            }
+        };
+
+
+        $('#preAddAuthorityUserBtn').bind("click", function () {
+            postUtil.submit("/authorityUser/preAddAuthorityEmployeePage");
+        });
+
+    });
+
+    function loadPlatMobileMessageAccountData(queryParam) {
+        layer.load();
+        postUtil.call("/platMobileMessageAccount/listJson", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var accountName = $('#accountName').val();
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        tempParam.accountName = accountName;
+                        loadPlatMobileMessageAccountData(tempParam);
+                    }
+                }
+            });
+            layer.closeAll("loading");
+        });
+    }
+
+    function renderTable(dataList) {
+        var length = dataList.length;
+        var table = document.getElementById("platMobileMessageAccountTable");
+        table.innerHTML = "";
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var row = renderRow(data);
+                table.appendChild(row);
+            }
+        } else {
+            var html = '<tr><td colspan="12"><p class="t-c fz16 c-2" style="line-height: 76px;">没有查询到账户信息</p></td></tr>';
+            $(table).html(html);
+        }
+    }
+
+    function renderRow(rowData) {
+        var accountId = rowData.accountId;
+        var parentAccountId = rowData.parentAccountId;
+        var smsPlatformCode = rowData.smsPlatformCode;
+        var smsPlatformUrl = rowData.smsPlatformUrl;
+        var accountName = rowData.accountName;
+        var accountPassword = rowData.accountPassword;
+        var accountStatus = rowData.accountStatus;
+        var accountSign = rowData.accountSign;
+        var accountAccessKey = rowData.accountAccessKey;
+        var accountAccessSecret = rowData.accountAccessSecret;
+        var accountRemark = rowData.accountRemark;
+
+
+        var tr = document.createElement('tr');
+        tr.appendChild(renderCell(null, accountId, "width:6%;"));
+        tr.appendChild(renderCell(null, parentAccountId, "width:7%;"));
+        tr.appendChild(renderCell(null, smsPlatformCode, "width:10%;"));
+        tr.appendChild(renderCell(null, smsPlatformUrl, "width:10%;"));
+        tr.appendChild(renderCell(null, accountName, "width:10%;"));
+//        tr.appendChild(renderCell(null, accountPassword, "width:10%;"));
+        tr.appendChild(renderCell(null, accountSign, "width:10%;"));
+        tr.appendChild(renderCell(null, accountAccessKey, "width:10%;"));
+        tr.appendChild(renderCell(null, accountAccessSecret, "width:10%;"));
+        tr.appendChild(renderCell(null, accountRemark, "width:10%;"));
+        tr.appendChild(renderCell("status", accountStatus, "width:10%;"));
+        tr.appendChild(renderCell("operation", rowData, "width:7%;"));
+        return tr;
+    }
+
+    function renderCell(name, value, style) {
+        var td = document.createElement('td');
+        if (style) {
+            td.style = style;
+        }
+        if ("operation" == name) {
+            td.innerHTML = '<a class="ml10" href="javascript:void(0);" onclick="enableIt(\'' + value.accountId + '\',\'' + value.smsPlatformCode + '\',\'' + value.accountName + '\')">启用</a>';
+        } else if ("status" == name) {
+            if (value) {
+                if (value == "Y") {
+                    td.innerHTML = '<span style=\"color:#fd4800\">有效</span>';
+                } else {
+                    td.innerText = "无效";
+                }
+            } else {
+                td.innerText = "--";
+            }
+        } else {
+            if (value) {
+                td.innerText = value;
+            } else {
+                td.innerText = "--";
+            }
+        }
+        return td;
+    }
+
+    function preEdit(accountId) {
+        layer.msg("编辑功能还未开放", {icon: 5});
+    }
+
+    function enableIt(accountId, smsPlatformCode, accountName) {
+        layer.open({
+            title: '操作提示',
+            skin: 'msgskin',
+            area: ['450px', '280px'],
+            btnAlign: 'c',
+            content: '<p style="text-align: center;margin-top: 50px;">是否确认启用短信平台[<span style="color:#fd4800">' + smsPlatformCode + '</span>]的账户：<span style="color:#fd4800">' + accountName + '</span>?</p>',
+            btn: ['确认', '取消'],
+            yes: function (index, layero) {
+                var param = {};
+                param.accountId = accountId;
+                postUtil.call("/platMobileMessageAccount/enableSMSAccount", param, function (result) {
+                    if (result.STATUS == "SUCCESS") {
+                        layer.close(index);
+                        platMobileMessageAccountTableInit();
+                        layer.msg("启用成功！", {icon: 6});
+                    } else {
+                        layer.msg(result.MSG + "", {icon: 5});
+                    }
+                });
+            }, btn2: function (index, layero) {
+                layer.close(index);
+            },
+            cancel: function (index, layero) {
+                layer.close(index);
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

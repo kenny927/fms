@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div class="purchaseSearch">
+                <!--<form>-->
+                    <!--<dl class="form-list flt">-->
+                        <!--<dt>类别：</dt>-->
+                        <!--<dd>-->
+                            <!--<select>-->
+                            <!--</select>-->
+                        <!--</dd>-->
+                        <!--<dd><span class="btn ml10" style="cursor: pointer;" id="searchBtn">查询</span></dd>-->
+                    <!--</dl>-->
+                <!--</form>-->
+            </div>
+            <div style="text-align:right;float:right;margin-bottom:4px;margin-right: 20px;">
+                <input type="button" id="addMallSkuConfigurationModalBtn" class="search-btn" style="cursor: pointer;" value="新   增">
+                <input type="button" id="batchDel" onclick="return batchDelete()" class="search-btn" style="cursor: pointer;" value="批量删除">
+            </div>
+            <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px">
+                <table class="layui-table" lay-skin="line">
+                    <thead>
+                    <tr>
+                        <th style="text-align:center;width:15%"><input type="checkbox" id="firstCheckbox" name="firstCheckbox" /></th>
+                        <th style="text-align:center;width:20%">楼层类型</th>
+                        <th style="text-align:center;width:20%">楼层名称</th>
+                        <th style="text-align:center;width:30%">排序号</th>
+                        <th style="text-align:center;width:15%">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="spuPloymerizeListTable">
+                    </tbody>
+                </table>
+            </div>
+            <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+
+            <div style="width: 100%;box-sizing: border-box;padding: 0 20px;margin-right: 20px;font-weight: bolder;">
+                当前楼层：<span id="spuInfo" style="color: red;"></span>
+            </div>
+            <!-- 已聚合和可聚合SKU信息 -->
+            <div class="layui-tab" style="width: 100%;box-sizing: border-box;padding: 0 20px;margin-right: 20px;">
+                <div style="position: absolute;right: 20px;z-index: 9999;">
+                    <input type="button" id="addSku" class="search-btn" style="cursor: pointer;margin-right: 5px;" value="添加商品">
+                    <input type="button" id="batchDelSku" onclick="return batchDeleteSku()" class="search-btn" style="cursor: pointer;" value="批量删除">
+                    <input type="button" id="saveSortBtn" onclick="return saveSort()" class="search-btn" style="cursor: pointer;" value="保存顺序">
+                </div>
+                <ul class="layui-tab-title">
+                    <li class="layui-this">楼层包含的SKU</li>
+                    <!--<li>可聚合的SKU</li>-->
+                </ul>
+                <div class="layui-tab-content">
+                    <div class="layui-tab-item layui-show">
+                        <div>
+                            <table class="layui-table" lay-skin="line">
+                                <thead>
+                                <tr>
+                                    <th style="text-align:center;width:5%"><input type="checkbox" id="firstCheckbox1" name="firstCheckbox1" /></th>
+                                    <th style="text-align:center;width:10%">楼层名称</th>
+                                    <th style="text-align:center;width:10%">商品ID</th>
+                                    <th style="text-align:center;width:60%">商品名称</th>
+                                    <th style="text-align:center;width:7%">排序号</th>
+                                    <th style="text-align:center;width:20%">操作</th>
+                                </tr>
+                                </thead>
+                                <tbody id="spuSkuListTable">
+                                </tbody>
+                            </table>
+                        </div>
+                        <!--<div id="spuSkuPaginationDiv" style="margin-right:7px;margin-top:-10px"></div>-->
+                    </div>
+                    <!--<div class="layui-tab-item">-->
+                        <!--<div>-->
+                            <!--<table class="layui-table" lay-skin="line">-->
+                                <!--<thead>-->
+                                <!--<tr>-->
+                                    <!--<th style="text-align:center;width:20%">商品ID</th>-->
+                                    <!--<th style="text-align:center;width:60%">商品名称</th>-->
+                                    <!--<th style="text-align:center;width:20%">操作</th>-->
+                                <!--</tr>-->
+                                <!--</thead>-->
+                                <!--<tbody id="spuAvailableSkuListTable">-->
+                                <!--</tbody>-->
+                            <!--</table>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
+
+<script type="text/javascript">
+
+    var PAGE_SIZE = 5;
+    var layer = null;
+    var currentDisplayId = null;
+
+    layui.use(['layer', 'element', 'util'], function () {
+        var element = layui.element();
+        layer = layui.layer;
+
+        doSpuPloymerizeSearch();
+
+    });
+
+    function doSpuPloymerizeSearch() {
+        var queryParam = {};
+        queryParam.currentPageIndex = 1;
+        queryParam.pageSize = 3;
+//        queryParam.skuClassifyName = $('#skuClassifyName').val();
+        loadSpuPloymerizeData(queryParam);
+    }
+
+    function loadSpuPloymerizeData(queryParam) {
+        layer.load();
+        postUtil.call("/homeSkuConfiguration/queryHomeSkuConfigurationList", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            renderTable(dataList);
+            layer.closeAll("loading");
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = 3;
+                        loadSpuPloymerizeData(tempParam);
+                    }
+                }
+            });
+        });
+    }
+
+    function renderTable(dataList) {
+        var length = dataList.length;
+        var table = document.getElementById("spuPloymerizeListTable");
+        table.innerHTML = "";
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var row = renderRow(data);
+                table.appendChild(row);
+            }
+        }else {
+            var html = '<tr><td colspan="5"><p class="t-c fz16 c-2" style="line-height: 76px;">暂无数据！</p></td></tr>';
+            $(table).html(html);
+        }
+    }
+
+    function renderRow(rowData) {
+        var displayId = rowData.displayId;
+        var displayType = rowData.displayType;
+        var displayDescribe = rowData.displayDescribe;
+        var sort = rowData.sort;
+        var tr = document.createElement('tr');
+        tr.appendChild(renderCell("check", displayId, "width:15%;"));
+        tr.appendChild(renderCell(null, displayType, "width:20%;"));
+        tr.appendChild(renderCell("name", rowData, "width:20%;"));
+        tr.appendChild(renderCell(null, sort, "width:30%;"));
+        tr.appendChild(renderCell("operation", rowData, "width:15%;"));
+        //绑定行级事件
+        $(tr).bind("click",{'displayId':displayId},function(e){
+            currentDisplayId = displayId;
+            $("#spuInfo").text(displayDescribe);
+            renderSpuSku(displayId);
+//            renderSpuAvailableSku(displayId);
+        });
+        return tr;
+    }
+
+
+    function renderCell(name, value, style) {
+        var td = document.createElement('td');
+        td.setAttribute("style", style)
+        //个性化差异-操作区域
+        if(name == "operation") {
+            var html = '<a style="color:#FE6527;margin-right: 5px;" href="javascript:void(0);" onclick="return editConfig(this)">修改</a>';
+            html += '<a style="color:#FE6527" href="javascript:void(0);" onclick="return deleteConfig(this)">删除</a>';
+            td.innerHTML = html;
+        } else if(name == "check") {
+            var html = '<input type="checkbox" name="checkItem" displayId="'+value+'" />';
+            td.innerHTML = html;
+        } else if(name == "name") {
+            var html = '<dl>';
+            html += '<dt><p>'+value.displayDescribe+'<img style="width:100px;height: 120px;" value="'+value.displayId+'" src="'+value.displayPic+'" border="0"></p></dt>';
+            html += '  </dl>';
+            td.innerHTML = html;
+        } else {
+            if(value) {
+                td.innerText = value;
+            }else {
+                td.innerText = "--";
+            }
+        }
+        return td;
+    }
+
+    //sku列表渲染
+    function renderSpuSku(displayId){
+        if(displayId) {
+            var queryParam = {};
+            queryParam.currentPageIndex = 1;
+            queryParam.pageSize = PAGE_SIZE;
+            queryParam.displayId = displayId;
+            loadSpuPloymerizeSkuData(queryParam);
+        }else {
+            var table = document.getElementById("spuSkuListTable");
+            var html = '<tr><td colspan="6"><p class="t-c fz16 c-2" style="line-height: 76px;">暂无SKU数据！</p></td></tr>';
+            $(table).html(html);
+        }
+    }
+
+    function loadSpuPloymerizeSkuData(queryParam) {
+        postUtil.call("/homeSkuConfigurationDetail/queryHomeSkuConfigurationDetailList", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            renderSpuSkuTable(dataList);
+//            laypage({
+//                cont: 'spuSkuPaginationDiv',
+//                pages: totalPage,
+//                curr: pageNumber,
+//                total: totalRow,
+//                skip: true,
+//                jump: function (obj, first) {
+//                    if (!first) {
+//                        var tempParam = {};
+//                        tempParam.currentPageIndex = obj.curr;
+//                        tempParam.pageSize = PAGE_SIZE;
+//                        tempParam.spuId = queryParam.spuId;
+//                        loadSpuPloymerizeSkuData(tempParam);
+//                    }
+//                }
+//            });
+        });
+    }
+
+    function renderSpuSkuTable(dataList){
+        var length = dataList.length;
+        var table = document.getElementById("spuSkuListTable");
+        table.innerHTML = "";
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var row = renderSpuSkuRow(data);
+                table.appendChild(row);
+            }
+        }else {
+            var html = '<tr><td colspan="6"><p class="t-c fz16 c-2" style="line-height: 76px;">暂无SKU数据！</p></td></tr>';
+            $(table).html(html);
+        }
+    }
+
+    function renderSpuSkuRow(rowData) {
+        var displayId = rowData.displayId;
+        var displayDescribe = rowData.displayDescribe;
+        var skuId = rowData.skuId;
+        var skuName = rowData.skuName;
+        var sort = rowData.sort;
+        var tr = document.createElement('tr');
+        tr.appendChild(renderSpuSkuCell("check", rowData, "width:5%;"));
+        tr.appendChild(renderSpuSkuCell(null, displayDescribe, "width:10%;"));
+        tr.appendChild(renderSpuSkuCell(null, skuId, "width:10%;"));
+        tr.appendChild(renderSpuSkuCell(null, skuName, "width:60%;"));
+        tr.appendChild(renderSpuSkuCell("sort", sort, "width:7%;"));
+        tr.appendChild(renderSpuSkuCell("operation", rowData, "width:20%;"));
+        return tr;
+    }
+
+    function renderSpuSkuCell(name,value,style){
+        var td = document.createElement('td');
+        td.setAttribute("style", style);
+        //个性化差异-操作区域
+        if(name == "operation") {
+            td.innerHTML = '<p><a id="test1"  style="color:#FE6527" href="javascript:void(0);" onclick="return deleteSku(this)">删除</a>';
+        } else if(name == "check") {
+            td.innerHTML = '<input type="checkbox" name="checkItem2" value="'+value.skuId+'" displayId="'+value.displayId+'"/>';
+        } else if(name == "sort") {
+            var sort = value?value:'';
+            td.innerHTML = '<input name="number1" type="text" style="text-align:center;width:40px;vertical-align: middle;" value="'+sort+'"/>'
+        } else {
+            if(value) {
+                td.innerText = value;
+            }else {
+                td.innerText = "--";
+            }
+        }
+        return td;
+    }
+
+
+    $(document).on("click", "#addMallSkuConfigurationModalBtn", function () {
+        layer.open({
+            title:"新增楼层",
+            type: 2,
+            area: ['600px', '520px'],
+            fixed: false, //不固定
+            maxmin: true,
+            content: '/homeSkuConfiguration/add'
+        });
+    });
+
+    function editConfig(obj) {
+        var displayId= $(obj).closest('tr').find('input[name="checkItem"]').attr("displayid");
+        var param = {};
+        param.displayId = displayId;
+        postUtil.call("/homeSkuConfiguration/loadMallHomeSkuConfigurationById",param,function(res){
+            if(res.STATUS == "SUCCESS"){
+                var data=res.DATA;
+                layer.open({
+                    title:"编辑楼层",
+                    type: 2,
+                    area: ['600px', '520px'],
+                    fixed: false, //不固定
+                    maxmin: true,
+                    content: '/homeSkuConfiguration/add',
+                    success: function(layero, index){
+                        var body = layer.getChildFrame('body', index);
+                        body.find('input[id="displayId"]').val(displayId);
+                        body.find('input[name="addDisplayDescribe"]').val(data.displayDescribe);
+                        body.find('input[name="addSort"]').val(data.sort);
+                        body.find('input[name="addDisplayType"]').val(data.displayType);
+                        body.find('div[id="skuMainImagesDiv"]').attr("imgUrl",data.displayPic);
+                        var imgHtml="<img class='img-thumbnail' width='150' src='" + data.displayPic + "'/>";
+                        body.find('div[id="skuMainImagesDiv"]').html(imgHtml);
+                    }
+                });
+            }else{
+                layer.msg(res.MSG);
+            }
+        });
+    }
+
+    function deleteConfig(obj) {
+        var displayId= $(obj).closest('tr').find('input[name="checkItem"]').attr("displayid");
+        var param = {};
+        param.displayId=displayId;
+        param.status="N";
+        postUtil.call("/homeSkuConfiguration/updateMallHomeSkuConfiguration",param,function(res){
+            if(res.STATUS == "SUCCESS") {
+                layer.msg("删除成功");
+                cardUtil.refreshCard("楼层管理");
+            } else {
+                layer.msg(res.MSG);
+            }
+        });
+    }
+
+    function batchDelete() {
+        //批量删除楼层
+        var  displayIds="";
+        $("input[type=checkbox][name=checkItem]:checked").each(function(){ //由于复选框一般选中的是多个,所以可以循环输出选中的值
+            displayIds+=($(this).attr("displayId")+",");
+        });
+        if(displayIds==""){
+            layer.msg("请至少选择一条记录!");
+            return false;
+        }
+        layer.confirm('是否确定批量删除?', {
+            btn: ['确定', '取消']
+        }, function(index, layero){
+            postUtil.call("/homeSkuConfiguration/deleteMallHomeSkuConfiguration", {"displayId" :displayIds}, function (result) {
+                if (result.STATUS == "SUCCESS") {
+                    layer.msg("删除成功");
+                    cardUtil.refreshCard("楼层管理");
+                } else {
+                    layer.msg(result.MSG);
+                }
+            });
+        }, function(index){
+            layer.close(index);
+        });
+    }
+
+    function refresh() {
+        cardUtil.refreshCard("楼层管理");
+    }
+
+    function changeSort(obj){
+        var skuId= $(obj).closest('tr').find('input[name="checkItem2"]').val();
+        var sort=$(obj).val();
+        postUtil.call("/homeSkuConfigurationDetail/updateHomeSkuConfigurationDetail", {"displayId" :currentDisplayId,"skuId" :skuId,"sort":sort}, function (result) {
+            if (result.STATUS == "SUCCESS") {
+                layer.msg("修改排序成功");
+                renderSpuSku(currentDisplayId);
+            } else {
+                layer.msg(result.MSG);
+            }
+        });
+    }
+
+    function saveSort() {
+        var data = {};
+        data.displayId = currentDisplayId;
+        var skuList = [];
+        var msg = "";
+        var isPass = true;
+        $.each($("#spuSkuListTable tr"), function (index, item) {
+            var skuInfo = {};
+            skuInfo.skuId = $(this).find('input[name="checkItem2"]').val();
+            skuInfo.sort = $(this).find('input[name="number1"]').val();
+            if($.trim(skuInfo.sort) == "") {
+                msg +="请输入【"+skuInfo.skuId+"】的排序号;<br>";
+                isPass = false;
+            }
+            skuList.push(skuInfo);
+        });
+        if(!isPass) {
+            layer.open({
+                title: '数据填写有误',
+                icon: 5,
+                skin: 'youskin',
+                area: ['350px', '350px'],
+                btnAlign: 'c',
+                content: msg,
+                btn: ['我知道了'],
+                yes: function(index1, layero){
+                    //关闭
+                    layer.close(index1);
+                },
+                cancel: function(){
+                    //右上角关闭回调
+                }
+            });
+            return;
+        }
+        data.skuList = skuList;
+        postUtil.call("/homeSkuConfigurationDetail/saveSort", {"jsonData" :JSON.stringify(data)}, function (result) {
+            if (result.STATUS == "SUCCESS") {
+                layer.msg("修改排序成功");
+                renderSpuSku(currentDisplayId);
+            } else {
+                layer.msg(result.MSG);
+            }
+        });
+    }
+    
+    function deleteSku(obj) {
+        var skuId= $(obj).closest('tr').find('input[name="checkItem2"]').val();
+        postUtil.call("/homeSkuConfigurationDetail/deleteMallHomeSkuConfigurationDetail", {"displayId" :currentDisplayId,"skuIds" :skuId}, function (result) {
+            if (result.STATUS == "SUCCESS") {
+                layer.msg("删除成功");
+                renderSpuSku(currentDisplayId);
+            } else {
+                layer.msg(result.MSG);
+            }
+        });
+    }
+    function batchDeleteSku() {
+        var skuIds="";
+        var  displayId="";
+        $("input[type=checkbox][name=checkItem2]:checked").each(function(){ //由于复选框一般选中的是多个,所以可以循环输出选中的值
+            displayId=$(this).attr("displayId");
+            skuIds+=($(this).val()+",");
+        });
+        if(skuIds==""){
+            layer.msg("请至少选择一条记录!");
+            return false;
+        }
+        layer.confirm('是否确定批量删除?', {
+            btn: ['确定', '取消']
+        }, function(index, layero){
+            postUtil.call("/homeSkuConfigurationDetail/deleteMallHomeSkuConfigurationDetail", {"displayId" :currentDisplayId,"skuIds" :skuIds}, function (result) {
+                if (result.STATUS == "SUCCESS") {
+                    layer.msg("删除成功");
+                    renderSpuSku(currentDisplayId);
+                } else {
+                    layer.msg(result.MSG);
+                }
+            });
+        }, function(index){
+            layer.close(index);
+        });
+    }
+
+    $(document).on("click", "#addSku", function () {
+        if(!currentDisplayId){
+            layer.msg("请选择一个楼层!");
+            return false;
+        }
+        layer.open({
+            title:"请选择SKU",
+            type: 2,
+            area: ['1000px', '650px'],
+            fixed: false, //不固定
+            maxmin: true,
+            content: '/reusable/skuCommodity/chooseSkuCommodityPage'
+        });
+    });
+
+    //选择sku商品的回调方法
+    function chooseSkuCommodityCallback(skuDataList) {
+        if(skuDataList) {
+            var existSku = $("input[type=checkbox][name=checkItem2]");
+            var html = "";
+            var addSkuList = [];
+            var skuObj = {};
+            var skuIds = "";
+            $.each(skuDataList, function (index, sku) {
+                var isExist = false;
+                $.each(existSku, function (idx, item) {
+                    if($(this).val() == sku.skuId) {
+                        isExist = true;
+                        return false;
+                    }
+                });
+                if(!isExist) {
+                    skuObj.displayId = currentDisplayId;
+                    skuObj.displayDescribe = $("#spuInfo").text();
+                    skuObj.skuId = sku.skuId;
+                    skuObj.skuName = sku.skuName;
+                    skuObj.sort = 0;
+                    addSkuList.push(skuObj);
+                    skuIds += sku.skuId + ",";
+                }
+            });
+            if(existSku.length + addSkuList.length > 20 || existSku.length + addSkuList.length < 5) {
+                layer.msg("楼层商品数量只能5-20个");
+                return false;
+            }
+            postUtil.call("/homeSkuConfigurationDetail/insertMallHomeSkuConfigurationDetail", {"skuIds" :skuIds,"displayId":currentDisplayId}, function (result) {
+                if (result.STATUS == "SUCCESS") {
+                    layer.msg("添加商品成功");
+                    renderSpuSku(currentDisplayId);
+                } else {
+                    layer.msg(result.MSG);
+                }
+            });
+        }
+        return true;
+    }
+
+//    $(document).on("click", "#spuPloymerizeListTable tr", function () {
+//        var checkObjs = $(this).find('input:checkbox[name="checkItem"]');
+//        var checked =  checkObjs[0].checked;
+//        checkObjs[0].checked = !checked;
+//        var isAllChecked = true;
+//        $.each($('input:checkbox[name="checkItem"]'), function (index, item) {
+//            if(!$(item).is(':checked')) {
+//                isAllChecked = false;
+//                return false;
+//            }
+//        });
+//        $("#firstCheckbox").prop("checked", isAllChecked);
+//    });
+
+    $(document).on("click", '#firstCheckbox', function () {
+        var selectAllChecked = document.getElementById("firstCheckbox").checked;
+        var checks = document.getElementsByName("checkItem");
+        if (checks.length > 0) {
+            for (var i = 0; i < checks.length; i++) {
+                checks[i].checked = selectAllChecked;
+            }
+        }
+    });
+
+//    $(document).on("click", "#spuSkuListTable tr", function () {
+//        var checkObjs = $(this).find('input:checkbox[name="checkItem2"]');
+//        var checked =  checkObjs[0].checked;
+//        checkObjs[0].checked = !checked;
+//        var isAllChecked = true;
+//        $.each($('input:checkbox[name="checkItem2"]'), function (index, item) {
+//            if(!$(item).is(':checked')) {
+//                isAllChecked = false;
+//                return false;
+//            }
+//        });
+//        $("#firstCheckbox1").prop("checked", isAllChecked);
+//    });
+
+    $(document).on("click", '#firstCheckbox1', function () {
+        var selectAllChecked = document.getElementById("firstCheckbox1").checked;
+        var checks = document.getElementsByName("checkItem2");
+        if (checks.length > 0) {
+            for (var i = 0; i < checks.length; i++) {
+                checks[i].checked = selectAllChecked;
+            }
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css"/>
+    <script src="/res/js/jquery-3.1.1.min.js"></script>
+    <script src="/res/public/layui/Area1.js" type="text/javascript"></script>
+    <script src="/res/public/layui/layui.js"></script>
+    <script src="/res/public/layui/layui-mz-min.js"></script>
+    <script src="/res/js/MultiSelectDropList.js"></script>
+    <script src="/res/public/layPage/laypage.js"></script>
+  </head>
+  <body>
+    <section id="itocCenter">
+         <section class="itocContent">
+          <div class="itocMain">
+          <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px; margin-top:10px;">
+                <h3 class="bg-f0 h3-tittle pl10 mt20" style="border:1px solid #e6e6e6; border-bottom:none;"><span>用户名称：刘先生</span><span style="margin-left: 50px;">联系电话：15122375392</span><span style="margin-left: 50px;">客户经理：朱舟</span></h3>
+                <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="padding-left: 40px;">
+                 <form class="jun-form-s form-css">
+                    <dl class="dl-form" style="margin-bottom: 0">
+                      <dt class="flt">公司名称：</dt>
+                      <dd class="flt line-middle c-2">武汉xxxxxx有限公司</dd>
+                    </dl>
+                    <dl class="dl-form" style="margin-bottom: 0">
+                      <dt class="flt">证件类型：</dt>
+                      <dd class="flt line-middle c-2">营业执照+税务登记证+组织机构代码证/三证合一</dd>
+                    </dl>
+                    <dl class="dl-form">
+                      <dt class="flt">&nbsp;</dt>
+                      <dd class="flt  c-2">
+                        <div class="flt">
+                          <p>营业执照</p>
+                          <div style="width:80px;height: 80px;border: 1px solid #e6e6e6;"><img style="width: 80px;height: 80px;" src="/res/images/yyzz.png" alt="" /></div>
+                          <p class="t-c"><a href="javascript:;" class="c-h cs-p fz12">下载</a></p>
+                        </div>
+                        <div class="flt ml20">
+                          <p>税务登记证</p>
+                          <div style="width:80px;height: 80px;border: 1px solid #e6e6e6;"><img style="width: 80px;height: 80px;" src="/res/images/yyzz.png" alt="" /></div>
+                          <p class="t-c"><a href="javascript:;" class="c-h cs-p fz12">下载</a></p>
+                        </div>
+                        <div class="flt ml20">
+                          <p>组织机构代码证</p>
+                          <div style="width:80px;height: 80px;border: 1px solid #e6e6e6;"><img style="width: 80px;height: 80px;" src="/res/images/yyzz.png" alt="" /></div>
+                          <p class="t-c"><a href="javascript:;" class="c-h cs-p fz12">下载</a></p>
+                        </div>
+                      </dd>
+                    </dl>
+                    <dl class="dl-form">
+                      <dt class="flt" style="width: 120px;margin-left: -30px;"><span class="c-f">*</span>企业社会信用代码：</dt>
+                      <dd class="flt"><input placeholder="请输入公司名称/联系人/电话" type="text" name="price_min" autocomplete="off" class="layui-input"></dd>
+                    </dl>
+                    <dl class="dl-form" style="margin-bottom: 10px;">
+                      <dt class="flt"><span class="c-f">*</span>审核意见：</dt>
+                      <dd class="flt layui-form">
+                        <input type="radio" name="sex" value="通过" title="通过" checked="">
+                        <input type="radio" name="sex" value="拒绝" title="拒绝">
+                      </dd>
+                    </dl>
+                    <dl class="dl-form" style="margin-bottom: 10px;">
+                      <dt class="flt">&nbsp;</dt>
+                      <dd class="flt layui-form">
+                          <textarea cols="100" placeholder="请输入内容" class="layui-textarea"></textarea>  
+                          <button class="form-btn layui-btn-small2 mt20">提交</button>
+                     </dd>
+                    </dl>
+                  </form> 
+                </blockquote>
+          </div>
+            <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px; margin-top:10px;">
+                  <h3 class="bg-f0 h3-tittle pl10 mt20" style="border:1px solid #e6e6e6; border-bottom:none;"><span>审核日志</span></h3>
+                  <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+                    <table lay-skin="line" class="layui-table pop table-css" >
+                        <colgroup>
+                          <col  width="100">
+                          <col  width="100">
+                          <col  width="200">
+                        </colgroup>
+                          <thead>
+                            <tr class="bor-no">
+                              <th >操作人</th>
+                              <th >操作时间</th>
+                              <th >操作内容</th>
+                            </tr> 
+                          </thead>
+                        <tbody>
+                        <tr>
+                        <td  colspan="3" height="50px"  align="center">
+                       <span class="fz16">暂无相关信息</span> 
+                        </td>
+                        </tr>
+                        <tr>
+                           <td>李先生</td>
+                           <td>2017-3-1 18:00:00</td>
+                           <td>提交</td>
+                        </tr>
+                        </tbody>
+                      </table> 
+                  </blockquote>
+            </div>
+          </div>
+         </section>
+    </section>
+
+<script type="text/javascript">
+      layui.use(['form','jquery','laydate','layedit','tree','layer'], function(){
+        var form = layui.form();
+      })
+</script>
+  </body>
+</html>

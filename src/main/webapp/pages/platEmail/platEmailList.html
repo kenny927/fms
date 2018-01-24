@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div class="purchaseSearch">
+                <form>
+                    <dl class="form-list flt">
+                        <dt>收件人邮箱：</dt>
+                        <dd><input type="text" id="toObject" style="width: 150px;" placeholder="请输入收件人邮箱"/></dd>
+                    </dl>
+                    <dl class="form-list flt">
+                        <dt>状态：</dt>
+                        <dd>
+                            <select id="status" style="width: 150px;height: 35px;">
+                                <option value="ALL">全部</option>
+                                <option value="1">已发</option>
+                                <option value="0">未发</option>
+                            </select>
+                        </dd>
+                    </dl>
+                    <dl class="form-list flt">
+                        <dd><span class="btn ml10" style="cursor: pointer;" id="searchBtn">查询</span></dd>
+                    </dl>
+                </form>
+            </div>
+            <div class="table">
+                <ul class="th">
+                    <li style="width:5%;">
+                        <div class="mida">
+                            <div class="midb">ID</div>
+                        </div>
+                    </li>
+                    <li style="width:10%">
+                        <div class="mida">
+                            <div class="midb">收件人</div>
+                        </div>
+                    </li>
+                    <li style="width:10%;">
+                        <div class="mida">
+                            <div class="midb">抄送人</div>
+                        </div>
+                    </li>
+                    <li style="width:10%;">
+                        <div class="mida">
+                            <div class="midb">主题</div>
+                        </div>
+                    </li>
+                    <li style="width:40%;">
+                        <div class="mida">
+                            <div class="midb">内容</div>
+                        </div>
+                    </li>
+                    <li style="width:5%;">
+                        <div class="mida">
+                            <div class="midb">状态</div>
+                        </div>
+                    </li>
+                    <li style="width:10%">
+                        <div class="mida">
+                            <div class="midb">创建时间</div>
+                        </div>
+                    </li>
+                    <li style="width:10%">
+                        <div class="mida">
+                            <div class="midb">修改时间</div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="information-list" id="platEmailTable"></div>
+                <div id="paginationDiv"></div>
+            </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript">
+
+    var PAGE_SIZE = 5;
+
+    function platEmailTableInit() {
+        var queryParam = {};
+        queryParam.currentPageIndex = 1;
+        queryParam.pageSize = PAGE_SIZE;
+        queryParam.toObject = $('#toObject').val();
+        queryParam.status = $('#status').val();
+        loadPlatEmailData(queryParam);
+    }
+
+    $(function () {
+        platEmailTableInit();
+
+        $("#searchBtn").bind("click", function () {
+            platEmailTableInit();
+        });
+
+        document.onkeydown = function (e) {
+            var ev = document.all ? window.event : e;
+            if (ev.keyCode == 13) {
+                platEmailTableInit();
+            }
+        };
+
+    });
+
+    function loadPlatEmailData(queryParam) {
+        layer.load();
+        postUtil.call("/platEmail/listJson", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        tempParam.toObject = $('#toObject').val();
+                        tempParam.status = $('#status').val();
+                        loadPlatEmailData(tempParam);
+                    }
+                }
+            });
+            layer.closeAll("loading");
+        });
+    }
+
+    function renderTable(dataList) {
+        var length = dataList.length;
+        var table = document.getElementById("platEmailTable");
+        table.innerHTML = "";
+
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var row = renderRow(data);
+                table.appendChild(row);
+            }
+        } else {
+            var html = '<p class="t-c fz16 c-2" style="line-height: 76px;">没有查询到邮件信息！</p>';
+            $(table).html(html);
+        }
+    }
+
+    function renderRow(rowData) {
+        var id = rowData.id;
+        var fromObject = rowData.fromObject;
+        var toObject = rowData.toObject;
+        var ccObject = rowData.ccObject;
+        var emailsubject = rowData.emailsubject;
+        var emailcontent = rowData.emailcontent;
+        var status = rowData.status;
+        var createTimeStr = rowData.createTimeStr;
+        var updateTimeStr = rowData.updateTimeStr;
+
+
+        var ul = document.createElement('ul');
+        ul.setAttribute("class", "information");
+        ul.setAttribute("style", "height:75px;");
+
+        ul.appendChild(renderCell(null, id, "width:5%;height:75px;"));
+        ul.appendChild(renderCell(null, toObject, "width:10%;height:75px;"));
+        ul.appendChild(renderCell(null, ccObject, "width:10%;height:75px;"));
+        ul.appendChild(renderCell(null, emailsubject, "width:10%;height:75px;"));
+        ul.appendChild(renderCell(null, emailcontent, "width:40%;height:75px;"));
+        ul.appendChild(renderCell("status", status, "width:5%;height:75px;"));
+        ul.appendChild(renderCell(null, createTimeStr, "width:10%;height:75px;"));
+        ul.appendChild(renderCell(null, updateTimeStr, "width:10%;height:75px;"));
+        return ul;
+    }
+
+    function renderCell(name, value, style) {
+        var li = document.createElement('li');
+        li.setAttribute("style", style)
+        var div_mida = document.createElement('div');
+        div_mida.setAttribute("class", "mida");
+        var div_midb = document.createElement('div');
+        div_midb.setAttribute("class", "midb");
+        //个性化差异-操作区域
+        if ("status" == name) {
+            if (value == "0") {
+                div_midb.innerText = "未发送";
+            } else if (value == "1") {
+                div_midb.innerText = "已发送";
+            }
+        } else {
+            if (value) {
+                div_midb.innerText = value;
+
+            } else {
+                div_midb.innerText = "--";
+            }
+        }
+        div_mida.appendChild(div_midb);
+        li.appendChild(div_mida);
+        return li;
+    }
+
+
+</script>
+</body>
+</html>

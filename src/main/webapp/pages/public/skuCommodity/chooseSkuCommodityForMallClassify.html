@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <style type="text/css">
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd .goodsName {
+            height: 35px;
+            line-height: 35px;
+            overflow: hidden;
+            width: 500px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            color: #222222;
+        }
+
+        #itocCenter .itocContent .itocMain {
+            width: 100%;
+            box-sizing: border-box;
+            background: #ffffff;
+            padding-bottom: 30px;
+            min-height: 100%;
+            height: auto;
+        }
+
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd p {
+            height: 20px;
+            line-height: 20px;
+            color: #999999;
+            overflow: hidden;
+            width: 500px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body>
+<div class="bz-bb pl20 pr20 pt20">
+    <form class="jun-form-s form-css " action="javascript:void(0)">
+        <dl class="dl-form">
+            <input type="hidden" id="skuType" />
+            <dd class="flt"><input type="text" id="queryString" placeholder="请输入商品名称/商品编码/型号" class="layui-input"/></dd>
+            <dd class="flt pre ml20" id="itocTree">
+                <input type="hidden" id="mallClassifyId">
+                <input type="text" id="mallClassifyName" readonly placeholder="请选择商城分类" class="layui-input">
+                <img style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png"/>
+                <div class="itocTree">
+                    <ul id="treeNav"></ul>
+                </div>
+            </dd>
+            <dd class="flt ml20">
+                <button id="searchBtn" class="form-btn layui-btn-small2">搜索</button>
+            </dd>
+            <dd class="flt ml20">
+                <button id="chooseBtn" class="form-btn layui-btn-small2">添加商品</button>
+            </dd>
+            <dd class="flt ml20">
+                <button id="cancelBtn" class="form-btn layui-btn-small2">取消</button>
+            </dd>
+        </dl>
+    </form>
+</div>
+<section id="itocCenter" style="padding-left: 0px;">
+    <section class="itocContent">
+        <div class="itocMain" style="border: 0px;">
+            <div id="addInquiry">
+
+                <!--<div class="treeSearch mb20 pre">-->
+                <!--&lt;!&ndash;<input type="text" id="queryString" placeholder="请输入商品名称/商品编码/型号" class="mr20"/>&ndash;&gt;-->
+                <!--<input type="text" readonly="readonly" id="mallClassifyName" placeholder="请选择分类"/>-->
+                <!--<input type="hidden" id="mallClassifyId">-->
+                <!--<span class="iconfont icon-xiala1" style="left: 525px;top: 27px;"></span>-->
+                <!--<ol id="treeNav" style="height: 300px;overflow: scroll;"></ol>-->
+                <!--<button id="searchBtn" class="search-btn" style="cursor: pointer;">搜索</button>-->
+                <!--<button id="chooseBtn" class="search-btn" style="cursor: pointer;">添加商品</button>-->
+                <!--<button id="cancelBtn" class="search-btn" style="cursor: pointer;">取消</button>-->
+                <!--</div>-->
+                <div class="table inquiry">
+                    <ul class="th th-border">
+                        <li style="width: 4%;">
+                            <div class="mida">
+                                <div class="midb"><input id="selectAllCheckBox" type="checkbox"/></div>
+                            </div>
+                        </li>
+                        <li style="width: 64%;">
+                            <div class="mida">
+                                <div class="midb">商品名称</div>
+                            </div>
+                        </li>
+                        <li style="width: 16%;">
+                            <div class="mida">
+                                <div class="midb">商城分类</div>
+                            </div>
+                        </li>
+                        <li style="width: 8%">
+                            <div class="mida">
+                                <div class="midb">目录价(元)</div>
+                            </div>
+                        </li>
+                        <li style="width: 8%">
+                            <div class="mida">
+                                <div class="midb">计量单位</div>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="information-list wait" id="skuCommodityTable_tbody">
+                    </div>
+                    <div id="paginationDiv"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript">
+    $(function () {
+        $('#addInquiry').show();
+    });
+
+    layui.use(['tree'], function () {
+        var treeOption = {};
+        treeOption.elem = "#treeNav";
+        treeOption.click = function (node) {
+            $('#mallClassifyName').val(node.allParentName);
+            $('#mallClassifyId').val(node.classifyId);
+            $('.itocTree').hide();
+            $('#treeNav').hide();
+        };
+
+        //1.layui tree 渲染外部分类
+        postUtil.call("/reusable/mallClassificatory/getAllMallClassificatoryJsonForLayuiTree", null, function (result) {
+            treeOption.nodes = result;
+            layui.tree(treeOption);
+        });
+
+    });
+
+    $(document).on("click", ".icon-xiala1", function () {
+        if ($(this).next().css("display") == "none") {
+            $(this).next().show();
+        } else {
+            $(this).next().hide();
+        }
+    });
+
+    var PAGE_SIZE = 3;
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    var skuDataMap = {};
+
+    function doSearch() {
+        var queryString = $('#queryString').val();
+        var mallClassifyId = $('#mallClassifyId').val();
+        var queryParam = {};
+        queryParam.currentPageIndex = 1;
+        queryParam.pageSize = PAGE_SIZE;
+        queryParam.queryString = queryString;
+        queryParam.mallClassifyId = mallClassifyId;
+        queryParam.skuType = '${skuType}';
+        loadSkuCommodityData(queryParam);
+    }
+
+
+    var layer = null;
+    layui.use('layer', function () {
+        layer = layui.layer;
+
+        doSearch();
+
+        $("#searchBtn").bind("click", function () {
+            doSearch();
+        });
+
+        $('#cancelBtn').bind("click", function () {
+            parent.layer.close(index);//关闭当前窗口
+        });
+
+        $('#chooseBtn').bind("click", function () {
+            var skuChecks = document.getElementsByName("skuIdCheckBox");
+            var checkedSkuIds = [];
+            if (skuChecks.length > 0) {
+                for (var i = 0; i < skuChecks.length; i++) {
+                    if (skuChecks[i].checked == true) {
+                        checkedSkuIds.push(skuChecks[i].value);
+                    }
+                }
+
+                if (checkedSkuIds.length == 0) {
+                    layer.msg("请查询数据勾选后再进行操作", {"icon": "5"});
+                } else {
+                    var choosedSkuDataArray = [];
+                    for (var j = 0; j < checkedSkuIds.length; j++) {
+                        var tempSkuData = skuDataMap[checkedSkuIds[j]];
+                        choosedSkuDataArray.push(tempSkuData);
+                    }
+                    var success = parent.chooseSkuCommodityCallback(choosedSkuDataArray);//调用父页面的渲染方法
+                    if (success) {
+                        parent.layer.close(index);//关闭当前窗口
+                    }
+                }
+            } else {
+                layer.msg("请查询数据勾选后再进行操作", {"icon": "5"});
+            }
+        });
+
+        $('#selectAllCheckBox').bind("click", function () {
+            var selectAllChecked = document.getElementById("selectAllCheckBox").checked;
+            var skuChecks = document.getElementsByName("skuIdCheckBox");
+            if (skuChecks.length > 0) {
+                for (var i = 0; i < skuChecks.length; i++) {
+                    skuChecks[i].checked = selectAllChecked;
+                }
+            }
+        });
+    });
+
+    function loadSkuCommodityData(queryParam) {
+        console.log('${skuType}');
+        layer.load();
+        postUtil.call("/reusable/skuCommodity/skuCommodityBasicInfoJsonDataForMallClassify", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            renderTable(dataList);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                skip: true,
+                total: totalRow,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var queryString = $('#queryString').val();
+                        var mallClassifyId = $('#mallClassifyId').val();
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        tempParam.queryString = queryString;
+                        tempParam.mallClassifyId = mallClassifyId;
+                        var skuType = $("#skuType").val();
+                        tempParam.skuType = skuType;
+                        loadSkuCommodityData(tempParam);
+                    }
+                }
+            });
+            layer.closeAll("loading");
+        });
+    }
+
+    function renderTable(dataList) {
+        console.log(dataList);
+        var length = dataList.length;
+        var table = document.getElementById("skuCommodityTable_tbody");
+        table.innerHTML = "";
+        skuDataMap = {};
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var skuId = data.skuId;
+                skuDataMap[skuId] = data;
+                var row = renderRow(data);
+                table.appendChild(row);
+            }
+        } else {
+            var html = '<p class="t-c fz16 c-2" style="line-height: 76px;">暂无商品SKU数据！</p>';
+            $(table).html(html);
+        }
+    }
+
+    function renderRow(rowData) {
+
+        var skuId = rowData.skuId;
+        var skuName = rowData.skuName;
+        var minnum = rowData.minnum;
+        var model = rowData.model;
+        var classifyId = rowData.classifyId;
+        var classifyName = rowData.classifyName;
+        var classifyAllParentName = rowData.classifyAllParentName;
+        var brandId = rowData.brandId;
+        var brandName = rowData.brandName;
+        var unitId = rowData.unitId;
+        var unitName = rowData.unitName;
+        var basePrice = rowData.basePrice;
+        var directoryPrice = rowData.directoryPrice;
+
+        var ul = document.createElement('ul');
+        ul.setAttribute("class", "information");
+
+
+        ul.appendChild(renderCell("skuIdcheckBox", skuId, "width:4%;"));
+        ul.appendChild(renderCell("baseInfo", rowData, "width:64%;"));
+        ul.appendChild(renderCell("classifyAllParentName", rowData, "width:16%;"));
+        ul.appendChild(renderCell("directoryPrice", directoryPrice, "width:8%;"));
+        ul.appendChild(renderCell(null, unitName, "width:8%;"));
+        return ul;
+    }
+
+    function renderCell(name, value, style) {
+
+        var li = document.createElement('li');
+        li.setAttribute("style", style);
+        var div_mida = document.createElement('div');
+        div_mida.setAttribute("class", "mida");
+        var div_midb = document.createElement('div');
+        div_midb.setAttribute("class", "midb");
+        if ("skuIdcheckBox" == name) {
+            div_midb.innerHTML = '<input type="checkbox" name="skuIdCheckBox" value="' + value + '" />';
+        } else if ("baseInfo" == name) {
+            var skuPropertyList = value.skuPropertyList;
+            var skuPropertyInfo = "";
+            if (skuPropertyList.length == 0) {
+                skuPropertyInfo = "暂无属性信息";
+            } else {
+                for (var i = 0; i < skuPropertyList.length; i++) {
+                    var property = skuPropertyList[i];
+                    var propertyName = property.propertyName;
+                    var propertyValue = property.propertyValue;
+                    if (i != skuPropertyList.length - 1) {
+                        skuPropertyInfo = skuPropertyInfo + propertyName + ":" + propertyValue + "|";
+                    } else {
+                        skuPropertyInfo = skuPropertyInfo + propertyName + ":" + propertyValue;
+                    }
+                }
+            }
+
+            var smallImgPath = value.orginImgPath;
+            if (smallImgPath == undefined || smallImgPath == null || smallImgPath == "") {
+                smallImgPath = "/res/images/nopic.png";
+            }
+
+            div_midb.innerHTML = "<dl>" +
+                    "<dt>" +
+                    "<img width='70' height='70' src=\"" + smallImgPath + "\" alt=\"\"/>" +
+                    "<span>" + value.brandName + "</span>" +
+                    "</dt>" +
+                    "<dd>" +
+                    "<p class=\"goodsName\" title=\"" + value.skuName + "\">" + value.skuName + "</p>" +
+                    "<p title=\"" + value.model + "\">" + "产品型号：" + value.model + "</p>" +
+                    "<p title=\"" + value.skuId + "\">" + "商品编码：" + value.skuId + "</p>" +
+                    "<p title=\"" + skuPropertyInfo + "\">" + "商品属性：" + skuPropertyInfo + "</p>" +
+                    "</dd>" +
+                    "</dl>";
+        } else if ("directoryPrice" == name) {
+            if (value) {
+                div_midb.innerText = "￥" + toDecimal2(value);
+            } else {
+                div_midb.innerText = "请询价";
+            }
+        } else if ("classifyAllParentName" == name) {
+
+            var mallClassifyAllParentNameArrays = value.mallClassifyAllParentNameList;
+            if (mallClassifyAllParentNameArrays && mallClassifyAllParentNameArrays.length > 0) {
+                var tempHtml = "";
+                for (var i = 0; i < mallClassifyAllParentNameArrays.length; i++) {
+                    var tempMallClassifyAllParentName = mallClassifyAllParentNameArrays[i];
+                    if (i == mallClassifyAllParentNameArrays.length - 1) {
+                        tempHtml = tempHtml + "<p>" + transformAllParentName(tempMallClassifyAllParentName) + "</p>";
+                    } else {
+                        tempHtml = tempHtml + "<p>" + transformAllParentName(tempMallClassifyAllParentName) + "</p><br>";
+                    }
+                    div_midb.innerHTML = tempHtml;
+                }
+            } else {
+                div_midb.innerText = "--";
+            }
+        } else {
+            div_midb.innerText = value;
+        }
+
+
+        div_mida.appendChild(div_midb);
+        li.appendChild(div_mida);
+        return li;
+    }
+
+    $(document).on('click', '#itocTree', function () {
+        if ($(this).find(".itocTree").css("display") == "none") {
+            $(this).find(".itocTree").show();
+            $('#treeNav').show();
+            $(this).find("img").attr('src', '/res/images/arrow4.png');
+        } else {
+            $(this).find(".itocTree").hide();
+            $('#treeNav').hide();
+            $(this).find("img").animate('slow').attr('src', '/res/images/arrow3.png');
+        }
+    });
+    $(document).on('click', '.itocTree', function (e) {
+        e.stopPropagation();
+    });
+
+
+    function transformAllParentName(name) {
+        var vals = name.split(",");
+        var allParentName = "";
+        var notNullVals = [];
+        for (var i = 0; i < vals.length; i++) {
+            var temp = vals[i];
+            if (null != temp && (temp.replace(/(^s*)|(s*$)/g, "").length != 0)) {
+                notNullVals.push(temp);
+            }
+        }
+        for (var i = 0; i < notNullVals.length; i++) {
+            if (i != notNullVals.length - 1) {
+                allParentName = allParentName + notNullVals[i] + ">";
+            } else {
+                allParentName = allParentName + notNullVals[i];
+            }
+        }
+        return allParentName;
+    }
+
+    //保留两位小数.不足的用0 补齐
+    function toDecimal2(x) {
+        var f = parseFloat(x);
+        if (isNaN(f)) {
+            return 0.00;
+        }
+        var f = Math.round(x * 100) / 100;
+        var s = f.toString();
+        var rs = s.indexOf('.');
+        if (rs < 0) {
+            rs = s.length;
+            s += '.';
+        }
+        while (s.length <= rs + 2) {
+            s += '0';
+        }
+        return s;
+    }
+</script>
+</body>
+</html>

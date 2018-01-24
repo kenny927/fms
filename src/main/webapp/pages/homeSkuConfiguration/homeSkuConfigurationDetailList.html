@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<meta charset="UTF-8">
+	<link href="${request.contextPath}/res/Css/layout.css<@resVersionDirective>?</@>" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/res/Css/bootstrap.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/res/Css/bootstrap-responsive.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/res/Css/easyui.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/res/Css/style.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="${request.contextPath}/res/Js/jquery.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="${request.contextPath}/res/Js/bootstrap.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="${request.contextPath}/res/Js/post.js<@resVersionDirective>?</@>"></script>
+     <!--jquery.table.js-->
+    <script type="text/javascript" src="${request.contextPath}/res/jquery.table/jquery.dataTables.js<@resVersionDirective>?</@>"></script>
+    <link rel="stylesheet" type="text/css" href="${request.contextPath}/res/jquery.table/jquery.dataTable.css<@resVersionDirective>?</@>"/>
+<script type="text/javascript" src="${request.contextPath}/res/Js/jquery.easyui.min.js<@resVersionDirective>?</@>"></script>
+    
+<style type="text/css">
+body {
+	padding-bottom: 40px;
+	font-size:10px;
+}
+
+.pay-off-line .control-label {
+	width: 80px;
+}
+
+.vp_ewmBox {
+	/*background: rgba(0, 0, 0, 0) url("${request.contextPath}/res/Images/icon/icon6.png") no-repeat scroll -226px -261px;*/
+	height: 210px;
+	margin: 0 auto;
+	padding: 7px;
+	position: relative;
+	width: 210px;
+}
+
+.code_hover {
+	cursor: pointer;
+	display: block;
+	left: 0;
+	position: absolute;
+	top: 0;
+}
+
+.code_hoverBg {
+	background: rgba(0, 0, 0, 0.78) none repeat scroll 0 0;
+	height: 110px;
+	margin: 7px;
+	width: 110px;
+}
+
+.saoma-text {
+	color: #333;
+	margin-top: 7px;
+	text-align: center;
+}
+
+.code_hover i {
+	background: rgba(0, 0, 0, 0)
+		url("${request.contextPath}/res/Images/icon/icon6.png") no-repeat
+		scroll -301px -203px;
+	display: block;
+	height: 30px;
+	left: 50%;
+	margin-left: -15px;
+	margin-top: -15px;
+	position: absolute;
+	top: 50%;
+	width: 30px;
+}
+
+@media ( max-width : 980px) {
+	/* Enable use of floated navbar text */
+	.navbar-text.pull-right {
+		float: none;
+		padding-left: 5px;
+		padding-right: 5px;
+	}
+}
+ div,img,p,dl,dt,dd{padding:0px;margin:0px;}
+	.cp_left{float:left;}
+	.cp_left dl dt{float:left;}
+	.cp_left dl dt img{width:100px;height:120px;border:#c1c1c1 4px;background:#fff;}
+	.cp_left dl dt p{display:block;font-family:"微软雅黑";color:#fff;line-height:18px;width:100px;padding-bottom:3px;background:#f94e1e;text-align:center}
+	.cp_left dl dd{display:block;text-align:left;padding-left:10px;font-family:"微软雅黑";line-height:20px;font-size:10px;margin-left:90px}
+	.cp_left dl dd span{color:#000;font-weight:bold;}
+	.productList {font-size:12px !important;}
+	#imgshow{
+        position:absolute;
+          border:1px solid ;
+         background:white;
+         padding:1px;
+         display:none;
+         width:150px;
+          height:150px;
+     }
+</style>
+</head>
+<script>
+var displayId="${displayId}";
+</script>
+<body>
+	<div style="float: right;">
+		<!-- 系统公共的搜索框 -->
+		<#include "/res/freemerk_template/_search.html" /> <@system_search/>
+	</div>
+	<div class="float:none" style="margin-top:10px;">
+		<ul class="nav nav-tabs" role="tablist">
+			<li role="presentation" style="font-color: #FE6527"><a href="${request.contextPath}/homeSkuConfiguration/queryHomeSkuConfigurationList" style="color: #FE6527;">楼层管理</a></li>
+			<li role="presentation"  class="active" style="background-color: rgba(215, 221, 223, 1)"><a href="javascript:void(0)" style="color: #434343">商品列表</a></li>
+		</ul>
+	</div>
+	   <form class="form-inline definewidth m20" id="mallHomeSkuConfigurationDetailPage_param" action="${request.contextPath}/homeSkuConfigurationDetail/queryHomeSkuConfigurationDetailList" method="post">
+			<input type="text" id='displayId_P' style="height:2px;display:none;" value='${mallHomeSkuConfigurationDetailPage_param.displayId}' name="displayId">
+		</form>
+	<div style="text-align:right;float:right;margin-bottom:4px"><input type="button" id="addMallSkuConfigurationModalDetailBtn" class="normal-btn" style="clear:both;float:right;color:#fff;font-size:14px;border:0px;background-color:#FE6527;min-width:90px;vertical-align:middle;height:32px" value="新   增"></div>
+			<table class="table table-bordered table-hover definewidth m10">
+		<thead>
+			<tr style="background-color: #dff0d8">
+				<th style="text-align: center; width:20px"><input type="checkbox" name="firstCheckbox1" /></th>
+				<th style="text-align: center; width:120px">楼层名称</th>
+				<th style="text-align: center; width:120px">商品编号</th>
+				<th style="text-align: center; width:600px">商品名称</th>
+				<th style="text-align: center; width:30px">排序号</th>
+				<th style="text-align: center; width:60px">操作</th>
+			</tr>
+		</thead>
+		<#list mallHomeSkuConfigurationDetailPage.getList() as item>
+		<tr>
+			   <td style="display:none">${item.displayId}</td>
+			   <td style="display:none">${item.skuId}</td>
+			   <td style="text-align: center;"><input type="checkbox" name="checkItem2" value="${item.skuId}" displayId="${item.displayId}"/></td>
+			   <td style="text-align: center; vertical-align: middle;">${item.displayDescribe}</td>
+			   <td style="text-align: center; vertical-align: middle;">${item.skuId!""}</td>
+			   <td style="text-align: center; vertical-align: middle;">${item.skuName!""}</td>
+		       <td style="text-align:center; vertical-align: middle;"><input name="number1" type="text" style="text-align:center;width:40px;vertical-align: middle;" onchange="changeSort(this)"
+														value="${item.sort!""}"/></td>
+		       <td style="text-align: center;vertical-align: middle;"><a id="test1"  style="color:#FE6527" href="#" onclick="return onSelectItem(1,this)">删除</a>
+		</tr>
+		</#list>
+		<tr>
+				    <td style="text-align: center; width:20px"><input type="checkbox" name="firstCheckbox1" /></td>
+				    <td style="text-align: left; width:20px" colspan="5"><a id="test2"  style="color:#FE6527" href="#" onclick="return onSelectItem(2,this)">批量删除</a></td>
+		</tr>
+	</table>
+		 <#include "/tpl/paginate.html" />
+		 <@paginate currentPage=mallHomeSkuConfigurationDetailPage.pageNumber totalPage=mallHomeSkuConfigurationDetailPage.totalPage totalRow=mallHomeSkuConfigurationDetailPage.totalRow actionUrl="${request.contextPath}/homeSkuConfigurationDetail/queryHomeSkuConfigurationDetailList" queryForm="mallHomeSkuConfigurationDetailPage_param" />
+	</div>
+	
+	
+<div id="addMallSkuConfigurationModalDetail" class="modal hide fade" style="width:900px;" tabindex="-1" role="dialog"
+     aria-labelledby="addMallSkuConfigurationModalDetailLabel" aria-hidden="true">
+    <div class="modal-body">
+         <form class="form-inline definewidth m20" id="queryOrderGoods_form" action="${request.contextPath}/manage/product/queryProductListJson" method="post">
+					   <div id="sel1" style="background-color:#FFFFFF;margin-top:-20px">
+					                          筛选：<select id="tree" name="allParentId" class="easyui-combotree" data-options="url:'${request.contextPath}/manage/product/getSkuClassificatory?type=2',method:'get',onlyleaf:true,valueField:'id',textField:'text'" style="width:200px;"></select>
+							<input type="text" id="query_productName" class="form-control"  pageNumber="1" firstSelect="" style="width: 300px;height: 20px;" placeholder="请输入商品编码/商品名称/型号进行搜索">
+			 				 <input type="button" id="queryProductBtn" onclick="doQueryProduct()" class="normal-btn" style="clear:both;color:#fff;font-size:14px;border:0px;background-color:#FE6527;min-width:90px;vertical-align:middle;height:32px" value="查    询"> 
+		                </div>
+		 </form>
+           <table id="mallSkuConfigurationModalDetailTable" style="width:90%">
+                    <thead>
+                    <tr>
+                        <th><input type='checkbox' name='firstCheckbox' style="margin-left:-26px"/></th>
+                        <th style="width:100px;text-align:left">商品编号</th>
+                        <th style="width:120px">商品名称</th>
+                        <th>分类</th>
+                    </tr>
+                    </thead>
+                </table>
+    </div>
+    <div class="modal-footer">
+        <button id="saveAddMallSkuConfigurationModalDetailBtn" class="btn btn-primary">保&nbsp;存</button>
+        <button id="calcelAddMallSkuConfigurationModalDetailBtn" class="btn btn-danger" data-dismiss="modal" aria-hidden="true">取&nbsp;消</button>
+    </div>
+</div>
+<script>
+var _allParentId=null;
+window.onload=function(){
+	 $("#tree").combotree("setValue",0);
+	 $("#tree").combotree("setText","全部");
+}
+function onSelectItem(type,obj){
+	var param={};
+    if("1"==type){
+		var  displayId= $(obj).closest('tr').find("td:eq(0)").text();
+		var  skuId= $(obj).closest('tr').find("td:eq(1)").text();
+		$.ajax({  
+	        type : "POST", 
+	        url : "${request.contextPath}/homeSkuConfigurationDetail/deleteMallHomeSkuConfigurationDetail",
+	        data : {"displayId" :displayId,"skuIds":skuId}, 
+	        success : function(result) {//返回数据根据结果进行相应的处理
+	       	   window.location.reload();
+	        }
+	    }); 
+	}else if("2"==type){
+		var skuIds="";
+		var  displayId="";
+		 $("input[type=checkbox][name=checkItem2]:checked").each(function(){ //由于复选框一般选中的是多个,所以可以循环输出选中的值 
+			 displayId=$(this).attr("displayId");
+			 skuIds+=($(this).val()+","); 
+		 });
+		 if(skuIds==""){
+		    	alert("请至少选择一条记录!");
+		    	return false;
+		 }
+		if(confirm("是否确定批量删除?")){
+		    	
+		    	$.ajax({  
+			        type : "POST", 
+			        url : "${request.contextPath}/homeSkuConfigurationDetail/deleteMallHomeSkuConfigurationDetail",
+			        data : {"displayId" :displayId,"skuIds":skuIds}, 
+			        success : function(result) {//返回数据根据结果进行相应的处理
+			       	   window.location.reload();
+			        }
+			    }); 
+			}
+	}
+}
+
+function changeSort(obj){
+	var skuId= $(obj).closest('tr').find("td:eq(1)").text();
+	var sort=$(obj).val();
+	$.ajax({  
+	         type : "POST", 
+	         url : "${request.contextPath}/homeSkuConfigurationDetail/updateHomeSkuConfigurationDetail", 
+	         data : {"displayId" :displayId,"skuId" :skuId,"sort":sort}, 
+	         success : function(result) {//返回数据根据结果进行相应的处理
+	        	 window.location.reload();
+	         }
+	}); 
+}
+
+function doQueryProduct(){
+	$('#mallSkuConfigurationModalDetailTable').DataTable().ajax.reload(); 
+}
+
+ $(function () {
+	 var lang = {
+		        "sProcessing": "处理中...",
+		        "sLengthMenu": "每页 _MENU_ 项",
+		        "sZeroRecords": "没有匹配结果",
+		        "sInfo": "当前显示第 _START_ 至 _END_ 项，共 _TOTAL_ 项。",
+		        "sInfoEmpty": "当前显示第 0 至 0 项，共 0 项",
+		        "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+		        "sInfoPostFix": "",
+		        "sSearch": "搜索:",
+		        "sUrl": "",
+		        "sEmptyTable": "表中数据为空",
+		        "sLoadingRecords": "载入中...",
+		        "sInfoThousands": ",",
+		        "oPaginate": {
+		            "sFirst": "首页",
+		            "sPrevious": "上页",
+		            "sNext": "下页",
+		            "sLast": "末页",
+		            "sJump": "跳转"
+		        },
+		        "oAria": {
+		            "sSortAscending": ": 以升序排列此列",
+		            "sSortDescending": ": 以降序排列此列"
+		        }
+		    };
+	    $("input[name=firstCheckbox]").on("click",function(){
+			if($(this).prop("checked")){
+				$("input[name=checkItem1]").prop("checked",true);
+			}else{
+				$("input[name=checkItem1]").prop("checked", false);
+			}
+		});
+	    $("input[name=firstCheckbox1]").on("click",function(){
+			if($(this).prop("checked")){
+				$("input[name=checkItem2]").prop("checked",true);
+				$("input[name=firstCheckbox1]").prop("checked",true);
+			}else{
+				$("input[name=checkItem2]").prop("checked", false);
+				$("input[name=firstCheckbox1]").prop("checked", false);
+			}
+		});
+        $('#addMallSkuConfigurationModalDetailBtn').bind("click", function () {
+            $('#addMallSkuConfigurationModalDetail').modal("show");
+        });
+
+        $('#saveAddMallSkuConfigurationModalDetailBtn').bind("click", function () {
+        	var skuIds="";
+        	 $("input[type=checkbox][name=checkItem1]:checked").each(function(){ //由于复选框一般选中的是多个,所以可以循环输出选中的值  
+        		 skuIds+=($(this).val()+","); 
+       		});
+       	    if(skuIds==""){
+       	    	alert("请至少选择一条记录!");
+       	    	return false;
+       	    }
+       		$.ajax({  
+       		         type : "POST", 
+       		         url : "${request.contextPath}/homeSkuConfigurationDetail/insertMallHomeSkuConfigurationDetail", 
+       		         data : {"skuIds" :skuIds,"displayId":displayId}, 
+       		         success : function(result) {//返回数据根据结果进行相应的处理
+       		        	 window.location.reload();
+       		         }
+       		}); 
+        });
+    	$(this).keydown(function (e){
+ 			if(e.which == "13"){
+ 				var focusActId = document.activeElement.id;
+ 				if(focusActId == 'query_productName'){
+ 					$('#mallSkuConfigurationModalDetailTable').DataTable().ajax.reload(); 
+ 					}
+ 				}
+ 			})
+        
+        mallSkuConfigurationModalDetailTable_table = $('#mallSkuConfigurationModalDetailTable').DataTable({
+            processing: true,
+            serverSide: true,
+            searching: false,
+            bLengthChange: false,
+            iDisplayLength: 5,
+            paging: true,"bAutoWidth": false,
+            pagingType: "full_numbers",
+            filter: false,
+            language: lang,
+            "bSort" : false,
+            ajax: function (data, callback, settings) {
+                var param = {};
+                param.pageSize = data.length;
+                param.start = data.start;
+                param.pageNumber = (data.start / data.length) + 1;
+                param.displayId=displayId;
+                var searchValue = $("#query_productName").val();
+                param.searchValue=searchValue;
+                param.allParentId =_allParentId;
+                postUtil.call("${request.contextPath}/manage/product/queryProductListJson", param, function (result) {
+                    setTimeout(function () {
+                        //封装返回数据
+                        var returnData = {};
+                        returnData.draw = data.pageSize;
+                        returnData.recordsTotal = result.totalRow;
+                        returnData.recordsFiltered = result.totalRow;
+                        returnData.data = result.list;
+                        callback(returnData);
+                    }, 200);
+                });
+            },
+            columns: [
+                {data: "skuId","sWidth": "20px" },
+                {data: "skuId","sWidth": "100px"},
+                {data: "skuName","sWidth": "400px"},
+                {data: "classficatoryName"},
+            ],
+            columnDefs: [
+                         {
+                             "targets": [0],
+                             "data": "skuId",
+                             "render": function (data, type, full) {
+                                 return "<input type='checkbox' name='checkItem1' value='"+data+"' />";
+                             }
+                         }
+                     ]
+        });
+        $("#tree").combotree({  
+			 url:'${request.contextPath}/manage/product/getSkuClassificatory?type=2',  
+			 onSelect:function(node){
+					_allParentId = node.id;
+					$('#mallSkuConfigurationModalDetailTable').DataTable().ajax.reload(); 
+		    }
+		}); 
+   	   
+});
+ </script>
+    
+</body>
+</html>

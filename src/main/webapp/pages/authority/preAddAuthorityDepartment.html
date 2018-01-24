@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="/res/css/sku.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+
+    <!-- ztree v3.5 -->
+    <link rel="stylesheet" type="text/css" href="/res/public/zTree_v3/css/zTreeStyle/zTreeStyle.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/public/zTree_v3/js/jquery.ztree.core-3.5.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/zTree_v3/js/jquery.ztree.excheck-3.5.min.js<@resVersionDirective>?</@>"></script>
+
+</head>
+<body>
+<section id="itocCenter">
+    <header>
+        <#include "/res/freemarkerTpl/header.html" />
+        <#if (SYSTEM_USER_SESSION != null)>
+            <@header currentUser=SYSTEM_USER_SESSION.systemUser/>
+            <#else>
+                <@header currentUser=""/>
+        </#if>
+        <div class="search">
+            <div class="crumbs flt">
+                <a href="javascript:void(0);">首页</a>>
+                <a href="/authorityRole/preList">权限</a>>
+                <a href="/authorityDepartment/preList">部门管理</a>>
+                <a class="c-b-i" href="javascript:void(0);">新增</a>
+            </div>
+        </div>
+    </header>
+    <footer>
+        <#include "/res/freemarkerTpl/left_menu.html" />
+        <@footer currentMenu="AUTHORITY"/>
+    </footer>
+    <section class="itocContent">
+        <div class="itocMain">
+            <div id="addInquiry" style="display: block">
+                <div class="addSku" style="padding-top: 20px;margin-left: -58px;margin-bottom: -40px;font-size: 12px;width:1500px;">
+                    <dl class="sku-list inline">
+                        <dt class="mt10">部门名称：</dt>
+                        <dd class="inputContent" style="width:220px;">
+                            <input type="text" id="departmentName" placeholder="请输入商品编码" style="width:208px;height:33px;">
+                        </dd>
+                    </dl>
+                    <dl class="sku-list inline">
+                        <dt class="mt10">部门描述：</dt>
+                        <dd class="inputContent" style="width:220px;">
+                            <input type="text" id="departmentDesc" placeholder="请输入商品编码" style="width:208px;height:33px;">
+                        </dd>
+                    </dl>
+                    <dl class="sku-list inline">
+                        <dt class="mt10">部门类型：</dt>
+                        <dd class="inputContent" style="width:220px;border:0;">
+                            <select id="departmentType" style="width: 150px;height: 40px;" >
+                                <option value="">---请选择部门类型---</option>
+                                <option value="DEPARTMENT">部门</option>
+                                <option value="POSITION">岗位</option>
+                            </select>
+                        </dd>
+                    </dl>
+                    <dl class="sku-list inline">
+                        <dt class="mt10">上级部门：</dt>
+                        <dd class="inputContent" style="width:839px;">
+                            <input type="hidden" id="pDepartmentId">
+                            <input type="text" readonly="readonly" id="pDepartmentName" placeholder="请选择上级部门" style="width:827px;height:33px;">
+                            <div class="xiala">
+                                <img src="/res/images/arrow2.png" alt="">
+                            </div>
+                            <div style="background-color: white;display:none">
+                                <ul id="tree" class="ztree"></ul>
+                            </div>
+                        </dd>
+                        <div id="treeNav" style="left:-1px;top:35px;"></div>
+                    </dl>
+                    <dl class="sku-list inline">
+                        <dd class="inputContent" style="margin-left: 30px;border:0;">
+                        <button id="addAuthorityDepartmentBtn" class="search-btn" style="cursor: pointer;">新增</button>
+                        <button id="cancelAddAuthorityDepartmentBtn" class="search-btn" style="cursor: pointer;">取消</button>
+                        </dd>
+                    </dl>
+                </div>
+
+                    <!--<dl class="form-list" style="height: 500px;">-->
+                        <!--<dt style="width: 150px;">上级部门：</dt>-->
+                        <!--<dd>-->
+                            <!--<div style="margin-top: 10px;">-->
+                                <!--<ul id="tree" class="ztree" style="width:340px; overflow:auto;"></ul>-->
+                            <!--</div>-->
+                        <!--</dd>-->
+                    <!--</dl>-->
+                    <div style="margin-top: 20px;margin-right: 20px;margin-bottom: 5px;float:right;">
+                        <button id="batchRemoveUser" class="search-btn" style="cursor: pointer;">批量移除</button>
+                        <button id="addUser" class="search-btn" style="cursor: pointer;">添加人员</button>
+                    </div>
+                    <div class="table" style="height: 300px;">
+                        <ul class="th">
+                            <li style="width:3%;"><div class="mida"><div class="midb"><input type="checkbox" id="selectAllUser"></div></div></li>
+                            <li style="width:10%"><div class="mida"><div class="midb">员工姓名</div></div></li>
+                            <li style="width:10%;"><div class="mida"><div class="midb">真是姓名</div></div></li>
+                            <li style="width:3%;"><div class="mida"><div class="midb">性别</div></div></li>
+                            <li style="width:8%;"><div class="mida"><div class="midb">手机</div></div></li>
+                            <li style="width:10%;"><div class="mida"><div class="midb">邮箱</div></div></li>
+                            <li style="width:6%;"><div class="mida"><div class="midb">来源</div></div></li>
+                            <li style="width:10%;"><div class="mida"><div class="midb">上级</div></div></li>
+                            <li style="width:5%"><div class="mida"><div class="midb">操作</div></div></li>
+                        </ul>
+                        <div class="information-list" id="userTable"></div>
+                        <!--<div id="userPaginationDiv"></div>-->
+                    </div>
+                    <div style="margin-top: 20px;margin-right: 20px;margin-bottom: 5px;float:right;">
+                        <button id="batchRemoveRole" class="search-btn" style="cursor: pointer;">批量移除</button>
+                        <button id="addRole" class="search-btn" style="cursor: pointer;">添加角色</button>
+                    </div>
+                    <div class="table" style="height: 300px;">
+                        <ul class="th">
+                            <li style="width:10%;"><div class="mida"><div class="midb"><input type="checkbox" id="selectAllRole"></div></div></li>
+                            <li style="width:25%"><div class="mida"><div class="midb">角色名称</div></div></li>
+                            <li style="width:25%;"><div class="mida"><div class="midb">角色描述</div></div></li>
+                            <li style="width:5%"><div class="mida"><div class="midb">操作</div></div></li>
+                        </ul>
+                        <div class="information-list" id="roleTable"></div>
+                        <!--<div id="rolePaginationDiv"></div>-->
+                    </div>
+
+            </div>
+        </div>
+    </section>
+</section>
+
+<script>
+
+    var zTree;
+    var setting = {
+        check: {
+            enable: false,
+            chkStyle: "radio",
+            chkboxType: { "Y": "s", "Y": "p" } //勾选只影响父节点,取消勾选只影响子节点
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        },
+        callback: {
+            onClick: zTreeOnClick
+        }
+
+    };
+
+    var pDepartmentId = "";
+    function zTreeOnClick(event, treeId, treeNode) {
+//        alert(treeId + ":" + treeNode.id + ":" + treeNode.allName + ":" + treeNode.code);
+        pDepartmentId = treeNode.id;
+        $("#pDepartmentName").val(treeNode.allName);
+        $(".xiala").next().hide();
+
+    };
+
+    var initParam={};
+    postUtil.call("/authorityDepartment/listALlJsonForZTree",initParam,function(resultData){
+        var t = $("#tree");
+        t = $.fn.zTree.init(t, setting, resultData);
+        zTree = $.fn.zTree.getZTreeObj("tree");
+    });
+
+    $(document).on("click", ".xiala", function () {
+        if ($(this).next().css("display") == "none") {
+            $(this).next().show();
+        } else {
+            $(this).next().hide();
+        }
+    });
+    $(document).on("click","#pDepartmentName",function(){
+        if($(".xiala").next().css("display")=="none"){
+            $(".xiala").next().show();
+        }else{
+            $(".xiala").next().hide();
+        }
+    });
+
+    $(document).on("click", "#userTable ul", function () {
+        var checked = $(this).find('input:checkbox[name="userCheck"]').attr("checked");
+        $(this).find('input:checkbox[name="userCheck"]').attr("checked", !checked);
+        var isAllChecked = true;
+        $.each($('input:checkbox[name="userCheck"]'), function (index, item) {
+            if(!$(item).is(':checked')) {
+                isAllChecked = false;
+                return false;
+            }
+        });
+        $('#selectAllUser').attr("checked", isAllChecked);
+    });
+
+    $('#selectAllUser').bind("click", function () {
+        var selectAllChecked = document.getElementById("selectAllUser").checked;
+        var checks = document.getElementsByName("userCheck");
+        if (checks.length > 0) {
+            for (var i = 0; i < checks.length; i++) {
+                checks[i].checked = selectAllChecked;
+            }
+        }
+    });
+
+    $(document).on("click", "#roleTable ul", function () {
+        var checked = $(this).find('input:checkbox[name="roleCheck"]').attr("checked");
+        $(this).find('input:checkbox[name="roleCheck"]').attr("checked", !checked);
+        var isAllChecked = true;
+        $.each($('input:checkbox[name="roleCheck"]'), function (index, item) {
+            if(!$(item).is(':checked')) {
+                isAllChecked = false;
+                return false;
+            }
+        });
+        $('#selectAllRole').attr("checked", isAllChecked);
+    });
+
+    $('#selectAllRole').bind("click", function () {
+        var selectAllChecked = document.getElementById("selectAllRole").checked;
+        var checks = document.getElementsByName("roleCheck");
+        if (checks.length > 0) {
+            for (var i = 0; i < checks.length; i++) {
+                checks[i].checked = selectAllChecked;
+            }
+        }
+    });
+
+
+    function returnToAuthorityDepartmentList(){
+        postUtil.submit("/authorityDepartment/preList")
+    }
+    var PAGE_SIZE = 5;
+
+    function userTableInit(){
+
+        var queryParam = {};
+        queryParam.currentPageIndex = 1;
+        queryParam.pageSize = PAGE_SIZE;
+
+        loadUserData(queryParam);
+    }
+
+    function loadUserData(queryParam) {
+        layer.load();
+        postUtil.call("/authorityDepartment/loadUser", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            renderTableById(dataList, "userTable");
+            laypage({
+                cont: 'userPaginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        loadUserData(tempParam);
+                    }
+                }
+            });
+            layer.closeAll("loading");
+        });
+    }
+
+    function roleTableInit(){
+
+        var queryParam = {};
+        queryParam.currentPageIndex = 1;
+        queryParam.pageSize = PAGE_SIZE;
+
+        loadRoleData(queryParam);
+    }
+
+    function loadRoleData(queryParam) {
+        layer.load();
+        postUtil.call("/authorityDepartment/loadRole", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            renderTableById(dataList, "roleTable");
+            laypage({
+                cont: 'rolePaginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        loadRoleData(tempParam);
+                    }
+                }
+            });
+            layer.closeAll("loading");
+        });
+    }
+
+    function renderTableById(dataList, tableId) {
+        var length = dataList.length;
+        var table = document.getElementById(tableId);
+        table.innerHTML = "";
+
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var row = renderRow(data, tableId);
+                table.appendChild(row);
+            }
+        }else {
+            var html = '<p class="t-c fz16 c-2" style="line-height: 76px;">暂无信息！</p>';
+            $(table).html(html);
+        }
+    }
+
+    function renderRow(rowData, tableId) {
+       if(tableId == "userTable") {
+           return renderUserRow(rowData);
+       } else if(tableId == "roleTable") {
+           return renderRoleRow(rowData);
+       }
+       return "";
+    }
+
+    function renderUserRow(rowData) {
+        var userId = rowData.userId;
+        var userName = rowData.userName;
+        var userRealName = rowData.userRealName;
+        var sex = rowData.sex;
+        var mobile = rowData.mobile;
+        var email = rowData.email;
+        var createChannel = rowData.createChannel;
+        var pUserId = rowData.pUserId;
+        var pUserName = rowData.pUserName;
+
+        var ul = document.createElement('ul');
+        ul.setAttribute("class", "information");
+        ul.setAttribute("style","height:35px;");
+
+        ul.appendChild(renderUserCell("check", userId, "width:3%;height:35px;"));
+        ul.appendChild(renderUserCell(null, userName, "width:10%;height:35px;"));
+        ul.appendChild(renderUserCell(null, userRealName, "width:10%;height:35px;"));
+        ul.appendChild(renderUserCell(null, sex, "width:3%;height:35px;"));
+        ul.appendChild(renderUserCell(null, mobile, "width:8%;height:35px;"));
+        ul.appendChild(renderUserCell(null, email, "width:10%;height:35px;"));
+        ul.appendChild(renderUserCell(null, createChannel, "width:6%;height:35px;"));
+        ul.appendChild(renderUserCell(null, pUserName, "width:10%;height:35px;"));
+        ul.appendChild(renderUserCell("operation", rowData, "width:5%;height:35px;"));
+        return ul;
+    }
+
+    function renderRoleRow(rowData) {
+        var roleId = rowData.roleId;
+        var roleName = rowData.roleName;
+        var roleDesc = rowData.roleDesc;
+
+
+        var ul = document.createElement('ul');
+        ul.setAttribute("class", "information");
+        ul.setAttribute("style","height:35px;");
+
+        ul.appendChild(renderRoleCell("check", roleId, "width:10%;height:35px;"));
+        ul.appendChild(renderRoleCell(null, roleName, "width:25%;height:35px;"));
+        ul.appendChild(renderRoleCell(null, roleDesc, "width:25%;height:35px;"));
+        ul.appendChild(renderRoleCell("operation", rowData, "width:5%;height:35px;"));
+        return ul;
+    }
+
+    function renderUserCell(name, value, style) {
+        var li = document.createElement('li');
+        li.setAttribute("style", style)
+        var div_mida = document.createElement('div');
+        div_mida.setAttribute("class", "mida");
+        var div_midb = document.createElement('div');
+        div_midb.setAttribute("class", "midb");
+        //个性化差异-操作区域
+        if ("operation" == name) {
+            div_midb.innerHTML = '<p><a href="javascript:void(0);" onclick="removeUser(\'' + value.departmentId + '\',\'' + value.departmentName + '\',\'' + value.departmentDesc + '\')">移除</a></p>';
+        } else if("check" == name) {
+            div_midb.innerHTML = '<input type="checkbox" name="userCheck" value="'+value+'">';
+        } else if("departmentType" == name) {
+            var text = "";
+            if(value == "DEPARTMENT") {
+                text = "部门";
+            } else if(value == "POSITION"){
+                text = "岗位";
+            }
+            div_midb.innerText = text;
+        } else {
+            if (value) {
+                div_midb.innerText = value;
+            } else {
+                div_midb.innerText = "--";
+            }
+        }
+        div_mida.appendChild(div_midb);
+        li.appendChild(div_mida);
+        return li;
+    }
+
+    function renderRoleCell(name, value, style) {
+        var li = document.createElement('li');
+        li.setAttribute("style", style)
+        var div_mida = document.createElement('div');
+        div_mida.setAttribute("class", "mida");
+        var div_midb = document.createElement('div');
+        div_midb.setAttribute("class", "midb");
+        //个性化差异-操作区域
+        if ("operation" == name) {
+            div_midb.innerHTML = '<p><a href="javascript:void(0);" onclick="removeRole('+value.roleId+')">移除</a></p>';
+        } else if("check" == name) {
+            div_midb.innerHTML = '<input type="checkbox" name="roleCheck" value="'+value+'">';
+        } else {
+            if (value) {
+                div_midb.innerText = value;
+            } else {
+                div_midb.innerText = "--";
+            }
+        }
+        div_mida.appendChild(div_midb);
+        li.appendChild(div_mida);
+        return li;
+    }
+
+    function chooseUserCallback(userData) {
+        if(userData) {
+            var tableId = "userTable";
+            var table = document.getElementById(tableId);
+
+            $.each(userData, function (index, item) {
+                var isExist = false;
+                $.each($('input:checkbox[name="userCheck"]'), function (idx, itm) {
+                    if(item.userId == $(itm).val()) {
+                        isExist = true;
+                        return true;
+                    }
+                });
+                if(isExist) {
+                    return true;
+                }
+                var row = renderRow(item, tableId);
+                table.appendChild(row);
+            });
+
+        }
+        return true;
+    }
+
+    function chooseRoleCallback(roleData) {
+        if(roleData) {
+            var tableId = "roleTable";
+            var table = document.getElementById(tableId);
+
+            $.each(roleData, function (index, item) {
+                var isExist = false;
+                $.each($('input:checkbox[name="roleCheck"]'), function (idx, itm) {
+                    if(item.roleId == $(itm).val()) {
+                        isExist = true;
+                        return true;
+                    }
+                });
+                if(isExist) {
+                    return true;
+                }
+                var row = renderRow(item, tableId);
+                table.appendChild(row);
+            });
+
+        }
+        return true;
+    }
+
+    //页面加载执行
+    $(function(){
+        $('#cancelAddAuthorityDepartmentBtn').bind("click",function(){
+            returnToAuthorityDepartmentList();
+        });
+
+        $('#addAuthorityDepartmentBtn').bind("click",function(){
+
+            var layerContent = '<div id="upload" class="t-c c-2" style="padding-top: 40px;"><p style="margin-top: 25px;">确定新增部门：<span class="fz18 c-f fw-b">['+$('#departmentName').val()+']</span>吗？</p></div>';
+            layer.open({
+                title: false,
+                skin: 'myskin3',
+                area: ['450px', '250px'],
+                btnAlign: 'c',
+                content:layerContent,
+                btn: ['确定', '取消'],
+                yes: function(index, layero){
+                    //选中选中的菜单项
+                    var departmentName = $('#departmentName').val();
+                    var departmentDesc = $('#departmentDesc').val();
+                    var departmentType = $('#departmentType').val();
+
+
+                    var saveParam = {};
+                    saveParam.departmentName = departmentName;
+                    saveParam.departmentDesc = departmentDesc;
+                    saveParam.departmentType = departmentType;
+                    saveParam.pDepartmentId = pDepartmentId;
+                    saveParam.userIds = [];
+                    saveParam.roleIds = [];
+                    $.each($('input:checkbox[name="userCheck"]'), function (index, item) {
+                        saveParam.userIds.push(this.value);
+                    });
+                    $.each($('input:checkbox[name="roleCheck"]'), function (index, item) {
+                        saveParam.roleIds.push(this.value);
+                    });
+                    console.log(saveParam);
+                    postUtil.call("/authorityDepartment/add",{jsonData:JSON.stringify(saveParam)},function(result){
+                        if(result.STATUS == "SUCCESS") {
+                            layer.msg('新增部门成功!', {
+                                time: 0,
+                                btn: ['继续添加', '返回列表'],
+                                yes: function (index) {
+                                    layer.close(index);
+                                    zTree.checkAllNodes(false);
+                                    $('#departmentName').val("");
+                                    $('#departmentDesc').val("");
+                                    $('#departmentType').val("");
+                                    pDepartmentId = "";
+                                    $("#userTable").empty();
+                                    $("#roleTable").empty();
+                                },
+                                btn2: function(){
+                                    returnToAuthorityDepartmentList();
+                                }
+                            });
+                        }else {
+                            layer.msg(result.MSG,{icon:5});
+                        }
+                    });
+                },btn2: function(index, layero){
+                    layer.close(index);
+                },
+                cancel: function(){
+
+                }
+            });
+
+        });
+
+        $('#batchRemoveUser').bind("click",function(){
+
+        });
+
+        $('#batchRemoveRole').bind("click",function(){
+
+        });
+
+        $('#addUser').bind("click",function(){
+            layer.open({
+                title:"请选择员工",
+                type: 2,
+                area: ['1000px', '650px'],
+                fixed: false, //不固定
+                maxmin: true,
+                content: '/reusable/user/chooseUserPage'
+            });
+        });
+
+        $('#addRole').bind("click",function(){
+            layer.open({
+                title:"请选择角色",
+                type: 2,
+                area: ['1000px', '650px'],
+                fixed: false, //不固定
+                maxmin: true,
+                content: '/reusable/role/chooseRolePage'
+            });
+        });
+    });
+
+</script>
+</body>
+</html>

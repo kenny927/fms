@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <!--<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">-->
+    <style>
+        /*.btn {*/
+            /*display: block;*/
+            /*width: 70px;*/
+            /*height: 28px;*/
+            /*line-height:28px!important;*/
+            /*font: 12px/36px "microsoft yahei";*/
+            /*text-align: center;*/
+            /*text-decoration: none;*/
+            /*color:#035a9d;*/
+            /*border-radius: 0;*/
+            /*!*border:1px solid #035a9d;*!*/
+            /*background: #035a9d;*/
+        /*}*/
+
+        .choosedTr{
+            background-color: #e2e2e2;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <form class="jun-form-s form-css mt20">
+                <dl class="dl-form">
+                    <dt class="flt">内部分类：</dt>
+                    <dd class="flt"><input type="text" id="skuClassifyName" placeholder="请输入商品内部分类" class="layui-input"/></dd>
+                    <dd  class="flt"><span class="form-btn layui-btn-small2 ml10" id="searchBtn">查询</span></dd>
+                </dl>
+            </form>
+            <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px">
+                <table class="layui-table pop" lay-skin="line">
+                    <thead>
+                    <tr>
+                        <th style="text-align:center;width:15%">SPUID</th>
+                        <th style="text-align:center;width:20%">内部分类</th>
+                        <th style="text-align:center;width:20%">品牌</th>
+                        <th style="text-align:center;width:30%">聚合属性</th>
+                        <th style="text-align:center;width:15%">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="spuPloymerizeListTable">
+                    </tbody>
+                </table>
+            </div>
+            <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+            <div style="width: 100%;box-sizing: border-box;padding: 0 20px;margin-right: 20px;font-weight: bolder;">
+                当前SPU：<span id="spuInfo" style="color: red;"></span>
+            </div>
+            <!-- 已聚合和可聚合SKU信息 -->
+            <div class="layui-tab" style="width: 100%;box-sizing: border-box;padding: 0 20px;margin-right: 20px;">
+                <ul class="layui-tab-title">
+                    <li class="layui-this">已聚合的SKU</li>
+                    <li>可聚合的SKU</li>
+                </ul>
+                <div class="layui-tab-content">
+                    <div class="layui-tab-item layui-show">
+                        <div>
+                            <table class="layui-table pop" lay-skin="line">
+                                <thead>
+                                    <tr>
+                                        <th colspan="4" class="bg-fff clr mr10">
+                                            <span class="form-btn layui-btn-itoc layui-btn-small2 frt" id="batchSeparateBtn">脱离</span>
+                                        </th>
+                                    </tr>
+                                <tr>
+                                    <th style="text-align:center;width:10%">
+                                        <input type="checkbox" id="spuSkuCheckAll">
+                                    </th>
+                                    <th style="text-align:center;width:10%">商品ID</th>
+                                    <th style="text-align:center;width:60%">商品名称</th>
+                                    <th style="text-align:center;width:20%">操作</th>
+                                </tr>
+                                </thead>
+                                <tbody id="spuSkuListTable">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="spuSkuPaginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+                    </div>
+                    <div class="layui-tab-item">
+                        <div>
+                            <table class="layui-table pop" lay-skin="line">
+                                <thead>
+                                <tr>
+                                    <th colspan="4" class="bg-fff clr mr10">
+                                        <span class="form-btn layui-btn-itoc layui-btn-small2 frt" id="batchPloymerizeBtn" >聚合</span>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th style="text-align:center;width:10%">
+                                        <input type="checkbox" id="spuAvailableSkuCheckAll">
+                                    </th>
+                                    <th style="text-align:center;width:10%">商品ID</th>
+                                    <th style="text-align:center;width:60%">商品名称</th>
+                                    <th style="text-align:center;width:20%">操作</th>
+                                </tr>
+                                </thead>
+                                <tbody id="spuAvailableSkuListTable">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript">
+
+    var PAGE_SIZE = 5;
+    var layer = null;
+    var currentSpuId = null;
+
+    layui.use(['layer', 'element', 'util'], function () {
+        var element = layui.element();
+        layer = layui.layer;
+
+        doSpuPloymerizeSearch();
+
+        $("#searchBtn").bind("click", function () {
+            doSpuPloymerizeSearch();
+        });
+        
+        $('#batchPloymerizeBtn').bind("click",function () {
+
+            var skuIds_array = getSpuAvailableSku();
+            if(skuIds_array.length == 0 ) {
+                layer.msg("请选择需要聚合的SKU",{icon:5});
+                return;
+            }
+            var skuIds = transArrayToString(skuIds_array);
+
+            layer.confirm('确定要将所选的SKU聚合到当前SPU?', {
+                btn: ['确定', '取消']
+            }, function (index) {
+                layer.close(index);
+                var param = {};
+                param.spuId = currentSpuId;
+                param.skuIds = skuIds;
+                postUtil.call("/spuPolymerize/polymerizeSkuToSpu", param, function (result) {
+                    if (result.STATUS == "SUCCESS") {
+                        layer.msg("聚合成功~",{icon:6});
+                        renderSpuSku(currentSpuId);
+                        renderSpuAvailableSku(currentSpuId);
+                    }else {
+                        layer.msg(result.MSG,{icon:5});
+                    }
+                });
+            }, function (index) {
+                layer.close(index);
+            });
+        });
+
+        $('#batchSeparateBtn').bind("click",function () {
+            var skuIds_array = getSpuSku();
+            if(skuIds_array.length == 0 ) {
+                layer.msg("请选择需要脱离的SKU",{icon:5});
+                return;
+            }
+            var skuIds = transArrayToString(skuIds_array);
+            layer.confirm('确定要脱离所选择的的SKU?', {
+                btn: ['确定', '取消']
+            }, function (index) {
+                layer.close(index);
+                var param = {};
+                param.spuId = currentSpuId;
+                param.skuIds = skuIds;
+                postUtil.call("/spuPolymerize/separateSkuFromSpu", param, function (result) {
+                    if (result.STATUS == "SUCCESS") {
+                        layer.msg("脱离SPU成功~",{icon:6});
+                        renderSpuSku(currentSpuId);
+                        renderSpuAvailableSku(currentSpuId);
+                    }else {
+                        layer.msg(result.MSG,{icon:5});
+                    }
+                });
+            }, function (index) {
+                layer.close(index);
+            });
+        });
+
+    });
+
+    function getSpuAvailableSku() {
+        var checkedSpuAvailableSkuIds = [];
+        $("input[name='checkbox_spuAvailableSku']:checkbox:checked").each(function () {
+            checkedSpuAvailableSkuIds.push($(this).val());
+        });
+        return checkedSpuAvailableSkuIds;
+    }
+
+    function getSpuSku(){
+        var checkedSpuSkuIds = [];
+        $("input[name='checkbox_spuSku']:checkbox:checked").each(function () {
+            checkedSpuSkuIds.push($(this).val());
+        });
+        return checkedSpuSkuIds;
+    }
+
+    function transArrayToString(skuIds) {
+        var result = "";
+        for (var i = 0; i < skuIds.length; i++) {
+            if (i != (skuIds.length - 1)) {
+                result = result + skuIds[i] + ",";
+            } else {
+                result = result + skuIds[i];
+            }
+        }
+        return result;
+    }
+
+    function doSpuPloymerizeSearch() {
+        var queryParam = {};
+        queryParam.currentPageIndex = 1;
+        queryParam.pageSize = PAGE_SIZE;
+        queryParam.skuClassifyName = $('#skuClassifyName').val();
+        loadSpuPloymerizeData(queryParam);
+    }
+
+    function loadSpuPloymerizeData(queryParam) {
+        layer.load();
+        postUtil.call("/spuPolymerize/listJson", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            renderTable(dataList);
+            layer.closeAll("loading");
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        tempParam.skuClassifyName = $('#skuClassifyName').val();
+                        loadSpuPloymerizeData(tempParam);
+                    }
+                }
+            });
+        });
+    }
+
+    function renderTable(dataList) {
+        var length = dataList.length;
+        var table = document.getElementById("spuPloymerizeListTable");
+        table.innerHTML = "";
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var row = renderRow(data);
+                table.appendChild(row);
+            }
+        }else {
+            var html = '<tr><td colspan="5"><p class="t-c fz16 c-2" style="line-height: 76px;">暂无SPU聚合数据！</p></td></tr>';
+            $(table).html(html);
+        }
+    }
+
+    function renderRow(rowData) {
+        var spuId = rowData.spuId;
+        var brandName = rowData.brandName;
+        var skuClassifyName = rowData.skuClassifyName;
+        var skuPropertyName = rowData.skuPropertyName;
+        var tr = document.createElement('tr');
+        tr.appendChild(renderCell(null, spuId, "width:15%;"));
+        tr.appendChild(renderCell(null, skuClassifyName, "width:20%;"));
+        tr.appendChild(renderCell(null, brandName, "width:20%;"));
+        tr.appendChild(renderCell(null, skuPropertyName, "width:30%;"));
+        tr.appendChild(renderCell("operation", rowData, "width:15%;"));
+        //绑定行级事件
+        $(tr).bind("click",{'spuId':spuId},function(e){
+
+            $(this).parent().find("tr").removeClass("choosedTr");
+            $(this).addClass("choosedTr");
+
+            currentSpuId = spuId;
+            $("#spuInfo").html(spuId);
+            renderSpuSku(spuId);
+            renderSpuAvailableSku(spuId);
+        });
+        return tr;
+    }
+
+
+    function renderCell(name, value, style) {
+        var td = document.createElement('td');
+        td.setAttribute("style", style)
+        //个性化差异-操作区域
+        if(name == "operation") {
+            td.innerHTML = '<p><a class="c-h fz12" href="javascript:void(0);" onclick="deleteSpu(\'' + value.spuId + '\')">删除SPU</a></p>';
+        }else {
+            if(value) {
+                td.innerText = value;
+            }else {
+                td.innerText = "--";
+            }
+        }
+        return td;
+    }
+
+    //已聚合sku列表渲染
+    function renderSpuSku(spuId){
+        if(spuId) {
+            var queryParam = {};
+            queryParam.currentPageIndex = 1;
+            queryParam.pageSize = PAGE_SIZE;
+            queryParam.spuId = spuId;
+            loadSpuPloymerizeSkuData(queryParam);
+        }else {
+            var table = document.getElementById("spuSkuListTable");
+            var html = '<tr><td colspan="5"><p class="t-c fz16 c-2" style="line-height: 76px;">暂无SKU聚合数据！</p></td></tr>';
+            $(table).html(html);
+        }
+    }
+
+    function loadSpuPloymerizeSkuData(queryParam) {
+        postUtil.call("/spuPolymerize/spuSkuListJson", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            renderSpuSkuTable(dataList);
+            laypage({
+                cont: 'spuSkuPaginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        tempParam.spuId = queryParam.spuId;
+                        loadSpuPloymerizeSkuData(tempParam);
+                    }
+                }
+            });
+        });
+    }
+
+    function renderSpuSkuTable(dataList){
+        var length = dataList.length;
+        var table = document.getElementById("spuSkuListTable");
+        table.innerHTML = "";
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var row = renderSpuSkuRow(data);
+                table.appendChild(row);
+            }
+        }else {
+            var html = '<tr><td colspan="5"><p class="t-c fz16 c-2" style="line-height: 76px;">暂无SKU聚合数据！</p></td></tr>';
+            $(table).html(html);
+        }
+
+        $("#spuSkuCheckAll").change(function(){
+            $("input[name='checkbox_spuSku']").attr("checked", $('#spuSkuCheckAll')[0].checked);
+        });
+    }
+
+    function renderSpuSkuRow(rowData) {
+        var skuId = rowData.skuId;
+        var skuName = rowData.skuName;
+        var tr = document.createElement('tr');
+        tr.appendChild(renderSpuSkuCell("check", skuId, "width:10%;"));
+        tr.appendChild(renderSpuSkuCell(null, skuId, "width:10%;"));
+        tr.appendChild(renderSpuSkuCell(null, skuName, "width:60%;"));
+        tr.appendChild(renderSpuSkuCell("operation", rowData, "width:20%;"));
+        return tr;
+    }
+
+    function renderSpuSkuCell(name,value,style){
+        var td = document.createElement('td');
+        td.setAttribute("style", style);
+        //个性化差异-操作区域
+        if (name == "operation") {
+            td.innerHTML = '<p><a class="c-h fz12" href="javascript:void(0);" onclick="separateFromSpu(\'' + value.skuId + '\')">从SPU脱离</a></p>';
+        } else if (name == "check") {
+            td.innerHTML = '<input type="checkbox" name="checkbox_spuSku" value="' + value + '">';
+        } else {
+            if (value) {
+                td.innerText = value;
+            } else {
+                td.innerText = "--";
+            }
+        }
+        return td;
+    }
+
+    //可聚合SKU列表渲染
+    function renderSpuAvailableSku(spuId) {
+        if(spuId) {
+            currentSpuId = spuId;
+            var queryParam = {};
+            queryParam.spuId = spuId;
+            loadSpuAvailableSkuData(queryParam);
+        }else {
+            var table = document.getElementById("spuAvailableSkuListTable");
+            var html = '<tr><td colspan="5"><p class="t-c fz16 c-2" style="line-height: 76px;">暂无SKU聚合数据！</p></td></tr>';
+            $(table).html(html);
+        }
+
+        $("#spuAvailableSkuCheckAll").change(function(){
+            $("input[name='checkbox_spuAvailableSku']").attr("checked", $('#spuAvailableSkuCheckAll')[0].checked);
+        });
+    }
+
+    function loadSpuAvailableSkuData(queryParam) {
+        postUtil.call("/spuPolymerize/spuAvailableSkuListJson", queryParam, function (dataList) {
+            renderSpuAvailableSkuTable(dataList);
+        });
+    }
+
+    function renderSpuAvailableSkuTable(dataList){
+        var length = dataList.length;
+        var table = document.getElementById("spuAvailableSkuListTable");
+        table.innerHTML = "";
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var row = renderSpuAvailableSkuRow(data);
+                table.appendChild(row);
+            }
+        }else {
+            var html = '<tr><td colspan="5"><p class="t-c fz16 c-2" style="line-height: 76px;">暂无SKU聚合数据！</p></td></tr>';
+            $(table).html(html);
+        }
+    }
+
+    function renderSpuAvailableSkuRow(rowData) {
+        var skuId = rowData.skuId;
+        var skuName = rowData.skuName;
+        var tr = document.createElement('tr');
+        tr.appendChild(renderSpuAvailableSkuCell("check", skuId, "width:10%;"));
+        tr.appendChild(renderSpuAvailableSkuCell(null, skuId, "width:10%;"));
+        tr.appendChild(renderSpuAvailableSkuCell(null, skuName, "width:60%;"));
+        tr.appendChild(renderSpuAvailableSkuCell("operation", rowData, "width:20%;"));
+        return tr;
+    }
+
+    function renderSpuAvailableSkuCell(name,value,style){
+        var td = document.createElement('td');
+        td.setAttribute("style", style);
+        //个性化差异-操作区域
+        if(name == "operation") {
+            td.innerHTML = '<p><a class="c-h fz12" href="javascript:void(0);" onclick="polymerizeToCurrentSpu(\'' + value.skuId + '\')">聚合到当前SPU</a></p>';
+        } else if (name == "check") {
+            td.innerHTML = '<input type="checkbox" name="checkbox_spuAvailableSku" value="' + value + '">';
+        } else {
+            if(value) {
+                td.innerText = value;
+            }else {
+                td.innerText = "--";
+            }
+        }
+        return td;
+    }
+
+    function polymerizeToCurrentSpu(skuId) {
+        layer.confirm('确定要将SKU<span class="fz14 c-f fw-b">[' + skuId + ']</span>聚合到当前SPU?', {
+            btn: ['确定', '取消']
+        }, function (index) {
+            layer.close(index);
+            var param = {};
+            param.spuId = currentSpuId;
+            param.skuIds = skuId;
+            postUtil.call("/spuPolymerize/polymerizeSkuToSpu", param, function (result) {
+                if (result.STATUS == "SUCCESS") {
+                    layer.msg("聚合成功~",{icon:6});
+                    renderSpuSku(currentSpuId);
+                    renderSpuAvailableSku(currentSpuId);
+                }else {
+                    layer.msg(result.MSG,{icon:5});
+                }
+            });
+        }, function (index) {
+            layer.close(index);
+        });
+    }
+
+    function separateFromSpu(skuId) {
+        layer.confirm('确定要脱离当前SKU<span class="fz14 c-f fw-b">[' + skuId + ']</span>?', {
+            btn: ['确定', '取消']
+        }, function (index) {
+            layer.close(index);
+            var param = {};
+            param.spuId = currentSpuId;
+            param.skuIds = skuId;
+            postUtil.call("/spuPolymerize/separateSkuFromSpu", param, function (result) {
+                if (result.STATUS == "SUCCESS") {
+                    layer.msg("脱离SPU成功~",{icon:6});
+                    renderSpuSku(currentSpuId);
+                    renderSpuAvailableSku(currentSpuId);
+                }else {
+                    layer.msg(result.MSG,{icon:5});
+                }
+            });
+        }, function (index) {
+            layer.close(index);
+        });
+    }
+
+
+    function deleteSpu(spuId){
+        layer.confirm('删除SPU<span class="fz14 c-f fw-b">[' + spuId + ']</span>将会删除掉SPU中所有关联的sku，确定删除吗?', {
+            btn: ['确定', '取消']
+        }, function (index) {
+            layer.close(index);
+            var param = {};
+            param.spuId = spuId;
+            postUtil.call("/spuPolymerize/deleteSpu", param, function (result) {
+                if (result.STATUS == "SUCCESS") {
+                    layer.msg("删除成功~",{icon:6});
+                    doSpuPloymerizeSearch();
+                    renderSpuSku(null);
+                    renderSpuAvailableSku(null);
+                }else {
+                    layer.msg(result.MSG,{icon:5});
+                }
+            });
+        }, function (index) {
+            layer.close(index);
+        });
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <link rel="stylesheet" type="text/css"
+          href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <style>
+        .btn {
+            display: block;
+            width: 86px;
+            height: 36px;
+            font: 12px/36px "microsoft yahei";
+            text-align: center;
+            text-decoration: none;
+            border-radius: 0;
+            background: #035a9d;
+            color: #ffffff;
+        }
+
+        a:hover {
+            color: #e80000;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div class="purchaseSearch">
+                <form>
+                    <dl class="form-list flt">
+                        <dt>SKU编码：</dt>
+                        <dd><input type="text" id="skuId" style="width: 150px;" placeholder="请输入SKU编码"/></dd>
+                    </dl>
+                    <dl class="form-list flt">
+                        <dd><span class="btn ml10" style="cursor: pointer;" id="searchBtn">查询</span></dd>
+                    </dl>
+                </form>
+            </div>
+            <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px">
+                <table class="layui-table" lay-skin="line">
+                    <thead>
+                    <tr>
+                        <th style="text-align:center;width:50%">SKU</th>
+                        <th style="text-align:center;width:50%">可售库存</th>
+                    </tr>
+                    </thead>
+                    <tbody id="skuStorageCacheTable">
+                    </tbody>
+                </table>
+            </div>
+            <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+        </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript">
+    var layer = null;
+    layui.use(['layer', 'upload'], function () {
+        layer = layui.layer;
+    });
+
+    function skuStorageCacheTableCacheInit() {
+        var skuId = $('#skuId').val();
+        var queryParam = {};
+        queryParam.skuId = skuId;
+        loadSkuStorageCacheData(queryParam);
+    }
+
+    $(function () {
+        $("#searchBtn").bind("click", function () {
+            skuStorageCacheTableCacheInit();
+        });
+        document.onkeydown = function (e) {
+            var ev = document.all ? window.event : e;
+            if (ev.keyCode == 13) {
+                skuStorageCacheTableCacheInit();
+            }
+        };
+    });
+
+    function loadSkuStorageCacheData(queryParam) {
+        layer.load();
+        postUtil.call("/skuStorage/cache/listJson", queryParam, function (result) {
+            layer.closeAll("loading");
+            renderTable(result);
+        });
+    }
+
+    function renderTable(dataList) {
+        var length = dataList.length;
+        var table = document.getElementById("skuStorageCacheTable");
+        table.innerHTML = "";
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var cacheData = dataList[i];
+                var cacheDataRow = renderRow(cacheData);
+                table.appendChild(cacheDataRow);
+            }
+        } else {
+            var html = '<tr><td colspan="10"><p class="t-c fz16 c-2" style="line-height: 76px;">未查询到库存缓存数据！</p></td></tr>';
+            $(table).html(html);
+        }
+    }
+
+    function renderRow(rowData) {
+        var skuId = rowData.skuId;
+        var skuStorage = rowData.skuStorage;
+        var tr = document.createElement('tr');
+        tr.appendChild(renderCell("skuId", rowData, "width:50%;"));
+        tr.appendChild(renderCell(null, skuStorage, "width:50%;"));
+        return tr;
+    }
+
+    function renderCell(name, value, style) {
+        var td = document.createElement('td');
+        td.setAttribute("style", style);
+        if (name == "skuId") {
+            if (value) {
+                td.innerHTML = "<a href='javascript:void(0);' onclick='preEditSkuStorageCache(\"" + value.skuId + "\",\"" + value.skuStorage.toFixed(4) + "\")'>" + value.skuId + "</a>";
+            } else {
+                td.innerText = "--";
+            }
+        } else {
+            if (!isNaN(value)) {
+                td.innerText = value.toFixed(4)
+            } else if (value) {
+                td.innerText = value;
+            } else {
+                td.innerText = "--";
+            }
+        }
+        return td;
+    }
+
+    function preEditSkuStorageCache(skuIdKey, skuStorage) {
+        layer.open({
+            title: "修改库存缓存",
+            type: 2,
+            area: ['500px', '300px'],
+            fixed: false, //不固定
+            maxmin: true,
+            content: '/skuStorage/cache/preUpdateSkuStorageCachePage?skuIdKey=' + skuIdKey
+        });
+    }
+
+    function updateSkuStorageCacheCallBack(success) {
+        if (success) {
+            skuStorageCacheTableCacheInit();
+        }
+    }
+
+</script>
+</body>
+</html>

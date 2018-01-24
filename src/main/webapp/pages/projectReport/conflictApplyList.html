@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css<@resVersionDirective>?</@>"/>
+   	<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+     <script type="text/javascript" src="/res/js/MultiSelectDropList.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <form class=" jun-form-s form-css" action="">
+                <div class="layui-form-item inline mb5 mt20 ml20">
+                    <div class="layui-inline">
+                        <label class="layui-form-label fz12" style="margin-left: 20px;width: 70px;">项目名称：</label>
+                        <div class="layui-input-block" style="margin-left: 90px;">
+                            <input style="width: 240px;" type="text" name="projectNameLike" placeholder="请输入项目名称/项目编码" autocomplete="off"
+                                   class="layui-input bor-e6  fz12">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item inline mb10 jun-form-l">
+                    <div class="layui-inline">
+                        <label class="layui-form-label  fz12 t-r-i" style="width:60px;">等级：</label>
+                        <div class="layui-input-block jun-form-l" style="margin-left: 63px;height: 30px;margin-top: -2px;">
+                            <select class="fz12" name="projectLevel" lay-filter="aihao" style="width: 240px;line-height:30px;">
+                                <option value=""></option>
+                                <option value="ALL" selected="">全部</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item inline mb5 ml20">
+                    <div class="layui-inline">
+                        <label class="layui-form-label  fz12 t-r-i" style="width:60px;">提报人：</label>
+                        <div class="layui-input-block" style="margin-left: 60px;">
+                            <input style="width: 240px;" type="text" name="createUserNameLike" placeholder="请输入提报人" autocomplete="off"
+                                   class="layui-input bor-e6  fz12">
+                        </div>
+                    </div>
+                        <button class="layui-btn bg-03  fz12" style="margin-top: -10px;height: 30px;line-height: 30px;"
+                                lay-submit="" lay-filter="demo1">查询
+                        </button>
+                </div>
+              <!--   <div class="layui-form-item inline mb10 jun-form-l">
+                    <div class="layui-inline">
+                        <label class="layui-form-label  fz12 t-r-i" style="width:60px;">授权：</label>
+                      <div class="pre">
+                          <div class="multi_select" id="statusSelect" style="position:absolute;left:0;top:0;margin-left:60px;z-index:999;"><img
+                                    style="position: absolute;right: 3px;top: 12px;cursor: pointer;"
+                                    src="/res/images/arrow3.png"/></div>
+                        </div>
+                    </div>
+                </div> --> 
+               <!--  <div class="layui-form-item inline"">
+                    <div class="layui-input-block" style="line-height: 30px;">
+                        <button class="layui-btn bg-03  fz12" style="margin-top: 2px;height: 30px;line-height: 30px;"
+                                lay-submit="" lay-filter="demo1">查询
+                        </button>
+                    </div>
+                </div> -->
+            </form>
+            <div class="table" id="applyList">
+                <ul class="th">
+                    <li style="width:3%;"><div class="mida"><div class="midb"></div></div></li>
+                    <li style="width:20%;"><div class="mida"><div class="midb">项目名称</div></div></li>
+                    <li style="width:9%;"><div class="mida"><div class="midb">所在地</div></div></li>
+                    <li style="width:20%;"><div class="mida"><div class="midb">集成商名称</div></div></li>
+                    <li style="width:14%;"><div class="mida"><div class="midb">业主名称</div></div></li>
+                    <li style="width:10%"><div class="mida"><div class="midb">提报人</div></div></li>
+                    <li style="width:6%"><div class="mida"><div class="midb">报备时间</div></div></li>
+                    <li style="width:6%"><div class="mida"><div class="midb">创建时间</div></div></li>
+                     <li style="width:10%"><div class="mida"><div class="midb">操作</div></div></li>
+                </ul>
+                <div class="information-list" style="border-right: none">
+
+                </div>
+            </div>
+            <div id="paginationDiv"></div>
+        </div>
+    </section>
+</section>
+<style type="text/css">
+.similar-mark{
+    color:red;
+}
+</style>
+<script>
+	var layer;
+	var form;
+    $(function () {
+    	 layui.use(['form', 'layedit', 'laydate','layer'], function () {
+    	         form = layui.form();
+    	         layer = layui.layer;
+    	        //监听提交
+    	        form.on('submit(demo1)', function(data) {
+    	        	var queryParam = $("form").serialize();
+    	        	queryParam.currentPage  = 1;
+                	initDatatable(queryParam);
+    	        // var status = $('#status_hidden').val();
+    	          //  data.field.status  =status;
+    	            return false;
+    	        });
+    	    })
+       $('#statusSelect').MSDL({
+            'width': '240',
+            'data': [{"text": "冲突裁定", "value": "CONFLICT_WAIT"}, {"text": "已授权", "value": "OK"}, {"text": "拒绝授权","value": "REFUSE"}],
+            'id': "status"
+        });
+        var param = {};
+        param.currentPage = 1;
+        initDatatable(param);
+    })
+
+    function isExitsVariable(variableName) {
+        try {
+            if (typeof (variableName) == "undefined") {
+                return "";
+            } else if ( variableName == null) {
+                return "";
+            }else {
+                return variableName;
+            }
+        } catch (e) {
+        }
+        return "";
+    }
+
+    function initDatatable(param) {
+        postUtil.call("/projectReport/queryConflictApplyList", param, function (result) {
+            var pageNumber = result.DATA.pageNumber;
+            var pageSize = result.DATA.pageSize;
+            var totalPage = result.DATA.totalPage;
+            var totalRow = result.DATA.totalRow;
+            var dataList = result.DATA.list;
+            var hasAuthorityRole=result.hasAuthorityRole;
+            renderTable(dataList,hasAuthorityRole);
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                total: totalRow,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        param.currentPage = obj.curr;
+                        initDatatable(param);
+                    }
+                }
+            });
+        });
+    }
+
+    function renderTable(dataList,hasAuthorityRole) {
+        var html="";
+        var length = dataList.length;
+        if (length > 0) {
+            for (var i1 = 0; i1 < dataList.length; i1++) {
+                var data = dataList[i1];
+                var conflicts = dataList[i1].conflicts;
+                if(conflicts.length > 0){
+                    var limitHtml ='<li style="width:3%;"><div class="mida"><div class="midb"><span class="iconfont icon-jiahao jun-spread"></span></div></div></li>';
+                    html+=  '<ul class="information informationList">'+
+                                limitHtml +
+                                renderTableTd(data ,1,hasAuthorityRole) +
+                            '</ul>';
+                    html+='<div style="background: #fefdb4;display: none;">';
+                        //销售经理审核，没有权限查看冲突
+                        for (var m = 0; m < conflicts.length; m++) {
+                            html += '<ul class="information informationList">' +
+                                    '   <li style="width:3%;"><div class="mida"><div class="midb"></div></div></li>' +
+                                    renderTableTd(conflicts[m], 2,hasAuthorityRole) +
+                                    '</ul>';
+                        }
+                    html+='</div>';
+                }else{
+                    //项目不存在冲突
+                    html+='  <ul class="information informationList">'+
+                            '   <li style="width:3%;"><div class="mida"><div class="midb"></div></div></li>'+
+                            renderTableTd(data, 1,hasAuthorityRole) +
+                            '  </ul>';
+                }
+
+
+            }
+        }
+        $("div .table .information-list").html(html);
+    }
+
+    function getStatusDisplayName(status, statusName){
+    	if(status == 'SUBMITTED' || status == 'WAITING_SALES_MANAGER_APPROVE' || status == 'WAITING_CONFLICTMANAGER_APPRVE'){
+    		return '待审核';
+    	}else{
+    		return statusName;
+    	}
+    }
+
+    function renderTableTd(data, type,hasAuthorityRole){
+        var location='';
+        if(isExitsVariable(data.projectProvince)==isExitsVariable(data.projectCity)){
+        	location=isExitsVariable(data.projectProvince);
+        }else{
+        	location=isExitsVariable(data.projectProvince)+isExitsVariable(data.projectCity);
+        }
+        var html = '';
+        if(type == 1){
+            /* html = '<a class="fz12 jun-a" href="javascript:openFinishTaskTab(' + data.taskId + ',' + data.backupId + ')" >' + isExitsVariable(data.projectName)+"(" +isExitsVariable(data.projectLevel)+")"+ '</a>'; */
+        	 html = '<a class="fz12 jun-a" href="javascript:openDetailTab(' + isExitsVariable(data.backupId) + ')">' + isExitsVariable(data.projectName)+"("+isExitsVariable(data.projectLevel)+")" + '</a>';
+        }else{
+            html = '<a class="fz12 jun-a" href="javascript:openDetailTab(' + isExitsVariable(data.backupId) + ')">' + isExitsVariable(data.projectName)+"("+isExitsVariable(data.projectLevel)+")" + '</a>';
+            location = '<span class="similar-mark">'+location+'</span>';
+        }
+        var salesManager =  "";
+        if(data.backupFrom == 'DISTRIBUTOR'){
+            salesManager = data.distributorAccountName;
+        }else{
+            salesManager =  isExitsVariable(data.salesManager);
+        }
+        var htmlContent='   <li style="width:20%;"><div class="mida"><div class="midb">'
+            + html +'</div></div></li>'+
+            '   <li style="width:9%;"><div class="mida"><div class="midb">'+location+'</div></div></li>'+
+            '   <li style="width:20%;"><div class="mida"><div class="midb">'+isExitsVariable(data.integratorCompanyName) + '<br>' + isExitsVariable(data.integratorCreditId) + '</div></div></li>'+
+            '   <li style="width:14%;"><div class="mida"><div class="midb">'+isExitsVariable(data.proprietorCompanyName)+'<br>' + isExitsVariable(data.proprietorCreditId) + '</div></div></li>'+
+            '   <li style="width:10%;"><div class="mida"><div class="midb">'+ salesManager +'</div></div></li>'+
+            '   <li style="width:6%;"><div class="mida"><div class="midb">'+ isExitsVariable(data.reportTime) +'</div></div></li>';
+                if(type == 1){
+                	htmlContent+='   <li style="width:6%;"><div class="mida"><div class="midb">'+isExitsVariable(data.updateTime)+'</div></div></li>';
+                	if(hasAuthorityRole==true){
+                		htmlContent+='   <li style="width:10%;"><div class="mida"><div class="midb"><a style="color:#407fe7" href="javascript:approve(\''+data.applyId +'\');">通过</a>&nbsp;&nbsp;&nbsp;&nbsp;<a style="color:#407fe7" href="javascript:refuse(\''+data.applyId +'\');">拒绝</a></div></div></li>';
+                	}
+                }
+        return htmlContent;
+    }
+
+    function openDetailTab(backupId){
+        cardUtil.openCard("项目详情-" + backupId,"/projectReport/projectDetail?backupId=" + backupId);
+        cardUtil.changeCard("项目详情-" + backupId);
+    }
+
+    $(document).on("click",".jun-spread",function(){
+
+        if($(this).parent().parent().parent().parent().next().css("display")=="none"){
+            $(this).parent().parent().parent().parent().next().show();
+            $(this).removeClass('icon-jiahao').addClass('icon-jianhao');
+        }else{
+            $(this).parent().parent().parent().parent().next().hide();
+            $(this).removeClass('icon-jianhao').addClass('icon-jiahao');
+        }
+    })
+    
+    function approve(applyId){
+        var layerContent = '<div class="t-c c-2" style="padding-top:30px;"><p style="margin-top: 25px;">确定要通过选中的项目吗？</p></div>';
+        layer.open({
+            title: false,
+            skin: 'myskin3',
+            area: ['400px', '180px'],
+            btnAlign: 'c',
+            content: layerContent,
+            btn: ['确定', '取消'],
+            yes: function (index, layero) {
+                var param = {};
+                param.applyId = applyId;
+                postUtil.call("/orderProjectBackupGrantAuthorization/approveConflict", param, function (result) {
+                    if (result.STATUS == "SUCCESS") {
+                    	var queryParam = $("form").serialize();
+                    	initDatatable(queryParam);
+                        layer.close(index);
+                        layer.msg("审批成功~", {icon: 6});
+                    } else {
+                        layer.msg(result.MSG + "", {icon: 5});
+                    }
+                });
+            }, btn2: function (index, layero) {
+                layer.close(index);
+            },
+            cancel: function () {
+
+            }
+        });	
+    }
+    
+    function refuse(applyId){
+            var layerContent = '<div class="t-c c-2" style="padding-top:5px;">' +
+                    '<p>是否确认拒绝所选中的项目授权,如确认，请填写拒绝原因</p>' +
+                    '<textarea maxlength="200" style="width: 300px;height: 80px;margin-top: 30px;" id="refuseReason"></textarea>' +
+                    '</div>';
+             layer.open({
+                title: "拒绝授权",
+                type:1,
+                skin: 'myskin3',
+                area: ['440px', '280px'],
+                btnAlign: 'c',
+                content: layerContent,
+                btn: ['确定', '取消'],
+                yes: function (index, layero) {
+                        var refuseReason = $('#refuseReason').val();
+                        var param = {};
+                        param.applyId =applyId;
+                        param.reason = refuseReason;
+                        postUtil.call("/orderProjectBackupGrantAuthorization/refuseConflict", param, function (result) {
+                            if (result.STATUS == "SUCCESS") {
+                            	var queryParam = $("form").serialize();
+                            	initDatatable(queryParam);
+                                layer.msg("授权冲突裁定不通过~", {icon: 6});
+                                layer.close(index);
+                            } else {
+                                layer.msg(result.MSG + "", {icon: 5});
+                            }
+                        });
+                }, btn2: function (index, layero) {
+                    layer.close(index);
+                },
+                cancel: function () {
+
+                }
+            }); 
+    }
+    
+    
+</script>
+</body>
+</html>

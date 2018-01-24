@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		   <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+	    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+	    <link rel="stylesheet" href="/res/public/css/daterangepicker.css<@resVersionDirective>?</@>"/>
+	    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css<@resVersionDirective>?</@>"/>
+	    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+	    <script src="/res/js/MultiSelectDropList.js<@resVersionDirective>?</@>"></script>
+	    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+	     <script src="/res/public/layui/layui-mz-min.js<@resVersionDirective>?</@>"></script>
+	    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+        <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+         <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+         <script src="/res/js/payCounter.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+         <script src="/res/js/dateUtil.js<@resVersionDirective>?</@>"></script>
+         <script src="/res/public/layui/moment.min.js<@resVersionDirective>?</@>"></script>
+         <script src="/res/public/layui/jquery.daterangepicker.js<@resVersionDirective>?</@>"></script>
+	</head>
+	<body>
+	<section id="itocCenter">
+         <section class="itocContent">
+          <div class="itocMain">
+          <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px; margin-top:30px;">
+           <form action="" class="jun-form-s form-css">
+              <dl class="dl-form">
+                  <dt class="flt fz12" style="width: 64px;">状态：</dt>
+                 <dd class="flt pre">
+                      <div class="multi_select" id="statusselect" style="position:absolute;left:1px;top:0;z-index:1"><img style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" /></div>
+                 </dd>
+                 <dt class="flt fz12 ml10" style="margin-left:250px">客户名称：</dt>
+                 <dd class="flt"><input type="text" name="title" id="accountName"  placeholder="请输入客户名称" autocomplete="off" class="layui-input searchFiled"></dd>
+                 <dt class="flt fz12" style="width: 76px;">区域：</dt>
+                <dd class="flt layui-form jun-form-l">
+		               <select name="areaselect" id="areaselect" lay-filter="aihao"  style="width: 240px;">
+		                <option value="1">全部</option>
+		                <option value="1001">北区</option>
+		                <option value="1002">中区</option>
+		                <option value="1003">南区</option>
+		              </select>
+           		</dd>
+           		
+              </dl>
+              <dl class="dl-form">
+		        <dt class="flt fz12" style="width: 66px;margin-left: -2px;">创建时间：</dt>
+		        <dd class="flt pre"  id="picker-css">
+		              <input class="picker-css" id="date-range0" value="">
+		              <img class="cs-p" style="position: absolute;right: 3px;top: 12px;" src="/res/images/arrow3.png" />
+		         </dd>
+                 <dt class="flt fz12" style="width: 100px;">单号：</dt>
+				<dd class="flt">
+					<input type="text" id="orderSalesId" name="title" placeholder="请输入单号" autocomplete="off" class="layui-input searchFiled">
+				</dd>
+	<!-- 				<dd class="flt ml10"></dd> -->
+				<dt class="flt fz12" style="width: 76px;">订单来源：</dt>
+				<dd class="flt layui-form">
+					<select id="orderSource" name="orderSource">
+						<option value=""></option>
+						<option selected="selected" value="ALL">全部</option>
+						<option value="ORDER_SALES_FROM_ORDERPLATFORM">分销商手动创建</option>
+						<option value="ORDER_SALES_FROM_SHOP">商城订单驱动</option>
+					</select>
+				</dd>
+                <dd style="margin-left:230px;">
+                    <span class="btn ml10 fz12" onclick="searchDATA()" style="height: 32px;cursor:pointer;width: 70px;background-color: #035a9d;color: #ffffff;display: inline-block;text-align: center;line-height: 32px;cursor: pointer;">查询</span>
+                </dd>
+			   </dl>
+           </form>
+          </div>
+          <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px; margin-top:10px;">
+          <table class="layui-table pop" lay-skin="line">
+              <colgroup>
+                <col  width="160">
+                <col  width="100">
+                <col  width="100">
+                <col  width="150">
+                <col  width="180">
+                <col  width="150">
+                <col  width="100">
+                <col  width="100">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>订单号</th>
+                  <th>合同号</th>
+                  <th>区域</th>
+                  <th>客户</th>
+                  <th>金额</th>
+                  <th>收货地址</th>
+                  <th>订单状态</th>
+                  <th>操作</th>
+                </tr> 
+              </thead>
+              <tbody>
+              
+              </tbody>
+              </table>
+              </div>
+                <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+          </div>
+         </section>
+    </section>
+
+<script type="text/javascript">
+var layer;
+var currentPageIndex=1;
+var currentTime=0;
+var countStopSign=true;
+
+$('#date-range0').dateRangePicker();
+
+layui.use(['form','jquery','laydate','layer'], function(){
+        var form = layui.form();
+        var $ = layui.jquery;
+        var laydate = layui.laydate;
+        //下拉多选
+        layui.selMeltiple($);
+        layer = layui.layer;
+	    searchDATA();
+ })
+ $(function (){
+
+  var isPaymentCheckGroupUser="${isPaymentCheckGroupUser}";
+  var MSDLData=[];
+  if("true"==isPaymentCheckGroupUser)
+  {
+      MSDLData=[{"text":"待收款确认","value":"GATHERING_CONFIRM"}];
+  }else{
+      MSDLData=[{"text":"待订单审核","value":"PLATFORM_SALES_APPROVE"},{"text":"待付款审核","value":"PAYMENT_CONFIRM"}];
+  }
+
+  $('#statusselect').MSDL({
+         'width': '240',
+         'data': MSDLData,
+         'id': "status"
+     });
+   });
+
+    function isExitsVariable(variableName) {  
+        try {  
+            if (typeof (variableName) == "undefined") {  
+                return "--";  
+            } else {  
+                return variableName;  
+            }  
+        } catch (e) {  
+        }  
+        return "--";  
+    }
+    function searchDATA(){
+    	var param={};
+    	param.currentPageIndex=currentPageIndex;
+    	var status = $('#statusselect #status_hidden').val();
+    	var accountName=$('#accountName').val();
+    	var area=$('#areaselect').find("option:selected").val();
+    	var orderSalesId = $('#orderSalesId').val();
+    	var date = $('#date-range0').val();
+    	if(date!=null&&date!=""){
+    		var dateStr = date.split(' to ');
+    		param.fromDate = dateStr[0];
+    		param.toDate = dateStr[1];
+    	}
+    	param.orderSalesId = orderSalesId;
+    	param.status=status;
+    	param.accountName=accountName;
+    	param.area=area;
+    	var orderSource = $("#orderSource").val();
+    	param.orderSource = orderSource;
+    	loadDATA(param);
+    }
+function loadDATA(param) {
+	layer.load();
+        postUtil.call("/order/getVettingList", param, function (result) {
+        	 layer.closeAll("loading");
+        	 var pageNumber = result.DATA.pageNumber;
+             var pageSize = result.DATA.pageSize;
+             var totalPage = result.DATA.totalPage;
+             var totalRow = result.DATA.totalRow;
+             var dataList = result.DATA.list;
+             renderTable(dataList);
+                laypage({
+                    cont: 'paginationDiv',
+                    pages: totalPage,
+                    curr: pageNumber,
+                    total: totalRow,
+                    skip: true,
+                    jump: function (obj, first) {
+                        if (!first) {
+                        	currentPageIndex=obj.curr;
+                        	searchDATA(param);
+                        }
+                    }
+                });
+     });
+ }
+function renderTable(dataList) {
+	var html="";
+    var length = dataList.length;
+    if (length > 0) {
+        for (var i1 = 0; i1 < dataList.length; i1++) {
+            var data = dataList[i1]; 
+            var status=isExitsVariable(data.status);
+            var createTimeStart=isExitsVariable(data.createTimeStart);
+             currentTime=isExitsVariable(data.currentTime);
+             var createDate=isExitsVariable(data.createDate);
+            html+='  <tr>'+
+                     '   <td><p><a href="javascript:openDetailTab(\''  + data.orderSalesId + '\')">'+isExitsVariable(data.orderSalesId)+'</p></a><p style="color:#999999">'+isExitsVariable(data.createDateDisplay)+'</p>'
+         			if(data.orderSalesSource && data.orderSalesSource=='ORDER_SALES_FROM_SHOP'){
+        				//html+= '<p style="color:#999999">'+isExitsVariable(data.orderId)+'</p>';
+        				html+= '<p style="color:#999999">商城订单驱动</p>';
+        			}else if(data.orderSalesSource && data.orderSalesSource=='ORDER_SALES_FROM_ORDERPLATFORM'){
+        				html+= '<p style="color:#999999">分销商手动创建</p>';
+        			}                     
+            html += '</td>'+
+            		 '   <td>'+isExitsVariable(data.externalContractId)+'</td>'+
+            		 '   <td>'+isExitsVariable(data.accountAreaName)+'</td>'+
+            		 '   <td>'+isExitsVariable(data.purchaseAccountName)+'</td>'+
+            		 '   <td>'+(data.settlementAmount ? data.settlementAmount.toFixed(2) : "0.00")+'</td>'+
+            		 '   <td><p>'+isExitsVariable(data.consignee)+'</p><p>'+isExitsVariable(data.consigneeAddress)+'</p></td>'+
+            		 '   <td>';
+            		 if(status!='--'&&'PAYMENT_CONFIRM'==status){
+            			 html+= ( '<p class="c-f">'+isExitsVariable(data.statusCname)+'</p>');
+             			html+= ( '<p><div class="inline colockbox" startTime="'+new Date(data.updateDate)+'" currentTime="'+new Date(data.currentTime)+'">	'+	
+             	                 ' <span class="counterDesc c-9 ml5">还剩</span>'+
+             	                 ' <span class="day c-f fw-b">00</span>'+
+             	                 ' <span class="c-9">天</span>'+
+             	                 ' <span class="hour c-f fw-b">00</span>'+
+             	                 ' <span class="c-9">小时</span>'+
+             	                 ' <span class="minute c-f fw-b">00</span>'+
+             	                  '<span class="c-9">分</span>'+
+             	                  '<span class="second c-f fw-b">00</span>'+
+             	                  '<span class="c-9">秒</span>'+
+             	                  '</div></p>');
+            		 }else{
+            			html+=( '<p class="c-f">'+isExitsVariable(data.statusCname)+'</p>');
+            		 }
+               html+='   </td>'+
+                     '   <td><a href="javascript:openDetailTab(\''  + data.orderSalesId + '\')">审核</a></td>'+
+                    /*  '   <td><a href="javascript:openDetailTab(\''  + data.orderSalesId + '\',\'2\')">审核</a><p><a href="javascript:openPurchaseDeliveryTab(\''  + data.orderSalesId + '\',\'2\')">采购出库发货记录</a></p><p><a href="javascript:openSalesDeliveryTab(\''  + data.orderSalesId + '\',\'2\')">销售出库发货记录</a></p><p><a href="javascript:openPurchaseDetailTab(\''  + data.orderSalesId + '\',\'2\')">采购详情</a></p></td>'+ */
+		             '  </tr>'
+       }
+    }else{
+    	 html+='<tr>'+
+    	 		'<td  colspan="10" height="50px"  align="center">'+
+    	 		'<span class="fz16">暂无相关信息</span> '+
+    	 		'</td>'+
+    	 		'</tr>'
+    }
+    $(".layui-table tbody").html(html);
+	$.each($('.colockbox'), function(n, item){
+   		var startTime = $(item).attr("startTime");
+   		var currentTime = $(item).attr("currentTime");
+   		var tmpTime = Date.parse(startTime.replace(/-/g,"/"));
+   		var tmpCurrentTime = Date.parse(currentTime.replace(/-/g,"/"));
+   		countDown(new Date(tmpTime).getTime()+(24*3600*1000),new Date(tmpCurrentTime).getTime(),$(item));
+   	});
+}
+
+function openDetailTab(orderSalesId,type){
+	cardUtil.closeCard("订单详情-" + orderSalesId);
+	cardUtil.openCard("订单详情-" + orderSalesId,"/order/detail/accountManager?orderSalesId="+orderSalesId);
+    cardUtil.changeCard("订单详情-" + orderSalesId);
+}
+
+//销售订单出库发货记录
+function openSalesDeliveryTab(orderSalesId){
+	cardUtil.closeCard("出库发货记录-" + orderSalesId);
+	cardUtil.openCard("出库发货记录-" + orderSalesId,"/orderLog/page4S?orderSalesId=SO2017063015304564465");
+    cardUtil.changeCard("出库发货记录-" + orderSalesId);
+	
+}
+
+//采购订单详情
+function openPurchaseDetailTab(orderSalesId){
+	cardUtil.closeCard("订单详情-" + orderSalesId);
+	cardUtil.openCard("订单详情-" + orderSalesId,"/orderPurchase/orderPurchaseDetail?orderPurchaseId=PO2017063014535317991");
+    cardUtil.changeCard("订单详情-" + orderSalesId);
+	
+}
+
+//采购订单出库发货记录
+function openPurchaseDeliveryTab(orderSalesId){
+	cardUtil.closeCard("出库发货记录-" + orderSalesId);
+	cardUtil.openCard("出库发货记录-" + orderSalesId,"/orderLog/page4P?orderPurchaseId=PO2017063014535317991");
+    cardUtil.changeCard("出库发货记录-" + orderSalesId);
+	
+}
+</script>
+	</body>
+</html>

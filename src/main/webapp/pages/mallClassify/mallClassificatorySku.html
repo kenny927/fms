@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="/res/css/sku.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <!-- ztree v3.5 -->
+    <link rel="stylesheet" type="text/css" href="/res/public/zTree_v3/css/zTreeStyle/zTreeStyle.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/public/zTree_v3/js/jquery.ztree.core-3.5.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/zTree_v3/js/jquery.ztree.excheck-3.5.min.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div class="addSku">
+                <dl class="sku-list">
+                    <dt class="mt10"><span class="c-f">*</span>请选择外部分类：</dt>
+                    <dd class="inputContent">
+                        <input type="hidden" id="mallClassifyId" value="${mallClassify.classifyId}">
+                        <input type="text" readonly="readonly" value="${mallClassify.allClassifyParentName}"
+                               id="mallClassifyName" placeholder="请选择外部分类">
+                        <div class="xiala">
+                            <img src="/res/images/arrow2.png" style="cursor: pointer;" alt="">
+                        </div>
+                        <div id="treeNav"></div>
+                    </dd>
+                </dl>
+            </div>
+            <section class="flex setsku mt20 pl20 pr20">
+                <div class="left" style="flex: 1;height: 500px;">
+                    <ul id="tree" class="ztree" style="width:350px; height: 100%; overflow:auto;"></ul>
+                </div>
+                <div class="right" style="flex: 3;height: 500px;">
+                    <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px" id="skuTable">
+
+                    </div>
+                </div>
+            </section>
+            <div class="flex setsku mt20 pl20 pr20 layui-form">
+                <table class="layui-table pop" lay-skin="line">
+                    <thead>
+                    <tr>
+                        <td align="left" style="background: #ffffff;border-bottom: none;">
+                            <span style="color: red;">*</span>请设置筛选属性:&nbsp;&nbsp;
+                            <input type="checkbox" lay-filter="checkAllPropertyNameBtn" title="全选" lay-skin="primary">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td id="propertyContent" align="left" style="background: #ffffff;border-top: none;">
+                        </td>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="flex setsku mt20 pl20 pr20">
+                <dl class="form-list flt">
+                    <button id="saveMallClassifySkuBtn" class="form-btn  layui-btn-big" lay-filter="formDemo">保存
+                    </button>
+                    <button id="cancelSaveMallClassifySkuBtn" class="form-btn  layui-btn-big" lay-filter="formDemo">
+                        返回
+                    </button>
+                </dl>
+            </div>
+        </div>
+    </section>
+</section>
+
+<script>
+
+    var zTree;
+    var setting = {
+        check: {
+            enable: true,
+            chkStyle: "checkbox",
+            chkboxType: {"Y": "s", "Y": "p"} //勾选只影响父节点,取消勾选只影响子节点
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        },
+        callback: {
+            onClick: zTreeOnClick,
+            onCheck: zTreeOnCheck
+        }
+    };
+
+    var layer = null;
+    var form = null;
+    layui.use(['tree', 'layer', 'form'], function () {
+        layer = layui.layer;
+        form = layui.form();
+        var treeOption = {};
+        treeOption.skin = "shihuang";
+        treeOption.elem = "#treeNav";
+        treeOption.click = function (node) {
+            var classifyIsLeaf = node.isLeaf;
+            if (classifyIsLeaf == "1") {
+                $('#mallClassifyName').val(node.allParentName);
+                $('#mallClassifyId').val(node.classifyId);
+                $('#treeNav').hide();
+
+
+                //根据选中的商城分类check对应的SKU分类
+                checkSkuClassifyByMallClassify();
+
+            } else {
+                layer.msg("请选择叶子节点", {"icon": "5"});
+
+            }
+        };
+
+        //1.layui tree 渲染外部分类
+        postUtil.call("/reusable/mallClassificatory/getAllMallClassificatoryJsonForLayuiTree", null, function (result) {
+            treeOption.nodes = result;
+            layui.tree(treeOption);
+        });
+
+        //2.渲染内部分类列表
+        initSkuClassifyZTree();
+
+        $('#cancelSaveMallClassifySkuBtn').bind("click", function () {
+            postUtil.submit("/mall/classify/list");
+        });
+
+        $('#saveMallClassifySkuBtn').bind("click", function () {
+            var mallClassifyId = $('#mallClassifyId').val();
+            if (!mallClassifyId) {
+                layer.msg("请选择外部分类~", {icon: 5});
+                return;
+            }
+            var skuClassifys = getCheckedNodes();
+            if (!skuClassifys.length > 0) {
+                layer.msg("请勾选对应的内部SKU分类~", {icon: 5});
+                return;
+            }
+            var checkedSkus = getAllCheckedSku();
+            if (!checkedSkus.length > 0) {
+                layer.msg("请勾选对应的SKU~", {icon: 5});
+                return;
+            }
+            var checkedPropertyName = getCheckedPropertyName();
+            if (!checkedPropertyName.length > 0) {
+                layer.msg("请勾选筛选属性~", {icon: 5});
+                return;
+            }
+
+            var skuClassifyIds = transformSkuClassifysToIdStr(skuClassifys);
+            var skuIds = transformCheckedSkusToIdStr(checkedSkus);
+            var propertyNames = transformCheckedSkusToIdStr(checkedPropertyName);
+
+            var saveParam = {};
+            saveParam.mallClassifyId = mallClassifyId;
+            saveParam.skuClassifyIds = skuClassifyIds;
+            saveParam.skuIds = skuIds;
+            saveParam.propertyNames = propertyNames;
+
+            postUtil.call("/mallClassificatorySku/saveMallClassifySku", saveParam, function (result) {
+                if (result) {
+                    if (result.STATUS == "SUCCESS") {
+                        layer.msg("保存成功", {icon: 6});
+                    } else {
+                        layer.msg("保存失败：" + result.MSG, {icon: 5});
+                    }
+                } else {
+                    layer.msg("保存过程中出现异常，请联系管理员或重新登录后再继续操作", {icon: 5});
+                }
+            });
+        });
+
+
+        form.on('checkbox(checkAllPropertyNameBtn)', function (data) {
+
+            $('#propertyContent').find("input[type='checkbox']").each(function () {
+                $(this)[0].checked = data.elem.checked;
+            });
+            form.render();
+//            alert(data.elem); //得到checkbox原始DOM对象
+//            alert(data.elem.checked); //是否被选中，true或者false
+//            alert(data.value); //复选框value值，也可以通过data.elem.value得到
+//            alert(data.othis); //得到美化后的DOM对象
+        });
+
+        form.on('checkbox(chooseSkuBySpuBtn)', function (data) {
+            var checked = data.elem.checked;
+            var classifyId = data.elem.name.split("_")[0];
+            var spuId = data.elem.name.split("_")[1];
+
+            if (spuId == "all") {
+                $("input[type='checkbox'][name^=" + classifyId + "_]").each(function () {
+                    $(this)[0].checked = checked;
+                });
+                form.render();
+            }
+
+            var checkedSPUs = getCheckedSpu(classifyId);
+            if (checkedSPUs.length > 0) {
+                checkAllSkuByCheckedSpu(checkedSPUs, true);
+            } else {
+                checkAllSkuByCheckedSpu(getSpuCheckbox(classifyId), false);
+            }
+
+        });
+    });
+
+    function initSkuClassifyZTree() {
+        var initParam = {};
+        postUtil.call("/reusable/skuClassificatory/getAllSkuClassificatoryJsonForZTree", initParam, function (resultData) {
+            var t = $("#tree");
+            t = $.fn.zTree.init(t, setting, resultData);
+            zTree = $.fn.zTree.getZTreeObj("tree");
+            zTree.expandAll(true);
+
+            //初始化时执行一次
+            checkSkuClassifyByMallClassify();
+        });
+    }
+
+    function zTreeOnClick(event, treeId, treeNode) {
+        layer.msg(treeNode.name);
+    }
+
+    function zTreeOnCheck(event, treeId, treeNode) {
+        var mallClassifyId = $('#mallClassifyId').val();
+        if (mallClassifyId == null || mallClassifyId == "") {
+            layer.msg("请选择外部分类~", {icon: 5});
+            return;
+        }
+        renderSkuTables();
+    }
+
+    function getCheckedPropertyName() {
+        var result = [];
+        var checkedPropertyName = $('#propertyContent').find("input[type='checkbox']:checked");
+        for (var i = 0; i < checkedPropertyName.length; i++) {
+            if (checkedPropertyName[i].value != "on") {
+                result.push(checkedPropertyName[i]);
+            }
+        }
+        return result;
+    }
+
+    //获取所有选择的内部分类
+    function getCheckedNodes() {
+        var checkedNodes = [];
+        var nodes = zTree.getCheckedNodes(true);
+        for (var i = 0; i < nodes.length; i++) {
+            var node = nodes[i];
+            if (node.isLeaf == "1") {
+                checkedNodes.push(node);
+            }
+        }
+        return checkedNodes;
+    }
+
+    $(document).on("click", ".xiala", function () {
+        if ($(this).next().css("display") == "none") {
+            $(this).next().show();
+        } else {
+            $(this).next().hide();
+        }
+    });
+
+    function checkSkuClassifyByMallClassify() {
+        var mallClassifyId = $('#mallClassifyId').val();
+        if (mallClassifyId == null || mallClassifyId == "") {
+            layer.msg("请选择外部分类~", {icon: 5});
+            return;
+        }
+        var param = {};
+        param.mallClassifyId = mallClassifyId;
+
+        postUtil.call("/mallClassificatorySku/querySkuClassificatory", param, function (result) {
+            zTree.checkAllNodes(false);
+            if (result) {
+                for (var i = 0; i < result.length; i++) {
+                    var skuClassifyId = result[i].skuClassifyId;
+                    var node = zTree.getNodeByParam("id", skuClassifyId, null);
+                    zTree.checkNode(node, true, true);
+                }
+                renderSkuTables();
+            }
+        });
+    }
+
+    function transformSkuClassifysToIdStr(skuClassifys) {
+        var skuClassifyIds = "";
+        if (skuClassifys && skuClassifys.length > 0) {
+            for (var i = 0; i < skuClassifys.length; i++) {
+                if (i != skuClassifys.length - 1) {
+                    skuClassifyIds = skuClassifyIds + skuClassifys[i].id + ",";
+                } else {
+                    skuClassifyIds = skuClassifyIds + skuClassifys[i].id;
+                }
+            }
+        }
+        return skuClassifyIds;
+    }
+
+    function transformCheckedSkusToIdStr(checkedSkus) {
+        var skuIds = "";
+        if (checkedSkus && checkedSkus.length > 0) {
+            for (var i = 0; i < checkedSkus.length; i++) {
+                if (i != checkedSkus.length - 1) {
+                    skuIds = skuIds + checkedSkus[i].value + ",";
+                } else {
+                    skuIds = skuIds + checkedSkus[i].value;
+                }
+            }
+        }
+        return skuIds;
+    }
+
+    //渲染筛选属性区域
+    function renderMallProperty() {
+        var checkedSkus = getAllCheckedSku();
+        if (checkedSkus && checkedSkus.length > 0) {
+            var skuClassifyIds = transformCheckedSkusToIdStr(checkedSkus);
+            var queryParam = {};
+            queryParam.skuClassifyIds = skuClassifyIds;
+            postUtil.call("/mallClassificatorySku/querySkuPropertyNames", queryParam, function (result) {
+                if (result && result.length > 0) {
+                    renderPropertyCheckbox(result);
+                    checkMallPropertyName();
+                } else {
+                    $('#propertyContent').html("");
+                    form.render();
+                }
+            });
+        } else {
+            $('#propertyContent').html("");
+            form.render();
+        }
+    }
+
+    function renderPropertyCheckbox(propertyNames) {
+        var checkbox_html = "";
+        for (var i = 0; i < propertyNames.length; i++) {
+            var propertyName = propertyNames[i].propertyName;
+            checkbox_html = checkbox_html + "<input type=\"checkbox\" name=\"checkbox_propertyName\" value=\"" + propertyName + "\" title=\"" + propertyName + "\" lay-skin=\"primary\">";
+        }
+        $('#propertyContent').html(checkbox_html);
+        form.render();
+    }
+
+    function checkMallPropertyName() {
+        var mallClassifyId = $('#mallClassifyId').val();
+        if (mallClassifyId != null && mallClassifyId != "") {
+            var param = {};
+            param.mallClassifyId = mallClassifyId;
+            postUtil.call("/mallClassificatorySku/queryPropertyNamesByMallClassifyId", param, function (result) {
+                if (result && result.length > 0) {
+                    $('#propertyContent').find("input[type='checkbox']").each(function () {
+                        for (var i = 0; i < result.length; i++) {
+                            if ($(this).val() == result[i].skuPropertyName) {
+                                $(this)[0].checked = true;
+                                break;
+                            }
+                        }
+                    });
+                }
+                form.render();
+            });
+        } else {
+            layer.msg("请选择外部分类", {icon: 5});
+        }
+    }
+
+    function renderSkuTables() {
+        layer.load();
+        var skuClassifys = getCheckedNodes();
+        var skuClassifyIds = transformSkuClassifysToIdStr(skuClassifys);
+        if (skuClassifyIds != "") {
+            var queryParam = {};
+            queryParam.skuClassifyIds = skuClassifyIds;
+            postUtil.call("/mallClassificatorySku/querySkuBySkuClassify", queryParam, function (result) {
+                if (result && result.length > 0) {
+                    renderSku(result);
+                    checkMallClassifySku();
+                    layer.closeAll("loading");
+                }
+            });
+
+        } else {
+            $('#skuTable').html("");
+            $('#propertyContent').html("");
+            layer.closeAll("loading");
+        }
+    }
+
+    //根据外部分类查询当前外部分类关联的sku信息，并checked
+    function checkMallClassifySku() {
+        var mallClassifyId = $('#mallClassifyId').val();
+        if (mallClassifyId != null && mallClassifyId != "") {
+            var param = {};
+            param.mallClassifyId = mallClassifyId;
+            postUtil.call("/mallClassificatorySku/queryMallClassifySku", param, function (result) {
+                console.log(result.length);
+                if (result && result.length > 0) {
+                    $('#skuTable').find("input[type='checkbox']").each(function () {
+                        for (var i = 0; i < result.length; i++) {
+                            if ($(this).val() == result[i].skuId) {
+                                $(this)[0].checked = true;
+                                break;
+                            }
+                        }
+                    });
+                }
+                renderMallProperty();
+            });
+        } else {
+            layer.closeAll("loading");
+            layer.msg("请选择外部分类", {icon: 5});
+        }
+
+    }
+
+    function renderSku(result) {
+        $('#skuTable').html("");
+        for (var i = 0; i < result.length; i++) {
+            var classifyId = result[i].classifyId;
+            var classifyName = result[i].classifyName;
+            var skuData = result[i].skuData;
+            var skuSize = result[i].skuSize;
+            var spuCountMap = calculateSpuSize(skuData);
+            if (skuSize > 0) {
+                var table = "<table class=\"layui-table pop\" lay-skin=\"line\"><thead>\n";
+
+                //已上架，已选中统计
+                table = table + "<tr><td colspan=\"6\" align=\"left\" style=\"background: #ffffff;\">\n";
+                table = table + classifyName + "(共计" + skuSize + "个已上架SKU,已选中<span id='span_" + classifyId + "'></span>)";
+                table = table + "</td></tr>\n";
+                //通过SPUID来选择SKU
+                table = table + "<tr><td colspan=\"6\" align=\"left\" class='layui-form'>通过SPUID来过滤SKU：";
+                table = table + "<input type=\"checkbox\" name=\"" + classifyId + "_all\" lay-filter=\"chooseSkuBySpuBtn\" title=\"全选\" lay-skin=\"primary\">";
+                for (var spuId in spuCountMap) {
+                    table = table + "<input type=\"checkbox\" name=\"" + classifyId + "_" + spuId + "\" lay-filter=\"chooseSkuBySpuBtn\" title=\"" + spuId + "\" lay-skin=\"primary\">";
+                }
+                table = table + "</td></tr>";
+                table = table +
+                        "                            <tr>\n" +
+                        "                                <th style=\"text-align:center;width:3%\">\n" +
+                        "                                    <input type=\"checkbox\" onchange=\"checkAllSkuByClassify(this)\" name=\"" + classifyId + "\">\n" +
+                        "                                </th>\n" +
+                        "                                <th>SPU编码</th>\n" +
+                        "                                <th>SKU编码</th>\n" +
+                        "                                <th>商品名称</th>\n" +
+                        "                                <th>商品型号</th>\n" +
+                        "                                <th>计量单位</th>\n" +
+                        "                            </tr>\n" +
+                        "                            </thead>\n" +
+                        "                            <tbody>\n";
+                for (var j = 0; j < skuData.length; j++) {
+                    table = table +
+                            "<tr>" +
+                            "<td><input type=\"checkbox\" onchange='checkChange(this)' spu=\"" + (skuData[j].spuId ? skuData[j].spuId : "--") + "\"  name=\"" + classifyId + "\" value=\"" + skuData[j].skuId + "\"></td>" +
+                            "<td>" + (skuData[j].spuId ? skuData[j].spuId : "--") + "</td>" +
+                            "<td>" + skuData[j].skuId + "</td>" +
+                            "<td>" + skuData[j].skuName + "</td>" +
+                            "<td>" + skuData[j].model + "</td>" +
+                            "<td>" + skuData[j].unitName + "</td>" +
+                            "</tr>";
+                }
+                table = table + "</tbody></table>";
+
+                $('#skuTable').append(table);
+            }
+        }
+    }
+
+    function checkAllSkuByClassify(obj) {
+        var checkboxName = $(obj).attr("name");
+        $("input[name=" + checkboxName + "]").each(function () {
+            $(this)[0].checked = $(obj)[0].checked;
+        });
+        var checkedSku = getAllCheckedSku(checkboxName);
+        $("#span_" + checkboxName).html(checkedSku.length);
+        renderMallProperty();
+    }
+
+    function getAllCheckedSku(checkboxName) {
+        var result = [];
+        var checkedSku = null;
+        if (checkboxName) {
+            checkedSku = $('#skuTable').find("input[type='checkbox'][name=" + checkboxName + "]:checked");
+        } else {
+            checkedSku = $('#skuTable').find("input[type='checkbox']:checked");
+        }
+        for (var i = 0; i < checkedSku.length; i++) {
+            if (checkedSku[i].value != "on") {
+                result.push(checkedSku[i]);
+            }
+        }
+        return result;
+    }
+
+    function checkChange(obj) {
+        var checkboxName = $(obj).attr("name");
+        var checkedSku = getAllCheckedSku(checkboxName);
+        $("#span_" + checkboxName).html(checkedSku.length);
+        renderMallProperty();
+    }
+
+    function calculateSpuSize(skuData) {
+        var result = {};
+        if (skuData && skuData.length > 0) {
+            for (var i = 0; i < skuData.length; i++) {
+                var spuId = skuData[i].spuId;
+                if (spuId) {
+                    if (result[spuId]) {
+                        result[spuId] = result[spuId] + 1;
+                    } else {
+                        result[spuId] = 1;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    function getSpuCheckbox(classifyId) {
+        var result = [];
+        $("input[type='checkbox'][name^=" + classifyId + "_]").each(function () {
+            result.push($(this)[0]);
+        });
+        return result;
+    }
+
+    function getCheckedSpu(classifyId) {
+        var result = [];
+        $("input[type='checkbox'][name^=" + classifyId + "_]:checked").each(function () {
+            result.push($(this)[0]);
+        });
+        return result;
+    }
+
+    function checkAllSkuByCheckedSpu(checkedSPUs, checked) {
+        for (var i = 0; i < checkedSPUs.length; i++) {
+            var obj = checkedSPUs[i];
+            var obj_name = obj.name;
+            var classifyId = obj_name.split("_")[0];
+            var spuId = obj_name.split("_")[1];
+            $("input[spu=" + spuId + "]").each(function () {
+                $(this)[0].checked = checked;
+            });
+            var checkedSku = getAllCheckedSku(classifyId);
+            $("#span_" + classifyId).html(checkedSku.length);
+        }
+        renderMallProperty();
+    }
+
+</script>
+
+</body>
+</html>

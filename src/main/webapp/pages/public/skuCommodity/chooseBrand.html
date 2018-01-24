@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>请选择供应商</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_svvppt2njx9u23xr.css<@resVersionDirective>?</@>"/>
+    <style type="text/css">
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd .goodsName {
+            height: 35px;
+            line-height: 35px;
+            overflow: hidden;
+            width: 500px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            color: #222222;
+        }
+
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd p {
+            height: 20px;
+            line-height: 20px;
+            color: #999999;
+            overflow: hidden;
+            width: 500px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        select {
+            margin-left: 10px;
+            height: 34px;
+            line-height: 34px;
+            width: 148px;
+            padding-left: 10px;
+            border: 1px solid #e6e6e6;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter" style="padding-left: 0px;">
+    <section class="itocContent">
+        <div class="itocMain" style="border: 0px;">
+            <div class="table inquiry" id="addInquiry">
+                <div class="treeSearch mb20">
+                    品牌名称：<input type="text" name="brandName" id="brandName" placeholder="请输入品牌名称">
+                    <button id="searchBtn" class="search-btn" style="cursor: pointer">查询</button>
+                    <button id="chooseBtn" style="width: auto;" style="cursor: pointer" class="search-btn">使用选中的品牌</button>
+                </div>
+                <ul class="th th-border">
+                    <li style="width: 10%;"><div class="mida"><div class="midb"><input id="selectAllCheckBox" type="checkbox"/></div></div></li>
+                    <li style="width: 10%"><div class="mida"><div class="midb">品牌ID</div></div></li>
+                    <li style="width: 25%;"><div class="mida"><div class="midb">品牌名称</div></div></li>
+                    <li style="width: 25%;"><div class="mida"><div class="midb">品牌英文名称</div></div></li>
+                    <li style="width: 15%;"><div class="mida"><div class="midb">创建时间</div></div></li>
+                    <li style="width: 15%"><div class="mida"><div class="midb">创建人</div></div></li>
+                </ul>
+                <div class="information-list wait" id="brandTable_tbody">
+                </div>
+                <div id="paginationDiv"></div>
+            </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#addInquiry').show();
+    });
+
+    var PAGE_SIZE = 5;
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    var brandDataMap = {};
+
+
+    $(function () {
+        $("#searchBtn").bind("click", function () {
+            var queryParam = {};
+            queryParam.currentPageIndex = 1;
+            queryParam.pageSize = PAGE_SIZE;
+            queryParam.brandName = $("#brandName").val();
+
+
+            loadBrandData(queryParam);
+        });
+
+        $('#chooseBtn').bind("click", function () {
+            var brandChecks = document.getElementsByName("brandIdCheckBox");
+            var checkedBrandIds = [];
+            if (brandChecks.length > 0) {
+                for (var i = 0; i < brandChecks.length; i++) {
+                    if (brandChecks[i].checked == true) {
+                        checkedBrandIds.push(brandChecks[i].value);
+                    }
+                }
+
+                if (checkedBrandIds.length == 0) {
+                    alert("请查询数据勾选后再进行操作");
+                } else {
+                    var choosedBrandDataArray = [];
+                    for (var j = 0; j < checkedBrandIds.length; j++) {
+                        var tempAccountData = brandDataMap[checkedBrandIds[j]];
+                        choosedBrandDataArray.push(tempAccountData);
+                    }
+                    var success = parent.chooseBrandCallback(choosedBrandDataArray);//调用父页面的渲染方法
+                    if (success) {
+                        parent.layer.close(index);//关闭当前窗口
+                    }
+                }
+            } else {
+                alert("请查询数据勾选后再进行操作");
+            }
+        });
+
+        $('#selectAllCheckBox').bind("click", function () {
+            var selectAllChecked = document.getElementById("selectAllCheckBox").checked;
+            var brandChecks = document.getElementsByName("brandIdCheckBox");
+            if (brandChecks.length > 0) {
+                for (var i = 0; i < brandChecks.length; i++) {
+                    brandChecks[i].checked = selectAllChecked;
+                }
+            }
+        });
+    });
+
+    function loadBrandData(queryParam) {
+        layer.load();
+        postUtil.call("/reusable/skuBrand/brandJsonData", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            renderTable(dataList);
+            layer.closeAll("loading");
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                skip: true,
+                total:totalRow,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        tempParam.brandName = $("#brandName").val();
+                        loadBrandData(tempParam);
+                    }
+                }
+            });
+        });
+    }
+
+    function renderTable(dataList) {
+        var length = dataList.length;
+        var table = document.getElementById("brandTable_tbody");
+        table.innerHTML = "";
+        brandDataMap = {};
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var brandId = data.brandId;
+                brandDataMap[brandId] = data;
+                var row = renderRow(data);
+                table.appendChild(row);
+            }
+        }
+    }
+
+    function renderRow(rowData) {
+
+        var brandId = rowData.brandId;
+        var brandChineseName = rowData.brandChineseName;
+        var brandEnglishName = rowData.brandEnglishName;
+        var description = rowData.description;
+        var brandCreateTimeStr = rowData.brandCreateTimeStr;
+        var createUser = rowData.createUser;
+
+        var ul = document.createElement('ul');
+        ul.setAttribute("class", "information");
+        ul.setAttribute("style", "height:75px;");
+
+
+        ul.appendChild(renderCell("brandIdCheckBox", brandId, "width:10%;height:75px;"));
+        ul.appendChild(renderCell(null, brandId, "width:10%;height:75px;"));
+        ul.appendChild(renderCell(null, brandChineseName, "width:25%;height:75px;"));
+        ul.appendChild(renderCell(null, brandEnglishName, "width:25%;height:75px;"));
+        ul.appendChild(renderCell(null, brandCreateTimeStr, "width:15%;height:75px;"));
+        ul.appendChild(renderCell(null, createUser, "width:15%;height:75px;"));
+        return ul;
+    }
+
+    function renderCell(name, value, style) {
+        var li = document.createElement('li');
+        li.setAttribute("style", style)
+        var div_mida = document.createElement('div');
+        div_mida.setAttribute("class", "mida");
+        var div_midb = document.createElement('div');
+        div_midb.setAttribute("class", "midb");
+        if ("brandIdCheckBox" == name) {
+            div_midb.innerHTML = '<input type="checkbox" name="brandIdCheckBox" value="' + value + '" />';
+        } else {
+            if(value) {
+                div_midb.innerText = value;
+            }else {
+                div_midb.innerText = "--";
+            }
+        }
+        div_mida.appendChild(div_midb);
+        li.appendChild(div_mida);
+        return li;
+    }
+</script>
+</body>
+</html>

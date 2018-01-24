@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/vue.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/moment.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <style type="text/css">
+        .first-row{
+            background-color: #f0f0f0;
+        }
+        .sku-pic img{
+            width: 60px;
+            height: 60px;
+        }
+        .secKillGoods{
+            display: none;
+        }
+        [v-cloak]{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<section class="bz-bb pl20 pr20 pt20" id="querySpotDetail"  v-cloak>
+    <div class="pb20 clr">
+        <div  class="preview flt" id="preview">
+            <div class="spec-preview">
+						<span class="jqzoom pre">
+                            <!--右侧秒杀 gray显灰色-->
+                            <span class="sk-logo gray"></span>
+                            <!--左上角购-->
+                            <span class="sk-buy"></span>
+                            <!--商品状态出现默认售罄  star 即将开始 ban 已经下架-->
+                            <span class="sk-status star ban"></span>
+							<img jqimg="/res/Images/b1.jpg" src="/res/Images/s1.jpg" />
+						</span>
+            </div>
+            <!--缩图开始-->
+            <div class="spec-scroll">
+                <a class="prev">&lt;</a>
+                <a class="next">&gt;</a>
+                <div class="items">
+                    <ul>
+                        <li><img alt="佳能" bimg="/res/Images/b1.jpg" src="/res/Images/s1.jpg" onmousemove="preview(this);"></li>
+                        <li><img alt="佳能" bimg="/res/Images/b2.jpg" src="/res/Images/s2.jpg" onmousemove="preview(this);"></li>
+                        <li><img alt="佳能" bimg="/res/Images/b3.jpg" src="/res/Images/s3.jpg" onmousemove="preview(this);"></li>
+                        <li><img alt="佳能" bimg="/res/Images/b1.jpg" src="/res/Images/s1.jpg" onmousemove="preview(this);"></li>
+                        <li><img alt="佳能" bimg="/res/Images/b3.jpg" src="/res/Images/s3.jpg" onmousemove="preview(this);"></li>
+                        <li><img alt="佳能" bimg="/res/Images/b1.jpg" src="/res/Images/s1.jpg" onmousemove="preview(this);"></li>
+                        <li><img alt="佳能" bimg="/res/Images/b2.jpg" src="/res/Images/s2.jpg" onmousemove="preview(this);"></li>
+                        <li><img alt="佳能" bimg="/res/Images/b1.jpg" src="/res/Images/s1.jpg" onmousemove="preview(this);"></li>
+                    </ul>
+                </div>
+            </div>
+            <!--缩图结束-->
+        </div>
+        <div class="flt" style="max-width:800px;">
+            <div class="good-detail">
+                <p class="good-name">{{todos.skuName}}</p>
+                <p class="c-9 fz12 mt10 pb10">分类:光缆 > 室外光缆</p>
+                <dl class="list-detail">
+                    <dt class="ls-2">芯&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;数：</dt>
+                    <dd class="selected"><a href="javascript:;">4芯</a></dd>
+                    <dd><a href="javascript:;">8芯</a></dd>
+                    <dd><a href="javascript:;">12芯</a></dd>
+                </dl>
+                <dl class="list-detail">
+                    <dt class="ls-2">光 纤 类 型：</dt>
+                    <dd><a href="javascript:;">OS2 9/125单装</a></dd>
+                    <dd><a href="javascript:;">OS2 9/125单装</a></dd>
+                    <dd><a href="javascript:;">OS2 9/125单装</a></dd>
+                </dl>
+                <dl class="list-detail">
+                    <dt class="ls-2">颜&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;色：</dt>
+                    <dd><a href="javascript:;">黑色</a></dd>
+                    <dd><a href="javascript:;">蓝色</a></dd>
+                    <dd><a href="javascript:;">红色</a></dd>
+                </dl>
+                <p class="list-type ls-2">型&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;号：<span class="c-f ml5">HT-GY</span></p>
+                <p class="list-type ls-2">品&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;牌：<span class="ml5 c-2">长飞光纤光缆</span></p>
+                <p class="list-type ls-2">计 量 单 位：<span class="ml5 c-2">盘</span></p>
+                <div class="sk-header h50 star clr" style="min-width:700px;">
+                    <!--star 即将开始-->
+                    <div class="flt">
+                        <span class="iconfont icon-naozhong ml20 hc50"></span>
+                        <span class="ml20 fz18 fw-b">长飞秒杀专场</span>
+                        <!--<span class="ml5 fz12">总有意想不到的惊喜，只要手够快>></span>-->
+                    </div>
+                    <div class="frt">
+                        <span>本次秒杀</span>
+                        <div class="inline colockbox"  id="colockbox">
+                            <span class="day mt4">00</span>
+                            天
+                            <span class="hour mt4">00</span>：
+                            <span class="minute mt4">00</span>：
+                            <span class="second mt4">00</span>
+                        </div>
+                        <span class="mr20">后结束抢购</span>
+                    </div>
+                </div>
+                <!--秒杀中-->
+                <div style="min-width:700px;" class="bg-f0">
+                    <p class="list-type inline ls-2 pl20" style="min-width:315px;">基 本 售 价：<span class="ml5 c-9 delete-line">¥10000</span></p>
+                    <p class="list-type inline ls-2 pl20" >基 本 售 价：<span  class="ml5 c-f delete-line">¥10000</span ></p>
+                    <p class="ls-1 pl20 fz12" >秒&nbsp;&nbsp;&nbsp;&nbsp;杀&nbsp;&nbsp;&nbsp;价：<span   class="ml5 c-f fw-b fz14">¥10</span ></p>
+                    <p class="list-type ls-2 pl20 mt10 pb10">订 购 数 量：<input name="title" placeholder="请输入数量" autocomplete="off" type="text" class="ml5 pl10 sk-input" /><span class="c-2 ml5 mr5">盘</span><span class="c-9">(库存数量为100.00,起订量为1000)</span></p>
+                </div>
+                <!--已下架出现-->
+                <!--<div style="min-width:700px;" class="bg-f0 pl20 pt20 pb20">-->
+                <!--该商品已下架-->
+                <!--</div>-->
+                <div class="mt20 pt10">
+                    <button class="form-btn layui-btn-big"  style="width:140px; height:38px;">加入购物车</button><button class="form-btn  layui-btn-primary layui-btn-big ml20" style="width:140px; height:38px;">取消收藏</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="xq-content">
+        <nav class="nav1">
+            <ul>
+                <li><a class="active" href="#Introduction">商品介绍</a></li>
+                <li><a href="#Specifications">商品图册</a></li>
+            </ul>
+        </nav>
+        <div>
+            导入内容
+        </div>
+    </div>
+</section>
+<script>
+//    $(".jqzoom").jqueryzoom({xzoom:400,yzoom:400});
+//    var tempLength = 0; //临时变量,当前移动的长度
+//    var viewNum = 4; //设置每次显示图片的个数量
+//    var moveNum = 1.1; //每次移动的数量
+//    var moveTime = 300; //移动速度,毫秒
+//    var scrollDiv = $(".spec-scroll .items ul"); //进行移动动画的容器
+//    var scrollItems = $(".spec-scroll .items ul li"); //移动容器里的集合
+//    var moveLength = scrollItems.eq(0).width() * moveNum; //计算每次移动的长度
+//    var countLength = (scrollItems.length - viewNum) * scrollItems.eq(0).width(); //计算总长度,总个数*单个长度
+
+    //下一张
+    $(".spec-scroll .next").bind("click",function(){
+        if(tempLength < countLength){
+            if((countLength - tempLength) > moveLength){
+                scrollDiv.animate({left:"-=" + moveLength + "px"}, moveTime);
+                tempLength += moveLength;
+            }else{
+                scrollDiv.animate({left:"-=" + (countLength - tempLength) + "px"}, moveTime);
+                tempLength += (countLength - tempLength);
+            }
+        }
+    });
+    //上一张
+    $(".spec-scroll .prev").bind("click",function(){
+        if(tempLength > 0){
+            if(tempLength > moveLength){
+                scrollDiv.animate({left: "+=" + moveLength + "px"}, moveTime);
+                tempLength -= moveLength;
+            }else{
+                scrollDiv.animate({left: "+=" + tempLength + "px"}, moveTime);
+                tempLength = 0;
+            }
+        }
+    });
+    function preview(img){
+        $("#preview .jqzoom img").attr("src",$(img).attr("src"));
+        $("#preview .jqzoom img").attr("jqimg",$(img).attr("bimg"));
+    }
+    //倒计时
+    $(function(){
+        countDown("2017/7/10 11:11:59","#colockbox");
+    });
+    function countDown(time,id){
+        var day_elem = $(id).find('.day');
+        var hour_elem = $(id).find('.hour');
+        var minute_elem = $(id).find('.minute');
+        var second_elem = $(id).find('.second');
+        var end_time = new Date(time).getTime(),//月份是实际月份-1
+                sys_second = (end_time-new Date().getTime())/1000;
+        var timer = setInterval(function(){
+            if (sys_second > 1) {
+                sys_second -= 1;
+                var day = Math.floor((sys_second / 3600) / 24);
+                var hour = Math.floor((sys_second / 3600) % 24);
+                var minute = Math.floor((sys_second / 60) % 60);
+                var second = Math.floor(sys_second % 60);
+                day_elem && $(day_elem).text(day);//计算天
+                $(hour_elem).text(hour<10?"0"+hour:hour);//计算小时
+                $(minute_elem).text(minute<10?"0"+minute:minute);//计算分钟
+                $(second_elem).text(second<10?"0"+second:second);//计算秒杀
+            } else {
+                clearInterval(timer);
+            }
+        }, 1000);
+    }
+
+    //加载页面
+    $(function(){
+        postUtil.call(apiUrl.querySpotDetail,{"skuId":'${skuId}'},function (resultData) {
+            loadSpotDetailData(resultData.DATA);
+        })
+    });
+
+
+    function loadSpotDetailData(value) {
+        console.log(value);
+        vm = new Vue({
+            el:'#querySpotDetail',
+            data:{
+                todos: value,
+                skuList: value.list,
+                activityList:[],
+                checkList:[],
+                skuIdList:[],
+                msg1:true,
+                spotSkuPage:true,
+                secondKillSkuPage:false
+
+            },
+            created: function () {
+
+            },
+            methods:{
+
+            }
+        });
+
+    }
+
+</script>
+</body>
+</html>

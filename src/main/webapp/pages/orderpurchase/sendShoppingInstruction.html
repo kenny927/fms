@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="/res/public/layui-v2.0.0/layui/css/layui.css"/>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <style>
+        /*下拉多选*/
+         select[multiple]+.layui-form-select dd{ padding:0;}
+         select[multiple]+.layui-form-select .layui-form-checkbox[lay-skin=primary]{ margin:0 !important; display:block; line-height:36px !important; position:relative; padding-left:26px;}
+         select[multiple]+.layui-form-select .layui-form-checkbox[lay-skin=primary] span{line-height:36px !important; float:left;}
+        .layui-table tbody tr:hover{
+            background-color: #ffffff!important;
+        }
+         select[multiple]+.layui-form-select .layui-form-checkbox[lay-skin=primary] i{ position:absolute; left:10px; top:0; margin-top:9px;}
+        .multiSelect{ line-height:normal; height:auto; padding:4px 10px; overflow:hidden;min-height:38px; margin-top:-38px; left:0; z-index:99;position:relative;background:none;}
+        .multiSelect a{ padding:2px 5px; border-radius:2px; color:#222222; display:block; line-height:20px; height:20px; margin:2px 5px 2px 0; float:left;}
+        .multiSelect a span{ float:left;}
+        .multiSelect a i{ float:left; display:block; margin:2px 0 0 2px; border-radius:2px; width:8px; height:8px; background:url(/res/images/close.png) no-repeat center; background-size:65%; padding:4px;}
+        .multiSelect a i:hover{ background-color:#545556;}
+        .layui-form-select dl{
+            min-height: 100px;
+        }
+        [v-cloak]{
+            display: none;
+        }
+        .layui-form-checked[lay-skin=primary] i{
+            border-color: #035a9d!important;
+            background-color: #fff!important;
+            color: #035a9d!important;
+        }
+        .layui-form-checkbox[lay-skin=primary]:hover i{
+            border-color: #035a9d!important;
+            /*color: #035a9d!important;*/
+        }
+    </style>
+</head>
+<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+<!--[if lt IE 9]>
+<script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+<script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<body>
+     <div class="bz-bb pl20 pr20" id="SendShoppingInstruction" v-cloak>
+         <div class="layui-row yofc-row add-inquiry fz12 mt20">
+             <div class="layui-col-md4"><span class="v-row">订单号：</span><span class="c-f">{{datas.orderSalesId}}</span></div>
+             <div class="layui-col-md4"><span class="v-row">创建时间：</span><span class="c-f ">{{datas.createDate1}}</span></div>
+             <div class="layui-col-md4"><span class="v-row">订单状态：</span><span class="c-2">{{datas.statusName}}</span></div>
+             <div class="layui-col-md4"><span class="v-row">买方：</span><span class="c-f"></span>{{datas.purchaseName}}</div>
+             <div class="layui-col-md4"><span class="v-row">卖方：</span><span class="c-f">{{datas.supplierName}}</span></div>
+             <div class="layui-col-md4"><span class="v-row">内部合同号：</span><span class="c-f">{{datas.orderSalesContractId}}</span></div>
+         </div>
+         <h3 class="fz16 mt20 mb10 c-2 pt10">关联采购订单发货指令</h3>
+         <template v-for="(item,index) in orderPurchaseList">
+             <div class="layui-row yofc-row fz12">
+                 <div class="layui-col-md3"><span class="v-row">订单号：</span><span class="c-2">{{item.orderPurchaseId}}</span></div>
+                 <div class="layui-col-md3"><span class="v-row">状态：</span><span class="c-2">{{item.statusName}}</span></div>
+                 <div class="layui-col-md3"><span>发货指令发送状态：</span><span class="c-2">{{item.instructionStatusName}}</span><span v-show="item.instructionStatus == 'SENDED'" class="ml10">{{item.instructionDate}}</span></div>
+                 <div class="layui-col-md3 t-r"><button class="form-btn layui-btn-itoc layui-btn-mini mr20" @click="exports(item)" v-if="item.instructionStatus == 'SENDED'">导出</button><button v-if="item.instructionStatus == 'NO_SENDED'" class="form-btn layui-btn-itoc layui-btn-mini mr20" @click="send(item,index)">发送</button></div>
+             </div>
+             <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="padding-left: 40px">
+                 <div class="layui-form jun-form-s form-css">
+                     <dl class="dl-form">
+                         <dt class="flt fz12"><span class="c-f">*</span>填写日期：</dt>
+                         <dd class="flt" style="width: 350px">
+                             <input type="text" class="layui-input" style="width: 240px" v-bind:id="'diyDate_'+index"  :value="item.fillInDate"  placeholder="">
+                         </dd>
+                         <dt class="flt fz12 ml20">到货时间要求：</dt>
+                         <dd class="flt">
+                             <input type="text" class="layui-input"  v-bind:id="'arrivalTime_'+index" :value="item.arriveTime"  placeholder="">
+                         </dd>
+                     </dl>
+                     <dl class="dl-form">
+                         <dt class="flt fz12"><span class="c-f">*</span>合同号：</dt>
+                         <dd class="flt line-middle"  style="width: 350px">
+                            {{item.orderPurchaseContractId}}
+                         </dd>
+                         <dt class="flt fz12 ml20"><span class="c-f">*</span>客户名称：</dt>
+                         <dd class="flt line-middle">
+                             {{item.consignee}}
+                         </dd>
+                     </dl>
+                     <dl class="dl-form">
+                         <dt class="flt fz12"><span class="c-f">*</span>销售联系人：</dt>
+                         <dd class="flt line-middle"  style="width: 350px;height: 32px;">
+                             {{item.userRealName}}
+                         </dd>
+                         <dt class="flt fz12 ml20"><span class="c-f">*</span>生产基地：</dt>
+                         <dd class="flt line-middle">
+                             长飞光纤光缆(上海)股份有限公司
+                         </dd>
+                     </dl>
+                     <dl class="dl-form">
+                         <dt class="flt fz12"><span class="c-f">*</span>运输方式：</dt>
+                         <dd class="flt"  style="width: 350px">
+                             <input type="radio" :name="'transportKind_'+index" value="YOFC_TRANS" title="长飞运输" :lay-filter="'transportKind_'+index"  v-bind:checked="item.transportKind == 'YOFC_TRANS'">
+                             <input type="radio" :name="'transportKind_'+index" value="SELF_PICK" title="自提" :lay-filter="'transportKind_'+index" v-bind:checked="item.transportKind == 'SELF_PICK'">
+                             <input type="radio" :name="'transportKind_'+index" value="OTHER" title="其他:外协厂运输,汽车" :lay-filter="'transportKind_'+index"  v-bind:checked="item.transportKind == 'OTHER'">
+                         </dd>
+                         <dt class="flt fz12 ml20"><span class="c-f">*</span>木材检疫证：</dt>
+                         <dd class="flt">
+                             <input type="radio" :name="'woodCheck_'+index" :lay-filter="'woodCheck_'+index" value="NEED" title="需要" v-bind:checked="item.woodCheck == 'NEED'">
+                             <input type="radio" :name="'woodCheck_'+index" :lay-filter="'woodCheck_'+index"  value="NO_NEED" title="不需要" v-bind:checked="item.woodCheck == 'NO_NEED'">
+                             <input type="radio" :name="'woodCheck_'+index" :lay-filter="'woodCheck_'+index" value="OTHER" title="其他" v-bind:checked="item.woodCheck == 'OTHER'">
+                         </dd>
+                     </dl>
+                 </div>
+                 <div class="mr20 layui-form">
+                     <table class="layui-table pop" lay-skin="line">
+                         <colgroup>
+                             <col  width="50">
+                             <col  width="150">
+                             <col  width="100">
+                             <col  width="100">
+                             <col  width="100">
+                             <col  width="50">
+                             <col  width="80">
+                             <col  width="100">
+                             <col  width="250">
+                             <col  width="150">
+                         </colgroup>
+                         <thead>
+                         <tr>
+                             <th>序号</th>
+                             <th >到货地址</th>
+                             <th >收货人</th>
+                             <th >收货人电话</th>
+                             <th >型号</th>
+                             <th >数量</th>
+                             <th >单位</th>
+                             <th >结算总价(元)</th>
+                             <th >盘号</th>
+                             <th >备注</th>
+                         </tr>
+                         </thead>
+                         <tbody>
+                         <tr v-for="(items,index) in  item.orderPurchaseDetailList">
+                             <td>{{index}}</td>
+                             <td>{{item.consigneeAddress}}</td>
+                             <td>{{item.consignee}}</td>
+                             <td>{{item.orderSignPersonContact}}</td>
+                             <td>{{items.model}}</td>
+                             <td>{{items.quantity}}</td>
+                             <td>{{item.unitName}}</td>
+                             <td>{{item.skuAmount}}</td>
+                             <td>
+                                 <div v-if="item.instructionStatus == 'NO_SENDED'">
+                                     <select :lay-filter="items.orderPurchaseId+'_'+index"  multiple  name="instructionStatus" lay-verify="required" placeholder="">
+                                         <option value="">请选择盘号</option>
+                                         <option :value="lis.cablePlateNumber+'_'+items.orderPurchaseDetailId+'_'+lis.skuId" v-for="lis in items.skuCablePlateNumberList">{{lis.cablePlateNumber}}</option>
+                                     </select>
+                                 </div>
+                                 <div v-if="item.instructionStatus == 'SENDED'">
+                                     {{items.cableTray}}
+                                 </div>
+                             </td>
+                             <td>{{items.remark}}</td>
+                         </tr>
+                         </tbody>
+                     </table>
+                 </div>
+                 <div class="layui-form jun-form-s form-css">
+                     <dl class="dl-form">
+                         <dt class="flt fz12"><span class="c-f">*</span>签收单格式：</dt>
+                         <dd class="flt"  style="width: 350px">
+                             <input type="radio" :name="'signStyleKind_'+index" :lay-filter="'signStyleKind_'+index" value="YOFC_KIND" title="长飞版" v-bind:checked="item.signStyleKind == 'YOFC_KIND'">
+                             <input type="radio" :name="'signStyleKind_'+index" :lay-filter="'signStyleKind_'+index" value="NO_YOFC_KIND" title="非长飞版" v-bind:checked="item.signStyleKind == 'NO_YOFC_KIND'">
+                         </dd>
+                         <dt class="flt fz12 ml20"><span class="c-f">*</span>回单份数：</dt>
+                         <dd class="flt line-middle">
+                             2
+                         </dd>
+                     </dl>
+                     <dl class="dl-form">
+                         <dt class="flt fz12"><span class="c-f">*</span>签收盖章要求：</dt>
+                         <dd class="flt line-middle"  style="width: 350px">
+                             签字并盖章
+                         </dd>
+                         <dt class="flt fz12 ml20"><span class="c-f">*</span>回单签章：</dt>
+                         <dd class="flt line-middle">
+                             签字并盖章
+                         </dd>
+                     </dl>
+                     <dl class="dl-form">
+                         <dt class="flt fz12" style="margin-left: -30px;width: 120px;"><span class="c-f">*</span>随货同行客户文件：</dt>
+                         <dd class="flt line-middle">
+                             检验合格证
+                         </dd>
+                     </dl>
+                     <dl class="dl-form">
+                         <dt class="flt fz12">备注：</dt>
+                         <dd class="flt">
+                             <textarea cols="130"  placeholder="请输入内容" class="layui-textarea" v-model="item.remark"></textarea>
+                         </dd>
+                     </dl>
+                 </div>
+             </blockquote>
+         </template>
+     </div>
+<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+     <script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui-v2.0.0/layui/layui.js"></script>
+<script src="/res/js/selectMultiple.js"></script>
+<script src="/res/public/vue/dist/vue.min.js"></script>
+<script>
+    var form,laydate,vm;
+    var orderId = '${orderId}';
+    vm = new Vue({
+        el:'#SendShoppingInstruction'
+        ,data:{
+            orderId:orderId,
+            datas:'',
+            orderPurchaseList:[]
+        }
+        ,mounted:function () {
+            this.$nextTick(function () {
+                this.showData(this.orderId);
+            })
+        }
+        ,methods:{
+            showData:function (orderId) {
+                    postUtil.call('/sendShoppingInstruction/sendShoppingInstructionDetail', {'orderId':orderId}, function (result) {
+                        if(result.STATUS == 'SUCCESS') {
+                            vm.datas = result.DATA;
+                            if(!vm.datas.createDate) {
+                                vm.$set(vm.datas,'createDate',"")
+                            }else {
+                                vm.datas.createDate = moment(vm.datas.createDate).format('YYYY-MM-DD');
+                            }
+                            vm.orderPurchaseList = result.DATA.orderPurchaseList;
+                            vm.loadTime();
+                        }
+                    })
+            },
+            loadTime:function () {
+                layui.use(['form','laydate'], function () {
+                    laydate = layui.laydate;form = layui.form;
+                    vm.orderPurchaseList.forEach(function (item,index) {
+                            if(!item.fillInDate) {
+                                vm.$set(item,'fillInDate',"")
+                            }else {
+                                item.fillInDate = moment(item.fillInDate).format('YYYY-MM-DD');
+                            }
+                            if(!item.arriveTime) {
+                                vm.$set(item,'arriveTime',"")
+                            }else {
+                                item.arriveTime = moment(item.arriveTime).format('YYYY-MM-DD');
+                            }
+                            if(!item.instructionDate) {
+                                vm.$set(item,'instructionDate',"")
+                            }else {
+                                item.instructionDate = moment(item.instructionDate).format('YYYY-MM-DD HH:mm:ss');
+                            }
+                            if(!item.transportKind) {
+                                vm.$set(item,'transportKind',"YOFC_TRANS")
+                            }
+                            if(!item.woodCheck) {
+                                vm.$set(item,'woodCheck',"NEED")
+                            }
+                            if(!item.signStyleKind) {
+                                vm.$set(item,'signStyleKind',"YOFC_KIND")
+                            }
+                           vm.radioMethod(item,index)
+                        })
+                    vm.$nextTick(function () {
+                        form.render();
+                    })
+                })
+            },
+            radioMethod: function (item,index) {
+                laydate.render({
+                    elem: '#diyDate_' + index
+                    ,done: function(value, date, endDate){
+                        item.fillInDate = value;
+                    }
+                });
+                laydate.render({
+                    elem: '#arrivalTime_' + index
+                    ,done: function(value,date,endDate){
+                        item.arriveTime = value;
+                    }
+                });
+                form.on('radio(transportKind_'+index+')', function (data) {
+                    item.transportKind = data.value;
+                });
+                form.on('radio(woodCheck_'+index+')', function(data){
+                    item.woodCheck = data.value;
+                });
+                form.on('radio(signStyleKind_'+index+')', function(data){
+                    item.signStyleKind = data.value;
+                });
+                if(item.instructionStatus == 'NO_SENDED') {
+                    item.orderPurchaseDetailList.forEach(function (items,index) {
+                        vm.selectMethod(item,items,index)
+                    })
+                    vm.$set(item,'skuCablePlateList',[]);
+                }
+            }
+            ,selectMethod: function (item,items,index) {
+                form.on('select('+items.orderPurchaseId+'_'+index+')', function(data){
+                    var value;
+                    if(data.value) {
+                        value = data.value;
+                    }else {
+                        value = data.valueStr;
+                    }
+                    console.log(value)
+                    if(value.length>0) {
+                        var cablePlateList="",orderPurchaseDetailId,skuId;
+                        for(var i=0;i<value.length;i++) {
+                            cablePlateList += value[i].split('_')[0]+";"
+                            orderPurchaseDetailId = value[i].split('_')[1];
+                            skuId = value[i].split('_')[2];
+                        }
+                        if(item.skuCablePlateList.length>0) {
+                            var skuList=[];
+                            item.skuCablePlateList.forEach(function (item2,index2) {
+                                skuList.push(item2.skuId);
+                            })
+                            item.skuCablePlateList.forEach(function (item2,index2) {
+                                if(item2.skuId == skuId ) {
+                                    item2.orderPurchaseDetailId = orderPurchaseDetailId;
+                                    item2.cablePlateList = cablePlateList;
+                                }
+                            })
+                            if(skuList.indexOf(skuId) == -1) {
+                                item.skuCablePlateList.push({
+                                    "cablePlateList": cablePlateList,
+                                    "orderPurchaseDetailId": orderPurchaseDetailId,
+                                    "skuId": skuId
+                                })
+                            }
+                        }else {
+                            item.skuCablePlateList.push({
+                                "cablePlateList": cablePlateList,
+                                "orderPurchaseDetailId": orderPurchaseDetailId,
+                                "skuId": skuId
+                            })
+                        }
+                    }else {
+
+                    }
+                    console.log(item.skuCablePlateList)
+
+                });
+            }
+            ,exports: function (item) {
+                var param={};
+                param.template = "sales_inner_shipping_instruction";
+                param.shippingIntructionDetailIds =[]; //发货指令详情ids
+                param.shippingIntructionDetailIds.push(item.orderPurchaseId);
+                param.zipFileNamePatten =encodeURI("内部合同发货指令");
+                url = '/shippingInstruction/api/shippingInstructionDetailExport';
+                postUtil.get(url, param);
+            }
+            ,send: function (item,index) {
+                var param = {};
+                param.fillInDate = $('#diyDate_'+index).val();
+                if(!param.fillInDate){
+                    return layer.msg('请填写日期');
+                }
+                param.arriveTime = $('#arrivalTime_'+index).val();
+                param.receiptNum = '2';
+                param.receiptStamp ='签字并盖章';
+                param.transportKind = vm.orderPurchaseList[index].transportKind;
+                param.produceBase = '长飞光纤光缆(上海)股份有限公司';
+                param.custFileDes = '检验合格证';
+                param.remark = item.remark;
+                param.shippingInstrDetailId = item.shippingInstrDetailId;
+                param.skuCablePlateList = item.skuCablePlateList;
+                param.woodCheck = item.woodCheck;
+                param.accountId = item.accountId;
+                param.signReceiptStampDemand = '签字并盖章';
+                param.contractId = item.orderPurchaseContractId;
+                param.orderPurchaseId = item.orderPurchaseId;
+                param.signStyleKind = vm.orderPurchaseList[index].signStyleKind;
+                param.salesContactUserId = item.salesContactUserId;
+                console.log(param)
+                postUtil.call('/sendShoppingInstruction/updateSendInstructionStatus', {"jsonData":JSON.stringify(param)}, function (result) {
+                    if(result.STATUS == 'SUCCESS') {
+                        item.instructionDate = moment(result.DATA).format('YYYY-MM-DD HH:mm:ss');
+                        layer.msg('发货成功');
+                        item.instructionStatus = 'SENDED';
+                        item.instructionStatusName = "已发送";
+                    }else {
+                        layer.msg(result.MSG, {icon: 5});
+                    }
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

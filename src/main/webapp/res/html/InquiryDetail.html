@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <script src="/res/js/jquery-3.1.1.min.js"></script>
+    <script src="/res/public/layui/layui.js"></script>
+    <script src="/res/common/globalVar.js"></script>
+    <script src="/res/common/post.js"></script>
+    <script src="/res/js/vue.js"></script>
+</head>
+<body>
+<div id="queryBuyerEnquireDetail">
+    <div class="bz-bb pl20 pr20 pt20 flex">
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor fz12" style="height: 130px;flex: 1;">
+            <p class="t-c fz16 line-middle">工程商</p>
+            <p class="line-middle pl20">账号：18571463313</p>
+            <p class="line-middle pl20">用户名：李旭梅</p>
+            <p class="line-middle pl20">公司名称：李旭梅</p>
+        </blockquote>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor ml20 mr20" style="height: 130px;flex: 1;">
+            <p class="t-c fz16">分销商</p>
+            <p class="line-middle pl20">公司名称：18571463313</p>
+            <p class="line-middle pl20">联系人：李旭梅</p>
+            <p class="line-middle pl20">手机号：李旭梅</p>
+        </blockquote>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="height: 130px;flex: 1;">
+            <p class="t-c fz16">专属客户经理：系统管理员</p>
+            <p class="line-middle pl20">手机：18571463313</p>
+            <p class="line-middle pl20">QQ：李旭梅</p>
+            <p class="line-middle pl20">邮箱：李旭梅</p>
+        </blockquote>
+    </div>
+    <div class="bz-bb pl20 pr20 pt10">
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor bg-f0">
+            <form action="" class="jun-form-s form-css">
+                <dl class="dl-form mb5-i">
+                    <dt class="flt w78">询单编号：</dt>
+                    <dd class="flt line-middle c-2 w240">{{todos.offerId}}</dd>
+                    <dt class="flt">专属客户经理：</dt>
+                    <dd class="flt line-middle"><span class="c-2">{{todos.accountManagerName}}</span><span class="c-9">手机：{{todos.mobile}}/邮箱：{{todos.email}}/qq：{{todos.qq}}</span></dd>
+                    <dt class="flt w78">来源：</dt>
+                    <dd class="flt line-middle c-2 w240">{{todos.offerId}}</dd>
+                </dl>
+                <dl class="dl-form mb5-i">
+                    <dt class="flt w78">询单状态：</dt>
+                    <dd class="flt line-middle w240"><span class="c-2">{{todos.inquiryOrderStatusName}}</span><span class="c-9">{{todos.operationTime}}</span></dd>
+                    <dt class="flt">报价：</dt>
+                    <dd class="flt line-middle w240"><span class="c-f fw-b">{{todos.operationTime}}</span><span class="c-2">元</span></dd>
+                    <dt class="flt"><span class="c-f">*</span>有效期至：</dt>
+                    <dd class="flt line-middle fw-b w240">{{todos.operationTime}}</dd>
+                </dl>
+                <dl class="dl-form mb5-i">
+                    <dt class="flt w78">期望交期：</dt>
+                    <dd class="flt line-middle fw-b w240">{{todos.operationTime}}</dd>
+                    <dt class="flt"><span class="c-f">*</span>回复交期：</dt>
+                    <dd class="flt line-middle fw-b w240">{{todos.operationTime}}</dd>
+                    <dd class="flt ml10"><span class="form-btn layui-btn-small2">修改</span></dd>
+                    <dd class="flt ml10"><span class="form-btn  layui-btn-primary layui-btn-small2">邮件发送</span></dd>
+                    <dd class="flt ml10"><span class="form-btn  layui-btn-primary layui-btn-small2">复制询价单</span></dd>
+                    <dd class="flt ml10"><span class="form-btn  layui-btn-primary layui-btn-small2" id="close">关闭询价单</span></dd>
+                </dl>
+            </form>
+        </blockquote>
+        <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">商品信息</h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <h3 class="mb5 fw-b">商城商品</h3>
+            <table class="layui-table pop">
+                <colgroup>
+                    <col  width="400">
+                    <col  width="100">
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="100">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>商品</th>
+                    <th >目录价</th>
+                    <th >数量</th>
+                    <th >计量单位</th>
+                    <th >商品描述</th>
+                    <th ><span>*</span>商品报价(含税/不含税)</th>
+                    <th >报价小计</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr  v-for="item in malls">
+                    <td class="goods-detail">
+                        <dl>
+                            <dt><img v-bind:src="item.skuProductImage"  alt="">
+                            <p>{{item.skuBrandName}}</p>
+                            </dt>
+                            <dd class="t-l ml10">
+                                <p class="one-row c-2">{{item.skuName}}</p>
+                                <p class="mt10">商品型号:{{item.skuMode}}</p>
+                                <p>商品编码:{{item.skuId}}</p>
+                                <p>芯数/光纤类型/颜色:{{item.skuProperty.name}}{{item.skuProperty.value}}</p>
+                            </dd>
+                        </dl>
+                    </td>
+                    <td>{{item.skuOfferPrice}}</td>
+                    <td>{{item.skuQuantity}}</td>
+                    <td>{{item.skuUnitName}}</td>
+                    <td>描述</td>
+                    <td>报价</td>
+                    <td>{{item.skuOfferAmount}}</td>
+                </tr>
+                </tbody>
+            </table>
+            <h3 class="mb5 fw-b">自定义商品</h3>
+            <table class="layui-table pop">
+                <colgroup>
+                    <col  width="300">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="200">
+                    <col  width="200">
+                    <col  width="150">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>商品名称</th>
+                    <th >商品型号</th>
+                    <th >品牌</th>
+                    <th >数量</th>
+                    <th >计量单位</th>
+                    <th >商品描述</th>
+                    <th ><span>*</span>商品报价(含税/不含税)</th>
+                    <th>报价小计</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="item in diys">
+                    <td>{{item.skuName}}</td>
+                    <td>{{item.skuMode}}</td>
+                    <td>{{item.skuBrandName}}</td>
+                    <td>{{item.skuQuantity}}</td>
+                    <td>{{item.skuUnitName}}</td>
+                    <td>{{item.remark}}</td>
+                    <td>{{item.skuPrice}}</td>
+                    <td>{{item.skuAmount}}</td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="mt20">
+                <form action="" class="jun-form-s form-css clr">
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">商品总报价：</dt>
+                        <dd class="flt line-middle w100"></dd>
+                        <dd class="flt line-middle ml5">元</dd>
+                    </dl>
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">运费：</dt>
+                        <dd class="flt line-middle"></dd>
+                        <dd class="flt line-middle ml5">元</dd>
+                    </dl>
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">其他费用描述：</dt>
+                        <dd class="flt line-middle"></dd>
+                        <dd class="flt line-middle ml5">元</dd>
+                        <dt class="flt">金额：</dt>
+                        <dd class="flt line-middle"></dd>
+                        <dd class="flt line-middle ml5">元</dd>
+                    </dl>
+                    <dl class="dl-form frt mb5-i" >
+                        <dt class="flt">总价：</dt>
+                        <dd class="flt line-middle w100"></dd>
+                        <dd class="flt line-middle ml5">元</dd>
+                    </dl>
+                </form>
+            </div>
+        </blockquote>
+        <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">详细信息</h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <form action="" class="jun-form-s form-css">
+                <dl class="dl-form mb5-i">
+                    <dt class="flt">配送方式：</dt>
+                    <dd class="flt line-middle c-2">{{todos.deliveryMode}}</dd>
+                </dl>
+                <dl class="dl-form mb5-i">
+                    <dt class="flt">收货地：</dt>
+                    <dd class="flt line-middle c-2">{{todos.inquiryOrderProvince}}{{todos.inquiryOrderCity}}</dd>
+                </dl>
+                <dl class="dl-form mb5-i layui-form">
+                    <dt class="flt">结算方式：</dt>
+                    <dd class="flt line-middle c-2">{{todos.payMode}}</dd>
+                </dl>
+                <dl class="dl-form mb5-i">
+                    <dt class="flt">开票信息：</dt>
+                    <dd class="flt line-middle  c-2">{{todos.isNeedInvoice}}</dd>
+                </dl>
+                <dl class="dl-form mb5-i">
+                    <dt class="flt fz12">备注：</dt>
+                    <dd class="flt line-middle  c-2">{{todos.purchasingRequisitionDesc}}</dd>
+                </dl>
+                <dl class="dl-form mb5-i">
+                    <dt class="flt fz12">附件：</dt>
+                    <dd class="flt line-middle">
+                        <a href="javascript:;" class="c-h cs-p mr20 fz12" v-for="item in attachment">{{item.attachmentName}}</a>
+                    </dd>
+                </dl>
+            </form>
+        </blockquote>
+        <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">添加报价人</h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <div>
+                <span class="form-btn layui-btn-small2" lay-filter="formDemo">分销商报价</span>
+                <span class="fz12 c-2">武汉安凯有限公司</span>
+            </div>
+        </blockquote>
+        <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">操作日志</h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <table class="layui-table pop mb5-i" lay-skin="line">
+                <colgroup>
+                    <col  width="200">
+                    <col  width="200">
+                    <col  width="200">
+                    <col  width="400">
+                    <col  width="200">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th >时间</th>
+                    <th >操作人</th>
+                    <th >询单状态</th>
+                    <th >操作内容</th>
+                    <th >操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="item in lis">
+                    <td>{{item.operationTime}}</td>
+                    <td>{{item.operationAccountName}}{{item.operationUserName}}</td>
+                    <td>{{item.offerStatus}}</td>
+                    <td>{{item.operationContent}}</td>
+                    <td><a href="javascript:;" class="c-h fz12 cs-p">查看原始单据</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </blockquote>
+    </div>
+</div>
+<script type="text/javascript">
+    //页面加载完后调用
+    $(function () {
+        $.ajax({
+            type:"post",
+            url: apiUrl.queryBuyerEnquireDetail,
+            success:function(data){
+                console.log(data)
+                inquiryOrderHistoryDetail(data.DATA);
+                closeQuire(data.DATA.offerId)
+            }
+        })
+    });
+    function inquiryOrderHistoryDetail(value){
+       new Vue({
+            el:'#queryBuyerEnquireDetail',
+            data:{
+                todos: value,
+                malls: value.skuList,
+                diys : value.customSkuList,
+                lis : value.operationLog,
+                attachment : value.attachmentList
+            }
+        })
+    }
+
+    function  closeQuire(value) {
+        layui.use('layer', function () {
+            var layer = layui.layer;
+            $("#close").click(function () {
+                layer.open({
+                    title: '操作提示',
+                    skin: 'msgskin',
+                    area: ['450px', '280px'],
+                    btnAlign: 'c',
+                    content: '<p style="text-align: center;margin-top: 50px;">是否关闭询单：<span style="color:#fd4800">' + value + '</span></p>',
+                    btn: ['确认关闭', '取消'],
+                    yes: function (index, layero) {
+                        //关闭
+                        layer.close(index);
+                        //关闭委托单的回调
+                    postUtil.call(apiUrl.closeBuyerEnquire, {"enquireId" : value}, function (result) {
+                        var msg = "";
+                        if (result.STATUS == "SUCCESS") {
+                            msg = '关闭询价单成功！';
+                        } else {
+                            msg = result.MSG;
+                        }
+                        var content = '<p class="iconfont icon-yiwancheng1" style="text-align: center;margin-top: 30px;"></p><p style="text-align: center;margin-top: 30px;font-size:16px;color:#222222">'+msg+'</p>';
+                        layer.open({
+                            title: '操作结果',
+                            skin: 'youskin',
+                            area: ['480px', '300px'],
+                            btnAlign: 'c',
+                            content: content,
+                            btn: ['我知道了'],
+                            yes: function(index1, layero){
+                                //关闭
+                                layer.close(index1);
+                                if(result.STATUS == "SUCCESS") {
+                                    postUtil.submit("/mallOrder/buyerEnquireService/list");
+                                }
+                            },
+                            cancel: function(){
+                                //右上角关闭回调
+                            }
+                        });
+                    });
+                    }, btn2: function (index, layero) {
+                        //取消的回调
+                    },
+                    cancel: function () {
+                        //右上角关闭回调
+                    }
+                });
+            });
+        });
+    }
+</script>
+</body>
+</html>

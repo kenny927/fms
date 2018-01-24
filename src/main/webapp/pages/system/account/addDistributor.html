@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <script src="/res/js/jquery-3.1.1.min.js"></script>
+    <script src="/res/public/layui/layui.js"></script>
+    <script src="/res/public/layPage/laypage.js"></script>
+    <script src="/res/public/layui/Area1.js" type="text/javascript"></script>
+    <script src="/res/js/rg-validator-1.1.js"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/user/chooseUser.js"></script>
+
+    <style type="text/css">
+        input[disabled]::-webkit-input-placeholder{ 
+        color: #cccccc;
+        } 
+        input:-moz-placeholder{ 
+        color: #cccccc;
+        } 
+        input::-moz-placeholder{ 
+        color: #cccccc;
+        } 
+        input:-ms-input-placeholder{ 
+        color: #cccccc;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px; margin-top:10px;">
+                <form id="distributor_basic_frm" class="layui-form jun-form-s form-css" method="post">
+                    <div>
+                        <h3 class="bg-f0 h3-tittle pl10 mt20">基本信息</h3>
+                        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+                            <div style="padding-left: 40px;">
+                                <dl class="dl-form mt5">
+                                    <dt class="flt fz12"><span class="c-f">*</span>公司名称：</dt>
+                                    <dd class="flt layui-form rg_group">
+                                       <input type="text" name="accountName" rg-validate-field="accountName"  placeholder="请输入公司名称" autocomplete="off" class="layui-input" value="">
+                                    </dd>
+                                    <dt class="flt fz12 ml20 pl20 "><span class="c-f">*</span>社会信用代码：</dt>
+                                    <dd class="flt layui-form rg_group">
+                                       <input type="text" name="inteSocialCreditNo" rg-validate-field="inteSocialCreditNo"  placeholder="请输入15或18位社会信用代码" autocomplete="off" class="layui-input" value="">
+                                    </dd>
+                                </dl>
+                                <dl class="dl-form mt5">
+                                    <dt class="flt fz12" style="width: 115px;margin-left:-25px;">座机：</dt>
+                                    <dd class="flt rg_group "><input type="text" name="telephone" rg-validate-field="telephone" placeholder="格式：027-88888888" autocomplete="off" class="layui-input"></dd>
+                                    <dt class="flt fz12" style="width: 130px;"><span class="c-f">*</span>区域：</dt>
+                                    <dd class="flt rg_group ">
+                                        <select name="accountAreaId" rg-validate-field="accountAreaId" lay-filter="accountAreaId" id="district" lay-search>
+                                            <option value="" selected="">请选区域</option>
+                                            <option value="1001">北区</option>
+                                            <option value="1002">中区</option>
+                                            <option value="1003">南区</option>
+                                        </select>
+                                    </dd>
+                                </dl>
+                                <dl class="dl-form mt5">
+                                    <dt class="flt fz12" style="width: 115px;margin-left:-25px;"><span class="c-f">*</span>客户经理：</dt>
+                                    <dd class="flt rg_group ">
+                                        <input type="text" name="accountManager" rg-validate-field="accountManager" lay-filter="accountManager" id="accountManager" placeholder="请选择"  autocomplete="off" class="layui-input">
+                                    </dd>
+                                    <dt class="flt fz12" style="width: 130px;"><span class="c-f">*</span>销售代表：</dt>
+                                    <dd class="flt rg_group">
+                                        <input name="pltSalesEmploy" type="text" rg-validate-field="pltSalesEmploy" lay-filter="pltSalesEmploy" id="pltSalesEmploy" placeholder="请选择"  autocomplete="off" class="layui-input">
+                                    </dd>
+                                </dl>
+                                <dl class="dl-form" style="margin-bottom:10px;">
+                                    <dt class="flt" style="width: 115px;margin-left:-25px;"><span class="c-f">*</span>地址：</dt>
+                                    <dd class="flt pre layui-form dd-city rg_group">
+                                        <select name="province" rg-validate-field="province" lay-filter="province" id="s_province" lay-search>
+                                            <option value="">请选择省</option>
+                                        </select>
+                                    </dd>
+                                    <dd class="flt pre layui-form dd-city rg_group ml10">
+                                        <select name="city" rg-validate-field="city" lay-filter="city" lay-search>
+                                            <option value="">请选择市</option>
+                                        </select>
+                                    </dd>
+                                    <dd class="flt ml10"><input style="width: 280px;" placeholder="请输入详细地址" type="text" name="address" autocomplete="off" class="layui-input"></dd>
+                                </dl>
+                            </div>
+                            <div class="mt20" hidden id="chongtuDiv">
+                                <hr class="hr-bor" />
+                                <span class="iconfont icon-icon13 frt fz12 c-9 mb10 cs-p" onclick="close1()"></span>
+                                <table class="layui-table pop" lay-skin="line">
+                                    <colgroup>
+                                        <col  width="300">
+                                        <col  width="150">
+                                        <col  width="150">
+                                        <col  width="150">
+                                        <col  width="150">
+                                        <col  width="150">
+                                    </colgroup>
+                                    <thead>
+                                    <tr>
+                                        <th >客户名称</th>
+                                        <th >地址</th>
+                                        <th >销售代表</th>
+                                        <th >客户经理</th>
+                                        <th >创建时间</th>
+                                        <th >操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </blockquote>
+                    </div>
+                    <div>
+                        <h3 class="bg-f0 h3-tittle pl10 mt20">主要联系人</h3>
+                        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="padding-left: 40px;">
+                            <div>
+                            <dl class="dl-form">
+                                <dt class="flt fz12"><span class="c-f">*</span>姓名：</dt>
+                                <dd class="flt layui-form pre rg_group">
+                                    <input type="text" name="linkmanName" rg-validate-field="linkmanName" placeholder="请输入联系人姓名" autocomplete="off" class="layui-input">
+                                </dd>
+                                <dt class="flt fz12"><span class="c-f">*</span>性别：</dt>
+                                <dd class="flt pre layui-form">
+                                    <input type="radio" name="sex" value="male" title="先生" checked="">
+                                    <input type="radio" name="sex" value="female" title="女士">
+                                </dd>
+                            </dl>
+                            <dl class="dl-form">
+                                <dt class="flt fz12"><span class="c-f">*</span>手机号：</dt>
+                                <dd class="flt pre rg_group"><input type="text" name="linkmanTelephone" rg-validate-field="linkmanTelephone"  placeholder="请输入联系方式" autocomplete="off" class="layui-input"></dd>
+                                <dt class="flt fz12">座机：</dt>
+                                <dd class="flt pre rg_group"><input type="text" name="linkmanFixedTelephone" rg-validate-field="linkmanFixedTelephone"  placeholder="格式：027-88888888" autocomplete="off" class="layui-input"></dd>
+                            </dl>
+                            <dl class="dl-form">
+                                <dt class="flt fz12">QQ：</dt>
+                                <dd class="flt pre rg_group"><input type="text" name="qq" rg-validate-field="qq"  placeholder="请输入QQ" autocomplete="off" class="layui-input"></dd>
+                                <dt class="flt fz12">邮箱：</dt>
+                                <dd class="flt rg_group"><input type="text" name="email" rg-validate-field="email"  placeholder="请输入邮箱" autocomplete="off" class="layui-input"></dd>
+                            </dl>
+                            <dl class="dl-form">
+                                <dt class="flt fz12">职位：</dt>
+                                <dd class="flt"><input type="text" name="linkmanPosition"  placeholder="请输入职位" autocomplete="off" class="layui-input"></dd>
+                                <dt class="flt fz12">部门：</dt>
+                                <dd class="flt"><input type="text" name="department"  placeholder="请输入部门" autocomplete="off" class="layui-input"></dd>
+                            </dl>
+                            <dl class="dl-form">
+                                <dt class="flt fz12" style="width: 115px;margin-left:-25px;">订货系统账号：</dt>
+                                <dd class="flt c-2" style="line-height: 32px;">
+                                    <input type="radio" name="createAccount" lay-filter="createAccount" value="Y" title="创建" checked="">
+                                    <!--<input type="radio" name="createAccount" lay-filter="createAccount" value="N" title="不创建" >-->
+                                </dd>
+                            </dl>
+                            <dl class="dl-form" id="createAccount">
+                                <dt class="flt fz12"><span class="c-f">*</span>登录名：</dt>
+                                <dd class="flt rg_group"><input type="text" name="userName"  rg-validate-field="userName" placeholder="请输入登录名" autocomplete="off" class="layui-input"></dd>
+                                <dt class="flt fz12"><span class="c-f">*</span>初始密码：</dt>
+                                <dd class="flt"><input style="background-color: #dcdcdc;" type="text" name="password" disabled="" placeholder="123456" autocomplete="off" class="layui-input" value="123456"></dd>
+                            </dl>
+                            </div>
+
+                            <div class="mt20" hidden id="chongtuDiv1">
+                                <hr class="hr-bor" />
+                                <span class="iconfont icon-icon13 frt fz12 c-9 mb10 cs-p" onclick="close2()"></span>
+                                <table class="layui-table pop" lay-skin="line">
+                                    <colgroup>
+                                        <col  width="150">
+                                        <col  width="150">
+                                        <col  width="150">
+                                        <col  width="150">
+                                    </colgroup>
+                                    <thead>
+                                    <tr>
+                                        <th >客户名称</th>
+                                        <th >联系人</th>
+                                        <th >联系电话</th>
+                                        <th >创建时间</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="mt20" hidden id="chongtuDiv2">
+                                <hr class="hr-bor" />
+                                <span class="iconfont icon-icon13 frt fz12 c-9 mb10 cs-p" onclick="close3()"></span>
+                                <table class="layui-table pop" lay-skin="line">
+                                    <colgroup>
+                                        <col  width="150">
+                                        <col  width="150">
+                                        <col  width="150">
+                                        <col  width="150">
+                                    </colgroup>
+                                    <thead>
+                                    <tr>
+                                        <th >客户名称</th>
+                                        <th >联系人</th>
+                                        <th >联系电话</th>
+                                        <th >创建时间</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </blockquote>
+                        <h3 class="bg-f0 h3-tittle pl10 mt20">财务信息</h3>
+                        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="padding-left: 40px;">
+                            <div class="mb20">
+                                <span class="c-2 fz14 mr10">对公账号</span>
+                                <div style="width:90%;display:inline-block;vertical-align: super;border-bottom: 1px solid #dcdcdc;"></div>
+                            </div>
+                            <dl class="dl-form">
+                               <dt class="flt fz12"><span class="c-f">*</span>税号：</dt>
+                               <dd class="flt pre rg_group"><input type="text" name="taxNum" rg-validate-field="taxNum"  placeholder="请输入税号" autocomplete="off" class="layui-input"></dd>
+                               <dt class="flt fz12"><span class="c-f">*</span>注册地址：</dt>
+                               <dd class="flt pre rg_group"><input type="text" name="registerAddress" rg-validate-field="registerAddress"  placeholder="请输入注册地址" autocomplete="off" class="layui-input"></dd>
+                            </dl>
+                            <dl class="dl-form">
+                               <dt class="flt fz12"><span class="c-f">*</span>开户银行：</dt>
+                               <dd class="flt pre rg_group"><input type="text" name="publicBankName" rg-validate-field="publicBankName"  placeholder="请输入开户银行" autocomplete="off" class="layui-input"></dd>
+                               <dt class="flt fz12"><span class="c-f">*</span>银行账号：</dt>
+                               <dd class="flt pre rg_group"><input type="text" name="publicBankNum" rg-validate-field="publicBankNum"  placeholder="请输入银行账号" autocomplete="off" class="layui-input"></dd>
+                            </dl>
+                            <div class="mb20">
+                                <span class="c-2 fz14 mr10">对私账号</span>
+                                <div style="width:90%;display:inline-block;vertical-align: super;border-bottom: 1px solid #dcdcdc;"></div>
+                            </div>
+                            <dl class="dl-form">
+                               <dt class="flt fz12"><span class="c-f">*</span>收款人姓名：</dt>
+                               <dd class="flt pre rg_group"><input type="text" name="privateBankUserName" rg-validate-field="privateBankUserName"  placeholder="请输入收款人姓名" autocomplete="off" class="layui-input"></dd>
+                               <dt class="flt fz12"><span class="c-f">*</span>银行账号：</dt>
+                               <dd class="flt pre rg_group"><input type="text" name="privateBankNum" rg-validate-field="privateBankNum"  placeholder="请输入银行账号" autocomplete="off" class="layui-input"></dd>
+                            </dl>
+                            <dl class="dl-form">
+                               <dt class="flt fz12"><span class="c-f">*</span>开户银行：</dt>
+                               <dd class="flt pre rg_group"><input type="text" name="privateBankName" rg-validate-field="privateBankName"  placeholder="请输入开户银行" autocomplete="off" class="layui-input"></dd>
+                            </dl>
+                        </blockquote>
+                    </div>
+                    <div class="pb20 t-c mt20">
+                        <button class="form-btn layui-btn-small ml10" lay-submit="" lay-filter="formDemo">提交</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript">
+//省市联动  star
+    var areaData = Area;
+    var $form;
+    var form;
+    var element;
+    var $;
+    var createOrnot = true;
+    var rgValidator;
+    var accountManagerId ="";
+    var pltSalesEmployId ="";
+    var layer;
+
+  layui.use(['form','element','layer'], function() {
+        form = layui.form();
+        element = layui.element();
+        $form = $('form');
+        layer= layui.layer;
+        loadProvince();
+
+
+      //客户经理
+      var opt = {
+          layerTitle:"选择客户经理",
+          layerArea:['700px', '410px'],
+          layer:layer,
+          dialogDef:{
+              pageSize:5,
+              showSelectAllButton:false,
+              searchCondition:[
+                  {
+                      title:'真实姓名',
+                      placeholder:'',
+                      type:'input',
+                      name:'userRealName'
+                  }
+//            ,{
+//                title:'岗位名称',
+//                placeholder:'',
+//                type:'select',
+//                name:'departmentName',
+//                options:[
+//                    {code:'客户运营',name:'客户运营'},
+//                    {code:'2',name:'2'},
+//                    {code:'3',name:'3'}
+//                ]
+//            }
+              ],
+              dataHeaders:[
+                  {
+                      itemTitle:'姓名',
+                      width:200
+                  },{
+                      itemTitle:'手机号',
+                      width:200
+                  },{
+                      itemTitle:'邮箱',
+                      width:250
+                  },{
+                      itemTitle:'岗位',
+                      width:200
+                  }
+              ],
+              dataRowsDef:[
+                  {name:'userId', type:'radio'},
+                  {name:'userRealName'},
+                  {name:'mobile'},
+                  {name:'email'},
+                  {name:'departmentName'}
+              ],
+              selectedCallBack: function(data){
+                  if(data[0]){
+                      $('#accountManager').val(data[0].userRealName);
+                      accountManagerId = data[0].userId;
+                  }
+                  return true;
+              }
+          }
+      };
+      var chooseAccountManagerDialog = new ChooseUserComponent(opt);
+
+      $('#accountManager').click(function(){
+          chooseAccountManagerDialog.openDialog();
+      })
+
+
+     //销售代表
+      var opt1 = {
+          layerTitle:"选择销售代表",
+          layerArea:['700px', '410px'],
+          layer:layer,
+          dialogDef:{
+              pageSize:5,
+              showSelectAllButton:false,
+              searchCondition:[
+                  {
+                      title:'真实姓名',
+                      placeholder:'',
+                      type:'input',
+                      name:'userRealName'
+                  }
+//            ,{
+//                title:'岗位名称',
+//                placeholder:'',
+//                type:'select',
+//                name:'departmentName',
+//                options:[
+//                    {code:'客户运营',name:'客户运营'},
+//                    {code:'2',name:'2'},
+//                    {code:'3',name:'3'}
+//                ]
+//            }
+              ],
+              dataHeaders:[
+                  {
+                      itemTitle:'姓名',
+                      width:200
+                  },{
+                      itemTitle:'手机号',
+                      width:200
+                  },{
+                      itemTitle:'邮箱',
+                      width:250
+                  },{
+                      itemTitle:'岗位',
+                      width:200
+                  }
+              ],
+              dataRowsDef:[
+                  {name:'userId', type:'radio'},
+                  {name:'userRealName'},
+                  {name:'mobile'},
+                  {name:'email'},
+                  {name:'departmentName'}
+              ],
+              selectedCallBack: function(data){
+                  if(data[0]){
+                      $('#pltSalesEmploy').val(data[0].userRealName);
+                      pltSalesEmployId = data[0].userId;
+                  }
+                  return true;
+              }
+          }
+      };
+      var choosePltSalesEmployDialog = new ChooseUserComponent(opt1);
+
+      $('#pltSalesEmploy').click(function(){
+          choosePltSalesEmployDialog.openDialog();
+      })
+
+        rgValidator = new RgValidator(ops);
+        rgValidator.bindValidator();
+        //提交按钮
+        form.on('submit(formDemo)', function(data) {
+            submitAccount(data);
+            return false;
+        });
+
+    });
+
+    function loadProvince() {
+      var proHtml = '';
+     for(var i = 0; i < areaData.length; i++) {
+        proHtml += '<option value="' + areaData[i].provinceName + '">' +
+            areaData[i].provinceName + '</option>';
+     }
+    //初始化省数据
+       $form.find('select[name=province]').append(proHtml);
+       form.render();
+       form.on('select(province)', function(data) {
+       var value = data.value;
+       var cities = getCityByProvince(areaData, value);
+       if(cities.length > 0) {
+           loadCity(cities);
+        } else {
+          $form.find('select[name=city]').parent().hide();
+        }
+      });
+    }
+ 
+    function loadCity(citys) {
+      var cityHtml = '';
+      for(var i = 0; i < citys.length; i++) {
+        cityHtml += '<option value="' + citys[i].cityName + '">' +
+        citys[i].cityName + '</option>';
+      }
+     $form.find('select[name=city]').html(cityHtml).parent().show();
+     form.render();
+    }
+
+   function getCityByProvince(areaData, provinceName) {
+        var cities = [];
+        $.each(areaData, function (index, item) {
+            if(item.provinceName == provinceName) {
+                cities = item.mallCityList;
+                return false;
+            }
+        });
+        return cities;
+   }
+
+//校验字段
+    var ops = {
+        form: "distributor_basic_frm",
+        valid: "",
+        invalidMessageClass : ' iconfont c-f jun-ch fz12 ',
+        invalidMessageStyle : '',
+        invalidIconOnlyWhileRequired : true,
+        fieldInType: "dd",
+        fields:{
+            accountName : {
+                message : '公司名称验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请填写公司名称！"
+                    },
+//                    csValidating:{
+//                        callback:'checkCorrectness4InteSocialCreditNo',
+//                        message:"公司名称与信用代码不符！"
+//                    },
+                    csValidating1 : {
+                        callback : 'checkConflictInteSocialCreditNo',
+                        message : '与分销商库中分销商存在冲突<span class="c-h ml10 cs-p repeat-view-msg" style="line-height: 32px;" onclick="queryCheckConflictInteSocialCreditNo()">查看冲突</span>'
+                    }
+                }
+            },
+            inteSocialCreditNo : {
+                message : '统一社会信用代码验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请填写统一社会信用代码！"
+                    },
+                    regexp : {
+                        message : "统一社会信用代码格式不正确",
+                        regexp : /(^[0-9A-Z]{18}$)|(^[0-9A-Z]{15}$)|(^无$)/
+                    },
+//                    csValidating:{
+//                        callback:'checkCorrectness4InteSocialCreditNo',
+//                        message:"公司名称与信用代码不符！"
+//                    },
+                    csValidating1 : {
+                        callback : 'checkConflictInteSocialCreditNo',
+                        message : '与分销商库中分销商存在冲突<span class="c-h ml10 cs-p repeat-view-msg" style="line-height: 32px;" onclick="queryCheckConflictInteSocialCreditNo()">查看冲突</span>'
+                    }
+                }
+            },
+            telephone: {
+                message : '公司座机验证失败',
+                validators : {
+                    regexp : {
+                        message : "输入的电话格式不正确(由数字或-组成)",
+                        regexp : /^0[\d]{2,3}-[\d]{7,8}$/
+                    }
+                }
+            },
+            accountAreaId : {
+                message : '所选区域验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请填写区域！"
+                    }
+                }
+            },
+            accountManager : {
+                message : '所选客户经理验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请选择客户经理！"
+                    }
+                }
+            },
+            pltSalesEmploy : {
+                message : '所选销售代表验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请选择销售代表！"
+                    }
+                }
+            },
+            province : {
+                message : '所选省份验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请填写省份！"
+                    }
+                }
+            },
+            city : {
+                message : '所选城市验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请填写城市！"
+                    }
+                }
+            },
+            linkmanName : {
+                message : '联系人验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请填写联系人！"
+                    }
+                }
+            },
+            linkmanTelephone: {
+                message : '手机号验证失败',
+                validators : {  
+                    notEmpty : {
+                        message : "请填写手机号！"
+                    },
+                    regexp : {
+                        message : "输入的手机号码格式不正确！",
+                        regexp : /^1[34578]\d{9}$/
+                    },
+                    csValidating : {
+                        callback : 'linkmanTelephoneCsValidator',
+                        message : '与分销商库中分销商联系人手机号存在冲突<span class="c-h ml10 cs-p repeat-view-msg" style="line-height: 32px;" onclick="queryCheckConflicLinkmanTelephone()">查看冲突</span>'
+                    }
+
+                }
+            },
+            linkmanFixedTelephone: {
+                message : '联系人座机验证失败',
+                validators : {
+                    regexp : {
+                        message : "输入的座机格式不正确(由数字或-组成)",
+                        regexp : /^0[\d]{2,3}-[\d]{7,8}$/
+                    }
+                }
+            },
+            qq:{
+                message : 'QQ号码验证失败',
+                validators : {
+                    regexp : {
+                        message : "您输入的QQ格式不正确哦！",
+                        regexp : /^[0-9]*$/
+                    }
+                }
+            },
+            email: {
+                message : '邮箱验证失败',
+                validators : {
+                    regexp : {
+                        message : "您输入的邮箱格式不正确哦！",
+                        regexp : /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/
+                    }
+                }
+            },
+            userName: {
+                message : '登录名验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请填写登录名！"
+                    },
+                    regexp : {
+                        message : "请输入4-20位数字或字母的组合！",
+                        regexp : /^[0-9a-zA-Z]{4,20}$/
+                    },
+                    csValidating : {
+                        callback : 'userNameCsValidator',
+                         message : '与分销商库中登录名存在冲突<span class="c-h ml10 cs-p repeat-view-msg" style="line-height: 32px;" onclick="queryCheckConflictUserName()">查看冲突</span>'
+                    }
+                }
+            },
+            taxNum: {
+                message : '税号验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请填写税号！"
+                    },
+                    regexp : {
+                        message : "请填写正确的纳税人识别号(15位、18位或者20位)！",
+                        regexp : /^([A-Za-z0-9]{15}|[A-Za-z0-9]{18}|[A-Za-z0-9]{20})$/
+                    }
+                }
+            },
+            registerAddress: {
+                message : '注册地址验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请填写注册地址！"
+                    },
+                }
+            },
+            publicBankName:{
+                message : '对公开户银行验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请填写对公开户银行！"
+                    },
+                    regexp : {
+                        message : "您输入的开户银行格式不正确哦！",
+                        regexp : /^[\u2E80-\u9FFF]+$/
+                    }
+                }
+            },
+            publicBankNum:{
+                message : '对公开户银行账号验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请填写对公银行账号！"
+                    },
+                    regexp : {
+                        message : "请输入16或19位银行卡号！",
+                        regexp : /^(\d{16}|\d{19})$/
+                    }
+                }
+            },
+            privateBankUserName:{
+                message : '收款人姓名验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请填写收款人姓名！"
+                    }
+                }
+            },
+            privateBankName:{
+                message : '对私开户银行验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请填写对私开户银行！"
+                    },
+                    regexp : {
+                        message : "您输入的开户银行格式不正确哦！",
+                        regexp : /^[\u2E80-\u9FFF]+$/
+                    }
+                }
+            },
+            privateBankNum:{
+             message : '对私开户银行账号验证失败',
+             validators : {
+                notEmpty : {
+                    message : "请填写对私银行账号！"
+                },
+                regexp : {
+                    message : "请输入16或19位银行卡号！",
+                    regexp :  /^(\d{16}|\d{19})$/
+                }
+             }
+            }
+        }
+    };
+
+    //公司名称和社会信用代码都有值，后才进行校验
+    function needCheckRepeat(){
+        var inteSocialCreditNo = $('input[name=inteSocialCreditNo]').val() || '';
+        var accountName = $('input[name=accountName]').val() || '';
+        //公司名称和社会信用代码都有值，后才进行校验
+        if(inteSocialCreditNo&&accountName){
+            return true;
+        }
+        return false;
+    }
+
+    //信用代码和公司名称检查有效性
+    function checkCorrectness4InteSocialCreditNo () {
+        var blresult = true;
+        var param = {};
+        param.inteSocialCreditNo = $('input[name=inteSocialCreditNo]').val() || '';
+        param.accountName = $('input[name=accountName]').val() || '';
+        if(needCheckRepeat()){
+            $.ajax({
+                url: '/systemAccount/management/distributor/checkCorrectness4InteSocialCreditNo',
+                type: 'post',
+                dataType: 'json',
+                data: param,
+                timeout: 10000,
+                async: false,
+                success: function (result) {
+                    if(result.STATUS == "SUCCESS"){
+                        blresult =  result.DATA;
+                    }else{
+                        console.log(result.MSG);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert(errorThrown);
+                }
+            });
+        }
+
+        return blresult;
+    }
+
+    //信用代码查重
+    function checkConflictInteSocialCreditNo(){
+        var blresult = true;
+        var param = {};
+            param.inteSocialCreditNo = $('input[name=inteSocialCreditNo]').val() || '';
+            param.accountName = $('input[name=accountName]').val() || '';
+        if(needCheckRepeat()){
+            $.ajax({
+                url: '/systemAccount/management/distributor/checkConflictInteSocialCreditNo',
+                type: 'post',
+                dataType: 'json',
+                data: param,
+                timeout: 10000,
+                async: false,
+                success: function (result) {
+                    if(result.STATUS == "SUCCESS"){
+                        blresult =  result.DATA;
+                    }else{
+                        console.log(result.MSG);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert(errorThrown);
+                }
+            });
+        }
+
+        if(blresult){
+            $('#chongtuDiv').hide();
+        }
+       return blresult;
+   }
+
+    function queryCheckConflictInteSocialCreditNo(){
+    var param = {
+        inteSocialCreditNo:$('input[name=inteSocialCreditNo]').val(),
+        accountName:$('input[name=accountName]').val()
+    };
+    postUtil.call('/systemAccount/management/distributor/queryCheckConflictInteSocialCreditNo', param, function(result) {
+        if(result.STATUS == "SUCCESS"){
+            if(result.DATA.length>0){
+                renderTable(result.DATA);
+            }
+        }else{
+            console.log(result.MSG);
+        }
+    });
+}
+   //冲突的公司名称与社会信用代码
+   function renderTable(dataList){
+    var html = '';
+    $('#chongtuDiv').show();
+    for (var i1 = 0; i1 < dataList.length; i1++) {
+        var data = dataList[i1];
+        var createTime = '';
+        if(data.createDate){
+            var newDate = new Date();
+            newDate.setTime(data.createDate);
+            createTime = newDate.format('yyyy-MM-dd h:m:s');
+        }
+
+        var operatorHtml = '<@havePermission resourceCode="operation:customer:engineer:add:viewctdetail"><span class="c-h ml10 cs-p" style="line-height: 32px;" onclick="openDetail(\'' + data.accountId + '\')">查看详情</span></@>'
+        html += '<tr>'
+            + '<td class="c-f">' + isExitsVariable(data.accountName) + '<br>' + isExitsVariable(data.inteSocialCreditNo) + '</td>'
+            + '<td>' + isExitsVariable(data.province) + isExitsVariable(data.city) + '</td>'
+            + '<td>' + isExitsVariable(data.pltSalesEmployName) + '</td>'
+            + '<td>' + isExitsVariable(data.accountManagerName) + '</td>'
+            + '<td>' + createTime + '</td>'
+            + '<td>' + operatorHtml + '</td>'
+            + '</tr>';
+    }
+    $("#chongtuDiv .layui-table tbody").html(html);
+  }
+
+   function openDetail(accountId){
+        cardUtil.openCard("客户详情-" + accountId,"/systemAccount/distributor/preDistributorDetail?accountId=" + accountId);
+        cardUtil.changeCard("客户详情-" + accountId);
+    }
+
+   //用户名是否重复校验
+    function userNameCsValidator(obj){
+        var blresult = true;
+        var param = {userName:$('input[name=userName]').val()};
+        $.ajax({
+            url: '/systemAccount/management/distributor/checkUserName',
+            type: 'post',
+            dataType: 'json',
+            data: param,
+            timeout: 10000,
+            async: false,
+            success: function (result) {
+                if(result.STATUS == "SUCCESS"){
+                    if(result.DATA.length>0){
+                        blresult = false ;
+
+                        var html = '';
+                        for (var i = 0; i < result.DATA.length; i++) {
+                            var data = result.DATA[i];
+                            var createTime = '';
+                            if(data.createDate){
+                                var newDate = new Date();
+                                newDate.setTime(data.createDate);
+                                createTime = newDate.format('yyyy-MM-dd h:m:s');
+                            }
+
+                            html += '<tr>'
+                                + '<td>' + isExitsVariable(data.accountName) +  '</td>'
+                                + '<td class="c-f">' + isExitsVariable(data.userName) + '</td>'
+                                + '<td>' + isExitsVariable(data.mobile) + '</td>'
+                                + '<td>' + createTime + '</td>'
+                                + '</tr>';
+                        }
+                        $("#chongtuDiv2 .layui-table tbody").html(html);
+
+                    }else{
+                        blresult =  true;
+                    }
+                }else{
+                    console.log(result.MSG);
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+
+        if(blresult){
+            $('#chongtuDiv2').hide();
+        }
+        return blresult;
+    }
+
+    function queryCheckConflictUserName() {
+        $('#chongtuDiv2').show();
+    }
+
+  //联系人手机号是否重复校验
+   function linkmanTelephoneCsValidator(obj){
+        var blresult = true;
+        var param = {linkmanTelephone:$('input[name=linkmanTelephone]').val()};
+        $.ajax({
+            url: '/systemAccount/management/distributor/checkLinkmanTelephone',
+            type: 'post',
+            dataType: 'json',
+            data: param,
+            timeout: 10000,
+            async: false,
+            success: function (result) {
+                if(result.STATUS == "SUCCESS"){
+                    if(result.DATA.length>0){
+                        blresult = false;
+
+                        var html = '';
+                        for (var i = 0; i < result.DATA.length; i++) {
+                            var data = result.DATA[i];
+                            var createTime = '';
+                            if(data.createDate){
+                                var newDate = new Date();
+                                newDate.setTime(data.createDate);
+                                createTime = newDate.format('yyyy-MM-dd h:m:s');
+                            }
+
+                            html += '<tr>'
+                                + '<td>' + isExitsVariable(data.accountName) +  '</td>'
+                                + '<td>' + isExitsVariable(data.userRealName) + '</td>'
+                                + '<td class="c-f">' + isExitsVariable(data.mobile) + '</td>'
+                                + '<td>' + createTime + '</td>'
+                                + '</tr>';
+                        }
+                        $("#chongtuDiv1 .layui-table tbody").html(html);
+
+                    }else{
+                        blresult =  true;
+                    }
+                }else{
+                    console.log(result.MSG);
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+
+       if(blresult){
+           $('#chongtuDiv1').hide();
+       }
+
+       return blresult;
+  }
+
+  function queryCheckConflicLinkmanTelephone(){
+      $('#chongtuDiv1').show();
+  }
+
+   function submitAccount(data){
+        rgValidator.validateOnSubmit(ops);
+        if(rgValidator.validateOnSubmit(ops) != ''){
+            layer.msg("页面填写有误或者有冲突，请检查", {icon: 5});
+            return false;
+        }
+
+       var param = {};
+        data.field.accountManagerId = accountManagerId;
+        data.field.pltSalesEmployId = pltSalesEmployId;
+       param.data = JSON.stringify(data.field);
+       console.log(data.field);
+       layer.load();
+       postUtil.call('/systemAccount/management/distributor/new', param, function(result) {
+           if(result.STATUS == "SUCCESS"){
+               layer.open({
+                   title: '操作提示',
+                   skin: 'youskin',
+                   area: ['480px', '300px'],
+                   btnAlign: 'c',
+                   content: '<p class="iconfont icon-yiwancheng1" style="text-align: center;margin-top: 30px;"></p><p style="text-align: center;margin-top: 30px;font-size:12px;color:#222222">'+result.MSG+'</p>',
+                   btn: ['关闭'],
+                   yes: function(index, layero){
+
+                       postUtil.submit('/systemAccount/distributor/preGetDistributorList',null);
+
+                       layer.closeAll('loading');
+                   }
+               });
+           }
+       });
+   }
+
+
+ function close1() {
+     $('#chongtuDiv').hide();
+ }
+
+  function close2() {
+      $('#chongtuDiv1').hide();
+  }
+
+  function close3() {
+    $('#chongtuDiv2').hide();
+}
+
+  function isExitsVariable(variableName) {
+    try {
+        if (typeof (variableName) == "undefined") {
+            return "";
+        } else if (variableName == null){
+            return "";
+        }else {
+            return variableName;
+        }
+    } catch (e) {
+    }
+    return "";
+}
+
+  Date.prototype.format = function (fmt) { //author: meizz
+        var o = {
+            "M+": this.getMonth() + 1, //月份
+            "d+": this.getDate(), //日
+            "h+": this.getHours(), //小时
+            "m+": this.getMinutes(), //分
+            "s+": this.getSeconds(), //秒
+            "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+            "S": this.getMilliseconds() //毫秒
+        };
+        if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+            if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        return fmt;
+  }
+
+
+</script>
+
+</body>
+</html>

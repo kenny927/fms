@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="/res/css/sku.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/vue.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <!-- kindediter -->
+    <link rel="stylesheet" type="text/css" href="/res/public/kindeditor4.1.7/themes/default/default.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/public/kindeditor4.1.7/kindeditor-all-min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/kindeditor4.1.7/lang/zh_CN.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/numCheck.js<@resVersionDirective>?</@>"></script>
+	<script type="text/javascript" src="/res/js/sku/sku.js<@resVersionDirective>?</@>"></script>
+		<style type="text/css">
+		.jun-close1 .layui-layer-content iframe {
+			height: 183px !important;
+		}
+		
+		.jun-close1 .layui-layer-btn {
+			background: #ffffff;
+			padding-bottom: 20px;
+			margin-top: -10px;
+		}
+</style>
+<script type="text/javascript">
+        var skuId = "${skuId}";
+        var isCopy = false;
+        var type = "${operationType}";
+        var vm;
+    </script>
+    <script type="text/javascript" src="/res/js/sku/editSku.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<section class="bz-bb pl20 pr20 pt20"  id="editSku">
+    <div class="jun-form-s form-css" @click="bodyClick()">
+        <div class="choose-type mb20">
+            <dl class="dl-form">
+                <dt class="flt fz12"><span class="c-f">*</span>商品类型：</dt>
+                <dd class="flt layui-form">
+                    <input type="radio" name="goodType" lay-filter="goodType" v-bind:disabled="type=='UPDATE'"  value="SPOT" title="现货商品" v-bind:checked="queryParam.skuType=='SPOT'">
+                    <input type="radio" name="goodType" lay-filter="goodType" v-bind:disabled="type=='UPDATE'" value="NORMAL" title="订货商品"  v-bind:checked="queryParam.skuType=='NORMAL'">
+                </dd>
+            </dl>
+        </div>
+        <h3 class="bg-f0 h3-tittle pl10">商品基本信息</h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+            <dl class="dl-form">
+                <dt class="flt"><span class="c-f">*</span>商品SKU编码：</dt>
+                <dd class="flt"><input type="text" style="width: 350px" v-bind:readonly="type=='UPDATE'" v-model="queryParam.skuId" name="title" placeholder="请输入商品SKU编码" autocomplete="off" class="layui-input"></dd>
+                <dt class="flt"><span class="c-f">*</span>商品型号：</dt>
+                <dd class="flt"><input type="text" style="width: 350px" v-model="queryParam.model" placeholder="请输入商品型号" autocomplete="off" class="layui-input"></dd>
+            </dl>
+            <dl class="dl-form">
+                <dt class="flt"><span class="c-f">*</span>商品名称：</dt>
+                <dd class="flt"><input type="text" style="width: 350px" v-model="queryParam.skuName" name="title" placeholder="请输入商品名称" autocomplete="off" class="layui-input"></dd>
+                <dt class="flt"><span class="c-f">*</span>内部分类：</dt>
+                <dd class="flt pre w240">
+                    <input type="hidden" v-model="queryParam.classifyId">
+                    <input type="text" readonly="readonly" v-model="queryParam.classifyName" @click.stop="dropDown('treeShowEdit')" placeholder="请选择内部分类" style="width:338px;height:30px;padding-left: 10px">
+                    <div id="fxTreeEdit" class="layui-tree-css" style="top:32px;width: 348px" v-show="treeShowEdit" @click.stop="treeClick('treeShowEdit')"></div>
+                </dd>
+            </dl>
+            <dl class="dl-form">
+                <dt class="flt"><span class="c-f">*</span>商品品牌：</dt>
+                <dd class="flt layui-form w350">
+                    <select name="brand" lay-filter="brand" v-bind:value="queryParam.brandId">
+                        <option value="1005_长飞" selected="">长飞</option>
+                    </select>
+                </dd>
+<!--                 <dt class="flt"><span class="c-f">*</span>商城分类：</dt> -->
+                <dt class="flt">商城分类：</dt>
+                <dd class="flt pre w240">
+                    <input type="hidden" v-model="queryParam.mallClassifyId">
+                    <input type="text" readonly="readonly" v-model="queryParam.mallClassifyName" @click.stop="dropDown('treeShowMallEdit')" placeholder="请选择商城分类" style="width:338px;height:30px;padding-left: 10px">
+                    <div id="mallTreeEdit" class="layui-tree-css" style="top:32px;width: 348px" v-show="treeShowMallEdit" @click.stop="treeClick('treeShowMallEdit')"></div>
+                </dd>
+            </dl>
+            <dl class="dl-form">
+                <dt class="flt"><span class="c-f">*</span>计量单位：</dt>
+                <dd class="flt layui-form w350">
+                    <select name="skuUnit" lay-filter="skuUnit" v-bind:value="queryParam.unitId">
+                        <option value="1007_千米" selected="">千米</option>
+                    </select>
+                </dd>
+                <dt class="flt"><span class="c-f">*</span>起订量：</dt>
+                <dd class="flt"><input type="text" style="width: 350px" v-model="queryParam.minNum" name="title" placeholder="请输入起订量" autocomplete="off" class="layui-input unitCheck unitDisplay"></dd>
+            </dl>
+            <dl class="dl-form">
+                <dt class="flt" style="width:100px;margin-left: -10px;"><span class="c-f">*</span>属性名/属性值：</dt>
+                <dd class="flt" style="width: 790px;">
+                    <table class="layui-table pop">
+                        <colgroup>
+                            <col  width="200">
+                            <col  width="200">
+                            <col  width="100">
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th >属性名</th>
+                            <th >属性值</th>
+                            <th >操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!--<tr v-show="queryParam.propertyList.length==0">-->
+                        <!--<td  colspan="3" height="50px"  align="center">-->
+                        <!--<span class="fz16">暂无相关信息</span>-->
+                        <!--</td>-->
+                        <!--</tr>-->
+                        <tr class="diy-input" v-for="(index,item) in queryParam.propertyList">
+                            <td><input type="text" style="width: 100%"  v-model="item.propertyName" name="title" placeholder="请输入属性名" autocomplete="off" class="layui-input"></td>
+                            <td><input type="text" style="width: 100%"  v-model="item.propertyValue" name="title" placeholder="请输入属性值" autocomplete="off" class="layui-input"></td>
+                            <td><a href="javascript:;" @click="deletePropertyList(index)">移除</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p><a href="javascript:;"  class="fz12 cs-p" @click="addPropertyList()">+添加属性</a></p>
+                </dd>
+            </dl>
+        </blockquote>
+        <h3 class="bg-f0 h3-tittle pl10  mt20">商品价格维护<span class="c-h frt fz12 cs-p under-l mr20"   @click="dropDown('priceShow')"><a class="fz12" v-show="priceShow==false">展开</a><a v-if="priceShow==true">收起</a></span></h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" v-show="priceShow">
+            <dl class="dl-form" v-show="queryParam.skuType=='NORMAL'">
+                <dt class="flt">订货系统售价：</dt>
+                <dd class="flt line-middle">订货价(订货商品)：</dd>
+                <dd class="flt"><input type="text"  v-model="queryParam.basePrice" name="title" placeholder="请输入订货价" autocomplete="off" class="layui-input num2"></dd>
+            </dl>
+            <dl class="dl-form" v-show="queryParam.skuType=='SPOT'">
+                <dt class="flt">&nbsp;</dt>
+                <dd class="flt line-middle">现货价(现货商品)：</dd>
+                <dd class="flt"><input type="text"  v-model="queryParam.spotPrice" name="title" placeholder="请输入现货价" autocomplete="off" class="layui-input num2"></dd>
+                <dd class="flt line-middle ml20">原价(划线价)：</dd>
+                <dd class="flt"><input type="text"  v-model="queryParam.basePrice" name="title" placeholder="请输入原价" autocomplete="off" class="layui-input num2"></dd>
+            </dl>
+            <dl class="dl-form">
+                <dt class="flt">商品目录价：</dt>
+                <dd class="flt"><input type="text"  v-model="queryParam.directoryPrice" name="title" placeholder="请输入目录价" autocomplete="off" class="layui-input num2"></dd>
+                <dd class="flt line-middle c-9 ml20">备注：目录价可为空,若为空,默认为零.商城展示请询价.</dd>
+            </dl>
+            <dl class="dl-form" v-show="queryParam.skuType=='SPOT'">
+                <dt class="flt">商城售价(现货)：</dt>
+                <dd class="flt"><input type="text"  v-model="queryParam.spotMallPrice" name="title" placeholder="商城售价(现货)" autocomplete="off" class="layui-input num2"></dd>
+            </dl>
+            <dl class="dl-form" >
+                <dt class="flt">采购价：</dt>
+                <dd class="flt"  style="width: 790px;">
+                    <table class="layui-table pop">
+                        <colgroup>
+                            <col  width="200">
+                            <col  width="200">
+                            <col  width="200">
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th ><span class="c-f">*</span>供应商</th>
+                            <th >采购价(元/{{queryParam.unitName}})</th>
+                            <th >默认供应商</th>
+                            <th >操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-show="queryParam.purchasePriceList.length==0">
+                        <td  colspan="4" height="50px"  align="center">
+                        <span class="fz16">暂无相关信息</span>
+                        </td>
+                        </tr>
+                        <tr v-if="queryParam.purchasePriceList.length>0" v-for="(index,item) in queryParam.purchasePriceList">
+                            <td>{{item.vendorName}}</td>
+                            <td><input type="text" style="width: 100%"  v-model="item.purchasePrice | formatQuantity '2'" name="title" placeholder="请输入属性名" autocomplete="off" class="layui-input"></td>
+                            <td ><input type='radio' name='groupName' id="item.vendorCode" v-bind:checked=" item.isDefaultVendor=='Y'" @click="turnTotrue(index)">设置为默认供应商</td>
+                            <td><a href="javascript:;" @click="deletePurchasePriceList(index)" >移除</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p><a href="javascript:;"  class="fz12 cs-p" @click="addPurchasePriceList()">+添加采购价</a></p>
+                </dd>
+            </dl>
+        </blockquote>
+        <h3 class="bg-f0 h3-tittle pl10 mt20" v-if="type=='UPDATE'&&queryParam.skuType=='SPOT'">库存信息<span class="c-h frt fz12 cs-p under-l mr20"   @click="dropDown('storagesShow')"><a class="fz12" v-show="storagesShow==false">展开</a><a v-if="storagesShow==true">收起</a></span></h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" v-if="type=='UPDATE'&&queryParam.skuType=='SPOT'" v-show="storagesShow">
+            <table class="layui-table pop">
+                <colgroup>
+                    <col  width="200">
+                    <col  width="150">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th >库房(供应商)</th>
+                    <th >配送城市</th>
+                    <th >库存状态</th>
+                    <th >现货</th>
+                    <th >可售库存</th>
+                    <th >订单预占</th>
+                    <th >待出库预占</th>
+                    <th >不可用</th>
+                    <th >已出库</th>
+                    <th >计量单位</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-show="storages.length==0">
+                    <td  colspan="10" height="50px"  align="center">
+                        <span class="fz16">暂无相关信息</span>
+                    </td>
+                </tr>
+                <tr v-for="item in storages">
+                    <td>全国</td>
+                    <td>全国</td>
+                    <td><span v-if="item.salableQuantity">有货</span><span v-if="!item.salableQuantity">有货</span></td>
+                    <td>{{item.stockQuantity}}</td>
+                    <td>{{item.salableQuantity}}</td>
+                    <td>{{item.orderPreholdingQuantity}}</td>
+                    <td>{{item.deliveryPreholdingQuantity}}</td>
+                    <td>{{item.deliveryPreholdingQuantity}}</td>
+                    <td>{{item.deliveryPreholdingQuantity}}</td>
+                    <td>{{item.unitName}}</td>
+                </tr>
+                <tr v-for="oitem in currentSkuStorageDetaiData">
+                    <td>{{oitem.accountName}}</td>
+                    <td>{{oitem.city}}</td>
+                    <td><span v-if="oitem.salableQuantity">有货</span><span v-if="!oitem.salableQuantity">有货</span></td>
+                    <td>{{oitem.stockQuantity}}</td>
+                    <td>{{oitem.salableQuantity}}</td>
+                    <td>{{oitem.orderPreholdingQuantity}}</td>
+                    <td>{{oitem.deliveryPreholdingQuantity}}</td>
+                    <td>{{oitem.deliveryPreholdingQuantity}}</td>
+                    <td>{{oitem.deliveryPreholdingQuantity}}</td>
+                    <td>{{oitem.unitName}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </blockquote>
+        <h3 class="bg-f0 h3-tittle pl10 mt20">商品状态<span class="c-h frt fz12 cs-p under-l mr20"   @click="dropDown('goodStatus')"><a class="fz12" v-show="goodStatus==false">展开</a><a v-if="goodStatus==true">收起</a></span></h3>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" v-show="goodStatus">
+            <dl class="dl-form mb5-i">
+                <dt class="flt" style="width: 120px;"><span class="c-f">*</span>订货系统商品状态：</dt>
+                <dd class="flt layui-form">
+                    <input type="radio" name="fxStatus" value="U"  lay-filter="fxStatus"  title="上架" v-bind:checked="queryParam.skuOrderStatus == 'U'">
+                    <input type="radio" name="fxStatus" value="D"  lay-filter="fxStatus" title="下架" v-bind:checked="queryParam.skuOrderStatus == 'D'">
+                </dd>
+            </dl>
+            <dl class="dl-form  mb5-i" >
+                <dt class="flt" style="width: 120px;"><span class="c-f">*</span>商城商品状态：</dt>
+                <dd class="flt layui-form" id="mallStatus">
+                    <input type="radio" name="mallStatus" value="U"  lay-filter="mallStatus" title="上架" v-bind:checked="queryParam.skuMallStatus == 'U'">
+                    <input type="radio" name="mallStatus" value="D"  lay-filter="mallStatus" title="下架" v-bind:checked="queryParam.skuMallStatus == 'D'">
+                </dd>
+            </dl>
+        </blockquote>
+    </div>
+    <div class="suspension-bottom-btn">
+        <span class="form-btn layui-btn-small2" lay-submit lay-filter="previewMsg">预览</span>
+        <span class="form-btn layui-btn-big" lay-submit lay-filter="goodBaseMsg" v-if="type=='UPDATE'">保存商品基本信息</span>
+        <span class="form-btn layui-btn-big" lay-submit lay-filter="goodDetail" v-if="type=='UPDATE'">保存商品详情页</span>
+        <span class="form-btn layui-btn-big" lay-submit lay-filter="wholeMsg">保存全部信息</span>
+    </div>
+</section>
+<div class="bz-bb pl20 pr20 pt20" style="padding-bottom: 70px;">
+    <h3 class="bg-f0 h3-tittle pl10">商品详情页维护<a class="frt fz12 cs-p under-l mr20 goodDetails"   onclick="dropDown()">展开</a></h3>
+    <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="margin-bottom: 50px;display: none">
+        <div class="addSku">
+            <div class="tapNum">
+                <p>内容设置：</p>
+                <div class="tap-ul">
+                    <ul>
+                        <li class="bg-fff"><a href="javascript:;">产品介绍</a></li>
+                        <li><a href="javascript:;">产品图片</a></li>
+                    </ul>
+                </div>
+
+                <div class="content" id="productDescTab">
+                    <div class="content-list">
+                        <p class="tittle">商品描述</p>
+                        <div class="detail">
+                            <div class="radios">
+                                <label class="ml20">
+                                    <span class="pay_list_c1 on"><input type="radio" name="describeEffective"  class="radioclass" checked="checked" value="Y"/></span>展示此Tab页</label>
+                                <label class="ml20">
+                                    <span class="pay_list_c1"><input type="radio" name="describeEffective"  class="radioclass" value="N"/></span>不展示此Tab页</label>
+                                <div class="layui-form-item mt10" style="margin-left: -65px;width: 300px">
+                                    <label class="layui-form-label"></label>
+                                    <button id="selectDesc" class="btn-click2">选择模板</button>
+                                    <button id="saveAsDesc" class="btn-click2">另存为模板</button>
+                                </div>
+                            </div>
+                            <div>
+                                <textarea name="descContent" style="width:1000px;height:400px;visibility:hidden;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-list mt20">
+                        <p class="tittle">商品问答</p>
+                        <div class="detail">
+                            <div class="radios">
+                                <label class="ml20">
+                                    <span class="pay_list_c1 on"><input type="radio" name="qaEffective"  class="radioclass" checked="checked" value="Y"/></span>展示此Tab页</label>
+                                <label class="ml20">
+                                    <span class="pay_list_c1"><input type="radio" name="qaEffective"  class="radioclass" value="N" /></span>不展示此Tab页</label>
+                                <div class="layui-form-item mt10" style="margin-left: -65px;width: 300px">
+                                    <label class="layui-form-label"></label>
+                                    <button id="selectQA" class="btn-click2">选择模板</button>
+                                    <button id="saveAsQA" class="btn-click2">另存为模板</button>
+                                </div>
+                            </div>
+                            <div>
+                                <textarea name="qaContent" style="width:1000px;height:400px;visibility:hidden;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-list mt20">
+                        <p class="tittle">采购说明</p>
+                        <div class="detail">
+                            <div class="radios">
+                                <label class="ml20">
+                                    <span class="pay_list_c1 on"><input type="radio" name="purchaseEffective"  class="radioclass" checked="checked" value="Y"/></span>展示此Tab页</label>
+                                <label class="ml20">
+                                    <span class="pay_list_c1"><input type="radio" name="purchaseEffective"  class="radioclass" value="N" /></span>不展示此Tab页</label>
+                                <div class="layui-form-item mt10" style="margin-left: -65px;width: 300px">
+                                    <label class="layui-form-label"></label>
+                                    <button id="selectPurchase" class="btn-click2">选择模板</button>
+                                    <button id="saveAsPurchase" class="btn-click2">另存为模板</button>
+                                </div>
+                            </div>
+                            <div>
+                                <textarea name="purchaseContent" style="width:1000px;height:400px;visibility:hidden;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-list mt20">
+                        <p class="tittle">售后保障（售后热线4008525118）</p>
+                        <div class="detail">
+                            <div class="radios">
+                                <label class="ml20">
+                                    <span class="pay_list_c1 on"><input type="radio" name="afterSaleEffective"  class="radioclass" checked="checked" value="Y"/></span>展示此Tab页</label>
+                                <label class="ml20">
+                                    <span class="pay_list_c1"><input type="radio" name="afterSaleEffective"  class="radioclass" value="N" /></span>不展示此Tab页</label>
+                                <div class="layui-form-item mt10" style="margin-left: -65px;width: 300px">
+                                    <label class="layui-form-label"></label>
+                                    <button id="selectAfterSale" class="btn-click2">选择模板</button>
+                                    <button id="saveAsAfterSale" class="btn-click2">另存为模板</button>
+                                </div>
+                            </div>
+                            <div>
+                                <textarea name="afterSaleContent" style="width:1000px;height:400px;visibility:hidden;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-list mt20">
+                        <p class="tittle">相关资料下载</p>
+                        <div class="detail">
+                            <div class="radios">
+                                <label class="ml20">
+                                    <span class="pay_list_c1 on"><input type="radio" name="downloadEffective"  class="radioclass" checked="checked" value="Y"/></span>展示此Tab页</label>
+                                <label class="ml20">
+                                    <span class="pay_list_c1"><input type="radio" name="downloadEffective"  class="radioclass" value="N" /></span>不展示此Tab页</label>
+                                <div class="layui-form-item mt10" style="margin-left: -65px;width: 300px">
+                                    <label class="layui-form-label"></label>
+                                    <button id="selectDownload" class="btn-click2">选择模板</button>
+                                    <button id="saveAsDownload" class="btn-click2">另存为模板</button>
+                                </div>
+                            </div>
+                            <div class="table mt20">
+                                <dl id="downloadContent">
+                                    <dt>
+                                        <span style="flex:1;">序号</span>
+                                        <span style="flex:2;">文件名称</span>
+                                        <span style="flex:1;">操作</span>
+                                    </dt>
+                                    <!--<dd>-->
+                                    <!--<span style="flex:1;">001</span>-->
+                                    <!--<span style="flex:2;">长飞单模光纤</span>-->
+                                    <!--<span style="flex:1;"><a href="javascript:;" class="c-h">下载</a></span>-->
+                                    <!--</dd>-->
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="content" id="produceImageTab" style="display: none;">
+                    <ul class="img-list">
+                        <!--<li>-->
+                        <!--<img src="/res/images/goods-eg.png" style="width:100px;height: 100px;">-->
+                        <!--<label style="top:0px;left:90px;cursor: pointer;">X</label>-->
+                        <!--<label><span class="pay_list_c2 on"><input type="radio" name="img"  class="radioclass" checked="checked" /></span>设为主图</label>-->
+                        <!--</li>-->
+                        <!--<li>-->
+                        <!--<label>-->
+                        <!--<span class="pay_list_c2"><input type="radio" name="img"  class="radioclass" checked="checked" /></span>设为主图</label></li>-->
+                        <!--<li>-->
+                        <!--<label>-->
+                        <!--<span class="pay_list_c2"><input type="radio" name="img"  class="radioclass" checked="checked" /></span>设为主图</label></li>-->
+                        <input type="file" name="file" class="layui-upload-file flt" lay-title="+" >
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </blockquote>
+</div>
+            <!--<div class="purchaseSearch ml10" style="padding-bottom: 10px;padding-right: 20px;text-align:center;">-->
+                <!--<button id="goPreview" class="btn-click2">预览</button>-->
+                <!--<button id="update" class="btn-click2">确认修改</button>-->
+                <!--<button id="cancelEdit" class="btn-click2">取消</button>-->
+            <!--</div>-->
+<#include "/res/freemarkerTpl/unitConfig.html" />
+<@unitConfig/>
+</body>
+</html>

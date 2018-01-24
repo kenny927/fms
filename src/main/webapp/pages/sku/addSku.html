@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="/res/css/sku.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <!-- kindediter -->
+    <link rel="stylesheet" type="text/css" href="/res/public/kindeditor4.1.7/themes/default/default.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/public/kindeditor4.1.7/kindeditor-all-min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/kindeditor4.1.7/lang/zh_CN.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/js/sku/sku.js<@resVersionDirective>?</@>"></script>
+
+
+    <style type="text/css">
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd .goodsName {
+            height: 40px;
+            line-height: 20px;
+            width: 400px;
+            text-overflow: ellipsis;
+            color: #222222;
+        }
+
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd p {
+            height: 20px;
+            line-height: 20px;
+            color: #999999;
+            width: 400px;
+            text-overflow: ellipsis;
+        }
+        button {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+        <div class="addSku">
+            <dl class="sku-list inline">
+                <dt class="mt10"><span class="c-f">*</span>商品SKU编码：</dt>
+                <dd class="inputContent"><input type="text" id="skuId" placeholder="请输入SKU编码"></dd>
+            </dl>
+            <dl class="sku-list inline">
+                <dt class="mt10"><span class="c-f">*</span>商品类型：</dt>
+                <dd class="inputContent" style="border:0;">
+                    <select id="skuType" style="width: 402px;height: 40px;">
+                        <option value="">请选择类型</option>
+                        <option value="NORMAL">普通商品</option>
+                        <option value="SPOT">现货商品</option>
+                    </select>
+                </dd>
+            </dl>
+            <dl class="sku-list inline">
+                <dt class="mt10"><span class="c-f">*</span>商品名称：</dt>
+                <dd class="inputContent"><input type="text" id="skuName" placeholder="请输入商品名称"></dd>
+            </dl>
+            <dl class="sku-list inline">
+                <dt class="mt10"><span class="c-f">*</span>商品型号：</dt>
+                <dd class="inputContent"><input type="text" id="model" placeholder="请输入商品型号"></dd>
+            </dl>
+            <dl class="sku-list inline">
+                <dt class="mt10"><span class="c-f">*</span>商品品牌：</dt>
+                <dd class="inputContent" style="border:0;">
+                    <!--<input type="text" id="brand" readonly="readonly" placeholder="点击选择品牌">-->
+                    <!--<input type="hidden" id="brandId">-->
+                    <select id="brandId" style="width: 402px;height: 40px;">
+                        <option value="">请选择品牌</option>
+                    </select>
+                </dd>
+            </dl>
+            <dl class="sku-list inline">
+                <dt class="mt10"><span class="c-f">*</span>商品内部分类：</dt>
+                <dd class="inputContent">
+                    <input type="hidden" id="skuClassifyId">
+                    <input type="text" readonly="readonly" id="skuClassifyName" placeholder="请选择内部分类">
+                    <div class="xiala">
+                        <img src="/res/images/arrow2.png" alt="">
+                    </div>
+                    <div id="treeNav"></div>
+                </dd>
+            </dl>
+            <dl class="sku-list">
+                <dt class="mt10"><span class="c-f">*</span>计量单位：</dt>
+                <!--<dd class="inputContent">-->
+                    <!--<input type="text" id="unit" placeholder="请输入商品名称">-->
+                    <!--<input type="hidden" id="unitId" >-->
+                <!--</dd>-->
+                <select id="unitId" style="width: 402px;height: 40px;">
+                    <option value="">请选择计量单位</option>
+                </select>
+            </dl>
+            <dl class="sku-list">
+                <dt class="mt10"><span class="c-f">*</span>起订量：</dt>
+                <dd class="inputContent"><input type="text" class="unitCheck unitDisplay" unitName="" id="minNum" placeholder="请输入起订量"></dd>
+            </dl>
+            <dl class="sku-list">
+                <dt class="mt10"><span class="c-f">*</span>属性名/属性值：</dt>
+
+                <dd class="tableContent2 inline tableContent3">
+                    <ul class="mb15" id="propertyList">
+                        <li><input class="flt" type="text" value="属性名" readonly="readonly"><input class="flt"  value="属性值"  readonly="readonly" type="text"></li>
+                        <!--<li id="property_0"><input class="flt" type="text" name="propertyName" placeholder="请输入属性名"><input class="flt" style="width: 33%;" name="propertyValue" type="text" placeholder="请输入属性值"><p style="text-align: center;line-height: 45px;"><a href="javascript:removeProperty(0);">移除</a></p></li>-->
+                    </ul>
+                    <a href="javascript:addProperty();" class="addAttribute fz14">+添加属性</a>
+                </dd>
+            </dl>
+            <!--<dl class="sku-list">-->
+                <!--<dt class="mt10"><span class="c-f">*</span>产品状态：</dt>-->
+                <!--<dd class="mt10">-->
+                    <!--<label style="cursor: pointer;">-->
+                        <!--<span class="pay_list_c1 on"><input type="radio" name="skuStatus"  class="radioclass" checked="checked" value="Y"/></span>有效</label>-->
+                    <!--<label class="ml20" style="cursor: pointer;">-->
+                        <!--<span class="pay_list_c1"><input type="radio" name="skuStatus"  class="radioclass" value="N"/></span>无效</label>-->
+                <!--</dd>-->
+            <!--</dl>-->
+            <dl class="sku-list">
+                <dt class="mt10"><span class="c-f">*</span>上架状态：</dt>
+                <dd class="mt10">
+                    <label style="cursor: pointer;">
+                        <span class="pay_list_c1 on"><input type="radio" name="upStatus"  class="radioclass" checked="checked" value="U"/></span>上架</label>
+                    <label class="ml20" style="cursor: pointer;">
+                        <span class="pay_list_c1"><input type="radio" name="upStatus"  class="radioclass" value="D"/></span>下架</label>
+                    <!--<label class="ml20" style="cursor: pointer;">-->
+                        <!--<span class="pay_list_c1"><input type="radio" name="upStatus"  class="radioclass" value=""/></span>仅设置为产品</label>-->
+                </dd>
+            </dl>
+            <dl class="sku-list">
+                <dt class="mt10"><span class="c-f" id="isPriceNeed">*</span>价格维护：</dt>
+                <dd>基本售价：<input style="width: 180px;" class="inputContent pl10 mr5" type="text" id="basePrice" placeholder="请输入数字" oninput="filterQty(event,0);">元/<span name="unitName"></span></dd>
+                <dd class="ml20">目录价：<input style="width: 180px;" type="text" class="inputContent pl10 mr5" id="directoryPrice" placeholder="请输入数字" oninput="filterQty(event,0);">元/<span name="unitName"></span></dd>
+                <div id="spotPriceDisplay" style="display: none;"><dd class="ml20">现货价：<input style="width: 180px;" type="text" class="inputContent pl10 mr5" id="spotPrice" placeholder="请输入数字" oninput="filterQty(event,0);">元/<span name="unitName"></span></dd></div>
+                <dd class="mt15">
+                    <div style="margin-left: 130px;">采购价：</div>
+                    <!--<div class="tableContent2 inline tableContent3" style="margin-left: 186px; margin-top: -15px">-->
+                        <!--<a href="javascript:;" class="addAttribute fz14">+添加采购价</a>-->
+                        <!--<ul class="mb15" id="purchasePriceList">-->
+                            <!--<li>-->
+                                <!--<input class="flt" type="text" value="选择供应商" readonly="readonly">-->
+                                <!--<input class="flt"  value="设置默认供应商" type="text"  readonly="readonly"/>-->
+                                <!--<input class="flt"  value="采购价" type="text"  readonly="readonly">-->
+                            <!--</li>-->
+                        <!--<li id="purchase_0">-->
+                            <!--<input class="flt" type="text" name="vendorName" placeholder="请输入供应商关键词">-->
+                            <!--<label class="ml20">-->
+                            <!--<span class="pay_list_c2 mt10 ml10 on">-->
+                                <!--<input type="radio" name="default"  class="radioclass" checked="checked" /></span>设为默认供应商</label>-->
+                            <!--<span class="frt mr20">-->
+                                <!--<input style="width: 215px" class="mr5" name="purchasePrice" type="text" placeholder="请输入数字">元/<span name="unitName">千米</span></span>-->
+                            <!--&lt;!&ndash;<p><a href="javascript:removePurchase(0);">移除</a></p>&ndash;&gt;-->
+                        <!--</li>-->
+                        <!--</ul>-->
+
+                    <!--</div>-->
+                    <div class="layui-form" style="margin-left: 190px; margin-top: -25px">
+                        <table class="layui-table pop" >
+                            <colgroup>
+                                <col width="250">
+                                <col width="200">
+                                <col width="200">
+                                <col width="200">
+                                <col>
+                            </colgroup>
+                            <thead>
+                            <tr>
+                                <th>选择供应商</th>
+                                <th>设置默认供应商</th>
+                                <th>采购价</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody id="purchasePriceList">
+                            <!--<tr id="purchase_0">-->
+                                <!--<td><input type="text" readonly="readonly" name="vendorName" lay-verify="title" autocomplete="off" placeholder="点击选择供应商" class="layui-input"></td>-->
+                                <!--<td><label>-->
+                                    <!--<span class="pay_list_c3 mt5 ml10 on"><input type="radio" name="default"  class="radioclass" checked="checked"/></span>设为默认供应商</label></td>-->
+                                <!--<td><input type="text" name="purchasePrice" lay-verify="title" autocomplete="off" placeholder="请输入数字" class="layui-input wid0 inline"><span class="inline">元/<span name="unitName"></span></span></td>-->
+                                <!--<td><a class="c-h" href="javascript:removePurchase(0);">移除</a></td>-->
+                            <!--</tr>-->
+                            </tbody>
+                        </table>
+                        <a href="javascript:addPurchase();" class="addAttribute fz14">+添加采购价</a>
+                    </div>
+                </dd>
+            </dl>
+            <!--<div class="table">-->
+                <!--<dl>-->
+                    <!--<dt class="compact fw-b">-->
+                        <!--<span style="flex:1;">序号</span>-->
+                        <!--<span style="flex:3;">长飞单模光纤</span>-->
+                        <!--<span style="flex:3;">IEC60973-2-50</span>-->
+                        <!--<span style="flex:2;">IEC60973-2-50</span>-->
+                        <!--<span style="flex:1;">IEC60973-2-50</span>-->
+                    <!--</dt>-->
+                    <!--<dd class="compact">-->
+                        <!--<span style="flex:1;">序号</span>-->
+                        <!--<span style="flex:3;">长飞单模光纤</span>-->
+                        <!--<span style="flex:3;">IEC60973-2-50</span>-->
+                        <!--<span style="flex:2;">IEC60973-2-50</span>-->
+                        <!--<span style="flex:1;"><a href="javascript:;">从该spu脱离</a></span>-->
+                    <!--</dd>-->
+                <!--</dl>-->
+            <!--</div>-->
+            <div class="tapNum">
+                <p>内容设置：</p>
+                <div class="tap-ul">
+                    <ul>
+                        <li class="bg-fff"><a href="javascript:;">产品介绍</a></li>
+                        <li><a href="javascript:;">产品图片</a></li>
+                    </ul>
+                </div>
+
+                <div class="content" id="productDescTab">
+                    <div class="content-list">
+                        <p class="tittle">商品描述</p>
+                        <div class="detail">
+                            <div class="radios">
+                                <label class="ml20">
+                                    <span class="pay_list_c1 on"><input type="radio" name="describeEffective"  class="radioclass" checked="checked" value="Y"/></span>使用模板</label>
+                                <label class="ml20">
+                                    <span class="pay_list_c1"><input type="radio" name="describeEffective"  class="radioclass" value="N"/></span>不展示此Tab页</label>
+                                    <div class="layui-form-item mt10" style="margin-left: -65px;width: 300px">
+                                        <label class="layui-form-label"></label>
+                                        <button id="selectDesc" class="btn-click2">选择模板</button>
+                                        <button id="saveAsDesc" class="btn-click2">另存为模板</button>
+                                    </div>
+                            </div>
+                            <div>
+                                <textarea name="descContent" style="width:1000px;height:400px;visibility:hidden;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-list mt20">
+                        <p class="tittle">商品问答</p>
+                        <div class="detail">
+                            <div class="radios">
+                                <label class="ml20">
+                                    <span class="pay_list_c1 on"><input type="radio" name="qaEffective"  class="radioclass" checked="checked" value="Y"/></span>使用模板</label>
+                                <label class="ml20">
+                                    <span class="pay_list_c1"><input type="radio" name="qaEffective"  class="radioclass" value="N" /></span>不展示此Tab页</label>
+                                <div class="layui-form-item mt10" style="margin-left: -65px;width: 300px">
+                                    <label class="layui-form-label"></label>
+                                    <button id="selectQA" class="btn-click2">选择模板</button>
+                                    <button id="saveAsQA" class="btn-click2">另存为模板</button>
+                                </div>
+                            </div>
+                            <div>
+                                <textarea name="qaContent" style="width:1000px;height:400px;visibility:hidden;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-list mt20">
+                        <p class="tittle">采购说明</p>
+                        <div class="detail">
+                            <div class="radios">
+                                <label class="ml20">
+                                    <span class="pay_list_c1 on"><input type="radio" name="purchaseEffective"  class="radioclass" checked="checked" value="Y"/></span>使用模板</label>
+                                <label class="ml20">
+                                    <span class="pay_list_c1"><input type="radio" name="purchaseEffective"  class="radioclass" value="N" /></span>不展示此Tab页</label>
+                                <div class="layui-form-item mt10" style="margin-left: -65px;width: 300px">
+                                    <label class="layui-form-label"></label>
+                                    <button id="selectPurchase" class="btn-click2">选择模板</button>
+                                    <button id="saveAsPurchase" class="btn-click2">另存为模板</button>
+                                </div>
+                            </div>
+                            <div>
+                                <textarea name="purchaseContent" style="width:1000px;height:400px;visibility:hidden;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-list mt20">
+                        <p class="tittle">售后保障（售后热线4008525118）</p>
+                        <div class="detail">
+                            <div class="radios">
+                                <label class="ml20">
+                                    <span class="pay_list_c1 on"><input type="radio" name="afterSaleEffective"  class="radioclass" checked="checked" value="Y"/></span>使用模板</label>
+                                <label class="ml20">
+                                    <span class="pay_list_c1"><input type="radio" name="afterSaleEffective"  class="radioclass" value="N" /></span>不展示此Tab页</label>
+                                <div class="layui-form-item mt10" style="margin-left: -65px;width: 300px">
+                                    <label class="layui-form-label"></label>
+                                    <button id="selectAfterSale" class="btn-click2">选择模板</button>
+                                    <button id="saveAsAfterSale" class="btn-click2">另存为模板</button>
+                                </div>
+                            </div>
+                            <div>
+                                <textarea name="afterSaleContent" style="width:1000px;height:400px;visibility:hidden;"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-list mt20">
+                        <p class="tittle">相关资料下载</p>
+                        <div class="detail">
+                            <div class="radios">
+                                <label class="ml20">
+                                    <span class="pay_list_c1 on"><input type="radio" name="downloadEffective"  class="radioclass" checked="checked" value="Y"/></span>使用模板</label>
+                                <label class="ml20">
+                                    <span class="pay_list_c1"><input type="radio" name="downloadEffective"  class="radioclass" value="N" /></span>不展示此Tab页</label>
+                                <div class="layui-form-item mt10" style="margin-left: -65px;width: 300px">
+                                    <label class="layui-form-label"></label>
+                                    <button id="selectDownload" class="btn-click2">选择模板</button>
+                                    <button id="saveAsDownload" class="btn-click2">另存为模板</button>
+                                </div>
+                            </div>
+                            <div class="table mt20">
+                                <dl id="downloadContent">
+                                    <dt>
+                                        <span style="flex:1;">序号</span>
+                                        <span style="flex:2;">文件名称</span>
+                                        <span style="flex:1;">操作</span>
+                                    </dt>
+                                    <!--<dd>-->
+                                        <!--<span style="flex:1;">001</span>-->
+                                        <!--<span style="flex:2;">长飞单模光纤</span>-->
+                                        <!--<span style="flex:1;"><a href="javascript:;" class="c-h">下载</a></span>-->
+                                    <!--</dd>-->
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="content" id="produceImageTab" style="display: none;">
+                    <ul class="img-list">
+                        <!--<li>-->
+                            <!--<img src="/res/images/goods-eg.png" style="width:100px;height: 100px;">-->
+                            <!--<label style="top:0px;left:90px;cursor: pointer;">X</label>-->
+                            <!--<label><span class="pay_list_c2 on"><input type="radio" name="img"  class="radioclass" checked="checked" /></span>设为主图</label>-->
+                        <!--</li>-->
+                        <!--<li>-->
+                            <!--<label>-->
+                                <!--<span class="pay_list_c2"><input type="radio" name="img"  class="radioclass" checked="checked" /></span>设为主图</label></li>-->
+                        <!--<li>-->
+                            <!--<label>-->
+                                <!--<span class="pay_list_c2"><input type="radio" name="img"  class="radioclass" checked="checked" /></span>设为主图</label></li>-->
+                        <input type="file" name="file" class="layui-upload-file flt" lay-title="+" >
+                    </ul>
+                </div>
+            </div>
+        </div>
+    <div class="purchaseSearch ml10" style="padding-bottom: 10px;padding-right: 20px;text-align:center;">
+        <button id="goPreview" class="btn-click2">预览</button>
+        <button id="submit" class="btn-click2">创建SKU</button>
+        <button id="cancelAdd" class="btn-click2">取消</button>
+    </div>
+</div>
+</section>
+</section>
+<#include "/res/freemarkerTpl/unitConfig.html" />
+<@unitConfig/>
+</body>
+</html>

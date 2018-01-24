@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/buyerenquire/buyerEnquireList.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <style type="text/css">
+        .fenlist{
+            display: none;
+        }
+        .fenlei:hover .fenlist{
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+        <section class="itocContent">
+            <div class="itocMain">
+                <div class="purchaseSearch purchasepading clr">
+                    <form  style="width: inherit;" class="flt">
+                        <dl class="form-list status">
+                            <dt style="width: 80px;line-height: 28px;">询单状态：</dt>
+                            <dd><label><input type="radio" checked="checked" name="status" value="All"/><span>全部</span></label></dd>
+                            <dd><label><input type="radio" name="status" value="WAIT_PROCESS"/>待处理</label></dd>
+                            <dd><label><input type="radio" name="status" value="OFFERED_PRICE"/>已委托平台报价</label></dd>
+                            <dd><label><input type="radio" name="status" value="CLOSED"/>已关闭</label></dd>
+                        </dl>
+                        
+                    </form>
+                    <@havePermission resourceCode="operation:mallorder:enquire:list:inquiryForOthers"><button class="form-btn layui-btn-small2 frt mr20 goEditForOther">代客下询单</button></@>
+                </div>
+<!--                 <div class="table quotation" id="enquireList">
+
+                </div> -->
+                
+         <div class="bz-bb pl20 pr20" id="enquireList">
+<!-- 	          <table class="layui-table pop table-css" lay-skin="line">
+	              <colgroup>
+	                <col  width="150">
+	                <col  width="120">
+	                <col  width="100">
+	                <col  width="300">
+	                <col  width="280">
+	                <col  width="280">
+	                <col  width="100">
+	                <col  width="120">
+	                <col  width="200">
+	              </colgroup>
+	              <tbody>
+	              <tr>
+		              <td>商品类型</td>
+		              <td>商品编码</td>
+		              <td>品牌</td>
+		              <td>商品名称</td>
+		              <td>商品型号</td>
+		              <td>描述</td>
+		              <td>数量</td>
+		              <td>计量单位</td>
+		              <td>询单状态</td>
+	              </tr>
+	              </tbody>
+            </table> -->
+         </div>
+
+                <div id="paginationDiv"></div>
+            </div>
+        </section>
+
+</section>
+
+
+<script type="text/javascript">
+
+    var currentEnquireId = "";
+
+    //页面加载完后调用
+    $(function () {
+        //获取询价单列表数据
+        queryBuyerEnquireList(1);
+
+        //绑定详情按钮事件
+        $(document).off("click", ".goDetail");
+        $(document).on("click", ".goDetail", function () {
+            var enquireId=$(this).attr("enquireId");
+            var param = {};
+            param.enquireId = enquireId;
+            postUtil.submit("/mallOrder/buyerEnquireService/detail", param);
+        });
+
+        //绑定详情按钮事件
+        $(document).off("click", ".goEdit");
+        $(document).on("click", ".goEdit", function () {
+            var enquireId=$(this).attr("enquireId");
+            var param = {};
+            param.enquireId = enquireId;
+            postUtil.submit("/mallOrder/buyerEnquireService/edit", param);
+        });
+
+        //绑定增加分销商按钮事件
+        $(document).off("click", ".addOffer");
+        $(document).on("click", ".addOffer", function () {
+            currentEnquireId=$(this).attr("enquireId");
+            chooseDistributor();
+        });
+        
+        initLayer();
+
+        $(document).on("click", ":radio", function () {
+            queryBuyerEnquireList(1);
+        });
+        
+        //代客下询单
+        $(document).off("click", ".goEditForOther");
+        $(document).on("click", ".goEditForOther", function () {
+        	var param={};
+        	 postUtil.submit("/mallOrder/buyerEnquireService/editForOther", param);
+        });
+
+    });
+
+    function chooseDistributor() {
+        layer.open({
+            title:"请选择分销商",
+            type: 2,
+            area: ['1000px', '500px'],
+            fixed: false, //不固定
+            maxmin: true,
+            content: '/reusable/systemAccount/chooseDistributorPage'
+        });
+    }
+
+    //选择分销商的回调方法
+    function chooseDistributorCallback(distributorList) {
+        if(distributorList) {
+            var param={};
+            param.enquireId = currentEnquireId;
+            param.distributorList = [];
+            $.each(distributorList, function (index, item) {
+               var distributor = {};
+                distributor.distributorId = item.accountId;
+                distributor.distributorName = item.accountName;
+                param.distributorList.push(distributor);
+            });
+            postUtil.call("/mallOrder/buyerEnquireService/addOffer", {"jsonData":JSON.stringify(param)}, function (res) {
+                if(res.STATUS == "SUCCESS") {
+                    layer.msg("新增分销商成功", {icon:6});
+                } else {
+                    layer.msg(res.MSG, {icon:5});
+                }
+            });
+        }
+        return true;
+    }
+
+</script>
+<#include "/res/freemarkerTpl/unitConfig.html" />
+<@unitConfig/>
+</body>
+
+</html>
+

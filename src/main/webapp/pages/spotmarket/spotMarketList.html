@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Insert title here</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/vue.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/moment.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <style type="text/css">
+        .first-row{
+            background-color: #f0f0f0;
+        }
+        .sku-pic{
+            position: relative;
+        }
+        .sku-pic img{
+            width: 60px;
+            height: 60px;
+        }
+        .sku-pic span{
+            position: absolute;
+            display: block;
+            width: 50px;
+            height: 50px;
+            top: 50%;
+            left: 50%;
+            margin-left: -25px;
+            margin-top: -25px;
+        }
+        .sku-pic .sell-out{
+            background: url(/res/images/sell-out.png) no-repeat;
+        }
+        .sku-pic .off-shelf{
+            background: url(/res/images/off-shelf.png) no-repeat;
+        }
+        .secKillGoods{
+            display: none;
+        }
+        [v-cloak]{
+            display: none;
+        }
+        .msgskin .layui-layer-content{
+            text-align: center;
+            line-height: 137px!important;
+            height:137px!important;
+            font-size: 16px!important;
+        }
+       .msgskin .layui-layer-title{
+           background: #ffffff!important;
+       }
+        .bgf0{
+            background: #f0f0f0;
+        }
+        /*.selectWidth input[type='text']{*/
+            /*width: 150px;*/
+        /*}*/
+        .form-css .dl-form dd.selectWidth input[type='text']{
+            width: 120px;
+        }
+    </style>
+</head>
+<body>
+<section class="bz-bb pl20 pr20 pt20 pb20" id="querySpotMarketList"  v-cloak>
+    <div class="tab-nav">
+        <ul class="tab-title">
+            <li class="tab-this mr10" value="0">现货</li>
+            <li value="1">秒杀</li>
+        </ul>
+    </div>
+    <div class="jun-form-s form-css " @click="bodyClick()">
+        <dl class="dl-form">
+            <dt class="flt fz12">查询：</dt>
+            <dd class="flt">
+                <input type="text" style="width: 180px;" name="title"  v-model="queryParam.skuName" placeholder="商品名称/型号/编号" autocomplete="off" class="layui-input pl10" @keyup.enter="enterBtn(queryParam.skuName)">
+            </dd>
+            <dt class="flt">内部分类：</dt>
+            <dd class="flt pre w190">
+                <input type="hidden" v-model="queryParam.skuClassifyId">
+                <input type="text" readonly="readonly" v-model="queryParam.classifyDisplayName" @click.stop="dropDown('treeShow')" placeholder="请选择内部分类" style="width:180px;height:30px;padding-left: 10px">
+                <div id="fxTree" class="layui-tree-css" style="top:32px;width: 190px" v-show="treeShow" @click.stop="treeClick('treeShow')"></div>
+            </dd>
+            <dt class="flt fz12"  style="width: 120px;">订货系统上下架：</dt>
+            <dd class="flt layui-form jun-form-l selectWidth">
+                <select name="manager" lay-filter="manager" id="skuStatus">
+                    <option value="0" selected="">全部</option>
+                    <option value="U">上架</option>
+                    <option value="D">下架</option>
+                </select>
+            </dd>
+            <dt class="flt fz12">库存：</dt>
+            <dd class="flt layui-form jun-form-l selectWidth">
+                <select name="source" lay-filter="source"  id="skuStore">
+                    <option value="0" selected="">全部</option>
+                    <option value="Y">有货</option>
+                    <option value="N">无货</option>
+                </select>
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12">sku编码：</dt>
+            <dd class="flt">
+                <div class="test_box" style="width: 172px;" contenteditable="true" id="skuId" title="请输入SKU编码，多个单号用回车或空格隔开"></div>
+            </dd>
+            <dt class="flt">商城分类：</dt>
+            <dd class="flt pre w190">
+                <input type="hidden" v-model="queryParam.skuMallClassifyId">
+                <input type="text" readonly="readonly" v-model="queryParam.mallClassifyDisplayName" @click.stop="dropDown('mallTreeShow')" placeholder="请选择内部分类" style="width:180px;height:30px;padding-left: 10px">
+                <div id="mallTree" class="layui-tree-css" style="top:32px;width: 190px" v-show="mallTreeShow" @click.stop="treeClick('mallTreeShow')"></div>
+            </dd>
+            <dt class="flt fz12"  style="width: 120px;">商城上下架：</dt>
+            <dd class="flt layui-form jun-form-l selectWidth">
+                <select name="manager" lay-filter="manager" id="mallSkuStatus">
+                    <option value="0" selected="">全部</option>
+                    <option value="U">上架</option>
+                    <option value="D">下架</option>
+                </select>
+            </dd>
+            <dd class="flt ml10">
+                <span id="searchBtn" class="form-btn layui-btn-small2  ml20 ">搜索</span>
+            </dd>
+        </dl>
+    </div>
+    <div class="mark-read mb10 ml10">
+        <span class="cs-p">
+          <input type="checkbox" class="allChoose fz12">
+          <span class="fz12 c-2">全选</span>
+        </span>
+        <#if _batchUpSkuBtn == "true">
+            <span v-show="msg1" class="c-h cs-p ml10 fz12" @click="setAllStatus('U')">批量上架(订货系统)</span>
+        </#if>
+        <#if _sedKillBatchUpSkuBtn == "true">
+            <span v-show="!msg1" class="c-h cs-p ml10 fz12" @click="setAllStatus('U')">批量上架(订货系统)</span>
+        </#if>
+        <#if _batchDownSkuBtn == "true">
+            <span v-show="msg1" class="c-h cs-p ml10 fz12" @click="setAllStatus('D')">批量下架(订货系统)</span>
+        </#if>
+        <#if _sedKillBatchDownSkuBtn == "true">
+            <span v-show="!msg1" class="c-h cs-p ml10 fz12" @click="setAllStatus('D')">批量下架(订货系统)</span>
+        </#if>
+        <#if _batchUpSkuBtn == "true">
+            <span v-show="msg1" class="c-h cs-p ml10 fz12" @click="setAllMallSkuStatus('U')">批量上架(商城)</span>
+        </#if>
+        <#if _batchDownSkuBtn == "true">
+            <span v-show="msg1" class="c-h cs-p ml10 fz12" @click="setAllMallSkuStatus('D')">批量下架(商城)</span>
+        </#if>
+        <#if _setPromotionSkuBtn == "true">
+            <span v-show="msg1" class="c-h cs-p ml10 fz12" @click="setPromotions('')">设置促销</span>
+        </#if>
+        <@havePermission resourceCode="operation:sku:promotion:list:exportexcel">
+            <span v-show="msg1"  class="c-h cs-p ml10 fz12" @click="exportData()">导出excel</span>
+        </@havePermission>
+        <@havePermission resourceCode="operation:sku:promotion:list:newsku">
+            <span v-show="msg1"  class="c-h cs-p ml10 fz12" @click="addSkuDetail()">新增sku</span>
+        </@havePermission>
+
+
+    </div>
+    <div class="content">
+        <div  class="spotGoods">
+            <table class="layui-table pop no-margin" lay-skin="line">
+                <colgroup>
+                    <col  width="10">
+                    <col  width="200">
+                    <col  width="200">
+                    <col  width="150">
+                    <col  width="100">
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                </colgroup>
+                <thead>
+                <th></th>
+                <th>商品信息</th>
+                <th>起订量</th>
+                <th>售价</th>
+                <th>计量单位</th>
+                <th>可售库存</th>
+                <th>采购价(元)</th>
+                <th>内部分类</th>
+                <th>商城分类</th>
+                <th>状态</th>
+                <th>操作</th>
+                </thead>
+                <tbody>
+                <tr v-for="item in skuList" :class="{bgf0:item.status == 'D'||item.salableQuantity==0}">
+                    <td><input class="choose" name="selectSku" type="checkbox" value="{{item.skuId}}_{{item.status}}_{{item.mallClassifyAllParentName}}"/></td>
+                    <td class="goods-detail">
+                        <dl>
+                            <dt  class="sku-pic" style="left: 0;top: 10px;">
+                                <span v-show="item.salableQuantity&&item.status == 'D'" class="off-shelf"></span>
+                                <span v-show="item.status == 'D'&&!item.salableQuantity" class="off-shelf"></span>
+                                <span v-show="!item.salableQuantity&&item.status != 'D'" class="sell-out"></span>
+                                <img v-bind:src="item.orginImgPath">
+                            </dt>
+                            <dd class="t-l ml10" style="max-width: 375px;">
+                                <div class="one-row c-2 pre" style="padding-right: 36px" @click="goodDetail(item.skuId)" title="{{item.skuName}}">{{item.skuName}}<div v-if="item.skuMallStatus == 'U'" class="good-icon good-icon-up"></div><div v-if="item.skuOrderStatus == 'U'" class="good-icon fx-icon-up"></div></div>
+                                <p class="mt10 one-row" title="{{item.skuPropertyValue}}">商品属性:{{item.skuPropertyValue}}</p>
+                                <p>品牌:{{item.brandName}}</p>
+                                <p>商品编码:{{item.skuId}}</p>
+                            </dd>
+                        </dl>
+                    </td>
+                    <td>{{item.minNum}}</td>
+                    <td>
+                        <p><span class="c-f ml5">现货价：￥{{item.spotPrice | currency ''}}</span></p>
+                        <p><span class="c-9 under-tr">原价：￥{{item.basePrice | currency ''}}</span></p>
+                        <p><span class="c-9 under-tr">商城售价：￥{{item.spotMallPrice | currency ''}}</span></p>
+                        <p><span class="c-9 under-tr">目录价：￥{{item.directoryPrice | currency ''}}</span></p>
+                    </td>
+                    <td>{{item.unitName}}</td>
+                    <td>
+                        <div class="supplier-purchase-price-tips" v-for="lis in item.skuStorageList"  v-if="lis.isDefaultVendor=='Y'">
+                            <p  v-if="lis.isDefaultVendor=='Y'">{{lis.outStock}}：{{lis.salableQuantity}}</p>
+                            <div class="supplier-purchase-price-list">
+                                <ul>
+                                    <li class="flex bor-first-no" v-for="items in item.skuStorageList">
+                                        <p style="flex: 1" class="one-row">{{items.outStock}}</p>
+                                        <p style="flex: 1">{{items.salableQuantity}}</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="supplier-purchase-price-tips" v-for="lis in item.costPriceList" v-if="lis.isDefaultVendor=='Y'">
+                            <p v-if="lis.isDefaultVendor=='Y'">{{lis.accountName}}</p>
+                            <p v-if="lis.isDefaultVendor=='Y'">采购价：<span class="c-f">{{lis.purchasePrice | formatQuantity "2"}}</span></p>
+                            <div class="supplier-purchase-price-list">
+                                <!--<div class="flex supplier-purchase-price-list-top">-->
+                                <!--<p style="flex: 2">全国</p>-->
+                                <!--<p style="flex: 1">全国</p>-->
+                                <!--<p style="flex: 1">1</p>-->
+                                <!--</div>-->
+                                <ul>
+                                    <li class="flex bor-first-no" v-for="items in item.costPriceList">
+                                        <p style="flex: 2" class="one-row">{{items.accountName}}</p>
+                                        <p style="flex: 1">{{items.purchasePrice | formatQuantity "2"}}</p>
+                                        <p style="flex: 1" v-if="items.isDefaultVendor=='Y'">默认</p>
+                                        <p style="flex: 1" v-if="items.isDefaultVendor!='Y'">-</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{item.classifyParentName}}</td>
+                    <td>{{item.mallClassifyAllParentName}}</td>
+                    <td class="c-2 fw-b">
+                        <p>订货系统：<span v-if="item.skuOrderStatus == 'U'">上架</span><span v-if="item.skuOrderStatus == 'D'">下架</span></p>
+                        <p>商城：<span v-if="item.skuMallStatus == 'U'">上架</span><span v-if="item.skuMallStatus == 'D'">下架</span></p>
+                    </td>
+                    <td>
+                        <@havePermission resourceCode="operation:sku:promotion:list:operation">
+                            <p><a class="c-h cs-p" @click="goEditDetail(item.skuId)" herf="javascript:;" >修改详情</a></p>
+                            <p><a class="c-h cs-p" @click="goCopyDetail(item.skuId)" herf="javascript:;" >复制SKU</a></p>
+                        </@havePermission>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="secKillGoods">
+            <table class="layui-table pop no-margin" lay-skin="line">
+                <colgroup>
+                    <col  width="10">
+                    <col  width="200">
+                    <col  width="200">
+                    <col  width="150">
+                    <col  width="100">
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                </colgroup>
+                <thead style="border-bottom:10px solid #fff;">
+                <th></th>
+                <th>商品信息</th>
+                <th>分类名称</th>
+                <th>售价</th>
+                <th>可售库存</th>
+                <th>采购价(元)</th>
+                <th>计量单位</th>
+                <th>状态</th>
+                <th>操作</th>
+                </thead>
+                <tbody v-for="activity in activityList" >
+                    <tr class="first-row"  >
+                        <td colspan="7" align="left" style="text-align: left;">
+                            <span class="c-f ml5">【秒杀】{{activity.startTime|time}}至{{activity.endTime|time}}</span>
+                        </td>
+                        <td class="c-h cs-p" align="right" colspan="2"
+                            style="text-align: right;" >
+                            <#if _editPromotionBtn == "true">
+                                <a href="javascript:;" class="c-h" @click="setPromotions(activity.activityId)">修改促销</a>
+                            </#if>
+                            <#if _cancelPromotionBtn == "true">
+                                <a href="javascript:;" class="ml10 c-h" @click="cancelPromotions(activity.activityId,$index)">取消促销</a>
+                            </#if>
+
+                        </td>
+                    </tr>
+                    <tr v-for="item in activity.secondKillList" :class="{bgf0:item.status == 'D'||item.salableQuantity==0}">
+                        <td><input class="choose" name="selectSku" type="checkbox" value="{{item.skuId}}_{{item.status}}"></td>
+                        <td class="goods-detail">
+                            <dl>
+                                <dt  class="sku-pic">
+                                    <span v-show="item.salableQuantity&&item.status == 'D'" class="off-shelf"></span>
+                                    <span v-show="item.status == 'D'&&!item.salableQuantity" class="off-shelf"></span>
+                                    <span v-show="!item.salableQuantity&&item.status != 'D'" class="sell-out"></span>
+                                    <img v-bind:src="item.orginImgPath">
+                                </dt>
+                                <dd class="t-l ml10" style="max-width: 375px;">
+                                    <p class="one-row c-2">{{item.skuName}}</p>
+                                    <p class="mt10 one-row">商品属性:{{item.porperytNameValue}}</p>
+                                    <p class="mt10">品牌:{{item.brandName}}</p>
+                                    <p>商品编码:{{item.skuId}}</p>
+                                </dd>
+                            </dl>
+                        </td>
+                        <td>{{item.classifyParentName}}</td>
+                        <td>
+                            <p><span class="c-f  ml5">秒杀价：￥{{item.seckPrice | currency ''}}</span></p>
+                            <p><span class="c-2  ml5">现货价：￥{{item.spotPrice | currency ''}}</span></p>
+                            <p><span class="c-9  under-tr">原价：￥{{item.basePrice | currency ''}}</span></p>
+                        </td>
+                        <td>
+                            <div class="supplier-purchase-price-tips" v-for="lis in item.skuStorageList"  v-if="lis.isDefaultVendor=='Y'">
+                                <p  v-if="lis.isDefaultVendor=='Y'">{{lis.outStock}}：{{lis.salableQuantity}}</p>
+                                <div class="supplier-purchase-price-list">
+                                    <ul>
+                                        <li class="flex bor-first-no" v-for="items in item.skuStorageList">
+                                            <p style="flex: 1" class="one-row">{{items.outStock}}</p>
+                                            <p style="flex: 1">{{items.salableQuantity}}</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="supplier-purchase-price-tips" v-for="lis in item.costPriceList" v-if="lis.isDefaultVendor=='Y'">
+                                <p v-if="lis.isDefaultVendor=='Y'">{{lis.accountName}}</p>
+                                <p v-if="lis.isDefaultVendor=='Y'">采购价：<span class="c-f">{{lis.purchasePrice | formatQuantity "2"}}</span></p>
+                                <div class="supplier-purchase-price-list">
+                                    <!--<div class="flex supplier-purchase-price-list-top">-->
+                                    <!--<p style="flex: 2">全国</p>-->
+                                    <!--<p style="flex: 1">全国</p>-->
+                                    <!--<p style="flex: 1">1</p>-->
+                                    <!--</div>-->
+                                    <ul>
+                                        <li class="flex bor-first-no" v-for="items in item.costPriceList">
+                                            <p style="flex: 2" class="one-row">{{items.accountName}}</p>
+                                            <p style="flex: 1">{{items.purchasePrice | formatQuantity "2"}}</p>
+                                            <p style="flex: 1" v-if="items.isDefaultVendor=='Y'">默认</p>
+                                            <p style="flex: 1" v-if="items.isDefaultVendor!='Y'">-</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{item.unitName}}</td>
+                        <td class="c-2 fw-b"><span v-if="item.status == 'U'">上架</span><span v-if="item.status == 'D'">下架</span></td>
+                        <td>
+                            <p><a class="c-h cs-p" @click="goEditDetail(item.skuId)" herf="javascript:;" >修改详情</a></p>
+                            <p><a class="c-h cs-p" @click="goCopyDetail(item.skuId)" herf="javascript:;" >复制SKU</a></p>
+                            <p><a class="c-h cs-p" @click="deleteMsg2($index,activity.activityId)" herf="javascript:;" >移除</a></p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="paginationDiv" class="mt20" v-show="spotSkuPage"></div>
+        <div id="paginationDivKill" class="mt20" v-show="secondKillSkuPage"></div>
+    </div>
+</section>
+<script src="/res/js/spot/spotMarketList.js<@resVersionDirective>?</@>"></script>
+</body>
+</html>

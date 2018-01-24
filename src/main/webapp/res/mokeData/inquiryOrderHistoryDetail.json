@@ -1,0 +1,84 @@
+{
+    "MSG": "error msg.",
+    "STATUS": "FAIL",
+    "DATA":
+    {
+        "offerValidUntil":"2017-06-23 17:24:24",
+        "expectDeliveryDate":"2017-06-23 17:24:24",
+        "replyDeliveryDate":"2017-06-03 17:24:24",
+        "offerTotalPrice":"998",
+        "purchasingRequisitionDesc":"需要小区网络",
+        "inquiryOrderProvince":"湖北省",
+        "inquiryOrderCity":"武汉市",
+        "inquiryOrderAddress":"长飞街5号",
+        "deliveryMode":"LORRY",
+        "payMode":"DEPOSIT",
+        "isNeedInvoice":"是",
+        "inquiryOrderSkuList":
+        [
+            {
+                "skuId":"1234567890",
+                "skuName":"光纤",
+                "skuMode":"BT-007",
+                "skuBrandName":"阿迪",
+                "skuProperty":
+                {
+                    "name":"芯数/颜色",
+                    "value":"24芯/黑色"
+                },
+                "skuProductImage":"http://www.yofc.com/wcs/Tpl/home/default/images/logo.png",
+                "skuClassifyName":"光纤",
+                "mallClassifyName":"光纤2",
+                "skuUnitName":"米",
+                "skuQuantity":"35123.87",
+                "skuOfferPrice":"123456.89",
+                "skuOfferAmount":"123456.89"
+            }
+        ,
+            {
+                "skuId": "0987654321",
+                "skuName": "光缆",
+                "skuMode": "BT-008",
+                "skuBrandName": "耐克",
+                "skuProperty": {
+                    "name": "芯数/颜色",
+                    "value": "24芯/黑色"
+                },
+                "skuProductImage": "http://www.yofc.com/wcs/Tpl/home/default/images/logo.png",
+                "skuClassifyName": "光纤",
+                "mallClassifyName": "光纤2",
+                "skuUnitName": "米",
+                "skuQuantity": "5000.00",
+                "skuOfferPrice": "25.00",
+                "skuOfferAmount": "125000.00"
+            }
+        ],
+        "inquiryOrderCustomSkuList":
+        [
+            {
+                "skuName":"自定义光纤1",
+                "skuBrandName":"阿迪王",
+                "skuMode":"BT-999",
+                "skuClassifyName":"阿迪王中王",
+                "mallClassifyName":"王中王",
+                "skuUnitName":"米",
+                "skuQuantity":"30000",
+                "skuPrice":"50",
+                "skuAmount":"1500000",
+                "remark":"这个是阿迪王中王"
+            },
+            {
+                "skuName":"自定义光纤2",
+                "skuBrandName":"阿迪王",
+                "skuMode":"BT-999",
+                "skuClassifyName":"阿迪王中王",
+                "mallClassifyName":"王中王",
+                "skuUnitName":"米",
+                "skuQuantity":"30000",
+                "skuPrice":"50",
+                "skuAmount":"1500000",
+                "remark":"这个是阿迪王中王"
+            }
+        ]
+    }
+}

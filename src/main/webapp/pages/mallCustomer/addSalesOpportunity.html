@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_rcslf61orstyy14i.css<@resVersionDirective>?</@>"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/Area1.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui-mz-min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/js/ajaxfileupload_final.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+    <style>
+        .layui-layedit{
+            width: 568px!important;
+        }
+        .layui-layedit iframe{
+            height: 157px!important;
+        }
+        /*input[type="file"]::-webkit-file-upload-button {*/
+        /*width: 100px;*/
+        /*height: 30px;*/
+        /*overflow: hidden;*/
+        /*line-height: 7em;*/
+        /*background: #FFFFFF;*/
+        /*content: "";*/
+        /*cursor: pointer;*/
+        /*background:url(/res/images/addfile.jpg) no-repeat 0 0;*/
+        /*outline: none;*/
+        /*border: 0 none;z-index: 2;*/
+    /*}*/
+        .a-upload {
+            padding: 4px 10px;
+            height: 20px;
+            line-height: 20px;
+            position: relative;
+            cursor: pointer;
+            color: #407fe7;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            display: inline-block;
+            *display: inline;
+            *zoom: 1
+        }
+
+        .a-upload  input {
+            position: absolute;
+            font-size: 100px;
+            right: 0;
+            top: 0;
+            opacity: 0;
+            filter: alpha(opacity=0);
+            cursor: pointer
+        }
+
+        .a-upload:hover {
+            color: #fff;
+            background: #407fe7;
+            border-color: #407fe7;
+            text-decoration: none
+        }
+        p[name="attachmentFile"]{
+            color: #407fe7 !important;
+        }
+    </style>
+</head>
+<body>
+<div style="margin-top: 30px;padding-left:32px;">
+    <form action="" class="jun-form-s form-css">
+        <dl class="dl-form">
+            <dt class="flt fz12">联系人：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="linkman" lay-filter="aihao"  style="width: 240px;" id="linkman">
+                    <option value=""></option>
+                    <!--<option value="0">刘经理(15122375392)项目经理</option>-->
+                    <!--<option value="1" selected="">马经理(15122375392)采购</option>-->
+                </select>
+            </dd>
+            <dt class="flt fz12">咨询类型：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="oppType" lay-filter="aihao"  style="width: 240px;" id="oppType">
+                    <option value=""></option>
+                    <!--<option value="SALES_OPP" selected>销售机会</option>-->
+                    <!--<option value="TECH">技术咨询</option>-->
+                    <!--<option value="AFTER_SALES">售后咨询</option>-->
+                    <!--<option value="COMPLAIN">客户投诉</option>-->
+                </select>
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12">等级：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="level" lay-filter="aihao"  style="width: 240px;" id="level">
+                    <option value="A" selected>A</option>
+                    <option value="B" >B</option>
+                    <option value="C" >C</option>
+                </select>
+            </dd>
+            <dt class="flt">采购地：</dt>
+            <dd class="flt layui-form dd-city">
+                <select name="province" lay-filter="province" id="province" lay-search>
+                    <option value="">请选择省</option>
+                </select>
+            </dd>
+            <dd class="flt layui-form dd-city">
+                <select name="city" lay-filter="city" id="city" lay-search>
+                    <option value="">请选择市</option>
+                </select>
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12">来源：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="oppSource" lay-filter="aihao"  style="width: 240px;" id="oppSource">
+                    <option value="CUSTOMER_CALL" selected>客户来电</option>
+                    <option value="RETURN_VISIT">回访调研</option>
+                    <option value="EMAIL">邮件</option>
+                    <option value="ONLINE_CUSTOMER_SERVICE">在线客服</option>
+                </select>
+            </dd>
+            <dt class="flt">期望交期：</dt>
+            <dd class="flt"><input name="expectDate" id="expectDate" value="" style="height: 32px;width: 240px;" class="layui-input laydate-icon" placeholder="期望交期" onclick="layui.laydate({elem: this,min: laydate.now(), istime: false, format: 'YYYY-MM-DD'})" validate="true"></dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12">产品类型：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select name="productType" lay-filter="productType"  style="width: 240px;" id="productType">
+                    <option value="OPTICAL_CABLE" selected>光缆</option>
+                    <option value="ACCESSORIES">配件</option>
+                    <option value="PDS">综合布线</option>
+                    <option value="OTHERS">其他</option>
+                </select>
+            </dd>
+            <dd class="flt productTypeDesc" style="display:none"><input name="productTypeDesc" id="productTypeDesc" placeholder="请输入产品类型描述(最多20个汉字)" style="height: 32px;width: 330px;" class="layui-input" ></dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12"><span class="c-f">*</span>机会描述：</dt>
+            <dd class="flt layui-form" style="width: 571px;">
+                <textarea class="layui-textarea" name="content" lay-verify="content" id="remark" placeholder="最多1000个字符" maxlength="1000"></textarea>
+            </dd>
+        </dl>
+        <dl class="dl-form  layuicss">
+               <dt class="flt">&nbsp;</dt>
+               <dd class="flt need-list orderSalesOppAttachments">
+                   <ul>
+                   </ul>
+                   <div>
+                       <a id='uploadAAA' class="a-upload" href="javascript:;">
+                           <input type="file" id="uploadAttachmentFileBtn" name="file" onchange="uploadAttachment()" multiple="multiple" style="height: 30px;" />+添加附件
+                       </a>
+                   </div>
+               </dd>
+           </dl>
+        <dl class="dl-form layui-form" style="margin-bottom: 0;">
+            <dt class="flt fz12">创建询单：</dt>
+            <dd class="flt pre layui-form">
+                <input type="radio" name="createVagueDemand" value="Y" title="是" checked="">
+                <input type="radio" name="createVagueDemand" value="N" title="否" >
+            </dd>
+        </dl>
+        <dl class="dl-form layui-form" style="margin-bottom: 10px;">
+            <dt class="flt fz12">转交对象：</dt>
+            <dd class="flt layui-form">
+                <input class="inline" type="radio" lay-filter="isTransfer" name="isTransfer" value="manager" title="转交给销售代表" checked>
+                <input class="inline" type="radio" lay-filter="isTransfer" name="isTransfer" value="distributor" title="转交给分销商">
+            </dd>
+        </dl>
+        <dl class="dl-form layui-form" style="margin-bottom: 20px;">
+            <dd class="flt fz12  pre" style="margin-left: 20px;">
+                <input class="inline line-middle pl10 mr20" type="text" name="s_user" id="searchObject"  placeholder="请输入员工姓名或部门" autocomplete="off" class="layui-input" style="width:206px">
+                <span class="iconfont icon-sousu cs-p" style="position: absolute;right: 30px;top: 10px;" id="searchBtn"></span>
+            </dd>
+            <dt class="flt" style="width:40px;">省份：</dt>
+            <dd class="flt layui-form dd-city">
+                <select name="province2" lay-filter="province2" id="province2">
+                    <option value="">请选择省</option>
+                </select>
+            </dd>
+        </dl>
+        <dl class="dl-form" style="margin-bottom: 0px;margin-top: -10px;">
+            <dd class="flt accountManagerList" style="margin-left: 20px;">
+                <table class="layui-table pop table-css" lay-skin="line">
+                    <colgroup>
+                        <col  width="10">
+                        <col  width="150">
+                        <col  width="240">
+                        <col  width="180">
+                    </colgroup>
+                    <thead>
+                    <tr class="bor-no">
+                        <th ></th>
+                        <th >员工姓名</th>
+                        <th >电话</th>
+                        <th >部门</th>
+                    </tr>
+                    </thead>
+                    <tbody id="userTable_tbody">
+                    </tbody>
+                </table>
+            </dd>
+            <dd class="flt distributorList" style="margin-left: 20px;">
+                <table class="layui-table pop table-css" lay-skin="line">
+                    <colgroup>
+                        <col  width="10">
+                        <col  width="230">
+                        <col  width="150">
+                        <col  width="120">
+                        <col  width="100">
+                    </colgroup>
+                    <thead>
+                    <tr class="bor-no">
+                        <th ></th>
+                        <th >公司名称</th>
+                        <th >销售代表/客户经理</th>
+                        <th >对接人</th>
+                        <th >省份</th>
+                    </tr>
+                    </thead>
+                    <tbody id="distributorTable_tbody">
+                    </tbody>
+                </table>
+            </dd>
+            <dd>
+                <div id="paginationDiv" style="margin-right: 28px;margin-top:10px;"></div>
+            </dd>
+        </dl>
+    <div class="layui-layer-btn layui-layer-btn-c">
+        <a class="layui-layer-btn0" lay-submit lay-filter="submit" id="addBtn">提交</a>
+        <a class="layui-layer-btn1" id="cancelBtn">取消</a>
+    </div>
+    </form>
+</div>
+<script type="text/javascript">
+    var _accountId = '${accountId}';
+    var _province = '${province}';
+    var _city = '${city}';
+    var _customerSalesOppId='${customerSalesOppId}';
+    var _userId='${userId}';
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    var PAGE_SIZE = 5;
+    var layer;
+    var areaData = Area;
+    var $form;
+    var form;
+    var $;
+    var currentAttachmentList = [];
+    //多个附件上传
+    var htmlFile="";
+    function deleteAttachment(id) {
+        var  attachmentId = id;
+        var $index = $(this).index();
+        layer.open({
+            title: '操作提示',
+            skin: 'myskin',
+            area: ['450px', '280px'],
+            btnAlign: 'c',
+            content: '<p style="text-align: center;margin-top: 50px;">是否确认删除此附件？</p>',
+            btn: ['确认', '取消'],
+            yes: function (index, layero) {
+                $('#'+id).parent().remove();
+            	 postUtil.call("/file_server/delete", {"id":attachmentId}, function (result) {
+            		 
+            		 
+            	 })
+                layer.close(index);
+            }, btn2: function (index, layero) {
+                layer.close(index);
+            },
+            cancel: function () {
+                //右上角关闭回调
+            }
+        });
+    };
+    
+    layui.use(['form','jquery','laydate','layer'], function(){
+        form = layui.form();
+        $form = $('form');
+        $ = layui.jquery;
+        layer = layui.layer;
+
+        loadProvince();
+        initFormData();
+        
+        form.on('radio(isTransfer)', function(data){
+        	var param={};
+      		param.currentPageIndex=1;
+      		param.province=_province;
+            loadDATA(param);
+          });
+        
+        form.on('select(productType)', function (data) {
+        	var selectedProductType=data.value;
+        	if("OTHERS"==selectedProductType){
+        		$(".productTypeDesc").css('display','block');
+        	}else{
+        		$(".productTypeDesc").css('display','none');
+        		$("#productTypeDesc").attr('value','');
+        	}
+        });
+        $("#productTypeDesc").bind("input propertychange",function(){
+        	var value=$(this).val();
+        	if(value.length>=21){
+        		value=value.substring(0,20);
+        		$("#productTypeDesc").val(value);
+        	}
+          });
+
+        $('#cancelBtn').bind("click", function () {
+            parent.layer.close(index);//关闭当前窗口
+        });
+
+        form.on('submit(submit)', function(data) {
+            layer.load();
+            var param = {};
+            param.accountId = _accountId;
+            param.customerSalesOppId=_customerSalesOppId;
+            param.linkmanId = $("#linkman").val();
+            param.oppType = $("#oppType").val();
+            param.level = $("#level").val();
+            param.province = $("#province").val();
+            param.city = $("#city").val();
+            param.source = $("#oppSource").val();
+            param.expectDate = $("#expectDate").val();
+            param.remark = $.trim($("#remark").val());
+            param.productType= $("#productType").val();
+            param.productTypeDesc= $("#productTypeDesc").val();
+            param.createVagueDemand = $('input[name="createVagueDemand"]:checked').val();
+            param.transmitToSubject = $('input[name="isTransfer"]:checked').val();
+            param.transferEmployId = $('input[name="userIdCheckBox"]:checked').val();
+            param.acceptUserName=$('input[name="userIdCheckBox"]:checked').attr("acceptUserName");
+            if(!doValidation(param)) {
+                layer.closeAll("loading");
+                return false;
+            }
+            postUtil.call("/customer/salesOpportunity/add", {"jsonData": JSON.stringify(param)}, function (result) {
+                if(parent.addSalesOpportunityCallback) {
+                    var success = parent.addSalesOpportunityCallback(result);//调用父页面的渲染方法
+                    if (success) {
+                            parent.layer.close(index);//关闭当前窗口
+                    }
+                }
+                layer.closeAll("loading");
+            });
+        });
+		var param={};
+		param.currentPageIndex=1;
+		param.province=_province;
+       	loadDATA(param);
+    });
+    
+    function uploadAttachment() {
+        //超过5个附件则不允许上传
+        var fileupload = document.getElementById('uploadAttachmentFileBtn').files;
+        var length= $('.orderSalesOppAttachments ul').find("li").length;
+        if(length>=5){
+            alert("很抱歉，最多只能上传5个附件");
+
+            //重新加载上传组件
+            $('#uploadAAA').html('<input type="file" id="uploadAttachmentFileBtn" name="file" onchange="uploadAttachment()" multiple="multiple" style="height: 30px;" />+添加附件');
+
+            return;
+        }
+        /* if(currentAttachmentList.length >=5) {
+           
+        } */
+        var url = '/file_server/upload';
+        var param = {};
+        param.type="CUSTOMER_SALES_OPPORTUNITY";
+        param.businessKey=_customerSalesOppId;
+        param.employId=_userId;
+        $.ajaxFileUpload({
+            url: url,
+            secureuri: false,
+            fileElementId: 'uploadAttachmentFileBtn',
+            data: param,
+            dataType: 'text',
+            success: function (result) {
+                var rtnResult = eval('(' + result + ')');
+                if (rtnResult.STATUS == "SUCCESS") {
+                    var fileObjList = rtnResult.data;
+                    var htmlFile = "";
+                    for (var i = 0; i < fileObjList.length; i++) {
+                        var attachmentFileId = fileObjList[i].id;
+                        var attachmentFileName = fileObjList[i].name;
+                        if(attachmentFileName) {
+                            htmlFile += '<li><a style="display: inline-block; width: 150px;" href="/file_server/download?id=' + attachmentFileId + '" title="' + attachmentFileName + '"><p class="one-row">' + attachmentFileName + '</p></a><span style="display: inline-block;vertical-align: top;width: 50px;" class="deleteAttachment cs-p" onclick="deleteAttachment(' + attachmentFileId + ')"  Id="' + attachmentFileId + '">删除</span></li>';
+                        }
+                        var tempFile = {};
+                        tempFile.attachmentId = attachmentFileId;
+                        tempFile.attachmentName = attachmentFileName;
+                        currentAttachmentList.push(tempFile);
+                    }
+                    $(".orderSalesOppAttachments ul").append(htmlFile);
+                } else {
+                    alert(rtnResult.MSG);
+                }
+                //重新加载上传组件
+                $('#uploadAAA').html('<input type="file" id="uploadAttachmentFileBtn" name="file" onchange="uploadAttachment()" multiple="multiple" style="height: 30px;" />+添加附件');
+            },
+            error: function (data, status, e) {
+
+                //重新加载上传组件
+                $('#uploadAAA').html('<input type="file" id="uploadAttachmentFileBtn" name="file" onchange="uploadAttachment()" multiple="multiple" style="height: 30px;" />+添加附件');
+
+                alert("上传过程中出现异常，请稍后再试");
+
+            }
+        });
+    }
+
+    function doValidation(data) {
+        var isPass = true;
+        var msg = "";
+        if(data.remark == "") {
+            msg += "请输入机会描述<br>";
+            isPass = false;
+        }
+        if(data.createVagueDemand == "Y" && !data.transferEmployId) {
+        	if(data.transmitToSubject=='manager'){
+        		  msg += "请选择要转交的销售代表<br>";
+        	}else{
+        		  msg += "请选择要转交的分销商<br>";
+        	}
+            isPass = false;
+         }
+        if(!isPass) {
+            layer.msg(msg, {icon:5});
+        }
+        return isPass;
+    }
+
+    //省市联动  star
+    function loadProvince() {
+        var proHtml = '';
+           var proHtml1 = '<option class="option1" value="' +"" + '" selected>' +
+         "全部" + '</option>';
+         var proHtml2 = '<option class="option2" value="' +"" + '" selected>' +
+         "全部" + '</option>';
+        for(var i = 0; i < areaData.length; i++) {
+            if(_province != '' && _province == areaData[i].provinceName) {
+                proHtml1 += '<option class="option1" value="' + areaData[i].provinceName + '" selected='+'"selected">' +
+                    areaData[i].provinceName + '</option>';
+                proHtml2 += '<option class="option2" value="' + areaData[i].provinceName + '" selected='+'"selected">' +
+                areaData[i].provinceName + '</option>';
+            } else {
+                proHtml1 += '<option class="option1" value="' + areaData[i].provinceName + '">' +
+                    areaData[i].provinceName + '</option>';
+                proHtml2 += '<option class="option2 "value="' + areaData[i].provinceName + '">' +
+                areaData[i].provinceName + '</option>';
+            }
+        }
+        if(_province != '') {
+            var cities = getCityByProvince(areaData, _province);
+            loadCity(cities, _city);
+        }
+        $form.find('select[name=province]').append(proHtml1);
+        $form.find('select[name=province2]').append(proHtml2);
+        form.render();
+        form.on('select(province)', function(data) {
+             _province = data.value;
+        	
+//         	 $(".alloptions2").attr("selected",true);
+             if(_province==""){
+                 $form.find('select[name=province2]').find('option').each(function(i,n){
+                     if($(n).text()=="全部")
+                     {
+                         $(n).attr("selected",true);
+                         
+                     }
+                 })	
+            	
+             }else{
+            	 $(".option2").attr("selected",false);
+                 $form.find('select[name=province2]').find('option').each(function(i,n){
+                     if($(n).text()==_province)
+                     {
+                         $(n).attr("selected",true);
+                     }
+                 })
+             }
+             
+//              
+             //省份联动
+//              $form.find('select[name=province2]').children()[0].innerText=_province;
+//              $form.find('select[name=province2]').children()[0].value=_province;
+
+             
+            var cities = getCityByProvince(areaData, _province);
+            if(cities.length > 0) {
+                loadCity(cities);
+
+            } else {
+                $form.find('select[name=city]').parent().hide();
+            }
+            var searchObject=$('#searchObject').val();
+    		var param={};
+    		param.searchObject=searchObject;
+    		param.currentPageIndex=1;
+    	 	param.province=_province;
+	       	loadDATA(param);
+	       	
+// 	       	form.render();
+        });
+        
+        form.on('select(province2)', function(data) {
+            _province = data.value;
+//            var cities = getCityByProvince(areaData, _province);
+//            if(cities.length > 0) {
+//                loadCity(cities);
+//            } else {
+//                $form.find('select[name=city]').parent().hide();
+//            }
+      		var param={};
+       		var searchObject=$('#searchObject').val();
+       		param.searchObject=searchObject;
+       		param.currentPageIndex=1;
+       	 	param.province=_province;
+           loadDATA(param);
+       });
+    }
+    function getCityByProvince(areaData, provinceName) {
+        var cities = [];
+        $.each(areaData, function (index, item) {
+            if(item.provinceName == provinceName) {
+                cities = item.mallCityList;
+                return false;
+            }
+        });
+        return cities;
+    }
+    function loadCity(citys, selCity) {
+        var cityHtml = '';
+        for(var i = 0; i < citys.length; i++) {
+            if(selCity != '' && selCity == citys[i].cityName) {
+                cityHtml += '<option value="' + citys[i].cityName + '" selected>' +
+                    citys[i].cityName + '</option>';
+            } else {
+                cityHtml += '<option value="' + citys[i].cityName + '">' +
+                    citys[i].cityName + '</option>';
+            }
+        }
+        $form.find('select[name=city]').html(cityHtml).parent().show();
+        form.render();
+
+    }
+    // 结束
+
+
+    function initFormData() {
+        //初始化联系人
+        initLinkman();
+
+        //初始化销售机会类型
+        initOppType();
+    }
+    function initLinkman() {
+        var param = {};
+        param.accountId = _accountId;
+        postUtil.call("/customer/salesOpportunity/queryAllLinkman", param, function (result) {
+            if (result.STATUS == "SUCCESS") {
+                var data = result.DATA;
+                var html = "";
+                $.each(data, function (index, item) {
+                    if(index == 0) {
+                        html += '<option value="'+item.linkmanId+'" selected>'+item.linkmanName+'('+item.linkmanTelephone+')'+(item.linkmanPosition||'')+'</option>';
+                    } else {
+                        html += '<option value="'+item.linkmanId+'">'+item.linkmanName+'('+item.linkmanTelephone+')'+(item.linkmanPosition||'')+'</option>';
+                    }
+                });
+                $form.find('select[id=linkman]').append(html);
+                form.render();
+            } else {
+                layer.msg("查询联系人失败:" + result.MSG, {icon: 5});
+            }
+        });
+    }
+
+    function initOppType() {
+        var param = {};
+        param.classify = "SALES_OPPORTUNITY_TYPE";
+        postUtil.call("/systemDictionary/list", param, function (result) {
+            if (result.STATUS == "SUCCESS") {
+                var data = result.DATA;
+                var html = "";
+                $.each(data, function (index, item) {
+                    if(index == 0) {
+                        html += '<option value="'+item.code+'" selected>'+item.cName+'</option>';
+                    } else {
+                        html += '<option value="'+item.code+'">'+item.cName+'</option>';
+                    }
+                });
+                $form.find('select[id=oppType]').append(html);
+                form.render();
+            } else {
+                layer.msg("查询销售机会类型失败:" + result.MSG, {icon: 5});
+            }
+        });
+    }
+
+    function loadDATA(param) {
+    	var transmitToSubject=$("input[name=isTransfer]:checked").val();
+    	param.transmitToSubject=transmitToSubject;
+    	if("manager"==transmitToSubject){
+    		$(".distributorList").css("display","none");
+    		$(".accountManagerList").css("display","block");
+    		$("#searchObject").attr("placeholder","请输入员工姓名或部门");
+    	}else{
+    		$(".distributorList").css("display","block");
+    		$(".accountManagerList").css("display","none");
+    		$("#searchObject").attr("placeholder","请输入公司名称");
+    	 }
+        postUtil.call("/mallCustomer/transmitRecordlist", param, function (result) {
+        	 var pageNumber = result.pageNumber;
+             var pageSize = result.pageSize;
+             var totalPage = result.totalPage;
+             var totalRow = result.totalRow;
+             var dataList = result.list;
+             renderTable(transmitToSubject,dataList);
+                laypage({
+                    cont: 'paginationDiv',
+                    pages: totalPage,
+                    curr: pageNumber,
+                    total: totalRow,
+                    skip: true,
+                    jump: function (obj, first) {
+                        if (!first) {
+                        	param.currentPageIndex=obj.curr;
+                        	loadDATA(param);
+                        }
+                    }
+                });
+     });
+    }
+
+    function renderTable(transmitToSubject,dataList) {
+    	  var length = dataList.length;
+    	if("manager"==transmitToSubject){
+    		var table = document.getElementById("userTable_tbody");
+            table.innerHTML = "";
+            userDataMap = {};
+            if (length > 0) {
+                for (var i = 0; i < dataList.length; i++) {
+                    var data = dataList[i];
+                    var userId = data.userId;
+                    userDataMap[userId] = data;
+                    var row = renderRow(data);
+                    table.appendChild(row);
+                }
+            }else {
+                var html = '<tr><td colspan="4">暂无信息！</td></tr>';
+                $(table).html(html);
+            }
+    		distributorTable_tbody
+    	}else{
+    		var table = document.getElementById("distributorTable_tbody");
+            table.innerHTML = "";
+            userDataMap = {};
+            if (length > 0) {
+                for (var i = 0; i < dataList.length; i++) {
+                    var data = dataList[i];
+                    var userId = data.userId;
+                    userDataMap[userId] = data;
+                    var row = renderRowDistributor(data);
+                    table.appendChild(row);
+                }
+            }else {
+                var html = '<tr><td colspan="4">暂无信息！</td></tr>';
+                $(table).html(html);
+            }
+    	}
+        
+    }
+
+    function isExitsVariable(variableName) {  
+        try {  
+            if (typeof (variableName) == "undefined") {  
+                return "--";  
+            } else {  
+                return variableName;  
+            }  
+        } catch (e) {  
+        }  
+        return "--";  
+    }
+    
+    function renderRow(rowData) {
+
+        var userId = rowData.userId;
+        var userName = rowData.userName;
+        var userRealName = rowData.userRealName;
+        var pUserId = rowData.pUserId;
+        var pUserName = rowData.pUserName;
+        var sex = rowData.sex;
+        var mobile = rowData.mobile;
+        var email = rowData.email;
+        var accountId = rowData.accountId;
+        var accountName = rowData.accountName;
+        var mainObjectId = rowData.mainObjectId;
+        var mainObjectName = rowData.mainObjectName;
+        var departmentId = rowData.departmentId;
+        var departmentName = rowData.departmentName;
+
+        var ul = document.createElement('tr');
+        ul.appendChild(renderCell("userIdCheckBox", userId,userRealName,"width:3%;height:75px;"));
+        ul.appendChild(renderCell(null, isExitsVariable(userRealName),null, "width:10%;height:75px;"));
+        ul.appendChild(renderCell(null, isExitsVariable(mobile),null, "width:12%;height:75px;"));
+        ul.appendChild(renderCell(null, isExitsVariable(departmentName),null, "width:12%;height:75px;"));
+        return ul;
+    }
+    
+    function renderRowDistributor(rowData) {
+        var ul = document.createElement('tr');
+        ul.appendChild(renderCell("userIdCheckBox", rowData.accountId,rowData.accountName, "width:3%;height:75px;"));
+        ul.appendChild(renderCell(null, isExitsVariable(rowData.accountName),null, "width:20%;height:75px;"));
+        ul.appendChild(renderCell(null, (isExitsVariable(rowData.pltSalesUserRealName)+"/"+isExitsVariable(rowData.salesUserRealName)),null, "width:8%;height:75px;"));
+        ul.appendChild(renderCell(null, isExitsVariable(rowData.storeContact),null, "width:8%;height:75px;"));
+        ul.appendChild(renderCell(null, isExitsVariable(rowData.province),null, "width:8%;height:75px;"));
+        return ul;
+    }
+
+    function renderCell(name, value, acceptName,style) {
+        var li = document.createElement('td');
+        if ("userIdCheckBox" == name) {
+            li.innerHTML = '<input type="radio" name="userIdCheckBox" value="' + value + '" acceptUserName="'+acceptName+'"/>';
+        } else {
+            if(value) {
+                li.innerText = value;
+            }else {
+                li.innerText = "--";
+            }
+        }
+        return li;
+    }
+
+    $(document).on("click", "#searchBtn", function () {
+    	var searchObject=$('#searchObject').val();
+  		var param={};
+  		param.searchObject=searchObject;
+  		param.currentPageIndex=1;
+  	 	param.province=_province;
+	       	loadDATA(param);
+    });
+    document.onkeydown = function(e){
+        var ev = document.all ? window.event : e;
+        if(ev.keyCode==13) {
+           var searchObject=$('#searchObject').val();
+      		var param={};
+      		param.searchObject=searchObject;
+      		param.currentPageIndex=1;
+      	 	param.province=_province;
+  	       	loadDATA(param);
+        }
+    }
+  
+</script>
+</body>
+</html>

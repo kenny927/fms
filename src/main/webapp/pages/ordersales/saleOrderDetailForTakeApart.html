@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/js/orderSale/saleOrderDetail.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<div>
+    <div class="operations bz-bb pl20 pr20 pt20 txtR">
+      <button onclick="watchAttachments()" class="form-btn layui-btn-itoc layui-btn-mini2">查看附件</button>
+        <#if sealSwitch == "ON">
+                <a id="downloadContract" href="/file_server/download?id=${sealFileId}" class="form-btn layui-btn-itoc layui-btn-mini2">下载合同</a>
+        </#if>
+    </div>
+
+    <div class="bz-bb pl20 pr20 pt20 jun-form-s form-css">
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+           <dl class="dl-form mb0">
+               <dt class="flt line-middle">订单号：</dt>
+               <dd class="flt line-middle c-2 w240">${orderInfo.orderSalesId!}</dd>
+               <dt class="flt line-middle">创建时间：</dt>
+               <dd class="flt line-middle c-2 w240">${orderInfo.createDate?string('yyyy-MM-dd HH:mm:ss')}</dd>
+               <dt class="flt line-middle">订单状态：</dt>
+               <dd class="flt line-middle c-f w240">${orderInfo.statusName}</dd>
+           </dl>
+           <dl class="dl-form  mb0">
+               <dt class="flt line-middle">付款状态：</dt>
+               <dd class="flt line-middle c-f w240"><#if "DELIVERY_CONFIRM,PART_DELIVERY,RECEIPT_CONFIRM,COMPLETED"?index_of(orderInfo.status)!=-1 >已付款<#else>未付款</#if></dd>
+               <dt class="flt line-middle">买方：</dt>
+               <dd class="flt line-middle c-2 w240">${orderInfo.purchaseAccountName}</dd>
+               <dt class="flt line-middle">卖方：</dt>
+               <dd class="flt line-middle w240">长飞光纤光缆股份有限公司</dd>
+           </dl>
+           <dl class="dl-form  mb0">
+               <dt class="flt line-middle">合同号：</dt>
+               <dd class="flt line-middle c-2 w240">${orderInfo.externalContractId}</dd>
+               <dt class="flt line-middle">客户经理：</dt>
+               <dd class="flt line-middle c-2 w240">${orderInfo.userRealName} ${orderInfo.mobile}</dd>
+               <#if orderInfo.mallOrderId != null && orderInfo.mallOrderId !=''>
+                    <dt class="flt line-middle">关联商城订单：</dt>
+                    <dd class="flt line-middle c-2 w240">${orderInfo.mallOrderId}${orderInfo.mallOrderStatus}</dd>
+               </#if>
+           </dl>
+        </blockquote>
+    </div>
+
+    <div class="bz-bb pl20 pr20  mb20 jun-form-s form-css">
+        <h3 class="mt20 fz16 h3-tittle pl10 c-2">订单明细信息</h3>
+        <blockquote >          
+            <table class="layui-table pop">
+                <colgroup>
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="200">
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>供应商</th>
+                    <th>商品编码</th>
+                    <th>商品名称</th>
+                    <th>型号</th>
+                    <th>出库地</th>
+                    <th>数量</th>
+                    <th>单位</th>
+                    <th>单价</th>
+                    <th>小计</th>
+                    <th>销售运费</th>
+                    <th>采购价</th>
+                    <th>采购小计</th>
+                    <th>采购运费</th>
+                    <th>商品要求</th>
+                    <th>备注</th>
+                </tr>
+                </thead>
+                <tbody>
+                <#list details as item>
+                   <#if item.spotSkuType=='SECOND_KILL_SKU'>
+                   <tr class="secKill-bg"> 
+                   <#else>
+                   <tr> 
+                   </#if>
+                    <td>${item.supplierName}</td>
+                    <td>${item.skuId}</td>
+                    <td>${item.skuName}</td>
+                    <td>${item.model}</td>
+                    <td>${item.outStock}</td>
+                    <td>${item.quantity?default(0.000)?string('0.000')}</td>
+                    <td>${item.unitName}</td>
+                    <td>${item.unitPrice?default(0.00)?string('0.00')}</td>
+                    <td>${item.settlementAmount?default(0.00)?string('0.00')}</td>
+                    <td>${item.expenseAmount?default(0.00)?string('0.00')}</td>
+                    <td>${item.purchasePrice?default(0.00)?string("0.00")}</td>
+                    <td>${item.purchaseAmount?default(0.00)?string("0.00")}</td>
+                    <td><#if item.expensePurchaseAmount!=null>${item.expensePurchaseAmount?default(0.00)?string('0.00')}<#else>0.00</#if></td>
+                    <td>${item.demand!}</td>
+                    <td>${item.remark!}</td>
+                    </tr>
+                </#list>             
+                </tbody>
+            </table>
+            <div class="mt20">
+                <form action="" class="clr">
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">商品总金额：</dt>
+                        <dd class="frt line-middle w100 txtR">￥${orderInfo.skuAmount?default(0.00)?string('0.00')}</dd>
+                    </dl>
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">运费：</dt>
+                        <dd class="frt line-middle w100 txtR">￥${orderInfo.otherAmount?default(0.00)?string('0.00')}</dd>
+                    </dl>
+                    <dl class="dl-form frt mb5-i" >
+                        <dt class="flt">订单总金额：</dt>
+                        <dd class="frt line-middle w100 txtR">￥<span class="c-f fz18 fw-b">${orderInfo.settlementAmount?default(0.00)?string('0.00')}</span></dd>
+                    </dl>
+                </form>
+            </div>
+            <h3 class="mt20 fz12 bg-f0 h3-tittle pl10 c-2 ">
+                <span class="fw-b ml10">收货人信息：</span>
+                <span>${orderInfo.consigneeAddress}  </span>
+                <span class="ml5">收货人：${orderInfo.consignee}</span>
+                <span class="ml5">联系电话：${orderInfo.consigneePhone}</span>
+            </h3>
+        </blockquote>
+
+        <h3 class="mt20 fz16 bg-f0 h3-tittle pl10">关联采购订单<span class="c-h frt fz12 cs-p under-l mr5 roleDetail">收起></span></h3>
+        <#list orderPurchaseList as item>
+        <blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor"> 
+            <dl class="dl-form mb0">
+               <dt class="flt line-middle">订单号：</dt>
+               <dd class="flt line-middle c-2 w240">${item.orderPurchaseId}</dd>
+               <dt class="flt line-middle">内部合同号：</dt>
+               <dd class="flt line-middle c-2 w240">${item.orderPurchaseContractId}</dd>
+               <dt class="flt line-middle">状态：</dt>
+               <dd class="flt line-middle c-f w240">${item.statusName}</dd>
+            </dl>   
+            <dl class="dl-form mb0">
+               <dt class="flt line-middle">买方：</dt>
+               <dd class="flt line-middle c-2 w240">长飞光纤光缆股份有限公司</dd>
+               <dt class="flt line-middle">供应商：</dt>
+               <dd class="flt line-middle c-2 w240">${item.supplierAccountName}</dd>
+            </dl>      
+            <table class="layui-table pop">
+                <colgroup>
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="200">
+                    <col  width="200">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                    <col  width="100">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>供应商</th>
+                        <th>商品编码</th>
+                        <th>商品名称</th>
+                        <th>型号</th>
+                        <th>出库地</th>
+                        <th>数量</th>
+                        <th>单位</th>
+                        <th>采购价</th>
+                        <th>小计</th>
+                        <th>采购运费</th>
+                        <th>商品要求</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <#list item.orderPurcahseDetailList as detail>
+                <#if detail.spotSkuType=='SECOND_KILL_SKU'>
+                   <tr class="secKill-bg"> 
+                <#else>
+                   <tr> 
+                </#if>
+                    <td>${item.supplierAccountName}</td>
+                    <td>${detail.skuId}</td>
+                    <td>${detail.skuName}</td>
+                    <td>${detail.model}</td>
+                    <td>${detail.outStock}</td>
+                    <td>${detail.quantity}</td>
+                    <td>${detail.unitName}</td>
+                    <td>${detail.approveUnitPrice}</td>
+                    <td>${detail.skuAmount}</td>
+                    <td>${detail.otherAmount}</td>
+                    <td>${detail.demand}</td>
+                    <td>${detail.remark}</td>
+                </tr>
+				</#list>
+                </tbody>
+            </table>
+            <div class="mt20">
+                <form action="" class="clr">
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">总商品金额：</dt>
+                        <dd class="frt line-middle w100 txtR">￥${item.skuAmount?default(0.00)?string('0.00')}</dd>
+                    </dl>
+                    <dl class="dl-form frt mb10-i">
+                        <dt class="flt">运费：</dt>
+                        <dd class="frt line-middle w100 txtR">￥${item.otherAmount?default(0.00)?string('0.00')}</dd>
+                    </dl>
+                    <dl class="dl-form frt mb5-i" >
+                        <dt class="flt">应付总额：</dt>
+                        <dd class="frt line-middle w100 txtR">￥<span class="c-f fz18 fw-b">${item.settlementAmount?default(0.00)?string('0.00')}</span></dd>
+                    </dl>
+                </form>
+            </div>
+            <h3 class="mt20 fz12 bg-f0 h3-tittle pl10 c-2 ">
+                <span class="fw-b ml10">收货人信息：</span>
+                <span>${item.consigneeAddress} </span>
+                <span class="ml5">收货人：${item.consignee}</span>
+                <span class="ml5">联系电话：${item.consigneePhone}</span>
+            </h3>
+        </blockquote>
+		</#list>
+
+ 		<!-- 合同详情 -->
+		<#assign order = orderInfo>
+		<!-- <#assign orderContract = orderContract>-->
+		<#include "/res/freemarkerTpl/_contract_info.html" />
+		<@contract_info/>
+ 		<!-- <#assign orderAuditLog=orderAuditLog> -->
+		<#include "/res/freemarkerTpl/_order_log.html" />
+		<@order_log/>
+
+    </div>
+</div>
+<script>
+	var status = '${status}';
+	var orderSalesId = '${orderSalesId}';
+	
+     layui.use(['form','laydate'], function() {
+        var form = layui.form();
+        var laydate = layui.laydate;
+        var start = {
+            min: laydate.now()
+            ,max: '2099-06-16 23:59:59'
+            ,istoday: false
+            ,choose: function(datas){
+                end.min = datas; //开始日选好后，重置结束日的最小日期
+                end.start = datas //将结束日的初始值设定为开始日
+            }
+        };
+
+        var end = {
+            min: laydate.now()
+            ,max: '2099-06-16 23:59:59'
+            ,istoday: false
+            ,choose: function(datas){
+                start.max = datas; //结束日选好后，重置开始日的最大日期
+            }
+        };
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+		<link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+		<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+		<script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+		<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+        <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+        <script type="text/javascript" src="/res/js/mallCustomer/memberVerify.js<@resVersionDirective>?</@>"></script>
+	</head>
+	<body>
+		<section id="itocCenter">
+	       <section class="itocContent">
+	       	<div class="itocMain">
+	       		<div class="purchaseSearch purchasepading">
+					<form>
+						<dl class="form-list flt mt10 status">
+	       		     			<dt style="width: 86px;line-height: 28px;">状态筛选：</dt>
+	       		     			<dd><label class="cs-p"><input type="radio" checked="checked" name="status" class="userType cs-p" value=""/>全部</label></dd>
+							    <dd><label class="cs-p"><input type="radio" name="status" class="userType cs-p" value="VERIFYING"/>待审核</label></dd>
+							    <dd><label class="cs-p"><input type="radio" name="status" class="userType cs-p"   value="VERIFIED"/>认证成功</label></dd>
+							    <dd><label class="cs-p"><input type="radio" name="status" class="userType cs-p"   value="VERIFY_FAILED"/>未通过</label></dd>
+						</dl>
+					</form>
+	       		</div>
+	       		<div class="layui-form" style="width:96%;margin-left:2%;margin-top:2.3%">
+					 <table class="layui-table pop" lay-skin="line">
+					    <colgroup>
+					      <col width="10%">
+					      <col width="22%">
+					      <col width="8%">
+					      <col width="8%">
+					      <col width="15%">
+					      <col width="8%">
+					      <col width="15%">
+					      <col width="14%">
+					      <col>
+					    </colgroup>
+					    <thead>
+					      <tr>
+					        <th style="text-align:center">申请编号</th>
+					        <th style="text-align:center">公司名称</th>
+					        <th style="text-align:center">用户名</th>
+					        <th style="text-align:center">类型</th>
+					        <th style="text-align:center">联系电话</th>
+					        <th style="text-align:center">状态</th>
+					        <th style="text-align:center">申请时间</th>
+					        <th style="text-align:center">操作</th>
+					      </tr> 
+					    </thead>
+					    <tbody>
+					    </tbody>
+					    </table>
+				</div>
+                <div id="paginationDiv"></div>
+	       	</div>
+	       </section>
+		</section>
+		<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+		<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+		<script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+	    <script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+	    <script>
+	    var status='${status}';
+	    if(status){
+        	$("input[name=status][value="+status+"]").attr("checked",true);
+        }
+	    </script>
+	</body>
+</html>

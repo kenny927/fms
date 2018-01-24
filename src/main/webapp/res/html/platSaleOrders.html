@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" href="/res/public/layui/css/layui.css"  media="all">
+<link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+<script src="/res/js/jquery-3.1.1.min.js"></script>
+<script src="/res/public/layui/layui.js"></script>
+<script src="/res/public/layPage/laypage.js"></script>
+</head>
+<body>
+   <section class="bz-bb pl20 pr20 pt20 pb20">
+     <a class="has-num"></a>
+      <div class="tab-nav">
+    		 <ul class="tab-title">
+    		   <li class="tab-this">全部</li>
+    		   <li class="has-num">待发货<i class="num">5</i></li>
+    		   <li>待收货</li>
+    		   <li>已完成</li>
+    		   <li>已关闭</li>
+    		 </ul>
+      </div> 
+      <div class="jun-form-s form-css ">  
+		     <dl class="dl-form">
+               <dt class="flt fz12" style="width:36px;">查询：</dt>
+               <dd class="flt"><input type="text" name="title" placeholder="单号/账号/联系人/联系电话" autocomplete="off" class="layui-input pl10"></dd>
+               <button class="form-btn layui-btn-small2  ml20 ">搜索</button>
+               <button class="form-btn layui-btn-small2  ml10 goEditForOther" style="background-color:#357bb1;">代客下询单</button>
+          </dl>
+      </div>
+      <div class="mark-read mb10 ml10">
+        <span class="cs-p">
+          <input type="checkbox" class="allChoose fz12">
+          <span class="fz12 c-2">全选</span>
+        </span>
+        <span class="c-2 cs-p ml10 fz12">设为已读</span>
+        <span class="c-2 cs-p ml10 fz12">设为未读</span>
+      </div>
+      <div class="content pb10 mb20">
+        <h3 class="bz-bb bg-f0 h3-tittle pl15 mb10 inquiry-title">
+         <span style="width:52%;">商品信息/客户信息</span>
+         <span style="width:13%;">收货地址</span>
+         <span style="width:8%;">报价/回复交期</span>
+         <span style="width:13%;">状态</span>
+         <span style="width:12%;">操作</span>
+        </h3>
+        
+        <div class="enquriry-data mb20" state="待发货">
+         <ol>
+	         <li class="fw-b"><input class="new" type="checkbox"><span>买方账号：<span class="c-f">18571463313/李旭梅</span></span></li>
+	         <li class="fw-b"><span>期望交期：<span class="fw-b">2017/6/30</span></span></li>
+	         <li><span class="c-9">询价单编号：02349283947</span></li>
+	         <li><span class="c-9">联系人/联系电话：李旭梅/18571463313</span></li>
+	         <li style="float:right;width:12%;"><span class="c-9">专属客户经理：朱舟</span></li>
+           <li class="ml20"><span>卖方账号：<span class="c-f">平台</span></span></li>
+           <li style="float:right;width:12%;"><span class="c-9">订单编号：02349283947</span></li>
+         </ol>
+         <table class="layui-table pop no-margin">
+              <colgroup>
+                <col  width="140">
+                <col  width="340">
+                <col  width="160">
+                <col  width="100">
+                <col  width="150">
+                <col  width="100">
+                <col  width="240">
+                <col  width="160">
+                <col  width="250">
+                <col  width="200">
+              </colgroup>
+              <tbody>
+               <tr>
+	                <td style="text-align:left!important;">自定义商品</td>
+	                <td>室外多膜中心管式轻铠装光缆HT-GYXTW室外多膜中心管式轻铠装光缆HT-GYXTW</td>
+	                <td>HT-GYXTW</td>
+	                <td>长飞</td>
+	                <td>100.000</td>
+	                <td>米</td>
+	                <td rowspan=2>湖北省/武汉市</td>
+	                <td rowspan=2>
+                    <dl>
+                      <dt class="c-f fz14 fw-b mb5">2080.40元<dt>
+                      <dd class="mb5" style="color:#00a930;">2017/06/30</dd>
+                    </dl>
+                  </td>
+	                <td rowspan=2>
+                   <dl>
+                    <dt class="status mt10">待发货</dt>
+                    <dd style="color:#999;">2016/01/10 12:00</dd>
+                   </dl>                  
+	                </td>
+                  <td rowspan=2>
+                   <span class="special-button mb10">查看</span>
+                   <dl>
+                    <dd><button class="form-btn layui-btn-itoc layui-btn-small3 mb5"" lay-filter="formDemo">发货</button></dd>
+                   </dl>
+                   <span class="special-button close mt10">关闭</span>                           
+                  </td>	              
+                </tr>
+                <tr>
+	              <td style="text-align:left!important;">自定义商品</td>
+	              <td>室外多膜中心管式轻铠装光缆HT-GYXTW室外多膜中心管式轻铠装光缆HT-GYXTW</td>
+	              <td>HT-GYXTW</td>
+	              <td>长飞</td>
+	              <td>100.000</td>
+	              <td>米</td>           
+               </tr>              
+              </tbody>
+           </table>
+        </div>
+
+        <div class="enquriry-data mb20" state="待收货">
+         <ol>
+           <li><input type="checkbox"><span>买方账号：<span class="c-f">18571463313/李旭梅</span></span></li>
+           <li><span>期望交期：<span class="fw-b">2017/6/30</span></span></li>
+           <li><span class="c-9">询价单编号：02349283947</span></li>
+           <li><span class="c-9">联系人/联系电话：李旭梅/18571463313</span></li>
+           <li style="float:right;width:12%;"><span class="c-9">专属客户经理：朱舟</span></li>
+           <li class="ml20"><span>卖方账号：<span class="c-f">平台</span></span></li>
+           <li style="float:right;width:12%;"><span class="c-9">订单编号：02349283947</span></li>
+         </ol>
+         <table class="layui-table pop no-margin">
+              <colgroup>
+                <col  width="140">
+                <col  width="340">
+                <col  width="160">
+                <col  width="100">
+                <col  width="150">
+                <col  width="100">
+                <col  width="240">
+                <col  width="160">
+                <col  width="250">
+                <col  width="200">
+              </colgroup>
+              <tbody>
+               <tr>
+                  <td style="text-align:left!important;">自定义商品</td>
+                  <td>室外多膜中心管式轻铠装光缆HT-GYXTW室外多膜中心管式轻铠装光缆HT-GYXTW</td>
+                  <td>HT-GYXTW</td>
+                  <td>长飞</td>
+                  <td>100.000</td>
+                  <td>米</td>
+                  <td rowspan=2>湖北省/武汉市</td>
+                  <td rowspan=2>
+                    <dl>
+                      <dt class="c-f fz14 fw-b mb5">2080.40元<dt>
+                      <dd class="mb5" style="color:#00a930;">2017/06/30</dd>
+                    </dl>
+                  </td>
+                  <td rowspan=2>
+                   <dl>
+                    <dt class="status mt10">待收货</dt>
+                    <dd class="c-9 mb5">2016/01/10 12:00</dd>
+                    <dd class="express-detail">
+                      <ul>
+                        <li>发货:2017-2-20 8:00</li>
+                        <li>物流公司:顺丰快递</li>
+                        <li>单号:2397365</li>
+                        <li>物流公司联系人:李旭梅</li>
+                        <li>联系方式:1982767544</li>
+                      </ul>
+                    </dd>
+                   </dl>                  
+                  </td>
+                  <td rowspan=2>
+                   <span class="special-button mb10">查看</span>                 
+                  </td>               
+               </tr>
+                <tr>
+                <td style="text-align:left!important;">自定义商品</td>
+                <td>室外多膜中心管式轻铠装光缆HT-GYXTW室外多膜中心管式轻铠装光缆HT-GYXTW</td>
+                <td>HT-GYXTW</td>
+                <td>长飞</td>
+                <td>100.000</td>
+                <td>米</td>           
+               </tr>              
+              </tbody>
+           </table>
+        </div>
+
+        <div class="enquriry-data mb20" state="已完成">
+         <ol>
+           <li ><input type="checkbox"><span>买方账号：<span class="c-f">18571463313/李旭梅</span></span></li>
+           <li><span>期望交期：<span class="fw-b">2017/6/30</span></span></li>
+           <li><span class="c-9">询价单编号：02349283947</span></li>
+           <li><span class="c-9">联系人/联系电话：李旭梅/18571463313</span></li>
+           <li style="float:right;width:12%;"><span class="c-9">专属客户经理：朱舟</span></li>
+           <li class="ml20"><span>卖方账号：<span class="c-f">平台</span></span></li>
+           <li style="float:right;width:12%;"><span class="c-9">订单编号：02349283947</span></li>
+         </ol>
+         <table class="layui-table pop no-margin">
+              <colgroup>
+                <col  width="140">
+                <col  width="340">
+                <col  width="160">
+                <col  width="100">
+                <col  width="150">
+                <col  width="100">
+                <col  width="240">
+                <col  width="160">
+                <col  width="250">
+                <col  width="200">
+              </colgroup>
+              <tbody>
+               <tr>
+                  <td style="text-align:left!important;">自定义商品</td>
+                  <td>室外多膜中心管式轻铠装光缆HT-GYXTW室外多膜中心管式轻铠装光缆HT-GYXTW</td>
+                  <td>HT-GYXTW</td>
+                  <td>长飞</td>
+                  <td>100.000</td>
+                  <td>米</td>
+                  <td rowspan=2>湖北省/武汉市</td>
+                  <td rowspan=2>
+                    <dl>
+                      <dt class="c-f fz14 fw-b mb5">2080.40元<dt>
+                      <dd class="mb5" style="color:#00a930;">2017/06/30</dd>
+                    </dl>
+                  </td>
+                  <td rowspan=2>
+                   <dl>
+                    <dt class="status mt10">已完成</dt>
+                    <dd class="c-9 mb5">2016/01/10 12:00</dd>
+                    <dd class="express-detail">
+                      <ul>
+                        <li>发货:2017-2-20 8:00</li>
+                        <li>物流公司:顺丰快递</li>
+                        <li>单号:2397365</li>
+                        <li>物流公司联系人:李旭梅</li>
+                        <li>联系方式:1982767544</li>
+                      </ul>
+                    </dd>
+                   </dl>                  
+                  </td>
+                  <td rowspan=2>
+                   <span class="special-button mb10">查看</span>                 
+                  </td>               
+               </tr>
+                <tr>
+                <td style="text-align:left!important;">自定义商品</td>
+                <td>室外多膜中心管式轻铠装光缆HT-GYXTW室外多膜中心管式轻铠装光缆HT-GYXTW</td>
+                <td>HT-GYXTW</td>
+                <td>长飞</td>
+                <td>100.000</td>
+                <td>米</td>           
+               </tr>              
+              </tbody>
+           </table>
+        </div>
+
+      </div>
+      <div id="paginationDiv" class="mb20"></div>
+   </section>
+   <script>
+   //分页
+   $(function(){
+      loadMallVagueData(1);
+    });
+
+   layui.use(['form','element'], function(){
+       var form = layui.form();
+       var element = layui.element();
+      
+   })
+
+   function loadMallVagueData(currentPageIndex) {
+        var param = {};
+        param.currentPageIndex = currentPageIndex;
+            var pages = 100;
+            laypage({
+                cont: 'paginationDiv',
+                pages: pages,
+                curr: currentPageIndex,
+                skip: true,
+                jump: function (obj, first) {
+                    if (!first) {
+                        loadMallVagueData(obj.curr);
+                    }
+                }
+            });
+    }
+
+    $(document).on('click','.tab-nav li',function () {
+        $(this).addClass("tab-this").siblings().removeClass("tab-this");
+    })
+   </script>
+</body>
+</html>

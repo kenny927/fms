@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>">
+    <script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+	<script src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+	<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+	<style>
+        #itocCenter .itocContent .itocMain .purchaseSearch form {width:99%}
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain" style="height:486px">
+            <div class="purchaseSearch" style="padding-top:0px;padding-bottom:10px">
+                <form method="post" class="layui-form" action="" style="width:100%">
+                    <dl class="form-list flt mt20">
+                        <dt>任务Job名称：</dt>
+                        <dd><input type="text" name="jobName" placeholder="请输入job名称"/></dd>
+                        <dd><span class="btn ml20" onclick="searchJob()" style="height:35px;cursor: pointer;">查询</span></dd>
+                    </dl>
+                </form>
+            </div>
+            <div class="purchaseSearch" style="padding-top:0px;padding-bottom:10px">
+            	<form class="layui-form" style="width:100%">
+	            	<dl class="form-list flt mt20">
+		            	<dd><span class="btn ml20" onclick="addJob()" style="height:35px;cursor: pointer;">添加新任务</span></dd>
+		            	<dd><span class="btn ml20" onclick="startScheduler()" style="height:35px;cursor: pointer;">启动调度器</span></dd>
+		            	<dd><span class="btn ml20" onclick="stopScheduler()" style="height:35px;cursor: pointer;">停止调度器</span></dd>
+	            	</dl>
+            	</form>
+            </div>
+            <div style="width:100%;box-sizing:border-box;padding:0 20px;margin-right:20px">
+                <table class="layui-table pop" lay-skin="line">
+                    <colgroup>
+                        <col>
+                        <col>
+                        <col>
+                        <col>
+                        <col>
+                        <col>
+                        <col>
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th style="text-align:center;width:8%">任务ID</th>
+                        <th style="text-align:center;width:10%">任务名称</th>
+                        <th style="text-align:center;width:10%">任务类Class</th>
+                        <th style="text-align:center;width:20%">任务描述</th>
+                        <th style="text-align:center;width:10%">任务类型</th>
+<!--                         <th style="text-align:center;width:10%">时间表达式</th> -->
+<!--                         <th style="text-align:center;width:10%">开始时间</th> -->
+<!--                         <th style="text-align:center;width:10%">结束时间</th> -->
+<!--                         <th style="text-align:center;width:10%">重复次数</th> -->
+<!--                         <th style="text-align:center;width:10%">间隔时间</th> -->
+                        <th style="text-align:center;width:10%">任务状态</th>
+                        <th style="text-align:center;width:12%">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div id="paginationDiv" style="margin-right:7px;margin-top:-10px"></div>
+        </div>
+    </section>
+</section>
+<script>
+	var layer;
+	layui.use('layer', function() {
+		layer = layui.layer;
+		var param = {};
+		loadSystemSchedulerList(param);
+	});
+
+	function loadSystemSchedulerList(param) {
+		var currentPageIndex = param.currentPage || 1; //如果currentPage没定义就设置为1
+		layer.load();
+		postUtil.call("/system/scheduler/listJson", param, function(result) {
+			layer.closeAll("loading");
+			if(result.STATUS=='SUCCESS'){
+				var pages = result.DATA.totalPage;
+				renderTable(result.DATA.list);
+				laypage({
+					cont : 'paginationDiv',
+					pages : pages,
+					total : result.DATA.totalRow,
+					curr : currentPageIndex,
+					skip : true,
+					jump : function(obj, first) {
+						if (!first) {
+							var jumpParam = {
+								currentPage : obj.curr
+							};
+							var jobName = $("input[name=jobName]").val()
+							if(jobName){
+								jumpParam.jobName = jobName;
+							}
+							loadSystemSchedulerList(jumpParam);
+						}
+					}
+				});
+			}else{
+				layer.msg('数据加载失败',{icon:5})
+			}
+
+		});
+	}
+
+	function renderTable(dataList) {
+		var html = "";
+		for(var i=0;i<dataList.length;i++){
+			html+="<tr><td>"+dataList[i].jobId+"</td>"
+				+"<td>"+dataList[i].jobName+"</td>"
+				+"<td>"+dataList[i].jobClassDescript+"</td>"
+				+"<td>"+dataList[i].memo+"</td>"
+				+"<td>"+dataList[i].triggerType+"</td>";
+				if(dataList[i].status=='ENABLE'){
+					html+="<td style='color:green'>"+dataList[i].status+"</td>";
+					html +=	"<td><a class='mr10' href='javascript:stopJob(\""+dataList[i].jobId+"\")'>停止</a><a class='mr10' href='javascript:editJob(\""+dataList[i].jobId+"\")'>编辑</a><a href='javascript:deleteJob(\""+dataList[i].jobId+"\")'>删除</a></td>"
+				}else{
+					html+="<td style='color:red'>"+dataList[i].status+"</td>";
+					html +=	"<td><a class='mr10' href='javascript:startJob(\""+dataList[i].jobId+"\")'>启动</a><a class='mr10' href='javascript:editJob(\""+dataList[i].jobId+"\")'>编辑</a><a href='javascript:deleteJob(\""+dataList[i].jobId+"\")'>删除</a></td>"
+				}
+			html +="</tr>";
+		}
+		
+		$(".layui-table tbody").html(html);
+	}
+
+	function searchJob() {
+		loadSystemSchedulerList({
+			currentPage:1,
+			jobName:$("input[name=jobName]").val()
+		});
+	}
+	function addJob(){
+	    layer.open({
+	        title:"新增任务信息",
+	        type: 2,
+	        area: ['900px', '430px'],
+	        fixed: false, //不固定
+	        maxmin: false,
+	        content: '/system/scheduler/addJobPage'
+	    });
+	}
+	
+	function deleteJob(jobId){
+		postUtil.call('/system/scheduler/deleteJob',{jobId:jobId},function(res){
+			if(res.STATUS=='SUCCESS'){
+				layer.msg('删除任务成功',{icon:5},function(){
+					window.location.reload();
+				});
+			}else{
+				layer.msg('删除任务失败',{icon:6});
+			}
+		});
+	}
+	
+	function startJob(jobId){
+		postUtil.call('/system/scheduler/startJob',{jobId:jobId},function(res){
+			if(res.STATUS=='SUCCESS'){
+				layer.msg('启动任务成功',{icon:5},function(){
+					window.location.reload();
+				});
+			}else{
+				layer.msg('启动任务失败',{icon:6});
+			}
+		});
+	}
+	
+	function stopJob(jobId){
+		postUtil.call('/system/scheduler/stopJob',{jobId:jobId},function(res){
+			if(res.STATUS=='SUCCESS'){
+				layer.msg('停止任务成功',{icon:5},function(){
+					window.location.reload();
+				});
+			}else{
+				layer.msg('停止任务失败',{icon:6});
+			}
+		});
+	}
+	
+	function startScheduler(){
+		postUtil.call('/system/scheduler/startScheduler',null,function(res){
+			if(res.STATUS=='SUCCESS'){
+				layer.msg('启动调度器成功',{icon:5},function(){
+					window.location.reload();
+				});
+			}else{
+				layer.msg('启动调度器失败',{icon:6});
+			}
+		});
+	}
+	
+	function stopScheduler(){
+		postUtil.call('/system/scheduler/stopScheduler',null,function(res){
+			if(res.STATUS=='SUCCESS'){
+				layer.msg('停止调度器成功',{icon:5},function(){
+					window.location.reload();
+				});
+			}else{
+				layer.msg('停止调度器成功',{icon:6});
+			}
+		});
+	}
+	
+	function editJob(jobId){
+	    layer.open({
+	        title:"修改任务信息",
+	        type: 2,
+	        area: ['900px', '430px'],
+	        fixed: false, //不固定
+	        maxmin: false,
+	        content: '/system/scheduler/addJobPage?jobId='+jobId
+	    });
+	}
+
+</script>
+</body>
+</html>

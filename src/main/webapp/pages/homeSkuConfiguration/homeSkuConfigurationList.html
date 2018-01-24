@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<meta charset="UTF-8">
+	<script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+	<link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+	<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+	<script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+	<script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+	<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<style type="text/css">
+body {
+	padding-bottom: 40px;
+	font-size:10px;
+}
+
+.pay-off-line .control-label {
+	width: 80px;
+}
+
+.vp_ewmBox {
+	/*background: rgba(0, 0, 0, 0) url("${request.contextPath}/res/Images/icon/icon6.png") no-repeat scroll -226px -261px;*/
+	height: 210px;
+	margin: 0 auto;
+	padding: 7px;
+	position: relative;
+	width: 210px;
+}
+
+.code_hover {
+	cursor: pointer;
+	display: block;
+	left: 0;
+	position: absolute;
+	top: 0;
+}
+
+.code_hoverBg {
+	background: rgba(0, 0, 0, 0.78) none repeat scroll 0 0;
+	height: 110px;
+	margin: 7px;
+	width: 110px;
+}
+
+.saoma-text {
+	color: #333;
+	margin-top: 7px;
+	text-align: center;
+}
+
+.code_hover i {
+	background: rgba(0, 0, 0, 0)
+		url("/res/Images/icon/icon6.png") no-repeat
+		scroll -301px -203px;
+	display: block;
+	height: 30px;
+	left: 50%;
+	margin-left: -15px;
+	margin-top: -15px;
+	position: absolute;
+	top: 50%;
+	width: 30px;
+}
+
+@media ( max-width : 980px) {
+	/* Enable use of floated navbar text */
+	.navbar-text.pull-right {
+		float: none;
+		padding-left: 5px;
+		padding-right: 5px;
+	}
+}
+ div,img,p,dl,dt,dd{padding:0px;margin:0px;}
+	.cp_left{float:left;}
+	.cp_left dl dt{float:left;}
+	.cp_left dl dt img{width:100px;height:120px;border:#c1c1c1 4px;background:#fff;}
+	.cp_left dl dt p{display:block;font-family:"微软雅黑";font-size:14px;color:#62c462;line-height:18px;width:100px;padding-bottom:3px;text-align:center}
+	.cp_left dl dd{display:block;text-align:left;padding-left:10px;font-family:"微软雅黑";line-height:20px;font-size:10px;margin-left:90px}
+	.cp_left dl dd span{color:#000;font-weight:bold;}
+	.productList {font-size:12px !important;}
+	#imgshow{
+        position:absolute;
+          border:1px solid ;
+         background:white;
+         padding:1px;
+         display:none;
+         width:180px;
+          height:200px;
+     }
+</style>
+</head>
+<body>
+
+	<div style="text-align:right;float:right;margin-bottom:4px"><input type="button" id="addMallSkuConfigurationModalBtn" class="normal-btn" style="clear:both;float:right;color:#fff;font-size:14px;border:0px;background-color:#FE6527;min-width:90px;vertical-align:middle;height:32px" value="新   增"></div>
+	  <form class="form-inline definewidth m20" id="mallHomeSkuConfigurationPage_param" action="${request.contextPath}/homeSkuConfiguration/queryHomeSkuConfigurationList" method="post">
+		<select id="displayType" name="displayType" onchange="selDisplayType(this)" style="width:130px;margin-top:-30px">
+					        <option value="">全部</option>
+					        <option <#if mallHomeSkuConfigurationPage_param.displayType=="PROMOTION">selected="selected"</#if>value="PROMOTION">促销楼层</option>
+					        <option <#if mallHomeSkuConfigurationPage_param.displayType=="PRODUCT">selected="selected"</#if>value="PRODUCT">产品楼层</option>
+			    		</select>
+		</form>
+	<table class="table table-bordered table-hover definewidth">
+		<thead>
+			<tr style="background-color: #dff0d8">
+				<th style="text-align: center; width:20px"><input type="checkbox" name="firstCheckbox" /></th>
+				<th style="text-align: center; width:60px">楼层类型</th>
+				<th style="text-align: center; width:300px">楼层名称</th>
+				<th style="text-align: center; width:120px">排序号</th>
+				<th style="text-align: center; width:40px">操作</th>
+			</tr>
+		</thead>
+		<#list mallHomeSkuConfigurationPage.getList() as item>
+		<tr>
+				   <td style="display:none">${item.displayId}</td>
+				   <td style="text-align: center; line-height:80px;"><input type="checkbox" name="checkItem" displayId="${item.displayId}" /></td>
+				    <td style="text-align: center; vertical-align: middle;">${item.displayType}</td>
+				   <td>
+					<div class="cp_left">
+					    <dl>
+					        <dt><p>${item.displayDescribe!""}<img class="btnPreview" value="${item.displayId}" src="${item.displayPic}" border="0"></p></dt>
+					     </dl>
+				     </div>
+			       </td>
+			        <td style="text-align: center; vertical-align: middle;">${item.sort}</td>
+			       <td style="text-align: center;vertical-align: middle;"><a id="test1"  style="color:#FE6527" href="#" onclick="return onSelectItem(1,this)">修改</a>&nbsp;&nbsp;&nbsp;&nbsp;<a id="test2"  style="color:#FE6527" href="#" onclick="return onSelectItem(2,this)">删除</a>
+				</tr>
+		</#list>
+			<tr>
+										    <td style="text-align: center; width:20px"><input type="checkbox" name="firstCheckbox" /></td>
+										     <td style="text-align: left; width:20px" colspan="4"><a id="test2"  style="color:#FE6527" href="#" onclick="return onSelectItem(3,this)">批量删除</a></td>
+									</tr>
+	</table>
+
+<script>
+var imgUrl="";
+//必须只能选中一个
+function toHomeSkuConfigurationDetail(){
+	var displayId="";
+	var k=0;
+	 $("input[type=checkbox][name=checkItem]:checked").each(function(){ //由于复选框一般选中的是多个,所以可以循环输出选中的值 
+		 k++;
+		 displayId=$(this).attr("displayId"); 
+		});
+	 if(displayId==""){
+		alert("请选择一条记录!");
+		return;
+	 }
+	 if(k>=2){
+			alert("请仅选择一条记录!");
+			return;
+		 }
+	window.location.href = "${request.contextPath}/homeSkuConfigurationDetail/queryHomeSkuConfigurationDetailList?displayId="+displayId;
+}
+
+function selDisplayType(value){
+	var selectedOption=value.options[value.selectedIndex];
+	var displayType=selectedOption.value;
+	var param={};
+	param.displayType=displayType;
+	postUtil.submit("${request.contextPath}/homeSkuConfiguration/queryHomeSkuConfigurationList",param,null);
+	
+}
+
+function onSelectItem(type,obj){
+	var param={};
+	if("1"==type){
+		//修改楼层
+		var displayId= $(obj).closest('tr').find("td:eq(0)").text();
+        $.ajax({  
+        	 url : "${request.contextPath}/homeSkuConfiguration/loadMallHomeSkuConfigurationById", 
+	         type : "POST", 
+	         data : {"displayId" :displayId}, 
+	         success : function(data) {//返回数据根据结果进行相应的处理
+	        	 if(data.STATUS == "SUCCESS"){
+	        		 var MSG=data.MSG;
+	        		 $("#editDisplayId").val(MSG.displayId);
+	        		 $("#editDisplayDescribe").val(MSG.displayDescribe);
+	        		 $("#editskuMainImagesDiv").html("<img style='width:150px;height:150px' src='" + MSG.displayPic + "'/>");
+	        		 $("#editskuMainImagesDiv").attr("imgUrl",MSG.displayPic);
+	        		 $("#editSort").val(MSG.sort);
+	        		 $("#editDisplayType").find("option[value='"+MSG.displayType+"']").attr("selected",true);
+	        		 $('#editMallSkuConfigurationModal').modal("show");
+	        	 }else{
+	        		 alert(result.MSG);
+	        	 }
+	         }
+	     }); 
+	}else if("2"==type){
+		//删除楼层
+		var  displayId= $(obj).closest('tr').find("td:eq(0)").text();
+		param.displayId=displayId;
+		param.status="N";
+		$.ajax({  
+	        type : "POST", 
+	        url : "${request.contextPath}/homeSkuConfiguration/updateMallHomeSkuConfiguration",
+	        data : {"displayId" :displayId,"status":"N"}, 
+	        success : function(result) {//返回数据根据结果进行相应的处理
+	       	   window.location.reload();
+	        }
+	    }); 
+	}else if("3"==type){
+		//批量删除楼层
+		var  displayIds="";
+		 $("input[type=checkbox][name=checkItem]:checked").each(function(){ //由于复选框一般选中的是多个,所以可以循环输出选中的值 
+			 displayIds+=($(this).attr("displayId")+",");
+		 });
+		 if(displayIds==""){
+		    	alert("请至少选择一条记录!");
+		    	return false;
+		 }
+		if(confirm("是否确定批量删除?")){
+		    	
+		    	$.ajax({  
+			        type : "POST", 
+			        url : "${request.contextPath}/homeSkuConfiguration/deleteMallHomeSkuConfiguration",
+			        data : {"displayId" :displayIds}, 
+			        success : function(result) {//返回数据根据结果进行相应的处理
+			       	   window.location.reload();
+			        }
+			    }); 
+			}
+	}
+}
+ $(function () {
+	 $("input[name=firstCheckbox]").on("click",function(){
+			if($(this).prop("checked")){
+				$("input[name=checkItem]").prop("checked",true);
+				$("input[name=firstCheckbox]").prop("checked",true);
+			}else{
+				$("input[name=checkItem]").prop("checked", false);
+				$("input[name=firstCheckbox]").prop("checked",false);
+			}
+		});
+        $('#addMallSkuConfigurationModalBtn').bind("click", function () {
+            $('#addMallSkuConfigurationModal').modal("show");
+        });
+
+        $('#saveAddMallSkuConfigurationModalBtn').bind("click", function () {
+          var displayDescribe =$("#addDisplayDescribe").val();
+          var sort = $("#addSort").val();
+          var displayType=$("#addDisplayType").val();
+          alert(displayType);
+          var displayPic=$("#skuMainImagesDiv").attr("imgUrl");
+	          $.ajax({  
+			         type : "POST", 
+			         url : "${request.contextPath}/homeSkuConfiguration/insertMallHomeSkuConfiguration", 
+			         data : {"displayDescribe" :displayDescribe,"displayType":displayType,"displayPic":displayPic,"sort":sort}, 
+			         success : function(result) {//返回数据根据结果进行相应的处理
+			        	 window.location.reload();
+			         }
+			}); 
+        });
+        $('#saveEditMallSkuConfigurationModalBtn').bind("click", function () {
+            var add_param = {};
+            var displayId = $("#editDisplayId").val();
+            var displayDescribe =$("#editDisplayDescribe").val();
+            var displayType=$("#editDisplayType").val();
+            var sort = $("#editSort").val();;
+            var displayPic=$("#editskuMainImagesDiv").attr("imgUrl");
+	          $.ajax({  
+			         type : "POST", 
+			         url : "${request.contextPath}/homeSkuConfiguration/updateMallHomeSkuConfiguration", 
+			         data : {"displayId" :displayId,"displayDescribe" :displayDescribe,"displayType" :displayType,"displayPic":displayPic,"sort":sort}, 
+			         success : function(result) {//返回数据根据结果进行相应的处理
+			        	 window.location.reload();
+			         }
+			}); 
+    });
+});
+ 
+ function doUploadSkuImage(divObject, uploadObjStr) {
+	    var jsonpara = {};
+	    var url = '';
+	    var uploadObj = $(document.getElementById(uploadObjStr));
+	    if(uploadObj) {
+	        var file = uploadObj[0];
+	        if (file.value == null || file.value == "") {
+	            alert("提示：请先选择文件再上传");
+	            return;
+	        }
+	    }
+	    url = '/file_server/images/uploadForAjax';
+	    $.ajaxFileUpload({
+	        url: url,
+	        secureuri: false,
+	        fileElementId: uploadObj.attr("id"),
+	        data: jsonpara,
+	        dataType: 'text',
+	        success: function (data) {
+	            var jsonData = $.parseJSON(data);
+	            if(jsonData.STATUS == "SUCCESS") {
+	            	imgUrl=jsonData.data;
+	            	 $("#"+divObject).attr("imgUrl",imgUrl);
+	            	 var imgHtml="<img class='img-thumbnail' width='150' src='" + imgUrl + "'/>";
+	            	 $("#"+divObject).html(imgHtml);
+	            }else{
+	                alert(jsonData.MSG);
+	            }
+	        },
+	        error: function (data, status, e) {
+	            alert(data);
+	        }
+	    });
+	}
+ 
+ function updateSkuImages(data, isMain) {
+	    var jsonParam = {};
+	    jsonParam.data = data;
+	    jsonParam.skuId = skuId;
+	    jsonParam.isMainImage = isMain;
+	    $.ajax({
+	        type: "POST",
+	        url: contextPath + "/manage/photo/savePhotos",
+	        data: JSON.stringify(jsonParam),
+	        dataType: "json",
+	        contentType: "application/json",
+	        success: function (result) {//返回数据根据结果进行相应的处理
+	            if ('FAIL' == result.STATUS) {
+	                alert(result.MSG);
+	            } else {
+	                showSkuPhotos(result);
+	            }
+	        },
+	        error: function () {
+	            alert("加载图片失败");
+	        }
+	    });
+	}
+ </script>
+    
+</body>
+</html>

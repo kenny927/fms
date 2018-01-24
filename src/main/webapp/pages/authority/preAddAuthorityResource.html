@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <style>
+        .form_content {
+            margin-top: 20px;
+        }
+
+        .form_content dl {
+            height: 60px;
+        }
+
+        .form_content dl dt {
+            width: 120px;
+            display: inline-block;
+            text-align: right;
+        }
+
+        .form_content dl dd {
+            display: inline-block;
+        }
+
+        .form_content dl dd input{
+            width: 300px;
+            height: 25px;
+        }
+
+        .btn_content{
+            text-align: center;
+        }
+
+        .btn {
+            display: block;
+            width: 80px;
+            height: 36px;
+            font: 12px/36px "microsoft yahei";
+            text-align: center;
+            text-decoration: none;
+            border-radius: 0;
+            background: #035a9d;
+            color: #ffffff;
+            float: left;
+        }
+
+    </style>
+
+</head>
+<body>
+<div class="form_content">
+    <dl>
+        <dt>父级模板ID：</dt>
+        <dd>
+            <input type="text" readonly="readonly" id="pResourceId" value="${pResourceId}"/>
+        </dd>
+    </dl>
+    <dl>
+        <dt>父级资源名称：</dt>
+        <dd>
+            <input type="text" readonly="readonly" id="pResourceAllName" value="${pResourceAllName}"/>
+        </dd>
+    </dl>
+    <dl>
+        <dt>父级资源编码：</dt>
+        <dd>
+            <input type="text" readonly="readonly" id="pResourceCode" value="${pResourceCode}"/>
+        </dd>
+    </dl>
+    <dl>
+        <dt>资源模块：</dt>
+        <dd>
+            <input type="text" readonly="readonly" id="resourceModule" value="${resourceModule}"/>
+        </dd>
+    </dl>
+    <dl>
+        <dt>资源名称：</dt>
+        <dd>
+            <input type="text" id="resourceName"/>
+        </dd>
+    </dl>
+    <dl>
+        <dt>资源类型：</dt>
+        <dd>
+            <label for="MENU">菜单</label>
+            <input type="radio" style="width: 18px;height: 18px;cursor: pointer;" checked="checked" class="radio" name="resourceType" id="MENU" value="MENU">
+            <label for="FUNCTION">功能</label>
+            <input type="radio" style="width: 18px;height: 18px;cursor: pointer;" class="radio" name="resourceType" id="FUNCTION" value="FUNCTION">
+        </dd>
+    </dl>
+    <dl>
+        <dt>资源编码：</dt>
+        <dd>
+            <input type="text" id="resourceCode"/>
+        </dd>
+    </dl>
+    <dl>
+        <dt>资源图标：</dt>
+        <dd>
+            <input type="text" id="resourceIcon"/>
+        </dd>
+    </dl>
+    <dl>
+        <dt>资源路径：</dt>
+        <dd>
+            <input type="text" id="resourceUrl"/>
+        </dd>
+    </dl>
+
+    <div class="btn_content" style="align-content: center;">
+        <a href="javascript:void(0)" class="btn" id="AddAuthorityResourceBtn" style="margin-left: 160px;">新增</a>
+        <a href="javascript:void(0)" class="btn" id="cancelAddAuthorityResourceBtn" style="margin-left: 20px;">取消</a>
+    </div>
+</div>
+<script type="text/javascript">
+
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+
+
+    $(function () {
+
+        $('#cancelAddAuthorityResourceBtn').bind("click",function(){
+            parent.layer.close(index);
+        });
+
+        $('#AddAuthorityResourceBtn').bind("click",function(){
+            var pResourceId = $('#pResourceId').val();
+            var pResourceAllName = $('#pResourceAllName').val();
+            var resourceModule = $('#resourceModule').val();
+            var resourceName = $('#resourceName').val();
+            var resourceType = $('input:radio[name="resourceType"]:checked').val();
+            var resourceCode = $('#resourceCode').val();
+            var resourceIcon = $('#resourceIcon').val();
+            var resourceUrl = $('#resourceUrl').val();
+
+            if(resourceName == null || resourceName == "") {
+                layer.msg("资源名称不允许为空",{icon:5});
+                return;
+            }
+            if(resourceCode == null || resourceCode == "") {
+                layer.msg("资源编码不允许为空",{icon:5});
+                return;
+            }
+//            if(resourceType == "MENU") {
+//                if(resourceUrl == null || resourceUrl == "") {
+//                    layer.msg("资源路径不允许为空",{icon:5});
+//                    return;
+//                }
+//            }
+
+            var param = {};
+            param.pResourceId = pResourceId;
+            param.resourceName = resourceName;
+            param.resourceAllName = pResourceAllName+">"+resourceName;
+            param.resourceType = resourceType;
+            param.resourceModule = resourceModule;
+            param.resourceCode = resourceCode;
+            param.resourceIcon = resourceIcon;
+            param.resourceUrl = resourceUrl;
+
+            var paramJsonStr = JSON.stringify(param);
+
+            postUtil.call("/authorityResource/add", {"paramJsonStr":paramJsonStr}, function (result) {
+                parent.addAuthorityResourceCallBack(result);
+                if (result.STATUS == "SUCCESS") {
+                    layer.msg('新增资源成功!', {
+                        time: 0,
+                        btn: ['继续添加', '返回列表'],
+                        yes: function (index) {
+                            layer.close(index);
+                            initPreAddForm();
+                        },
+                        btn2: function () {
+                            parent.layer.close(index);
+                        }
+                    });
+                } else {
+                    layer.msg(result.MSG, {icon: 5});
+                }
+            });
+
+        });
+    });
+
+    function initPreAddForm(){
+        var resourceModule = $('#resourceModule').val();
+        $('#resourceName').val("");
+        $("input[name='resourceType'][value='MENU']").attr("checked",true);
+        $('#resourceCode').val("");
+        $('#resourceIcon').val("");
+        $('#resourceUrl').val("");
+    }
+
+</script>
+</body>
+</html>

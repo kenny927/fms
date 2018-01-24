@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="/res/public/layui-v2.0.0/layui/css/layui.css"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_233622_cgas2t1faiz4cxr.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css"/>
+    <style type="text/css">
+        .similar-mark{
+            color:red;
+        }
+        [v-cloak]{
+         display: none;
+        }
+        .yofc-page{
+            margin:20px;
+        }
+        .jun-spread{
+          font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter" v-cloak>
+    <section class="itocContent">
+        <div class="itocMain pt20">
+            <div class="jun-form-s form-css">
+                <dl class="dl-form">
+                  <dt class="flt fz12" style="width: 84px;">创建时间：</dt>
+                  <dd class="flt layui-form">
+                      <input type="text" class="layui-input" id="createTime" placeholder="" >
+                  </dd>
+
+                  <dt class="flt fz12 ml10">公司名称：</dt>
+                  <dd class="flt layui-form">
+                    <input type="text" class="layui-input" id="accountName"  placeholder="请输入客户公司名称" v-model="queryParam.accountName">
+                  </dd>
+
+                   <button  @click="queryConfict()" class="form-btn layui-btn-small2 ml10">查询</button>
+                </dl>                             
+            </div>
+
+            <div class="table" id="applyList">
+                <ul class="th">
+                    <li style="width:3%;"><div class="mida"><div class="midb"></div></div></li>
+                    <li style="width:15%;"><div class="mida"><div class="midb">客户公司名称</div></div></li>
+                    <li style="width:9%;"><div class="mida"><div class="midb">地址</div></div></li>
+                    <li style="width:10%;"><div class="mida"><div class="midb">主要联系人</div></div></li>
+                    <li style="width:10%;"><div class="mida"><div class="midb">联系电话</div></div></li>
+                    <li style="width:10%"><div class="mida"><div class="midb">客户类型</div></div></li>
+                    <li style="width:9%"><div class="mida"><div class="midb">所属行业</div></div></li>
+                    <li style="width:9%"><div class="mida"><div class="midb">客户经理</div></div></li>
+                    <li style="width:9%"><div class="mida"><div class="midb">入库状态</div></div></li>
+                    <li style="width:8%"><div class="mida"><div class="midb">创建时间</div></div></li>
+                    <li style="width:8%"><div class="mida"><div class="midb">操作</div></div></li>
+                </ul>
+                <div class="information-list" style="border-right: none">                  
+                  <template v-for="(item,index) in conflictList">
+                     <ul class="information informationList">
+                        <li style="width:3%;">
+                            <div class="mida">
+                                <div class="midb">
+                                    <span v-if="item.conflicts.length!=0" class="cs-p iconfont jun-spread icon-jiahao1"></span>
+                                </div>
+                            </div>
+                        </li>   
+                        <li style="width:15%;">
+                            <div class="mida">
+                                <div class="midb">
+                                    <a class="fz12 jun-a" href="javascript:void(0);" @click="openDetailTab(item.accountId)">{{item.accountName.replace(' ','&nbsp;')}}</a>
+                                </div>
+                            </div>
+                        </li>   
+                        <li style="width:9%;">
+                            <div class="mida">
+                                <div class="midb">{{item.province}}{{item.city}}</div>
+                            </div>
+                        </li>   
+                        <li style="width:10%;">
+                            <div class="mida">
+                                <div class="midb">{{item.linkman}}</div>
+                            </div>
+                        </li>   
+                        <li style="width:10%;">
+                            <div class="mida">
+                                <div class="midb">{{item.linkmanTelephone}}</div>
+                            </div>
+                        </li>   
+                        <li style="width:10%;">
+                            <div class="mida">
+                                <div class="midb">{{item.accountKind}}</div>
+                            </div>
+                        </li>   
+                        <li style="width:9%;">
+                            <div class="mida">
+                                <div class="midb">{{item.businessGroup}}</div>
+                            </div>
+                        </li>  
+                        <li style="width:9%;">
+                            <div class="mida">
+                                <div class="midb">{{item.accountManagerName}}</div>
+                            </div>
+                        </li>   
+                        <li style="width:9%;">
+                            <div class="mida">
+                                <div class="midb">{{item.accountEntryStatus}}</div>
+                            </div>
+                        </li> 
+                        <li style="width:8%;">
+                            <div class="mida">
+                                <div class="midb">{{item.createDate}}</div>
+                            </div>
+                        </li>  
+                        <li style="width:8%;">
+                            <div class="mida">
+                              <div class="midb">
+                                 <a class="c-h mr5" href="javascript:void(0);" @click="approve(item.accountId)">入库</a>
+                                 <a class="c-h" href="javascript:void(0);" @click="cancel(item.accountId)">作废</a>
+                              </div>
+                            </div>
+                        </li>
+                     </ul>
+                     <div style="background: rgb(254, 253, 180);display: none;">
+                      <template v-for="(items,index) in item.conflicts">
+                        <ul class="information informationList">   
+                            <li style="width:3%;">
+                                <div class="mida">
+                                    <div class="midb"></div>
+                                </div>
+                            </li>   
+                            <li style="width:15%;">
+                                <div class="mida">
+                                    <div class="midb">
+                                        <a class="fz12 jun-a" href="javascript:void(0);" @click="openDetailTab(items.accountId)" v-html="items.accountName">
+                                          <!--  {{items.accountName}} -->
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>   
+                            <li style="width:9%;">
+                                <div class="mida">
+                                    <div class="midb">
+                                        <span class="similar-mark">{{items.area}}</span>
+                                    </div>
+                                </div>
+                            </li>   
+                            <li style="width:10%;">
+                                <div class="mida">
+                                    <div class="midb">{{items.linkman}}</div>
+                                </div>
+                            </li>   
+                            <li style="width:10%;">
+                                <div class="mida">
+                                    <div class="midb">{{items.linkmanTelephone}}</div>
+                                </div>
+                            </li>   
+                            <li style="width:10%;">
+                                <div class="mida">
+                                    <div class="midb">{{items.accountType}}</div>
+                                </div>
+                            </li>   
+                            <li style="width:9%;">
+                                <div class="mida">
+                                    <div class="midb">{{items.businessGroup}}</div>
+                                </div>
+                            </li>
+                            <li style="width:9%;">
+                                <div class="mida">
+                                    <div class="midb">{{items.accountManagerName}}</div>
+                                </div>
+                            </li>
+                            <li style="width:9%;">
+                                <div class="mida">
+                                    <div class="midb">{{items.accountEntryStatus}}</div>
+                                </div>
+                            </li>
+                            <li style="width:8%;">
+                                <div class="mida">
+                                    <div class="midb">{{items.createDate | time}}</div>
+                                </div>
+                            </li>
+                            <li style="width:8%;">
+                                <div class="mida">
+                                    <div class="midb"></div>
+                                </div>
+                            </li>
+                         </ul>
+                       </template>
+                     </div>
+                  </template>
+
+                  <template v-if="conflictList.length==0">
+                      <div class="t-c"  style="line-height: 50px;"> 暂无相关信息！</div>
+                  </template>
+                </div>
+            </div>
+            <div id="paginationDiv" class="yofc-page"></div>
+        </div>
+    </section>
+</section>
+<script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script src="/res/js/moment.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/layui-v2.0.0/layui/layui.js"></script>
+<script src="/res/public/layer/layer_util.js<@resVersionDirective>?</@>"></script>
+<script src="/res/public/vue/dist/vue.min.js"></script>
+<script>
+var vm,form,laypage,layer,laydate;
+var _menuType="checkAuthor";
+
+Vue.filter('time', function (value, format) {
+    value = value || '';
+    if(value == ''){
+        return '--';
+    }
+    format = format || 'YYYY-MM-DD HH:mm:ss';
+    return moment(value).format(format);
+});
+
+vm = new Vue({
+el:"#itocCenter",
+data:{
+  queryParam:{
+     pageNumber:1,
+     pageSize:10,
+     createTime:'',
+     accountName:''
+  },
+  conflictList:[]
+},
+mounted:function(){
+  this.$nextTick(function(){
+     this.showData();
+  })
+},
+methods:{
+    showData:function(){
+        layui.use(['form','laypage','layer','laydate'],function(){
+              form = layui.form;
+              layer = layui.layer;
+              laypage = layui.laypage;
+              laydate = layui.laydate;
+
+               //初始化时间控件  
+              laydate.render({
+                elem: '#createTime',
+                type:'date',
+                format:"yyyy-MM-dd",
+                range: "~",
+                done:function(value, date){
+                  vm.queryParam.createTime = value;
+                }
+              });
+
+              vm.loadConflictList(vm.queryParam);                  
+
+        })
+    },
+    loadConflictList:function(queryParam){
+       layer.load();
+       postUtil.call('/customerManagement/queryCustConflictList',queryParam,function(result){
+
+            if(result.STATUS=="SUCCESS"){
+                var totalRow = result.DATA.totalRow;
+                var pageNumber = result.DATA.pageNumber;
+                var pageSize  = result.DATA.pageSize;
+
+                vm.conflictList = result.DATA.list;
+
+                console.log(result);
+
+                laypage.render({
+                        elem: 'paginationDiv'
+                        ,count: totalRow
+                        ,curr : pageNumber
+                        ,first: '首页'
+                        ,last: '尾页'
+                        ,layout: ['count', 'prev', 'page', 'next', 'limit', 'skip']
+                        ,limit: pageSize
+                        ,limits: [5, 10, 15]
+                        ,jump: function(obj,first){
+                            if(!first){
+                                vm.queryParam.pageNumber =  obj.curr;
+                                vm.queryParam.pageSize =  obj.limit;
+                                vm.loadConflictList(vm.queryParam);
+                            }
+                        }
+                });
+
+                layer.closeAll("loading");    
+            }else{
+                layer.closeAll("loading");
+                layer.msg(result.MSG, {icon: 5});
+            }
+       })
+
+    },
+    approve:function(accountId){
+       postUtil.call('/customerManagement/inComeData',{accountId:accountId},function(result){
+         if(result.STATUS=="SUCCESS"){
+            layer.msg('入库成功！', {icon: 6});
+
+            vm.loadConflictList(vm.queryParam);
+         }
+       })
+    },
+    cancel:function(accountId){
+        var layerContent = '<div class="t-c c-2 pt20">' +
+                    '<p><span class="c-f">是否确认作废该客户信息？</span>如确认，请输入作废原因</p>' +
+                    '<textarea maxlength="200" style="width: 320px;height: 120px;margin-top: 20px;margin-bottom:20px;padding:5px;font-size:12px;" id="refuseReason"></textarea>' +
+                    '</div>';
+        layer.open({
+            title: "审核提示",
+            skin: 'msgskin',
+            area: ['450px', '350px'],
+            btnAlign: 'c',
+            content: layerContent,
+            scrolling:'no',
+            btn: ['确定', '取消'],
+            yes: function (index, layero) {
+                var refuseReason = $('#refuseReason').val();
+                if(refuseReason == null || refuseReason == "") {
+                    layer.msg("拒绝原因不允许为空");
+                }else{
+                    var param = {};
+                    param.accountId = accountId;
+                    param.remark = refuseReason;
+                    postUtil.call("/customerManagement/outComeData", param, function (result) {
+                        if (result.STATUS == "SUCCESS") {
+                            layer.msg("作废成功！", {icon: 6});
+                            layer.close(index);
+                            vm.loadConflictList(vm.queryParam);
+                        } else {
+                            layer.msg(result.MSG + "", {icon: 5});
+                        }
+                    });
+                    // layer.close(index);
+                }
+            }, btn2: function (index, layero) {
+                layer.close(index);
+            },
+            cancel: function () {
+
+            }
+        });
+
+    },
+    queryConfict:function(){
+        vm.queryParam.pageNumber =  1;
+        vm.queryParam.pageSize =  10;
+
+        vm.loadConflictList(vm.queryParam);
+    },
+    openDetailTab:function(accountId){
+        //判断是否存在相应的tab，存在则直接跳转过去
+        cardUtil.closeCard("客户详情-" + accountId);
+        cardUtil.openCard("客户详情-" + accountId,"/customerManagement/preDetail?accountId="+accountId+"&menuType="+_menuType);
+        cardUtil.changeCard("客户详情-" + accountId);
+    }
+ }
+})
+
+$(document).on("click",".jun-spread",function(){
+
+    if($(this).parent().parent().parent().parent().next().css("display")=="none"){
+        $(this).parent().parent().parent().parent().next().show();
+        $(this).removeClass('icon-jiahao1').addClass('icon-jianhao1');
+    }else{
+        $(this).parent().parent().parent().parent().next().hide();
+        $(this).removeClass('icon-jianhao1').addClass('icon-jiahao1');
+    }
+})
+
+    
+</script>
+</body>
+</html>

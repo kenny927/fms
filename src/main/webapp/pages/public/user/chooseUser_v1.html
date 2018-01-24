@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>请选择员工</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_svvppt2njx9u23xr.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+    <!--script src="/res/public/vue/dist/vue.min.js<@resVersionDirective>?</@>"></script-->
+    <script src="/res/js/vue.js<@resVersionDirective>?</@>"></script>
+    <style type="text/css">
+        [v-cloak]{
+            display: none;
+        }
+        .form-css .dl-form dd .layui-select-title input[type=text]{
+            width:160px;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter" style="padding-left: 0px;">
+    <section class="itocContent">
+        <div class="itocMain" style="border: 0px;">
+            <div class="table inquiry userList" v-cloak>
+                <form id="mem_basic_frm" class="layui-form jun-form-s form-css" method="post">
+                <div class="jun-form-s form-css ">
+                    <dl class="dl-form">
+                        <template v-for="item in dialogDef.searchCondition">
+                            <dt class="flt fz12">{{item.title}}：</dt>
+                            <template v-if="item.type=='input'">
+                                <dd class="flt">
+                                    <input type="text" name="{{item.name}}" lay-filter="{{item.name}}"
+                                           placeholder="{{item.placeholder}}" autocomplete="off"
+                                           class="layui-input pl10" v-bind:style="item.style">
+                                </dd>
+                            </template>
+                            <template v-if="item.type=='select'">
+                                <dd class="flt layui-form jun-form-l">
+                                    <select name="{{item.name}}" lay-filter="{{item.name}}" v-bind:style="item.style">
+                                        <option value="" selected=""></option>
+                                        <option value="">全部</option>
+                                        <option v-for='one in item.options' value="{{one.code}}">{{one.name}}</option>
+                                    </select>
+                                </dd>
+                            </template>
+                        </template>
+                        <dd class="flt ml20">
+                        <button id="searchBtn" class="form-btn layui-btn-small2  ml10 " lay-submit="" lay-filter="demo1">搜索</button>
+                        <button id="chooseBtn" class="form-btn layui-btn-small2  ml10 " lay-submit="" lay-filter="demo2">确定</button>
+                        </dd>
+                    </dl>
+                </div>
+                </form>
+                <table class="layui-table pop mb5-i" lay-skin="line">
+                    <colgroup>
+                        <col width="30">
+                        <col  v-for="item in dialogDef.dataHeaders" width="{{item.width}}">
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th>
+                            <template v-if="dialogDef.showSelectAllButton">
+                                <input id="selectAllCheckBox" type="checkbox"/>
+                            </template>
+                        </th>
+                        <th v-for="item in dialogDef.dataHeaders">{{item.itemTitle}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="item in dataRows">
+                            <template v-for="key in dialogDef.dataRowsDef">
+                                <template v-if="key.type=='checkbox'">
+                                    <td>
+                                        <input type="checkbox" name="userIdCheckBox" value="{{item[key.name]}}"/>
+                                    </td>
+                                </template>
+                                <template v-else>
+                                    <template v-if="key.type=='radio'">
+                                        <td>
+                                        <input type="radio" name="userIdCheckBox" value="{{item[key.name]}}"/>
+                                        </td>
+                                    </template>
+                                    <template v-else>
+                                        <td class="dataCellCs">
+                                        {{item[key.name]}}
+                                        </td>
+                                    </template>
+                                </template>
+                            </template>
+                        </tr>
+                    </tbody>
+                </table>
+                <div id="paginationDiv"></div>
+            </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript">
+    var layer;
+    var form;
+    var currentVue;
+    var pageOptions = parent.currentChooseUserComponent;
+    var PAGE_SIZE = parent.currentChooseUserComponent.options.dialogDef.pageSize || 10;
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    var userDataMap = {};
+    layui.use(['form', 'element', 'layer'], function () {
+        layer = layui.layer;
+        form = layui.form();
+        var element = layui.element();
+        $form = $('form');
+        currentVue = new Vue({
+            el:'.userList',
+            data:{
+                dialogDef:pageOptions.options.dialogDef,
+                dataRows:[]
+            }
+        });
+        doSearch();
+        form.render();
+        form.on('submit(demo1)', function (data) {
+            //alert(JSON.stringify(data.field));
+            var param = data.field;
+            param.currentPageIndex = 1;
+            param.pageSize = PAGE_SIZE;
+            doSearch(param);
+            return false;
+        });
+
+        form.on('submit(demo2)', function (data) {
+            var userChecks = document.getElementsByName("userIdCheckBox");
+            var checkedUserIds = [];
+            if (userChecks.length > 0) {
+                for (var i = 0; i < userChecks.length; i++) {
+                    if (userChecks[i].checked == true) {
+                        checkedUserIds.push(userChecks[i].value);
+                    }
+                }
+
+                if (checkedUserIds.length == 0) {
+                    layer.msg("请查询数据勾选后再进行操作");
+                } else {
+                    var choosedUserDataArray = [];
+                    for (var j = 0; j < checkedUserIds.length; j++) {
+                        var tempAccountData = userDataMap[checkedUserIds[j]];
+                        choosedUserDataArray.push(tempAccountData);
+                    }
+
+                    var success = pageOptions.options.dialogDef.selectedCallBack(choosedUserDataArray);//调用父页面的渲染方法
+                    if (success) {
+                        parent.layer.close(index);//关闭当前窗口
+                    }
+                }
+            } else {
+                layer.msg("请查询数据勾选后再进行操作");
+            }
+            return false;
+        });
+    })
+
+    function loadUserDetail(data){
+        currentVue.dataRows = data;
+        Vue.nextTick(function () {
+        });
+        //用来防止 table 事件绑定
+        if(!hadBindClick){
+            afterVueRender();
+        }
+        if (data.length > 0) {
+            for (var i = 0; i < data.length; i++) {
+                var item = data[i];
+                var userId = item.userId;
+                userDataMap[userId] = item;
+            }
+        }
+
+        $('#selectAllCheckBox').bind("click", function () {
+            var selectAllChecked = document.getElementById("selectAllCheckBox").checked;
+            var userChecks = document.getElementsByName("userIdCheckBox");
+            if (userChecks.length > 0) {
+                for (var i = 0; i < userChecks.length; i++) {
+                    userChecks[i].checked = selectAllChecked;
+                }
+            }
+        });
+
+        form.render();
+    }
+
+    function afterVueRender(){
+        $(document).on("click", ".userList table tbody tr .dataCellCs", function () {
+            var isAllChecked = true;
+            var currentEl = $(this).parent().find('input[name="userIdCheckBox"]')[0];
+            var checked = currentEl.checked;
+            if(!checked){
+                currentEl.checked = true;
+            }else{
+                currentEl.checked = false;
+                isAllChecked = false;
+            }
+            var allCheckbox = $('#selectAllCheckBox')[0];
+            if(allCheckbox){
+                $.each($('input[name="userIdCheckBox"]'), function (index, item) {
+                    if(!$(item).is(':checked')) {
+                        isAllChecked = false;
+                        return false;
+                    }
+                });
+                allCheckbox.checked = isAllChecked;
+            }
+        });
+    }
+
+    function doSearch(param){
+        if(param){
+            ;
+        }else{
+            var param = {};
+            param.currentPageIndex = 1;
+            param.pageSize = PAGE_SIZE;
+        }
+        if(pageOptions.options.searchParam){
+            $.extend(true, param, pageOptions.options.searchParam);
+        }
+        console.log("查询参数", param)
+        loadUserData(param);
+    }
+    //用来防止 table 事件绑定
+    var hadBindClick = false;
+
+    function loadUserData(queryParam) {
+        layer.load();
+        var url = pageOptions.options.searchUrl;
+        postUtil.call(url, queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            loadUserDetail(dataList);
+            layer.closeAll("loading");
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                skip: true,
+                total:totalRow,
+                jump: function (obj, first) {
+                    if (!first) {
+                        hadBindClick = true;
+                        queryParam.currentPageIndex = obj.curr;
+                        loadUserData(queryParam);
+                    }
+                }
+            });
+        });
+    }
+</script>
+</body>
+</html>

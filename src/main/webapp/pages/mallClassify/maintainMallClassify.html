@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+
+    <!-- ztree v3.5 -->
+    <link rel="stylesheet" type="text/css" href="/res/public/zTree_v3/css/zTreeStyle/zTreeStyle.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/public/zTree_v3/js/jquery.ztree.core-3.5.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/zTree_v3/js/jquery.ztree.excheck-3.5.min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/public/zTree_v3/js/jquery.ztree.exedit.js<@resVersionDirective>?</@>"></script>
+
+    <script src="/res/js/classify/editMallclassify.js<@resVersionDirective>?</@>"></script>
+    <style>
+        .ztree_wd li span.button.add {
+            margin-left: 2px;
+            margin-right: -1px;
+            background-position: -144px 0;
+            vertical-align: top;
+            *vertical-align: middle
+        }
+
+        /*list_ztree表格*/
+        .list_ztree {
+            padding: 0;
+            border: 1px solid #CDD6D5;
+        }
+
+        .list_ztree li a {
+            vertical-align: middle;
+            height: 40px;
+        }
+
+        .list_ztree li > a {
+            width: 100%;
+        }
+
+        .list_ztree li > a,
+        .list_ztree li a.curSelectedNode {
+            padding-top: 0px;
+            background: none;
+            height: auto;
+            border: none;
+            cursor: default;
+            opacity: 1;
+        }
+
+        .list_ztree li ul {
+            padding-left: 0px
+        }
+
+        .list_ztree div.diy span {
+            line-height: 30px;
+            vertical-align: middle;
+        }
+
+        .list_ztree div.diy {
+            height: 100%;
+            width: 25%;
+            line-height: 30px;
+            border-top: 1px solid #dddddd;
+            border-left: 0px solid #dddddd;
+            text-align: center;
+            display: inline-block;
+            box-sizing: border-box;
+            /*color: #6c6c6c;*/
+            font-family: "SimSun";
+            font-size: 12px;
+            vertical-align: top;
+        }
+
+        .list_ztree div.diy:first-child {
+            text-align: left;
+            text-indent: 10px;
+            border-left: none;
+        }
+
+        .list_ztree .head {
+            background: #eaeaea;
+        }
+
+        .list_ztree .head div.diy {
+            border-top: none;
+            border-right: 0px solid #CDD2D4;
+            color: #000;
+            font-family: "Microsoft YaHei";
+            font-size: 14px;
+        }
+
+        /*end--ztree表格*/
+        .edit_mallclass_ztree li span.button.add {
+            margin-left: 2px;
+            margin-right: -1px;
+            background-position: -144px 0;
+            vertical-align: top;
+            *vertical-align: middle
+        }
+
+        .dhButton {
+            color: #fff;
+            font-size: 14px;
+            border: 0px;
+            background-color: #FE6527;
+            min-width: 90px;
+            vertical-align: middle;
+            height: 32px;
+            margin-left:5px;
+            margin-right:5px;
+        }
+    </style>
+</head>
+<body>
+<!-- 修改商城外部分类层 -->
+<div style="height: 400px;overflow: auto;">
+    <div class="zTreeDemoBackground left">
+        <ul id="treeMallList" class="ztree edit_mallclass_ztree"></ul>
+    </div>
+</div>
+
+<div style="float:right;margin-right: 10px;">
+<button id="doChooseMallClassifyBtn" class="search-btn" style="cursor: pointer;">确&nbsp;认</button>
+<button id="cancelChooseMallClassifyBtn" class="search-btn" style="cursor: pointer;">关&nbsp;闭</button>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="/res/css/sku.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/Area1.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+    <script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/layui-mz-min.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+
+    <style type="text/css">
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd .goodsName {
+            height: 40px;
+            line-height: 20px;
+            width: 400px;
+            text-overflow: ellipsis;
+            color: #222222;
+        }
+
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd p {
+            height: 20px;
+            line-height: 20px;
+            color: #999999;
+            width: 400px;
+            text-overflow: ellipsis;
+        }
+
+        button {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter">
+    <section class="itocContent">
+        <div class="itocMain">
+            <div class="addSku">
+              <form id="mem_basic_frm" class="layui-form jun-form-s form-css" method="post">
+	                <input type="hidden" id="salsRepId" value="${salesRepAreaRelationship.salsRepId}">
+	                <dl class="sku-list">
+	                    <dt class="mt10"><span class="c-f">*</span>用户名：</dt>
+	                    <dd class="inputContent">${authorityUser.userName}</dd>
+	                </dl>
+	                <dl class="sku-list inline">
+	                    <dt class="mt10"><span class="c-f">*</span>真实姓名：</dt>
+	                    <dd class="inputContent">${authorityUser.userRealName}</dd>
+	                </dl>
+	                <dl class="sku-list">
+	                    <dt class="mt10"><span class="c-f">*</span>手机号：</dt>
+	                    <dd class="inputContent">${authorityUser.mobile}</dd>
+	                </dl>
+	                <dl class="sku-list">
+	                    <dt class="mt10"><span class="c-f">*</span>负责区域(省)：</dt>
+	                    <dd class="inputContent">
+	                         <select name="province" rg-validate-field="province" lay-filter="province" id="s_province" lay-search>
+	                                    <option value="">请选择省</option>
+	                         </select>
+	                    </dd>
+	                </dl>
+                </form>
+            </div>
+            <div class="purchaseSearch ml10"
+                 style="padding-bottom: 10px;padding-right: 20px;text-align:left;margin-left: 140px;">
+                <button id="doEditSalerFitForArea" class="btn-click2" style="height: 36px;width: 80px;">修改</button>
+                <button id="cancel" class="btn-click2" style="height: 36px;width: 80px;">取消</button>
+            </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript">
+
+//省市联动  star
+var areaData = Area;
+var $form;
+var form;
+var _province = "${salesRepAreaRelationship.province}";
+var _salesRepId = "${salesRepAreaRelationship.salesRepId}";
+
+layui.use('form', function() {
+    form = layui.form();
+    $form = $('form');
+    loadProvince();
+   });
+   
+function loadProvince() {
+
+
+ var proHtml = '';
+ for(var i = 0; i < areaData.length; i++) {
+     if(_province != '' && _province == areaData[i].provinceName) {
+         proHtml += '<option class="option1" value="' + areaData[i].provinceName + '" selected='+'"selected">' +
+             areaData[i].provinceName + '</option>';
+        
+     } else {
+         proHtml += '<option class="option1" value="' + areaData[i].provinceName + '">' +
+             areaData[i].provinceName + '</option>';
+     }
+  }
+    $form.find('select[name=province]').append(proHtml);
+    form.render();
+   }
+
+
+
+    $(function () {
+
+
+
+        $('#cancel').bind("click", function () {
+            jumpToAuthoritySaleForAreaList();
+        });
+
+        
+        $('#doEditSalerFitForArea').bind("click",function () {
+            
+            var province = $form.find('select[name=province] option:selected').attr("value");
+            
+    		if(province==""||province==null){
+    			layer.msg("请先给"+para.userName+"选择负责区域(省)",{icon:5});
+    			return;
+    		}
+    		
+           
+            var updateParam = {};
+            updateParam.salesRepId = _salesRepId;
+            updateParam.province = province;
+
+            var updateParamStr = JSON.stringify(updateParam);
+            postUtil.call("/salerFitForArea/updateSalerForArea",{"jsonStr":updateParamStr},function (result) {
+                   if(result.success == true) {
+                    	jumpToAuthoritySaleForAreaList();
+                    }else {
+                        layer.msg(result.msg,{icon:5});
+                    }
+            })
+
+        });
+        
+    });
+
+    function jumpToAuthoritySaleForAreaList() {
+        postUtil.submit("/salerFitForArea/preAuthoritySalerForAreaList");
+    }
+
+
+
+
+</script>
+</body>
+</html>

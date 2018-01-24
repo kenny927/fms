@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>请选择角色</title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_p3j907q2agbq33di.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_svvppt2njx9u23xr.css<@resVersionDirective>?</@>"/>
+    <style type="text/css">
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd .goodsName {
+            height: 35px;
+            line-height: 35px;
+            overflow: hidden;
+            width: 500px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            color: #222222;
+        }
+
+        #itocCenter .itocContent .itocMain .inquiry ul dl dd p {
+            height: 20px;
+            line-height: 20px;
+            color: #999999;
+            overflow: hidden;
+            width: 500px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        select {
+            margin-left: 10px;
+            height: 34px;
+            line-height: 34px;
+            width: 148px;
+            padding-left: 10px;
+            border: 1px solid #e6e6e6;
+        }
+    </style>
+</head>
+<body>
+<section id="itocCenter" style="padding-left: 0px;">
+    <section class="itocContent">
+        <div class="itocMain" style="border: 0px;">
+            <div class="table inquiry" id="addInquiry">
+                <div class="treeSearch mb20">
+                    角色名称：<input type="text" name="s_roleName" id="s_user" placeholder="请输入角色名称">
+                    <button id="searchBtn" class="search-btn" style="cursor: pointer;">查询</button>
+                    <button id="chooseBtn" style="width: 84px;cursor: pointer;" class="search-btn">确定</button>
+                </div>
+                <ul class="th th-border">
+                    <li style="width: 10%;"><div class="mida"><div class="midb"><input id="selectAllCheckBox" type="checkbox"/></div></div></li>
+                    <li style="width: 45%"><div class="mida"><div class="midb">角色名称</div></div></li>
+                    <li style="width: 45%;"><div class="mida"><div class="midb">角色描述</div></div></li>
+                </ul>
+                <div class="information-list wait" id="roleTable_tbody">
+                </div>
+                <div id="paginationDiv"></div>
+            </div>
+        </div>
+    </section>
+</section>
+<script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/public/layer/layer.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript" src="/res/public/layPage/laypage.js<@resVersionDirective>?</@>"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#addInquiry').show();
+    });
+
+    var PAGE_SIZE = 5;
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    var dataMap = {};
+
+
+    function doSearch(){
+        var roleName = $('#s_roleName').val();
+        var queryParam = {};
+        queryParam.currentPageIndex = 1;
+        queryParam.pageSize = PAGE_SIZE;
+        queryParam.roleName = roleName;
+
+        loadRoleData(queryParam);
+    }
+
+    $(function () {
+
+        doSearch();
+
+        $("#searchBtn").bind("click", function () {
+            doSearch();
+        });
+
+        $('#chooseBtn').bind("click", function () {
+            var checks = document.getElementsByName("roleIdCheckBox");
+            var checkedUserIds = [];
+            if (checks.length > 0) {
+                for (var i = 0; i < checks.length; i++) {
+                    if (checks[i].checked == true) {
+                        checkedUserIds.push(checks[i].value);
+                    }
+                }
+
+                if (checkedUserIds.length == 0) {
+                    alert("请查询数据勾选后再进行操作");
+                } else {
+                    var choosedDataArray = [];
+                    for (var j = 0; j < checkedUserIds.length; j++) {
+                        var tempData = dataMap[checkedUserIds[j]];
+                        choosedDataArray.push(tempData);
+                    }
+                    var success = parent.chooseRoleCallback(choosedDataArray);//调用父页面的渲染方法
+                    if (success) {
+                        parent.layer.close(index);//关闭当前窗口
+                    }
+                }
+            } else {
+                alert("请查询数据勾选后再进行操作");
+            }
+        });
+
+        $('#selectAllCheckBox').bind("click", function () {
+            var selectAllChecked = document.getElementById("selectAllCheckBox").checked;
+            var checks = document.getElementsByName("roleIdCheckBox");
+            if (checks.length > 0) {
+                for (var i = 0; i < checks.length; i++) {
+                    checks[i].checked = selectAllChecked;
+                }
+            }
+        });
+    });
+
+    function loadRoleData(queryParam) {
+        layer.load();
+        postUtil.call("/reusable/role/roleJsonData", queryParam, function (pageResult) {
+            var pageNumber = pageResult.pageNumber;
+            var pageSize = pageResult.pageSize;
+            var totalPage = pageResult.totalPage;
+            var totalRow = pageResult.totalRow;
+            var dataList = pageResult.list;
+            renderTable(dataList);
+            layer.closeAll("loading");
+            laypage({
+                cont: 'paginationDiv',
+                pages: totalPage,
+                curr: pageNumber,
+                skip: true,
+                total:totalRow,
+                jump: function (obj, first) {
+                    if (!first) {
+                        var roleName = $('#s_roleName').val();
+                        var tempParam = {};
+                        tempParam.currentPageIndex = obj.curr;
+                        tempParam.pageSize = PAGE_SIZE;
+                        tempParam.roleName = roleName;
+
+                        loadRoleData(tempParam);
+                    }
+                }
+            });
+        });
+    }
+
+    function renderTable(dataList) {
+        var length = dataList.length;
+        var table = document.getElementById("roleTable_tbody");
+        table.innerHTML = "";
+        dataMap = {};
+        if (length > 0) {
+            for (var i = 0; i < dataList.length; i++) {
+                var data = dataList[i];
+                var roleId = data.roleId;
+                dataMap[roleId] = data;
+                var row = renderRow(data);
+                table.appendChild(row);
+            }
+        }else {
+            var html = '<p class="t-c fz16 c-2" style="line-height: 76px;">暂无信息！</p>';
+            $(table).html(html);
+        }
+    }
+
+    function renderRow(rowData) {
+
+        var roleId = rowData.roleId;
+        var roleName = rowData.roleName;
+        var roleDesc = rowData.roleDesc;
+
+        var ul = document.createElement('ul');
+        ul.setAttribute("class", "information");
+        ul.setAttribute("style", "height:75px;");
+
+
+        ul.appendChild(renderCell("roleIdCheckBox", roleId, "width:10%;height:75px;"));
+        ul.appendChild(renderCell(null, roleName, "width:45%;height:75px;"));
+        ul.appendChild(renderCell(null, roleDesc, "width:45%;height:75px;"));
+        return ul;
+    }
+
+    function renderCell(name, value, style) {
+        var li = document.createElement('li');
+        li.setAttribute("style", style)
+        var div_mida = document.createElement('div');
+        div_mida.setAttribute("class", "mida");
+        var div_midb = document.createElement('div');
+        div_midb.setAttribute("class", "midb");
+        if ("roleIdCheckBox" == name) {
+            div_midb.innerHTML = '<input type="checkbox" name="roleIdCheckBox" value="' + value + '" />';
+        } else {
+            if(value) {
+                div_midb.innerText = value;
+            }else {
+                div_midb.innerText = "--";
+            }
+        }
+        div_mida.appendChild(div_midb);
+        li.appendChild(div_mida);
+        return li;
+    }
+
+    $(document).on("click", "#roleTable_tbody ul", function () {
+        var checked = $(this).find('input:checkbox[name="roleIdCheckBox"]').attr("checked");
+        $(this).find('input:checkbox[name="roleIdCheckBox"]').attr("checked", !checked);
+        var isAllChecked = true;
+        $.each($('input:checkbox[name="roleIdCheckBox"]'), function (index, item) {
+            if(!$(item).is(':checked')) {
+                isAllChecked = false;
+                return false;
+            }
+        });
+        $('#selectAllCheckBox').attr("checked", isAllChecked);
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,289 @@
+<#import "/res/template/indexBase.html" as base/>
+<@base.htmlBase>
+<script src="/res/common/area.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<link href="/res/bootstrap3.3/dist/css/bootstrap.min.css<@resVersionDirective>?</@>" rel="stylesheet">
+<link href="/res/bootstrap3.3/dist/css/bootstrap-theme.css<@resVersionDirective>?</@>" rel="stylesheet">
+<link href="/res/bootstrap3.3/_style.css<@resVersionDirective>?</@>" rel="stylesheet">
+<script src="/res/bootstrap3.3/dist/js/bootstrap.min.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<script src="/res/bootstrap3.3/jquery.dataTables.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<script src="/res/bootstrap3.3/dist/js/dataTables.bootstrap.min.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<script src="/res/js/ajaxfileupload_final.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+<script src="/res/common/multiple-select.js<@resVersionDirective>?</@>"></script>
+<script src="/res/js/projectReport/commonProjectDetail.js<@resVersionDirective>?</@>"></script>
+<link href="/res/css/multiple-select.css<@resVersionDirective>?</@>" rel="stylesheet">
+<style>
+    .nav3{height:55px; margin-left: -20px;
+        border-top: 1px solid #f0f0f0;bottom:15px;}
+    .nav3  button{height:35px;}
+    .bor-ff {
+        border: 1px solid #ff4800!important;
+    }
+    .form-css .layui-form-radio{
+        display:inline!important;
+    }
+    .form-css .layui-form-radio:nth-of-type(3){
+        margin-left:220px;
+    }
+    .radios .layui-form-radio:nth-of-type(2){
+        margin-left:12px;
+    }
+</style>
+<script type="text/javascript">
+    var contextPath ='${request.contextPath}';
+    var backupId = '${backup.backupId}';
+    var secrecyOpt= '${backup.secrecyOpt!}';
+    var $form;
+    var form;
+</script>
+
+<!-- 附件模块 -->
+<#assign v_businessKey  = backup.backupId/>
+<#include "/res/template/_attachment_info.html"/>
+<@attachment_info/>
+<div class="main">
+    <div class="jun-base">
+        <div class="base pt20">
+            <article class="bor-e6 pt10" style="height:40px;">
+                <div class="c-2" style="display:inherit;clear:both;">
+                    <p class="c-9 fz12 mt5 flt" >销售代表：${realName} ${mobile}</p>
+                    <button onClick="listAttachment('${backup.backupId!}','PROJECT_BACKUP_FILE_TYPE')" class="btn-click frt ml10" data-toggle="modal" data-target="#list_attachment_modal">查看附件</button>
+                </div>
+            </article>
+        </div>
+        <#if backup.distributorCompanyName!=null && backup.distributorCompanyName!=''>
+            <div class="base pt20">
+                <article class="bor-e6 pt10" style="height:30px;">
+                    <div class="">
+                        <p>公司名称：<span class="c-2">${backup.distributorCompanyName!}</span></p>
+                        <p>分销商本项目负责人：<span class="c-2">${backup.distributorPrincipalName!}</span></p>
+                        <p>联系电话：<span class="c-2">${backup.distributorPrincipalMobile!}</span></p>
+                        <p>邮箱：<span class="c-2">${backup.distributorPrincipalEmail!}</span></p>
+                    </div>
+                </article>
+            </div>
+        </#if>
+        <div class="base pre">
+            <p class="pt10 mb10"><span class="c-2">项目基本信息</span><span class="fz12">（编号：${backup.backupId!}，<#if (backup.commitDate??) >${backup.commitDate?string('yyyy-MM-dd HH:mm:ss')}</#if>）</span></p>
+            <article class="bor-e6 pt10 pb10">
+                <div class="mt10">
+                    <p>项目名称：<span class="c-2">${backup.projectName!}</span></p>
+                </div>
+                <div class="mt10">
+                    <p>项目编号：<span class="c-2">${backup.projectNumber!}</span></p>
+                    <p>报备状态：<span class="c-f">${backup.statusName!}</span></p>
+                    <p>项目等级：<span class="c-2">${backup.projectLevel!}</span></p>
+                </div>
+                <div class="mt10">
+                    <#if backup.projectProvince?exists >
+                        <#if backup.projectProvince==backup.projectCity >
+                            <p>项目地：<span class="c-2">${backup.projectProvince!}</span></p>
+                            <#else>
+                                <p>项目地：<span class="c-2">${backup.projectProvince!}${backup.projectCity!}</span></p>
+                        </#if>
+                    </#if>
+                    <p>要求保护期：<span class="c-2"><#if (backup.projectProtectDate??) >${backup.projectProtectDate?string('yyyy-MM-dd')}</#if></span></p>
+                    <p>授权状态：<span class="c-f">${authorizationStatus}</span></p>
+                </div>
+                <form  class="jun-form-s form-css" style="height:70px;">
+                    <dl class="dl-form" style="margin-bottom:0;">
+                        <dt class="flt fz12" style="font-weight:500;line-height:30px;margin-left:30px;">项目保密选择：</dt>
+                        <dd class="flt layui-form">
+                            <input  lay-filter="secrecyOpt" type="radio" name="secrecyOpt" value="SECRETIVE" title="保密" ${(backup.secrecyOpt==null || backup.secrecyOpt=='SECRETIVE')?string('checked','')} />
+                            <input  lay-filter="secrecyOpt" type="radio" name="secrecyOpt" value="OPEN_TO_SOMEAREA" title="对某些区域公开" ${(backup.secrecyOpt!=null && backup.secrecyOpt=='OPEN_TO_SOMEAREA')?string('checked','')} />
+                            <input  lay-filter="secrecyOpt" type="radio" name="secrecyOpt" value="OPEN_TO_ALL" title="对所有区域公开" ${(backup.secrecyOpt!=null && backup.secrecyOpt=='OPEN_TO_ALL')?string('checked','')} />
+                        </dd>
+                        <dd class="pre"><span class="jun-wrong-msg c-f" style="top:30px;left:270px;display:none;">请选择具体的区域</span></dd>
+                    </dl>
+                    <br /><br />
+                    <dl class="dl-form" style="margin-bottom:0;">
+                        <dt class="flt fz12" style="font-weight:500;line-height:30px;margin-left:30px;">公开商品：</dt>
+                        <dd class="flt layui-form radios" style="margin-left:23px;">
+                            <input lay-filter="isOpenSku" type="radio" name="isOpenSku" value="N" title="否" ${(backup.isOpenSku==null || backup.isOpenSku=='N')?string('checked','')} />
+                            <input lay-filter="isOpenSku" type="radio" name="isOpenSku" value="Y" title="是" ${(backup.isOpenSku!=null && backup.isOpenSku=='Y')?string('checked','')} />
+                        </dd>
+                        <dd class="pre"><span class="jun-wrong-msg c-f" style="top:30px;left:270px;display:none;"></span></dd>
+                    </dl>
+                </form>
+            </article>
+            <div style="position:absolute;left:390px;top:165px;width:200px;height:32px;">
+                <div style="display:inline;">
+                    <select id="secrecyArea" name="secrecyArea" multiple="multiple">
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="base mt5">
+            <p class="pt20 mb10"><span class="c-2">项目描述</span></p>
+            <article class="bor-e6 pt10 pb10">
+                <div class="c-2">${backup.projectDecription!}
+                </div>
+            </article>
+        </div>
+        <div class="base mt5">
+            <p class="pt20" style="height: 15px;"><span class="c-2 flt">业主信息</span></p>
+            <table class="layui-table pop">
+                <colgroup>
+                    <col width="300">
+                    <col width="300">
+                    <col width="200">
+                    <col width="200">
+                    <col width="200">
+                    <col>
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>公司名称</th>
+                    <th>统一社会信用代码</th>
+                    <th>联系人</th>
+                    <th>联系电话</th>
+                    <th>职位</th>
+                </tr>
+                </thead>
+                <tbody>
+                <#if proprietorList?? && (proprietorList?size>0) >
+                    <#list proprietorList as proprietor>
+                        <tr id="proprietor${proprietor_index}">
+                            <td>${proprietor.proprietorCompanyName!}</td>
+                            <td class="pre">
+                                ${proprietor.proprietorCreditId!}
+                            </td>
+                            <td>${proprietor.proprietorLinkMan!}</td>
+                            <td>${proprietor.proprietorLinkMobile!}</td>
+                            <td>${proprietor.proprietorLinkPosition!}</td>
+                        </tr>
+                    </#list>
+                </#if>
+                </tbody>
+            </table>
+        </div>
+        <div class="base mt5">
+            <p class="pt20 mb10"><span class="c-2">集成商信息</span></p>
+            <table class="layui-table pop">
+                <colgroup>
+                    <col width="300">
+                    <col width="300">
+                    <col width="200">
+                    <col width="200">
+                    <col width="200">
+                    <col>
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>公司名称</th>
+                    <th>统一社会信用代码</th>
+                    <th>联系人</th>
+                    <th>联系电话</th>
+                    <th>职位</th>
+                </tr>
+                </thead>
+                <tbody>
+                <#if integratorList?exists && (integratorList?size>0) >
+                    <#list integratorList as integrator>
+                        <tr id="integrator${integrator_index}">
+                            <td>${integrator.integratorCompanyName!}</td>
+                            <td class="pre">
+                                ${integrator.integratorCreditId!}
+                            </td>
+                            <td>${integrator.integratorLinkMan!}</td>
+                            <td>${integrator.integratorLinkMobile!}</td>
+                            <td>${integrator.integratorLinkPosition!}</td>
+                        </tr>
+                    </#list>
+                </#if>
+                </tbody>
+            </table>
+        </div>
+        <div class="base mt5">
+            <p class="pt20" style="height: 15px;"><span class="c-2 flt">产品信息</span></p>
+            <table class="layui-table pop">
+                <colgroup>
+                    <col width="200">
+                    <col width="100">
+                    <col width="350">
+                    <col width="100">
+                    <col width="100">
+                    <col width="200">
+                    <col>
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>商品型号</th>
+                    <th>品牌</th>
+                    <th>商品名称</th>
+                    <th><span class="c-f">*</span>数量</th>
+                    <th>计量单位</th>
+                    <th>希望厂家配合报出的价格</th>
+                </tr>
+                </thead>
+                <tbody>
+                <#if skuList?exists && (skuList?size !=0) >
+                    <#list skuList as sku>
+                        <tr id="customProduct${sku_index}">
+                            <td>${sku.skuModel!}</td>
+                            <td>${sku.skuBrandName!}</td>
+                            <td>${sku.skuName!}</td>
+                            <td>${sku.skuQuantity!}</td>
+                            <td>${sku.skuUnitName!}</td>
+                            <td>${sku.expectSkuPrice!}</td>
+                        </tr>
+                    </#list>
+                </#if>
+                </tbody>
+            </table>
+        </div>
+        <div class="base mt5">
+            <article class="bor-e6 pt10 pb10">
+                <div>
+                    <p  class="mt10">预计芯公里（光缆）：<span class="c-2">${backup.predictFiberKilometers!}</span></p>
+                    <p class="mt10">预计金额（光配、铜配）：<span class="c-2">${backup.predictAmount!}</span></p>
+                    <p></p>
+                </div>
+            </article>
+        </div>
+        <div class="base mt5 pb20">
+            <p class="pt20" style="height: 15px;"><span class="c-2 flt">项目跟进情况(<span class="c-f fz12">项目报备以后必须两周内跟进报备一次，如未及时跟进，项目保护将自动失效</span>)</span>
+                <#if (backup.status=='PROTECTED') >
+                    <a href="javascript:addVisit();" class="c-h fz12 frt mt5 cs-p">添加跟进记录</a>
+                </#if>
+            </p>
+            <table class="layui-table pop"  lay-skin="line">
+                <colgroup>
+                    <col width="100">
+                    <col width="100">
+                    <col width="100">
+                    <col width="100">
+                    <col width="100">
+                    <col width="100">
+                    <col width="400">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>跟进人</th>
+                    <th>时间</th>
+                    <th>拜访主体</th>
+                    <th>公司名称</th>
+                    <th>联系人</th>
+                    <th>联系电话</th>
+                    <th>跟进记录</th>
+                </tr>
+                </thead>
+                <tbody>
+                <#if followList?exists && (followList?size !=0) >
+                    <#list followList as follow>
+                        <tr>
+                            <td>${follow.followMan!}</td>
+                            <td><#if (follow.followDate??) >${follow.followDate?string('yyyy-MM-dd HH:mm:ss')}</#if></td>
+                            <td>${follow.visitMainObject!}</td>
+                            <td>${follow.visitCompanyName!}</td>
+                            <td>${follow.visitLinkMan!}</td>
+                            <td>${follow.visitLinkMobile!}</td>
+                            <td>${follow.visitContentDescriptor!}</td>
+                        </tr>
+                    </#list>
+                </#if>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</@base.htmlBase>

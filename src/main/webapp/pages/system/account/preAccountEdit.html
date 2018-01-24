@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/res/public/layui/css/layui.css<@resVersionDirective>?</@>" media="all">
+    <link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+    <link rel="stylesheet" type="text/css" href="http://at.alicdn.com/t/font_wgxw75694927qfr.css<@resVersionDirective>?</@>"/>
+    <script type="text/javascript" src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/public/layui/WorldArea.js<@resVersionDirective>?</@>" type="text/javascript"></script>
+    <script type="text/javascript" src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+    <script type="text/javascript" src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/MultiSelectDropList.js<@resVersionDirective>?</@>"></script>
+    <script src="/res/js/rg-validator-1.1.js<@resVersionDirective>?</@>"></script>
+</head>
+<body>
+<div style="margin-left:60px;margin-top: 20px;">
+    <form action="" class="layui-form jun-form-s form-css" id="mem_basic_frm">
+        <dl class="dl-form">
+            <dt class="flt fz12" style="width:128px;margin-left:-44px"><span class="c-f">*</span>客户类型：</dt>
+            <dd class="flt layui-form">
+                <input name="accountType" lay-filter="accountType" type="radio" value="Enterprise" title="企业" <#if detail.account.accountType == 'Enterprise'>checked</#if> disabled>
+                <input name="accountType" lay-filter="accountType" type="radio" value="Individual" title="个人" <#if detail.account.accountType == 'Individual'>checked</#if> disabled>
+            </dd>
+            <#if detail.verify.status=='UNVERIFIED' || detail.verify.status=='VERIFY_FAILED'>
+                <@havePermission resourceCode="operation:customer:engineer:manage:editField">
+                <dd class="flt line-middle"><a style="margin-left: 101px" href="javascript:;" class="c-h cs-p fz12" onclick="enableAccountType()">修改</a></dd>
+                </@>
+            </#if>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12"  style="width:128px;margin-left:-44px"><span class="c-f">*</span>客户名称：</dt><!-- 不能编辑 加背景颜色  bg-f0-->
+            <dd class="flt"><input name="accountName" type="text"  placeholder="请输入联系人姓名" autocomplete="off" class="layui-input bg-f0"  disabled="disabled" value="${detail.account.accountName}"><input name="accountId" type="hidden" value="${detail.account.accountId}" class="layui-input"></dd>
+            <#if detail.verify.status=='UNVERIFIED' || detail.verify.status=='VERIFY_FAILED'>
+                <@havePermission resourceCode="operation:customer:engineer:manage:editField">
+                <dd class="flt line-middle"><a style="margin-left: 4px" href="javascript:;" class="c-h cs-p fz12" onclick="enableAccountName()">修改</a></dd>
+                </@>
+            </#if>
+        </dl>
+        <dl class="dl-form" id="inteSocialCreditNo_dl" <#if detail.account.accountType == 'Individual'>hidden</#if>>
+            <dt class="flt fz12" style="width: 128px;margin-left:-44px"><span class="c-f">*</span>统一社会信用代码：</dt>
+            <dd class="flt"><input name="inteSocialCreditNo" type="text"  placeholder="请输入统一社会信用代码" autocomplete="off" class="layui-input bg-f0" disabled="disabled" value="${detail.account.inteSocialCreditNo}"></dd>
+            <#if detail.verify.status=='UNVERIFIED' || detail.verify.status=='VERIFY_FAILED'>
+                <@havePermission resourceCode="operation:customer:engineer:manage:editField">
+                <dd class="flt line-middle"><a style="margin-left: 4px" href="javascript:;" class="c-h cs-p fz12" onclick="enableInteSocialCreditNo()">修改</a></dd>
+                </@>
+            </#if>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12" style="width: 128px;margin-left:-44px">座机：</dt>
+            <dd class="flt rg_group"><input type="text" name="telephone" rg-validate-field="telephone" placeholder="格式：027-8888888" autocomplete="off" class="layui-input" value="${detail.account.telephone}"></dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12" style="width: 128px;margin-left:-44px">国家：</dt>
+            <dd class="flt layui-form dd-city rg_group">
+                <select name="country" rg-validate-field="country" lay-filter="country" id="s_country" lay-search>
+                    <option value="">请选国家</option>
+                </select>
+            </dd>
+        </dl>
+        <dl class="dl-form" style="margin-bottom:10px;">
+            <dt class="flt"  style="width:128px;margin-left:-44px"><span class="c-f">*</span>地址：</dt>
+            <dd class="flt layui-form dd-city rg_group">
+                <select name="province" rg-validate-field="province" lay-filter="province" id="s_province" lay-search>
+                    <option value="">请选择省</option>
+                </select>
+            </dd>
+            <dd class="flt layui-form dd-city rg_group">
+                <select name="city" rg-validate-field="city"  id="s_city" lay-filter="city" lay-search>
+                    <option value="">请选择市</option>
+                </select>
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt"  style="width:128px;margin-left:-44px">&nbsp;</dt>
+            <dd class="flt">
+                <input type="text" name="address" autocomplete="off" class="layui-input" value="${detail.account.address}" filter="address">
+            </dd>
+        </dl>
+        <dl class="dl-form">
+            <dt class="flt fz12"  style="width:128px;margin-left:-44px">客户来源：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select lay-filter="aihao"  style="width: 240px;" disabled="disabled">
+                    <option value=""></option>
+                    <option value="MANUAL" <#if detail.account.accountResource == 'MANUAL'>selected</#if>>手动新增</option>
+                    <option value="MALL_PERSONAGE_REGIST" <#if detail.account.accountResource == 'MALL_PERSONAGE_REGIST'>selected</#if>>商城个人注册</option>
+                    <option value="MALL_ENTERPRISE_REGISTION" <#if detail.account.accountResource == 'MALL_ENTERPRISE_REGISTION'>selected</#if>>商城企业注册</option>
+                    <option value="DISTRIBUTOR_PROJECT_BACKUP" <#if detail.account.accountResource == 'DISTRIBUTOR_PROJECT_BACKUP'>selected</#if>>分销商项目报备</option>
+                    <option value="SALES_PROJECT_BACKUP" <#if detail.account.accountResource == 'SALES_PROJECT_BACKUP'>selected</#if>>销售员项目报备</option>
+                    <option value="RAPID_DEMAND" <#if detail.account.accountResource == 'RAPID_DEMAND'>selected</#if>>快捷委托单</option>
+                </select>
+            </dd>
+        </dl>
+        <dl class="dl-form" style="margin-bottom: 0;">
+            <dt class="flt fz12"  style="width:128px;margin-left:-44px">客户状态：</dt>
+            <dd class="flt layui-form jun-form-l">
+                <select lay-filter="aihao"  style="width: 240px;" disabled="disabled">
+                    <option value=""></option>
+                    <option value="0" <#if detail.account.accountStatus == 'NO_SIGNED'>selected</#if>>未签约</option>
+                    <option value="1" <#if detail.account.accountStatus == 'SIGNED'>selected</#if>>已签约</option>
+                    <option value="1" <#if detail.account.accountStatus == 'TEMINATED'>selected</#if>>已解约</option>
+                </select>
+            </dd>
+        </dl>
+        <div class="pb20 t-c mt20">
+            <button class="form-btn layui-btn-big ml15" lay-submit="" lay-filter="formDemo">确定</button>
+            <button class="form-btn layui-btn-big" lay-filter="formDemo1" style="background-color: #cccccc;" id="cancelEditSystemAccountBtn">取消</button>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+
+    var _accountId = '${accountId}';
+    var index = parent.layer.getFrameIndex(window.name);//当前窗口的标识
+    var areaData = Area;
+    var $form;
+    var form;
+    var layer;
+    var companyProvince = '${detail.account.province}';
+    var city = '${detail.account.city}';
+    var country = "${detail.account.country}";
+    var rgValidator;
+    var ops = {
+        form: "mem_basic_frm",
+        valid: "",
+        invalidMessageClass : ' iconfont c-f jun-ch fz12 ',
+        invalidMessageStyle : '',
+        invalidIconOnlyWhileRequired : true,
+        invalidIcon : "",
+        fieldInType: "dd",
+        fields:{
+            accountName: {
+                message : '所选客户座机验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请留下客户名称！"
+                    }
+                }
+            },
+            inteSocialCreditNo: {
+                message : '统一社会信用代码验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请留下统一社会信用代码！"
+                    },
+                    regexp : {
+                        message : "统一社会信用代码格式不正确",
+                        regexp : /(^[0-9A-Z]{18}$)|(^[0-9A-Z]{15}$)|(^无$)/
+                    }
+                }
+            },
+            telephone: {
+                message : '所选客户座机验证失败',
+                validators : {
+                    csValidating : {
+                        callback : 'telephoneCommonValidator',
+                        message : "请输入的电话格式不正确(由数字或-组成)"
+                    }
+                }
+            },
+            province : {
+                message : '所选身份验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请留下省份！"
+                    }
+                }
+            },
+            city : {
+                message : '所选城市验证失败',
+                validators : {
+                    notEmpty : {
+                        message : "请留下城市！"
+                    }
+                }
+            }
+        }
+    };
+
+    function enableAccountType() {
+        $form.find('input[name=accountType]');
+        $.each($form.find('input[name=accountType]'), function (n, item) {
+            $(this).removeAttr("disabled");
+        })
+        form.render();
+    }
+    
+    function enableAccountName(){
+        var obj = $form.find('input[name=accountName]');
+        obj.removeAttr("disabled");
+        obj.removeClass('bg-f0');
+        obj.attr("rg-validate-field", "accountName");
+        obj.parent().addClass("rg_group");
+        rgValidator.bindValidator();
+    }
+    
+    function enableInteSocialCreditNo() {
+        var obj = $form.find('input[name=inteSocialCreditNo]');
+        obj.removeAttr("disabled");
+        obj.removeClass('bg-f0');
+        obj.attr("rg-validate-field", "inteSocialCreditNo");
+        obj.parent().addClass("rg_group");
+        rgValidator.bindValidator();
+    }
+
+    function loadCountry(country) {
+        var defaultCountry = country == '' ? '中国':country;
+
+        var ctHtml = '';
+        for(var i = 0; i < WorldArea.length; i++) {
+            if(defaultCountry != '' && defaultCountry == WorldArea[i].countryName) {
+                ctHtml += '<option value="' + WorldArea[i].countryName + '" selected>' +
+                        WorldArea[i].countryName + '</option>';
+            }else{
+                ctHtml += '<option value="' + WorldArea[i].countryName + '">' +
+                        WorldArea[i].countryName + '</option>';
+            }
+        }
+
+        if(defaultCountry != ''){
+            var provincesDefault = getProvinceByCountry(WorldArea, defaultCountry);
+            if(provincesDefault.length > 0) {
+                loadProvince(provincesDefault, companyProvince, city);
+            } else {
+                hideArea();
+            }
+        }
+
+        $form.find('select[name=country]').append(ctHtml);
+        form.render();
+
+        form.on('select(country)', function(data) {
+            var value = data.value;
+            var provinces = getProvinceByCountry(WorldArea, value);
+            if(provinces.length > 0) {
+                resetProvinceAddress(provinces);
+            } else {
+                hideArea();
+            }
+            if($('input[name=telephone]').val() != '') {
+                rgValidator.rgValidateFieldOne($('input[name=telephone]'), ops.fields['telephone']);
+            }
+        });
+    }
+
+    /**
+     * 国家下无地区（省市时）不显示 省市和地区控件
+     * */
+    function hideArea(){
+        $form.find('select[name=province]').val("");
+        $form.find('select[name=city]').val("");
+        $form.find('input[name=address]').val("");
+        $form.find('select[name=province]').parent().parent().hide();
+        $form.find('input[name=address]').parent().parent().hide();
+        $form.find('select[name=province]').parent().removeClass("rg_group");
+        $form.find('select[name=city]').parent().removeClass("rg_group");
+    }
+
+    function showArea(){
+        $form.find('select[name=province]').parent().parent().show();
+        $form.find('input[name=address]').parent().parent().show();
+        $form.find('select[name=province]').parent().addClass("rg_group");
+        $form.find('select[name=city]').parent().addClass("rg_group");
+    }
+
+    /**
+     * 国家切换时，省市、地址需重置
+     * */
+    function resetProvinceAddress(provinces) {
+        companyProvince = '';
+        city = '';
+        $form.find('select[name=province]').val("");
+        $form.find('select[name=city]').val("");
+        $form.find('input[name=address]').val("");
+        loadProvince(provinces, '', '');
+    }
+
+    function loadProvince(provinces, provinceDefault, cityDefault) {
+        var proHtml = '';
+        for(var i = 0; i < provinces.length; i++) {
+            if(provinceDefault != '' && provinceDefault == areaData[i].provinceName) {
+                proHtml += '<option value="' + provinces[i].provinceName + '" selected>' +
+                        areaData[i].provinceName + '</option>';
+            } else {
+                proHtml += '<option value="' + provinces[i].provinceName + '">' +
+                        areaData[i].provinceName + '</option>';
+            }
+        }
+        showArea()
+        if(companyProvince != '') {
+            var cities = getCityByProvince(provinces, companyProvince);
+            loadCity(cities, cityDefault);
+        }
+        $form.find('select[name=province]').append(proHtml);
+        form.render();
+        form.on('select(province)', function(data) {
+            var value = data.value;
+            var cities = getCityByProvince(provinces, value);
+            if(cities.length > 0) {
+                loadCity(cities, cityDefault);
+            } else {
+                $form.find('select[name=city]').parent().hide();
+            }
+
+            if($('input[name=telephone]').val() != '') {
+                rgValidator.rgValidateFieldOne($('input[name=telephone]'), ops.fields['telephone']);
+            }
+        });
+    }
+
+    function loadCity(citys, cityDefault) {
+        var cityHtml = '';
+        for(var i = 0; i < citys.length; i++) {
+        	 if(cityDefault != '' && cityDefault == citys[i].cityName) {
+        		 cityHtml += '<option value="' + citys[i].cityName + '" selected>' +
+                 citys[i].cityName + '</option>';
+        	 }else{
+        		 cityHtml += '<option value="' + citys[i].cityName + '">' +
+                 citys[i].cityName + '</option>';
+        	 }
+        }
+        $form.find('select[name=city]').html(cityHtml).parent();
+        form.render();
+
+    }
+
+    function getCityByProvince(areaData, provinceName) {
+        var cities = [];
+        $.each(areaData, function (index, item) {
+            if(item.provinceName == provinceName) {
+                cities = item.mallCityList;
+                return false;
+            }
+        });
+        return cities;
+    }
+
+    /*function msg( msg){
+        layer.open({
+            title: '操作提示',
+            skin: 'youskin',
+            area: ['280px', '200px'],
+            btnAlign: 'c',
+            content: '<p class="iconfont icon-yiwancheng1" style="text-align: center;margin-top: 30px;"></p><p style="text-align: center;margin-top: 30px;font-size:12px;color:#222222">' + msg + '</p>',
+            btn: ['关闭'],
+            yes: function(index, layero){
+            }
+        });
+    }*/
+
+    layui.use(['form', 'layer'], function () {
+        layer = layui.layer;
+        form = layui.form();
+        $form = $('form');
+        loadCountry(country);
+        //rgValidate(ops);
+
+        $('#cancelEditSystemAccountBtn').bind("click", function () {
+            parent.layer.close(index);//关闭当前窗口
+        });
+
+        form.on('radio(accountType)', function(data){
+            var obj = $("input[name=inteSocialCreditNo]");
+            if(data.value=="Enterprise"){
+                $('#inteSocialCreditNo_dl').show();
+                $('input[name=inteSocialCreditNo]').val("");
+                enableInteSocialCreditNo();
+            }else{
+                $('#inteSocialCreditNo_dl').hide();
+                $('input[name=inteSocialCreditNo]').val("无");
+            }
+        });
+
+        form.on('submit(formDemo)', function(data) {
+            if(rgValidator.validateOnSubmit(ops) != ''){
+                return false;
+            }
+            if(data.field.accountType == 'Enterprise'){
+                if(/(^[0-9A-Z]{18}$)|(^[0-9A-Z]{15}$)/.test(data.field.inteSocialCreditNo)){
+                    var message = checkInteSocialCreditNoRepeat(data.field);
+                    if(message.length > 0){
+                        layer.msg("企业信用代码与现有客户库信息冲突，操作不会生效！" , {icon: 5});
+                        return false;
+                    }
+                }
+            }
+            //查重验证
+            var message = checkAccountNameRepeat(data.field);
+            if(message.length > 0){
+                layer.msg("用户名称（所在地）与现有客户库信息冲突，操作不会生效！" , {icon: 5});
+                return false;
+            }
+            var param = {};
+            param.data = JSON.stringify(data.field);
+            //alert(JSON.stringify(data.field));
+            postUtil.call("/systemAccount/accountEdit", param, function (result) {
+                if(result.success){
+                    layer.msg("客户信息修改成功", {icon: 6});
+                }else{
+                    layer.msg("客户信息修改失败", {icon: 5});
+                }
+                var success = parent.editAccount(result);//调用父页面的渲染方法
+                if (success) {
+                    setTimeout(function () {
+                        parent.layer.close(index);//关闭当前窗口
+                    },1500);
+                }
+            });
+            return false;
+        });
+
+        form.on('submit(formDemo1)', function(data) {
+            parent.layer.close(index);//关闭当前窗口
+        });
+
+        rgValidator = new RgValidator(ops);
+        rgValidator.bindValidator();
+    });
+
+    function checkAccountNameRepeat(param){
+        var message = '';
+        $.ajax({
+            url: '/systemAccount/queryCheckConflictAccountName',
+            type: 'post',
+            dataType: 'json',
+            data: param,
+            timeout: 10000,
+            async: false,
+            success: function (result) {
+                if(result.success){
+                    message = result.data;
+                }else{
+                    alert(result.message);
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+        return message;
+    }
+
+    function checkInteSocialCreditNoRepeat(param){
+        var message = '';
+        $.ajax({
+            url: '/systemAccount/queryCheckConflictInteSocialCreditNo',
+            type: 'post',
+            dataType: 'json',
+            data: param,
+            timeout: 10000,
+            async: false,
+            success: function (result) {
+                if(result.success){
+                    message = result.data;
+                }else{
+                    alert(result.message);
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(errorThrown);
+            }
+        });
+        return message;
+    }
+
+    function telephoneCommonValidator(obj) {
+        var province = $form.find('select[name=province]').val() || '';
+        if(obj.val() == '' || province == ''){
+            return true;
+        }
+        if(province.indexOf("香港") > -1 || province.indexOf("澳门")  > -1 || province.indexOf("台湾")  > -1){
+            return true;
+        }else if(/^0[\d]{2,3}-[\d]{7,8}$/.test(obj.val())){
+            return true;
+        }
+        return false;
+    }
+
+</script>
+</body>
+</html>

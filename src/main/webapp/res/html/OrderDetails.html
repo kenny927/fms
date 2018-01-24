@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="/res/css/style.css<@resVersionDirective>?</@>"/>
+	<script src="/res/js/jquery-3.1.1.min.js<@resVersionDirective>?</@>"></script>
+	<script src="/res/js/main.js<@resVersionDirective>?</@>"></script>
+	<script src="/res/common/globalVar.js<@resVersionDirective>?</@>"></script>
+	<script src="/res/common/post.js<@resVersionDirective>?</@>"></script>
+	<script src="/res/public/layui/layui.js<@resVersionDirective>?</@>"></script>
+	<script src="/res/js/vue.js<@resVersionDirective>?</@>"></script>
+	<style type="text/css">
+		.fenlist{
+			display: none;
+		}
+		.fenlei:hover .fenlist{
+			display: block;
+		}
+		[v-cloak]{
+			display: none;
+		}
+	</style>
+</head>
+<body>
+<!--头部-->
+<div class="content" id="mallOrderBaseDetail"  v-cloak>
+	<div class="bz-bb pl20 pr20 pt20 flex">
+		<blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor fz12" style="height: 130px;flex: 1;">
+			<p class="t-c fz16 line-middle">工程商</p>
+			<p class="line-middle pl20">账号：{{todos.buyerAccountId}}</p>
+			<p class="line-middle pl20">用户名：{{todos.buyerUserRealName}}</p>
+			<p class="line-middle pl20">公司名称：{{todos.buyerAccountName}}</p>
+		</blockquote>
+		<blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor ml20 mr20" style="height: 130px;flex: 1;">
+			<p class="t-c fz16">分销商</p>
+			<p class="line-middle pl20">公司名称：{{todos.sellerAccountName}}</p>
+			<p class="line-middle pl20">联系人：{{todos.sellerLinkman}}</p>
+			<p class="line-middle pl20">手机号：{{todos.sellerLinkmanTelephone}}</p>
+		</blockquote>
+		<blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="height: 130px;flex: 1;">
+			<p class="t-c fz16">专属客户经理：{{todos.accountManagerName}}</p>
+			<p class="line-middle pl20">手机：{{todos.accountManagerMobile}}</p>
+			<p class="line-middle pl20">QQ：{{todos.accountManagerQQ}}</p>
+			<p class="line-middle pl20">邮箱：{{todos.accountManagerEmail}}</p>
+		</blockquote>
+	</div>
+	<div class="bz-bb pl20 pr20 pt20">
+		<blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor bg-f0" style="padding: 0">
+			<form action="" class="jun-form-s form-css">
+				<dl class="dl-form" style="margin-bottom: 0">
+					<dt class="flt w78">订单编号：</dt>
+					<dd class="flt line-middle w200 c-2">{{todos.orderId}}</dd>
+					<dt class="flt">订单状态：</dt>
+					<dd class="flt line-middle w200"><span class="c-f">{{todos.statusCname}}</span><span class="c-9 ml10"></span>{{todos.updateTime}}</dd>
+					<dt class="flt">价格：</dt>
+					<dd class="flt line-middle w200"><span class="c-f">{{todos.totalOrderAmount}}</span>元</dd>
+				</dl>
+				<dl class="dl-form" style="margin-bottom: 0">
+					<dt class="flt">回复交期：</dt>
+					<dd class="flt line-middle fw-b w200 c-2">{{todos.confirmDeliveryDate}}</dd>
+					<dd class="flt ml20"><span class="form-btn layui-btn-itoc layui-btn-small2" onclick="sendDelivery('{{todos.orderId}}')">发货</span></dd>
+				</dl>
+				<dl class="dl-form" style="margin-bottom: 0">
+					<dt class="flt w78">卖方：</dt>
+					<dd class="flt line-middle w200"><span class="c-f">{{todos.sellerAccountName}}</span></dd>
+					<dt class="flt">专属客户经理：</dt>
+					<dd class="flt line-middle"><span class="c-2">{{todos.accountManagerName| nullValue}}</span><span class="c-9">手机：{{todos.accountManagerMobile | nullValue}}/邮箱：{{todos.accountManagerEmail | nullValue}}/qq：{{todos.accountManagerQQ | nullValue}}</span></dd>
+
+				</dl>
+			</form>
+		</blockquote>
+			<h3 class="mb5 fw-b">商城商品</h3>
+			<table class="layui-table pop">
+				<colgroup>
+					<col  width="400">
+					<col  width="100">
+					<col  width="200">
+					<col  width="100">
+					<col  width="200">
+					<col  width="100">
+					<col  width="100">
+				</colgroup>
+				<thead>
+					<tr>
+						<th>商品信息</th>
+						<th >描述</th>
+						<th >数量</th>
+						<th >计量单位</th>
+						<th ><span>*</span>商品报价(含税/不含税)</th>
+						<th >报价小计</th>
+					</tr>
+				</thead>
+				<tbody>
+				<tr  v-for="item in skuList">
+					<td class="goods-detail">
+						<dl>
+							<dt><img v-bind:src="item.imgUrl"  alt="">
+							<p>{{item.skuBrandName}}</p>
+							</dt>
+							<dd class="t-l ml10">
+								<p class="one-row c-2">{{item.skuName}}</p>
+								<p class="mt10">商品型号:{{item.skuMode}}</p>
+								<p>商品编码:{{item.skuId}}</p>
+								<p>{{item.skuProperty}}</p>
+							</dd>
+						</dl>
+					</td>
+					<td>{{item.remark}}</td>
+					<td>{{item.skuQuantity}}</td>
+					<td>{{item.skuUnitName}}</td>
+					<td>{{item.skuOfferPrice}}</td>
+					<td>{{item.skuOfferAmount}}</td>
+				</tr>
+				</tbody>
+			</table>
+
+		<div class="mt20">
+			<form action="" class="jun-form-s form-css clr">
+				<dl class="dl-form frt mb10-i">
+					<dt class="flt">商品总报价：</dt>
+					<dd class="flt line-middle w100">{{item.totalSkuOrderAmount}}</dd>
+					<dd class="flt line-middle ml5">元</dd>
+				</dl>
+				<dl class="dl-form frt mb10-i">
+					<dt class="flt">运费：</dt>
+					<dd class="flt line-middle w100">{{item.totalDeliveryOrderAmount}}</dd>
+					<dd class="flt line-middle ml5">元</dd>
+				</dl>
+				<dl class="dl-form frt mb10-i">
+					<dt class="flt">其他费用描述：</dt>
+					<dd class="flt line-middle w100">{{item.totalOtherExpenseRemark}}</dd>
+					<dd class="flt line-middle ml5"></dd>
+					<dt class="flt">金额：</dt>
+					<dd class="flt line-middle w100">{{item.totalOtherExpenseOrderAmount}}</dd>
+					<dd class="flt line-middle ml5">元</dd>
+				</dl>
+				<dl class="dl-form frt mb5-i" >
+					<dt class="flt">总价：</dt>
+					<dd class="flt line-middle w100">{{item.totalOrderAmount}}</dd>
+					<dd class="flt line-middle ml5">元</dd>
+				</dl>
+			</form>
+		</div>
+		<div class="clr">
+			<div class="flt" style="width: 68%;margin-right:2%;">
+				<h3 class="mt20 fz16 bg-f0 h3-tittle pl10">详细信息</h3>
+				<blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="height:280px;">
+					<form action="" class="jun-form-s form-css ml20">
+						<dl class="dl-form mb5-i">
+							<dt class="flt">配送方式：</dt>
+							<dd class="flt line-middle c-2">{{todos.deliveryModeCname}}</dd>
+						</dl>
+						<dl class="dl-form mb5-i">
+							<dt class="flt">收货地：</dt>
+							<dd class="flt line-middle c-2">{{todos.inquiryOrderProvince}}{{todos.inquiryOrderCity}}</dd>
+						</dl>
+						<dl class="dl-form mb5-i">
+							<dt class="flt">详细地址：</dt>
+							<dd class="flt line-middle c-2">{{todos.corporationAddress}}</dd>
+						</dl>
+						<dl class="dl-form mb5-i layui-form">
+							<dt class="flt">结算方式：</dt>
+							<dd class="flt line-middle c-2">{{todos.payModeCname}}</dd>
+						</dl>
+						<dl class="dl-form mb5-i">
+							<dt class="flt">是否开票：</dt>
+							<dd class="flt line-middle  c-2">{{todos.isNeedInvoiceCname}}</dd>
+						</dl>
+						<dl class="dl-form mb5-i">
+							<dt class="flt">发票信息：</dt>
+							<dd class="flt line-middle c-2" >开票单位名称:{{todos.corporationName}}/纳税人识别码:{{todos.taxpayerIdentificationNumber}}/注册地址:{{todos.corporationAddress}}/开户银行:{{todos.corporationBankDesc}}/银行账号:{{todos.corporationBankAccount}}</dd>
+						</dl>
+						<dl class="dl-form mb5-i">
+							<dt class="flt">收票地址：</dt>
+							<dd class="flt line-middle c-2" >{{todos.invoiceConsigneeAddress}}</dd>
+						</dl>
+						<dl class="dl-form mb5-i">
+							<dt class="flt fz12">备注：</dt>
+							<dd class="flt line-middle  c-2" style="width: 500px;">{{todos.remark}}</dd>
+						</dl>
+					</form>
+				</blockquote>
+			</div>
+			<div class="flt" style="width: 30%;">
+				<h3 class="mt20 fz16 bg-f0 h3-tittle pl10">发货信息</h3>
+				<blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor" style="height:280px;">
+					<form action="" class="jun-form-s form-css">
+						<dl class="dl-form mb5-i">
+							<dt class="flt">发货日期：</dt>
+							<dd class="flt line-middle c-2">{{deliveryLogList.deliveryTime}}</dd>
+						</dl>
+						<dl class="dl-form mb5-i">
+							<dt class="flt">物流公司：</dt>
+							<dd class="flt line-middle c-2">{{deliveryLogList.transportCorporationName}}</dd>
+						</dl>
+						<dl class="dl-form mb5-i">
+							<dt class="flt">单号：</dt>
+							<dd class="flt line-middle c-2">{{deliveryLogList.transportNo}}</dd>
+						</dl>
+						<dl class="dl-form mb5-i layui-form">
+							<dt class="flt" style="width: 110px;margin-left: -20px;">物流公司联系人：</dt>
+							<dd class="flt line-middle c-2">{{deliveryLogList.contactsName}}</dd>
+						</dl>
+						<dl class="dl-form mb5-i">
+							<dt class="flt">物流联系方式：</dt>
+							<dd class="flt line-middle  c-2">{{deliveryLogList.contactsMobileOrFixedPhoneNumber}}</dd>
+						</dl>
+						<dl class="dl-form mb5-i">
+							<dt class="flt fz12"><span class="form-btn  layui-btn-normal layui-btn-small2" onclick="sendDelivery('{{todos.orderId}}')">发货</span></dt>
+						</dl>
+					</form>
+				</blockquote>
+			</div>
+		</div>
+		<h3 class="mt20 fz16 bg-f0 h3-tittle pl10">双方确认合同</h3>
+		<blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+			<table class="layui-table pop mb5-i">
+				<colgroup>
+					<col  width="100">
+					<col  width="200">
+				</colgroup>
+				<tbody>
+				<tr >
+					<td class="bg-f0  t-l">
+						<p>买方账号：{{todos.buyerUserMobile}}</p>
+						<p class="mt5">姓名：{{todos.buyerUserRealName}}</p>
+						<p class="mt5">公司名称：{{todos.buyerAccountName}}</p>
+					</td>
+					<td>
+						<ul id="buyerAttachmentList" class="attachmentFileList clr" v-for="item in buyerAttachmentList">
+							<li class="flex flt"><p class="t-l" style="flex: 5;" onclick="downLoadFile('{{item.attachmentId}}')">{{item.attachmentName}}</p>
+								<button class="form-btn  layui-btn-normal layui-btn-mini mt5" lay-filter="formDemo">下载</button></li>
+						</ul>
+					</td>
+				</tr>
+				<tr>
+					<td class="bg-f0  t-l">
+						<p>买方账号：{{todos.buyerUserMobile}}</p>
+						<p class="mt5">姓名：{{todos.buyerUserRealName}}</p>
+						<p class="mt5">公司名称：{{todos.buyerAccountName}}</p>
+					</td>
+					<td>
+						<ul id="sellerAttachmentList" class="attachmentFileList clr" v-for="item in sellerAttachmentList">
+							<li class="flex flt"><p class="t-l" style="flex: 5;" onclick="downLoadFile('{{item.attachmentId}}')" >{{item.attachmentName}}</p>
+								<a class="delete" href="javadcript:;" style="flex: 1;" onclick="deleteAttachmentFile('{{item.attachmentId}}')">删除</a></li>
+						</ul>
+						<div class="t-l" v-show="attachment">
+							<input type="file" name="file" id="sellerAttachmentFileBtn"  class="layui-upload-file inline" lay-title="上传合同" />
+							<p class="msg fz12 c-9 inline ml10">最多5个附件,单个附件8M以内,格式不限</p>
+						</div>
+					</td>
+				</tr>
+				</tbody>
+			</table>
+		</blockquote>
+		<h3 class="mt20 fz16 bg-f0 h3-tittle pl10">操作日志 <span class="c-h frt fz12 cs-p under-l mr20"   @click="fn()">{{word}}></span></h3>
+		<blockquote class="layui-elem-quote layui-quote-nm layui-elem-bor">
+			<table class="layui-table pop mb5-i" lay-skin="line" v-show="willShow">
+				<colgroup>
+					<col  width="200">
+					<col  width="200">
+					<col  width="200">
+					<col  width="400">
+					<col  width="200">
+				</colgroup>
+				<thead>
+				<tr>
+					<th >时间</th>
+					<th >操作人</th>
+					<th >询单状态</th>
+					<th >操作内容</th>
+					<th >操作</th>
+				</tr>
+				</thead>
+				<tbody >
+				<tr v-show="orderLogList.length==0">
+					<td  colspan="5" height="50px"  align="center">
+						<span class="fz16">暂无相关信息</span>
+					</td>
+				</tr>
+				<tr v-for="item in orderLogList">
+					<td>{{item.operationTime}}</td>
+					<td>{{item.operationName}}</td>
+					<td>{{item.statusCname}}</td>
+					<td>{{item.operationContent}}</td>
+				</tr>
+				</tbody>
+			</table>
+		</blockquote>
+	</div>
+</div>
+<!--底部-->
+<#include "/res/freemarkerTpl/unitConfig.html" />
+<@unitConfig/>
+
+<script type="text/javascript">
+    //页面加载完后调用
+    $(function () {
+		postUtil.call(apiUrl.queryMallOrderDetail, {"orderId" : ${orderId}}, function (result) {
+			if (result.STATUS == "SUCCESS") {
+				mallOrderBaseDetail(result.DATA);
+			} else {
+				alert(result.MSG);
+			}
+		});
+    });
+	var vm;
+    function mallOrderBaseDetail(value){
+        console.log(value)
+		Vue.filter('nullValue',function(input){
+			if(input=="" || input == undefined){
+				input="--";
+			}
+			return input
+		});
+		vm = new Vue({
+            el:'#mallOrderBaseDetail',
+            data:{
+                todos: value,
+                skuList: value.skuList,
+                deliveryLogList : value.deliveryLogList,
+                buyerAttachmentList : value.buyerAttachmentList,
+                sellerAttachmentList : value.sellerAttachmentList,
+				orderLogList : value.orderLogList,
+				msg:false,
+				word : "展开",
+				willShow : false,
+				attachment : true,
+                filelist:[]
+
+            },
+			created: function () {
+				this.showData()
+			},
+			methods:{
+				showData:function () {
+					if(this.todos.orderType =="DISTRIBUTORS_ORDER"){
+						this.msg = true;
+					}
+					//隐藏上传文件按钮
+					if(("RECEIVE_WAITING"==this.todos.status||"DELIVERY_WAITING"==this.todos.status) && this.todos.orderType =="PLATFORM_ORDER"){
+						this.attachment = true
+					}
+				},
+				fn:function(){
+					if(this.willShow==true){
+						this.willShow=false;
+						this.word="展开";
+					}else{
+						this.willShow=true;
+						this.word="收起";
+					}
+				}
+			}
+        })
+    }
+
+
+	layui.use('upload', function(){
+		layui.upload({
+			elem: "#sellerAttachmentFileBtn",
+			ext: 'jpg|png|pdf|zip',
+			skin: 'upload',
+			url: '/file_server/mall/generalFileUpload', //上传接口
+			before: function (input) {
+				// //返回的参数item，即为当前的input DOM对象
+				// console.log('文件上传中');
+			},
+			success: function (result) { //上传成功后的回调
+				if(vm.$data.sellerAttachmentList.length <= 4) {
+					if (result.STATUS == "SUCCESS") {
+						for (var i = 0; i < result.data.length; i++) {
+							var tempFile = {};
+							tempFile.attachmentName = result.data[i].MALL_FILE_NAME;
+							tempFile.attachmentId = result.data[i].MALL_FILE_ATTACHMENT_ID;
+							vm.$data.sellerAttachmentList.push(tempFile);
+							param.orderId=vm.$data.todos.orderId;
+							param.attachmentFileListStr = tempFile.attachmentId + "|" + tempFile.attachmentName;
+							//上传订单附件
+							postUtil.call(apiUrl.createMallOrderContractUploadLog, param)
+						}
+					} else {
+						alert("上传过程中出现异常，请稍后再试");
+					}
+				}else{
+					alert("合同只能上传5份");
+				}
+			}
+		});
+
+	});
+
+	//删除附件
+	function deleteAttachmentFile(attachmentId){
+		layer.open({
+			title: '操作提示',
+			skin: 'myskin',
+			area: ['450px', '280px'],
+			btnAlign: 'c',
+			content: '<p style="text-align: center;margin-top: 50px;" >确定删除此附件吗？</p>',
+			btn: ['确认', '取消'],
+			yes: function (index, layero) {
+				var attachmentList = vm.$data.buyerAttachmentList;
+				for (var i = 0; i < attachmentList.length; i++) {
+					var tempAttachmentFile = attachmentList[i];
+					if (tempAttachmentFile.attachmentId == attachmentId) {
+						var param={};
+						param.attachmentId=attachmentId;
+						vm.$data.buyerAttachmentList.splice(i, 1);
+						postUtil.call(apiUrl.deleteMallOrderContractUploadLog, param);
+						break;
+					}
+				}
+				layer.close(index);
+			}, btn2: function (index, layero) {
+				layer.close(index);
+			},
+			cancel: function () {
+				//右上角关闭回调
+			}
+		});
+	}
+
+	function downLoadFile(id) {
+		var param = {};
+		param.fileAttachmentId = id;
+		postUtil.submit("/file_server/mall/generalFileDownload",param);
+	}
+
+
+	function sendDelivery(orderId){
+		var param={};
+		var content = '';
+		content += '<form action="" class="jun-form-s form-css ml20">' ;
+		content +='<dl class="dl-form mt20">' ;
+		content +='<dt class="flt"><span class="c-f">*</span>物流信息：</dt>' ;
+		content +='<dd class="flt"><input type="text" name="title" id="transportCorporationName"  placeholder="请输入标题" autocomplete="off" class="layui-input"></dd>' ;
+		content +='</dl><dl class="dl-form">' ;
+		content +='<dt class="flt"><span class="c-f">*</span>单号：</dt>';
+		content +='<dd class="flt"><input type="text" name="title" id="transportNo"  placeholder="请输入标题" autocomplete="off" class="layui-input"></dd>' ;
+		content +='</dl><dl class="dl-form">' ;
+		content +='<dt class="flt" style="width: 110px;margin-left: -20px;">物流公司联系人：</dt>' ;
+		content +='<dd class="flt"><input type="text" name="title" id="contactsName"  placeholder="请输入标题" autocomplete="off" class="layui-input"></dd>' ;
+		content +='</dl><dl class="dl-form">' ;
+		content +='<dt class="flt">物流联系方式：</dt>';
+		content +='<dd class="flt"><input type="text" name="title" id="contactsMobileOrFixedPhoneNumber" placeholder="请输入标题" autocomplete="off" class="layui-input"></dd>' ;
+		content +='</dl></form>';
+		layer.open({
+			title: '操作提示',
+			skin: 'msgskin',
+			area: ['450px', '380px'],
+			btnAlign: 'c',
+			content: content,
+			btn: ['确认收货', '取消'],
+			yes: function(index, layero){
+				var param={};
+				param.orderId=orderId;
+				param.transportCorporationName = $("#transportCorporationName").val();
+				param.transportNo = $("#transportNo").val();
+				param.contactsName = $("#contactsName").val();
+				param.contactsMobileOrFixedPhoneNumber = $("#contactsMobileOrFixedPhoneNumber").val();
+				if(param.transportCorporationName == "" || param.transportCorporationName == null){
+					alert("请填写物流信息");
+					return;
+				}
+				if(param.transportNo =="" || param.transportNo == null){
+					alert("请填写物流单号");
+					return;
+				}
+				postUtil.call('/mallOrder/api/updateDeliveryComplete',param,function(result){
+					postUtil.submit("/mallOrder/api/preList");
+				});
+			},btn2: function(index, layero){
+				//取消的回调
+			},
+			cancel: function(){
+				//右上角关闭回调
+				postUtil.submit("/mallOrder/api/preList");
+			}
+		});
+	};
+
+</script>
+</body>
+
+</html>
+
